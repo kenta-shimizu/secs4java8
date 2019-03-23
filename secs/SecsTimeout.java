@@ -11,7 +11,7 @@ public class SecsTimeout {
 	private float t7;
 	private float t8;
 
-	public SecsTimeout() {
+	protected SecsTimeout() {
 		t1 =  1.0F;
 		t2 = 15.0F;
 		t3 = 45.0F;
@@ -22,96 +22,160 @@ public class SecsTimeout {
 		t8 =  6.0F;
 	}
 	
+	/**
+	 * 
+	 * @param T1-timeout seconds
+	 */
 	public void t1(float v) {
 		synchronized ( this ) {
 			t1 = v;
 		}
 	}
 	
+	/**
+	 * 
+	 * @return seconds
+	 */
 	public float t1() {
 		synchronized ( this ) {
 			return t1;
 		}
 	}
 	
+	/**
+	 * 
+	 * @param T2-timeout seconds
+	 */
 	public void t2(float v) {
 		synchronized ( this ) {
 			t2 = v;
 		}
 	}
 	
+	/**
+	 * 
+	 * @return seconds
+	 */
 	public float t2() {
 		synchronized ( this ) {
 			return t2;
 		}
 	}
 	
+	/**
+	 * 
+	 * @param T3-timeout seconds
+	 */
 	public void t3(float v) {
 		synchronized ( this ) {
 			t3 = v;
 		}
 	}
 	
+	/**
+	 * 
+	 * @return seconds
+	 */
 	public float t3() {
 		synchronized ( this ) {
 			return t3;
 		}
 	}
 	
+	/**
+	 * 
+	 * @param T4-timeout seconds
+	 */
 	public void t4(float v) {
 		synchronized ( this ) {
 			t4 = v;
 		}
 	}
 	
+	/**
+	 * 
+	 * @return seconds
+	 */
 	public float t4() {
 		synchronized ( this ) {
 			return t4;
 		}
 	}
 	
+	/**
+	 * 
+	 * @param T5-timeout seconds
+	 */
 	public void t5(float v) {
 		synchronized ( this ) {
 			t5 = v;
 		}
 	}
 	
+	/**
+	 * 
+	 * @return seconds
+	 */
 	public float t5() {
 		synchronized ( this ) {
 			return t5;
 		}
 	}
 	
+	/**
+	 * 
+	 * @param T6-timeout seconds
+	 */
 	public void t6(float v) {
 		synchronized ( this ) {
 			t6 = v;
 		}
 	}
 	
+	/**
+	 * 
+	 * @return seconds
+	 */
 	public float t6() {
 		synchronized ( this ) {
 			return t6;
 		}
 	}
 	
+	/**
+	 * 
+	 * @param T7-timeout seconds
+	 */
 	public void t7(float v) {
 		synchronized ( this ) {
 			t7 = v;
 		}
 	}
 	
+	/**
+	 * 
+	 * @return seconds
+	 */
 	public float t7() {
 		synchronized ( this ) {
 			return t7;
 		}
 	}
 	
+	/**
+	 * 
+	 * @param T8-timeout seconds
+	 */
 	public void t8(float v) {
 		synchronized ( this ) {
 			t8 = v;
 		}
 	}
 	
+	/**
+	 * 
+	 * @return seconds
+	 */
 	public float t8() {
 		synchronized ( this ) {
 			return t8;

@@ -105,8 +105,8 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		throw new Secs2IrregalDataFormatException("Not Secs2Ascii");
 	}
 	
-	public final byte getByte( int... indices_plus1 ) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices_plus1);
+	public final byte getByte( int... indices ) throws Secs2Exception {
+		LinkedList<Integer> list = createLinkedList(indices);
 		int lastIndex = list.removeLast();
 		return get(list).getByte(lastIndex);
 	}
@@ -115,8 +115,8 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		throw new Secs2IrregalDataFormatException("Not Secs2Byte");
 	}
 	
-	public final boolean getBoolean( int... indices_plus1 ) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices_plus1);
+	public final boolean getBoolean( int... indices ) throws Secs2Exception {
+		LinkedList<Integer> list = createLinkedList(indices);
 		int lastIndex = list.removeLast();
 		return get(list).getBoolean(lastIndex);
 	}
@@ -125,8 +125,8 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		throw new Secs2IrregalDataFormatException("Not Secs2Boolean");
 	}
 	
-	public final int getInt( int... indices_plus1 ) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices_plus1);
+	public final int getInt( int... indices ) throws Secs2Exception {
+		LinkedList<Integer> list = createLinkedList(indices);
 		int lastIndex = list.removeLast();
 		return get(list).getInt(lastIndex);
 	}
@@ -135,8 +135,8 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		throw new Secs2IrregalDataFormatException("Not Secs2Number");
 	}
 	
-	public final long getLong( int... indices_plus1 ) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices_plus1);
+	public final long getLong( int... indices ) throws Secs2Exception {
+		LinkedList<Integer> list = createLinkedList(indices);
 		int lastIndex = list.removeLast();
 		return get(list).getLong(lastIndex);
 	}
@@ -145,8 +145,8 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		throw new Secs2IrregalDataFormatException("Not Secs2Number");
 	}
 	
-	public final BigInteger getBigInteger( int... indices_plus1 ) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices_plus1);
+	public final BigInteger getBigInteger( int... indices ) throws Secs2Exception {
+		LinkedList<Integer> list = createLinkedList(indices);
 		int lastIndex = list.removeLast();
 		return get(list).getBigInteger(lastIndex);
 	}
@@ -155,8 +155,8 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		throw new Secs2IrregalDataFormatException("Not Secs2Number");
 	}
 	
-	public final float getFloat( int... indices_plus1 ) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices_plus1);
+	public final float getFloat( int... indices ) throws Secs2Exception {
+		LinkedList<Integer> list = createLinkedList(indices);
 		int lastIndex = list.removeLast();
 		return get(list).getFloat(lastIndex);
 	}
@@ -165,8 +165,8 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		throw new Secs2IrregalDataFormatException("Not Secs2Float");
 	}
 	
-	public final double getDouble( int... indices_plus1 ) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices_plus1);
+	public final double getDouble( int... indices1 ) throws Secs2Exception {
+		LinkedList<Integer> list = createLinkedList(indices1);
 		int lastIndex = list.removeLast();
 		return get(list).getDouble(lastIndex);
 	}

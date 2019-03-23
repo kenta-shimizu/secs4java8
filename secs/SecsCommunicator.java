@@ -7,12 +7,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class SecsCommunicator implements Closeable {
 
-	private final SecsConfig config;
+	private final SecsCommunicatorConfig config;
 	
 	private boolean opened;
 	private boolean closed;
 	
-	public SecsCommunicator(SecsConfig config) {
+	public SecsCommunicator(SecsCommunicatorConfig config) {
 		
 		this.config = config;
 		
@@ -23,6 +23,7 @@ public abstract class SecsCommunicator implements Closeable {
 	public void open() throws IOException {
 		
 		synchronized ( this ) {
+			
 			if ( closed ) {
 				throw new IOException("Already closed");
 			}
@@ -39,6 +40,7 @@ public abstract class SecsCommunicator implements Closeable {
 	public void close() throws IOException {
 		
 		synchronized ( this ) {
+			
 			if ( closed ) {
 				return ;
 			}

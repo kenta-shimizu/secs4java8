@@ -1,13 +1,13 @@
 package secs;
 
-public class SecsConfig {
+public class SecsCommunicatorConfig {
 	
 	private final SecsTimeout timeout = new SecsTimeout();
 	
 	private int deviceId;
 	private boolean isEquip;
 	
-	public SecsConfig() {
+	public SecsCommunicatorConfig() {
 		deviceId = 10;
 		isEquip = false;
 	}
