@@ -1,6 +1,7 @@
 package secs.hsmsSs;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import secs.SecsMessage;
 import secs.secs2.Secs2;
@@ -14,6 +15,9 @@ public class HsmsSsMessage extends SecsMessage {
 	
 	public HsmsSsMessage(byte[] head, Secs2 body) {
 		
+		Objects.requireNonNull(head);
+		Objects.requireNonNull(body);
+		
 		if ( head.length != HEAD_SIZE ) {
 			throw new IllegalArgumentException("head size is not " + HEAD_SIZE);
 		}
@@ -21,7 +25,11 @@ public class HsmsSsMessage extends SecsMessage {
 		this.head = Arrays.copyOf(head, HEAD_SIZE);
 		this.body = body;
 	}
-
+	
+	public HsmsSsMessage(byte[] head) {
+		this(head, Secs2.empty());
+	}
+	
 	@Override
 	public int getStream() {
 		return (head[2] & 0x7F);
@@ -44,9 +52,11 @@ public class HsmsSsMessage extends SecsMessage {
 
 	@Override
 	public int deviceId() {
-		
-		// TODO Auto-generated method stub
-		return 0;
+		if ( dataMessage() ) {
+			return ((head[0] << 8) & 0x7F00) | (head[1] & 0xFF);
+		} else {
+			throw new IllegalStateException("HsmsSsMessage is not DataMessage");
+		}
 	}
 	
 	protected boolean dataMessage() {
@@ -57,7 +67,20 @@ public class HsmsSsMessage extends SecsMessage {
 	}
 	
 	@Override
+	protected Integer systemBytesKey() {
+		
+		int key;
+		key =  (head[6] << 24) & 0xFF000000;
+		key |= (head[7] << 16) & 0x00FF0000;
+		key |= (head[8] <<  8) & 0x0000FF00;
+		key |= (head[9]      ) & 0x000000FF;
+		
+		return Integer.valueOf(key);
+	}
+	
+	@Override
 	protected String toHeaderBytesString() {
+		
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -20,11 +20,13 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	});
 	
 	private final HsmsSsCommunicatorConfig hsmsSsConfig;
+	private final HsmsSsMessageAnswerManager answerManager;
 
 	public HsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);
 		
 		this.hsmsSsConfig = config;
+		this.answerManager = new HsmsSsMessageAnswerManager(execServ);
 	}
 	
 	protected ExecutorService executorServicde() {
@@ -33,6 +35,10 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	
 	protected HsmsSsCommunicatorConfig hsmsSsConfig() {
 		return hsmsSsConfig;
+	}
+	
+	protected HsmsSsMessageAnswerManager answerManager() {
+		return answerManager;
 	}
 	
 	private final BlockingQueue<HsmsSsMessage> recvDataMsgQueue = new LinkedBlockingQueue<>();

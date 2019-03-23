@@ -15,6 +15,7 @@ public abstract class SecsMessage {
 	
 	abstract public int deviceId();
 	
+	abstract protected Integer systemBytesKey();
 	abstract protected String toHeaderBytesString();
 	
 }

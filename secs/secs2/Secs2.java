@@ -196,8 +196,14 @@ public abstract class Secs2 implements Iterable<Secs2> {
 	
 	protected abstract String toStringValue();
 	
-	//TODO
-	//parse
+	public static Secs2 empty() {
+		return new Secs2BytesParser();
+	}
+	
+	public static Secs2 parse(byte[] bs) {
+		return new Secs2BytesParser(bs);
+	}
+	
 	
 	//TODO
 	//builder
