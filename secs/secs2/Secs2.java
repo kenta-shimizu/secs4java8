@@ -195,6 +195,11 @@ public abstract class Secs2 implements Iterable<Secs2> {
 	public abstract Secs2Item secs2Item();
 	
 	protected abstract String toStringValue();
-
-
+	
+	//TODO
+	//parse
+	
+	//TODO
+	//builder
+	
 }
