@@ -58,6 +58,7 @@ public abstract class SecsCommunicator implements Closeable {
 	//send
 	
 	
+	/* Secs-Message Receive Listener */
 	private final Collection<SecsMessageReceiveListener> msgRecvListeners = new CopyOnWriteArrayList<>();
 	
 	public boolean addSecsMessageReceiveListener(SecsMessageReceiveListener lstnr) {
@@ -68,15 +69,30 @@ public abstract class SecsCommunicator implements Closeable {
 		return msgRecvListeners.remove(lstnr);
 	}
 	
-	protected void putReceiveMessage(SecsMessage msg) {
+	protected void notifyReceiveMessage(SecsMessage msg) {
 		msgRecvListeners.forEach(lstnr -> {
 			lstnr.receive(msg);
 		});
 	}
 	
 	
-	//TODO
-	//log
+	/* Secs-Log Receive Listener */
+	private final Collection<SecsLogListener> logListeners = new CopyOnWriteArrayList<>();
+	
+	public boolean addSecsLogListener(SecsLogListener lstnr) {
+		return logListeners.add(lstnr);
+	}
+	
+	public boolean removeSecsLogListener(SecsLogListener lstnr) {
+		return logListeners.remove(lstnr);
+	}
+	
+	protected void notifyLog(SecsLog log) {
+		logListeners.forEach(lstnr -> {
+			lstnr.receive(log);
+		});
+	}
+	
 	
 	//TOOD
 	//communication

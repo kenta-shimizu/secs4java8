@@ -87,8 +87,8 @@ public class Secs1Message extends SecsMessage {
 	
 	@Override
 	public int deviceId() {
-		byte[] b = head();
-		return ((b[0] << 8) & 0x7F00) | (b[1] & 0xFF);
+		byte[] bs = head();
+		return ((bs[0] << 8) & 0x7F00) | (bs[1] & 0xFF);
 	}
 	
 	private synchronized List<Secs1MessageBlock> parseBlocks() {
@@ -103,6 +103,11 @@ public class Secs1Message extends SecsMessage {
 	
 	public List<Secs1MessageBlock> blocks() {
 		return parseBlocks();
+	}
+	
+	protected byte[] header10Bytes() {
+		byte[] bs = head();
+		return Arrays.copyOf(bs, bs.length);
 	}
 	
 	@Override

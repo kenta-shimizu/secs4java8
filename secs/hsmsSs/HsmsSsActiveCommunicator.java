@@ -3,6 +3,7 @@ package secs.hsmsSs;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 
@@ -18,7 +19,13 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 			throw new IOException("HsmsSsCommunicatorConfig#protocol is not ACTIVE");
 		}
 		
-		//TODO
+		executorService().execute(() -> {
+			try {
+				loop();
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		});
 		
 	}
 	
@@ -39,6 +46,19 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 		
 		if ( ! ioExcepts.isEmpty() ) {
 			throw ioExcepts.get(0);
+		}
+	}
+	
+	private void loop() throws InterruptedException {
+		
+		for ( ;; ) {
+			
+			//TODO
+			//circuit
+			
+			
+			long t5 = (long)(hsmsSsConfig().timeout().t5() * 1000.0F);
+			TimeUnit.MILLISECONDS.sleep(t5);
 		}
 	}
 

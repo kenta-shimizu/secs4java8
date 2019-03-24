@@ -9,12 +9,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class SecsMessageAnswerManager<T extends SecsMessage> {
+public class SecsMessageReplyManager<T extends SecsMessage> {
 	
 	private final ExecutorService execServ;
 	private final Map<Integer, T> map = new HashMap<>();
 	
-	public SecsMessageAnswerManager(ExecutorService es) {
+	public SecsMessageReplyManager(ExecutorService es) {
 		this.execServ = es;
 	}
 	
@@ -39,13 +39,13 @@ public class SecsMessageAnswerManager<T extends SecsMessage> {
 	 * 
 	 * @param primary-message
 	 * @param timeout-seconds
-	 * @return 2nd-message
+	 * @return 2nd-message if exists
 	 * @throws TimeoutException
 	 * @throws InterruptedException
 	 */
-	public Optional<T> waitAnswer(T msg, float timeout_seconds) throws TimeoutException, InterruptedException {
+	public Optional<T> waitReply(T msg, float timeout_seconds) throws TimeoutException, InterruptedException {
 		
-		if ( isWaitAnswerMessage(msg) ) {
+		if ( isWaitReplyMessage(msg) ) {
 			
 			Future<T> f = execServ.submit(() -> {
 				
@@ -98,7 +98,6 @@ public class SecsMessageAnswerManager<T extends SecsMessage> {
 	
 	/**
 	 * 
-	 * 
 	 * @param msg
 	 * @return Optional.empty() if message is answer-message, else Optional#exist
 	 */
@@ -134,7 +133,14 @@ public class SecsMessageAnswerManager<T extends SecsMessage> {
 		}
 	}
 	
-	protected boolean isWaitAnswerMessage(T msg) {
+	public void clear() {
+		synchronized ( this ) {
+			map.clear();
+			this.notifyAll();
+		}
+	}
+	
+	protected boolean isWaitReplyMessage(T msg) {
 		return msg.wbit();
 	}
 	

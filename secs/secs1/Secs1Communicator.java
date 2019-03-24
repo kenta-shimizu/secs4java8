@@ -11,9 +11,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import secs.SecsCommunicator;
-import secs.SecsMessageAnswerManager;
+import secs.SecsMessageReplyManager;
 
 public abstract class Secs1Communicator extends SecsCommunicator {
+	
+	protected static final byte ENQ = (byte)0x05;
+	protected static final byte EOT = (byte)0x04;
+	protected static final byte ACK = (byte)0x06;
+	protected static final byte NAK = (byte)0x15;
+	
 	
 	private final ExecutorService execServ = Executors.newCachedThreadPool(r -> {
 		Thread th = new Thread(r);
@@ -22,7 +28,7 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 	});
 	
 	private final Secs1MessageBlockManager blockManager;
-	private final SecsMessageAnswerManager<Secs1Message> answerManager;
+	private final SecsMessageReplyManager<Secs1Message> replyManager;
 	
 	private final Secs1CommunicatorConfig secs1Config;
 	
@@ -31,7 +37,7 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		
 		this.secs1Config = config;
 		this.blockManager = new Secs1MessageBlockManager(config);
-		this.answerManager = new SecsMessageAnswerManager<>(execServ);
+		this.replyManager = new SecsMessageReplyManager<>(execServ);
 	}
 	
 	protected Secs1CommunicatorConfig secs1Config() {
@@ -42,10 +48,12 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		return execServ;
 	}
 	
+	
 	abstract protected void sendByte(byte b) throws IOException;
 	abstract protected void sendByte(byte[] bs) throws IOException;
-	abstract protected Byte pollByte() throws InterruptedException;
+	abstract protected Optional<Byte> pollByte() throws InterruptedException;
 	abstract protected Optional<Byte> pollByte(long timeout, TimeUnit unit) throws InterruptedException;
+	
 	
 	private Optional<Byte> pollByteTx(float v) throws InterruptedException {
 		return pollByte((long)(v * 1000.0F), TimeUnit.MILLISECONDS);
@@ -72,11 +80,7 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		
 		blockManager.addSecs1MessageReceiveListener(msg -> {
 			try {
-				
-				//TODO
-				
 				recvMsgQueue.put(msg);
-				
 			}
 			catch ( InterruptedException ignore ) {
 			}
@@ -85,16 +89,20 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		execServ.execute(() -> {
 			try {
 				for ( ;; ) {
-					putReceiveMessage(recvMsgQueue.take());
+					replyManager.put(recvMsgQueue.take()).ifPresent(this::notifyReceiveMessage);
 				}
 			}
 			catch ( InterruptedException ignore ) {
 			}
 		});
 		
-		
-		//TODO
-		
+		execServ.execute(() -> {
+			try {
+				loop();
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		});
 	}
 	
 	@Override
@@ -125,4 +133,15 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 			throw ioExcepts.get(0);
 		}
 	}
+	
+	private void loop() throws InterruptedException {
+		
+		for ( ;; ) {
+			
+			//TODO
+		}
+	}
+	
+	
+	
 }

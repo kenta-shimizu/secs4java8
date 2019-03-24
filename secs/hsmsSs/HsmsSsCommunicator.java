@@ -20,16 +20,16 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	});
 	
 	private final HsmsSsCommunicatorConfig hsmsSsConfig;
-	private final HsmsSsMessageAnswerManager answerManager;
+	private final HsmsSsMessageReplyManager replyManager;
 
 	public HsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);
 		
 		this.hsmsSsConfig = config;
-		this.answerManager = new HsmsSsMessageAnswerManager(execServ);
+		this.replyManager = new HsmsSsMessageReplyManager(execServ);
 	}
 	
-	protected ExecutorService executorServicde() {
+	protected ExecutorService executorService() {
 		return execServ;
 	}
 	
@@ -37,8 +37,8 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 		return hsmsSsConfig;
 	}
 	
-	protected HsmsSsMessageAnswerManager answerManager() {
-		return answerManager;
+	protected HsmsSsMessageReplyManager answerManager() {
+		return replyManager;
 	}
 	
 	private final BlockingQueue<HsmsSsMessage> recvDataMsgQueue = new LinkedBlockingQueue<>();
@@ -51,7 +51,7 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 		execServ.execute(() -> {
 			try {
 				for ( ;; ) {
-					putReceiveMessage(recvDataMsgQueue.take());
+					notifyReceiveMessage(recvDataMsgQueue.take());
 				}
 			}
 			catch ( InterruptedException ignore ) {
@@ -87,6 +87,10 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 		if ( ! ioExcepts.isEmpty() ) {
 			throw ioExcepts.get(0);
 		}
+	}
+	
+	protected void putReceiveDataMessage(HsmsSsMessage msg) throws InterruptedException {
+		recvDataMsgQueue.put(msg);
 	}
 	
 	public static HsmsSsCommunicator newInstance(HsmsSsCommunicatorConfig config) {

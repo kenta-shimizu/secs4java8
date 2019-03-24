@@ -60,10 +60,11 @@ public class HsmsSsMessage extends SecsMessage {
 	}
 	
 	protected boolean dataMessage() {
-		
-		//TODO
-		
-		return false;
+		return HsmsSsMessageType.get(this) == HsmsSsMessageType.DATA;
+	}
+	
+	protected byte[] header10Bytes() {
+		return Arrays.copyOf(head, head.length);
 	}
 	
 	@Override
