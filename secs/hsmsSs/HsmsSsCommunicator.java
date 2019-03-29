@@ -20,13 +20,17 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	});
 	
 	private final HsmsSsCommunicatorConfig hsmsSsConfig;
-	private final HsmsSsMessageReplyManager replyManager;
+	private final HsmsSsMessageSendReplyManager sendReplyManager;
 
 	public HsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);
 		
 		this.hsmsSsConfig = config;
-		this.replyManager = new HsmsSsMessageReplyManager(execServ);
+		this.sendReplyManager = new HsmsSsMessageSendReplyManager(execServ, config.timeout(), msg -> {
+			
+			//TODO
+			//send-queue
+		});
 	}
 	
 	protected ExecutorService executorService() {
@@ -37,8 +41,8 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 		return hsmsSsConfig;
 	}
 	
-	protected HsmsSsMessageReplyManager answerManager() {
-		return replyManager;
+	protected HsmsSsMessageSendReplyManager sendReplyManager() {
+		return sendReplyManager;
 	}
 	
 	private final BlockingQueue<HsmsSsMessage> recvDataMsgQueue = new LinkedBlockingQueue<>();

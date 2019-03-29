@@ -3,7 +3,10 @@ package secs;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import secs.secs2.Secs2;
 
 public abstract class SecsCommunicator implements Closeable {
 
@@ -11,6 +14,7 @@ public abstract class SecsCommunicator implements Closeable {
 	
 	private boolean opened;
 	private boolean closed;
+	private boolean lastCommunicatable;
 	
 	public SecsCommunicator(SecsCommunicatorConfig config) {
 		
@@ -18,6 +22,7 @@ public abstract class SecsCommunicator implements Closeable {
 		
 		opened = false;
 		closed = false;
+		lastCommunicatable = false;
 	}
 	
 	public void open() throws IOException {
@@ -53,9 +58,83 @@ public abstract class SecsCommunicator implements Closeable {
 		return config.deviceId();
 	}
 	
+	/**
+	 * Blocking-method<br />
+	 * send primary-message,<br />
+	 * wait until reply-message if exist
+	 * 
+	 * @param strm
+	 * @param func
+	 * @param wbit
+	 * @return reply-message if exist
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<? extends SecsMessage> send(int strm, int func, boolean wbit)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+			, InterruptedException {
+		
+		return send(strm, func, wbit, Secs2.empty());
+	}
 	
-	//TODO
-	//send
+	/**
+	 * Blocking-method<br />
+	 * send primary-message,<br />
+	 * wait until reply-message if exist
+	 * 
+	 * @param strm
+	 * @param func
+	 * @param wbit
+	 * @param secs2
+	 * @return reply-message if exist
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	abstract public Optional<? extends SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+			, InterruptedException;
+	
+	/**
+	 * send reply-message
+	 * 
+	 * @param primary (primary-message)
+	 * @param strm
+	 * @param func
+	 * @param wbit
+	 * @return Optional.empty()
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<? extends SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+			, InterruptedException {
+		
+		return send(primary, strm, func, wbit, Secs2.empty());
+	}
+	
+	/**
+	 * send reply-message
+	 * 
+	 * @param primary (primary-message)
+	 * @param strm
+	 * @param func
+	 * @param wbit
+	 * @param secs2
+	 * @return Optional.empty()
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	abstract public Optional<? extends SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+			, InterruptedException;
 	
 	
 	/* Secs-Message Receive Listener */
@@ -91,6 +170,39 @@ public abstract class SecsCommunicator implements Closeable {
 		logListeners.forEach(lstnr -> {
 			lstnr.receive(log);
 		});
+	}
+	
+	
+	/* Secs-Communicatable-State-Changed-Listener */
+	private final Collection<SecsCommunicatableStateChangeListener> commStateChangeListeners = new CopyOnWriteArrayList<>();
+	
+	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener lstnr) {
+		
+		synchronized ( this ) {
+			
+			lstnr.changed(lastCommunicatable);
+			
+			return commStateChangeListeners.add(lstnr);
+		}
+	}
+	
+	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener lstnr) {
+		return commStateChangeListeners.remove(lstnr);
+	}
+	
+	protected void notifyCommunicatableStateChange(boolean communicatable) {
+		
+		synchronized ( this ) {
+			
+			if ( lastCommunicatable != communicatable ) {
+				
+				lastCommunicatable = communicatable;
+				
+				commStateChangeListeners.forEach(lstnr -> {
+					lstnr.changed(lastCommunicatable);
+				});
+			}
+		}
 	}
 	
 	

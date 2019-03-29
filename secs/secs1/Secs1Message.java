@@ -1,5 +1,8 @@
 package secs.secs1;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -7,10 +10,12 @@ import java.util.Objects;
 
 import secs.SecsMessage;
 import secs.secs2.Secs2;
+import secs.secs2.Secs2Exception;
 
 public class Secs1Message extends SecsMessage {
 	
 	private static final int HEAD_SIZE = 10;
+	private static final int BODY_SIZE = 244;
 	
 	private byte[] head;
 	private Secs2  body;
@@ -35,7 +40,7 @@ public class Secs1Message extends SecsMessage {
 		this(head, Secs2.empty());
 	}
 	
-	protected Secs1Message(List<Secs1MessageBlock> blocks) {
+	public Secs1Message(List<Secs1MessageBlock> blocks) {
 		super();
 		
 		this.head = null;
@@ -44,18 +49,36 @@ public class Secs1Message extends SecsMessage {
 	}
 	
 	private synchronized byte[] head() {
+		
 		if ( this.head == null ) {
-			
-			//TODO
+			this.head = Arrays.copyOfRange(blocks.get(0).bytes(), 1, 11);
 		}
 		
 		return this.head;
 	}
 	
 	private synchronized Secs2 body() {
+		
 		if ( this.body == null ) {
 			
-			//TODO
+			try (
+					ByteArrayOutputStream st = new ByteArrayOutputStream();
+					) {
+				
+				for ( Secs1MessageBlock block : blocks ) {
+					
+					byte[] bs = block.bytes();
+					int len = bs.length;
+					
+					st.write(bs, 11, (len - 13));
+				}
+				
+				this.body = Secs2.parse(st.toByteArray());
+				
+			}
+			catch ( IOException e ) {
+				this.body = null;
+			}
 		}
 		
 		return this.body;
@@ -88,24 +111,63 @@ public class Secs1Message extends SecsMessage {
 	@Override
 	public int deviceId() {
 		byte[] bs = head();
-		return ((bs[0] << 8) & 0x7F00) | (bs[1] & 0xFF);
+		return (((int)(bs[0]) << 8) & 0x7F00) | (bs[1] & 0xFF);
 	}
 	
-	private synchronized List<Secs1MessageBlock> parseBlocks() {
+	private synchronized List<Secs1MessageBlock> parseBlocks() throws Secs2Exception {
 		
 		if ( this.blocks == null ) {
 			
-			//TODO
+			byte[] headBytes = header10Bytes();
+			byte[] bodyBytes = body.secs2Bytes();
+			
+			int bodyLength = bodyBytes.length;
+			
+			if ( bodyLength > (BODY_SIZE * (0x7FFF - 1)) ) {
+				throw new Secs2Exception("Secs2 overflow");
+			}
+			
+			int blockNum = 1;
+			int offset = 0;
+			
+			List<Secs1MessageBlock> list = new ArrayList<>();
+			
+			for ( ;; ) {
+				
+				headBytes[4] = (byte)(blockNum >> 8);
+				headBytes[5] = (byte)blockNum;
+				
+				if ( (offset + BODY_SIZE) > bodyLength ) {
+					
+					list.add(new Secs1MessageBlock(headBytes
+							, Arrays.copyOfRange(bodyBytes, offset, offset + BODY_SIZE)));
+					
+					offset += BODY_SIZE;
+					blockNum += 1;
+					
+				} else {
+					
+					headBytes[4] |= (byte)0x80;
+					
+					list.add(new Secs1MessageBlock(headBytes
+							, Arrays.copyOfRange(bodyBytes, offset, bodyLength)));
+					
+					break;
+				}
+			}
+			
+			this.blocks = Collections.unmodifiableList(list);
 		}
 		
-		return blocks;
+		return this.blocks;
 	}
 	
-	public List<Secs1MessageBlock> blocks() {
+	public List<Secs1MessageBlock> blocks() throws Secs2Exception {
 		return parseBlocks();
 	}
 	
-	protected byte[] header10Bytes() {
+	@Override
+	public byte[] header10Bytes() {
 		byte[] bs = head();
 		return Arrays.copyOf(bs, bs.length);
 	}
@@ -116,10 +178,10 @@ public class Secs1Message extends SecsMessage {
 		byte[] bs = head();
 		
 		int key;
-		key =  (bs[6] << 24) & 0xFF000000;
-		key |= (bs[7] << 16) & 0x00FF0000;
-		key |= (bs[8] <<  8) & 0x0000FF00;
-		key |= (bs[9]      ) & 0x000000FF;
+		key =  ((int)(bs[6]) << 24) & 0xFF000000;
+		key |= ((int)(bs[7]) << 16) & 0x00FF0000;
+		key |= ((int)(bs[8]) <<  8) & 0x0000FF00;
+		key |= ((int)(bs[9])      ) & 0x000000FF;
 		
 		return Integer.valueOf(key);
 	}

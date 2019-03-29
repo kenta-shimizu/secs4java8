@@ -4,19 +4,14 @@ import secs.SecsCommunicatorConfig;
 
 public class Secs1CommunicatorConfig extends SecsCommunicatorConfig {
 	
-	public static int ZERO = 0;
-	public static int ONE  = 1;
-	
 	private boolean isMaster;
 	private int retry;
-	private int firstBlockNumber;
 	
 	public Secs1CommunicatorConfig() {
 		super();
 		
 		isMaster = true;
 		retry = 3;
-		firstBlockNumber = ONE;
 	}
 	
 	/**
@@ -61,31 +56,6 @@ public class Secs1CommunicatorConfig extends SecsCommunicatorConfig {
 	public int retry() {
 		synchronized ( this ) {
 			return retry;
-		}
-	}
-	
-	/**
-	 * 
-	 * @param first-block-number value is ONE or ZERO
-	 */
-	public void firstBlockNumber(int n) {
-		
-		if ( n != ZERO && n != ONE ) {
-			throw new IllegalArgumentException("first-block-number is ONE or ZERO");
-		}
-		
-		synchronized ( this ) {
-			this.firstBlockNumber = n;
-		}
-	}
-	
-	/**
-	 * 
-	 * @return first-block-number
-	 */
-	public int firstBlockNumber() {
-		synchronized ( this ) {
-			return firstBlockNumber;
 		}
 	}
 	

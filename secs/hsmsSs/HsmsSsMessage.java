@@ -53,7 +53,7 @@ public class HsmsSsMessage extends SecsMessage {
 	@Override
 	public int deviceId() {
 		if ( dataMessage() ) {
-			return ((head[0] << 8) & 0x7F00) | (head[1] & 0xFF);
+			return (((int)(head[0]) << 8) & 0x7F00) | (head[1] & 0xFF);
 		} else {
 			throw new IllegalStateException("HsmsSsMessage is not DataMessage");
 		}
@@ -63,7 +63,8 @@ public class HsmsSsMessage extends SecsMessage {
 		return HsmsSsMessageType.get(this) == HsmsSsMessageType.DATA;
 	}
 	
-	protected byte[] header10Bytes() {
+	@Override
+	public byte[] header10Bytes() {
 		return Arrays.copyOf(head, head.length);
 	}
 	
@@ -71,10 +72,10 @@ public class HsmsSsMessage extends SecsMessage {
 	protected Integer systemBytesKey() {
 		
 		int key;
-		key =  (head[6] << 24) & 0xFF000000;
-		key |= (head[7] << 16) & 0x00FF0000;
-		key |= (head[8] <<  8) & 0x0000FF00;
-		key |= (head[9]      ) & 0x000000FF;
+		key =  ((int)(head[6]) << 24) & 0xFF000000;
+		key |= ((int)(head[7]) << 16) & 0x00FF0000;
+		key |= ((int)(head[8]) <<  8) & 0x0000FF00;
+		key |= ((int)(head[9])      ) & 0x000000FF;
 		
 		return Integer.valueOf(key);
 	}
