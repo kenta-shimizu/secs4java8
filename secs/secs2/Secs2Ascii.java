@@ -57,24 +57,20 @@ public class Secs2Ascii extends Secs2 {
 		}
 	}
 	
-	private String ascii() {
-		synchronized ( this ) {
-			if ( ascii == null ) {
-				ascii = new String(bytes, charset);
-			}
-			
-			return ascii;
+	private synchronized String ascii() {
+		if ( ascii == null ) {
+			ascii = new String(bytes, charset);
 		}
+		
+		return ascii;
 	}
 	
 	private byte[] bytes() {
-		synchronized ( this ) {
-			if ( bytes == null ) {
-				bytes = ascii.getBytes(charset);
-			}
-			
-			return bytes;
+		if ( bytes == null ) {
+			bytes = ascii.getBytes(charset);
 		}
+		
+		return bytes;
 	}
 	
 	@Override

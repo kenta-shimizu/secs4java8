@@ -1,8 +1,6 @@
 package secs.secs1;
 
-import secs.SecsSendMessageException;
-
-public class Secs1RetryOverException extends SecsSendMessageException {
+public class Secs1RetryOverException extends Secs1SendMessageException {
 
 	private static final long serialVersionUID = -3699602290397266734L;
 

@@ -189,8 +189,9 @@ public class Secs1Message extends SecsMessage {
 	@Override
 	protected String toHeaderBytesString() {
 		
-		// TODO Auto-generated method stub
-		return null;
+		//TODO
+		
+		return "[ Secs1Message#toHeaderBytesString ]"; 
 	}
 
 }

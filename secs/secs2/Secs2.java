@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -196,6 +197,7 @@ public abstract class Secs2 implements Iterable<Secs2> {
 	
 	protected abstract String toStringValue();
 	
+	/* builder */
 	public static Secs2 empty() {
 		return new Secs2BytesParser();
 	}
@@ -204,8 +206,64 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2BytesParser(bs);
 	}
 	
+	public static Secs2 list() {
+		return new Secs2List();
+	}
+	
+	public static Secs2 list(Secs2... values) {
+		return new Secs2List(values);
+	}
+	
+	public static Secs2 list(List<Secs2> values) {
+		return new Secs2List(values);
+	}
+	
+	public static Secs2 ascii(CharSequence cs) {
+		return new Secs2Ascii(cs);
+	}
+	
+	public static Secs2 binary(byte... bs) {
+		return new Secs2Binary(bs);
+	}
+	
+	public static Secs2 binary(List<Byte> bs) {
+		return new Secs2Binary(bs);
+	}
+	
+	public static Secs2 bool(boolean... bools) {
+		return new Secs2Boolean(bools);
+	}
+	
+	public static Secs2 bool(List<Boolean> bools) {
+		return new Secs2Boolean(bools);
+	}
+	
 	
 	//TODO
-	//builder
+	//int1
+	//int2
+	//int4
+	//int8
+	//uint1
+	//uint2
+	//uint4
+	//uint8
+	
+	
+	public static Secs2 float4(float... values) {
+		return new Secs2Float4(values);
+	}
+	
+	public static Secs2 float4(List<Float> values) {
+		return new Secs2Float4(values);
+	}
+	
+	public static Secs2 float8(double... values) {
+		return new Secs2Float8(values);
+	}
+	
+	public static Secs2 float8(List<Double> values) {
+		return new Secs2Float8(values);
+	}
 	
 }

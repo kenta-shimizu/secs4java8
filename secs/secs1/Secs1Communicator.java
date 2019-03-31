@@ -2,6 +2,7 @@ package secs.secs1;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -18,6 +19,7 @@ import secs.SecsMessage;
 import secs.SecsSendMessageException;
 import secs.SecsWaitReplyMessageException;
 import secs.secs2.Secs2;
+import secs.secs2.Secs2Exception;
 
 public abstract class Secs1Communicator extends SecsCommunicator {
 	
@@ -46,8 +48,13 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		this.blockManager = new Secs1MessageBlockManager(config);
 		this.replyManager = new Secs1MessageSendReplyManager(execServ, config.timeout(), msg -> {
 			
-			//TODO
-			//send-queue
+			try {
+				List<Secs1MessageBlock> blocks = msg.blocks();
+				sendBlockQueue.addAll(blocks);
+			}
+			catch ( Secs2Exception e ) {
+				throw new Secs1SendMessageException(msg, e);
+			}
 		});
 	}
 	
@@ -61,9 +68,66 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 	
 	
 	abstract protected void sendByte(byte[] bs) throws IOException, InterruptedException;
-	abstract protected Optional<Byte> pollByte();
-	abstract protected Optional<Byte> pollByte(long timeout, TimeUnit unit) throws InterruptedException;
 	
+	private final BlockingQueue<Byte> recvByteQueue = new LinkedBlockingQueue<>();
+	
+	protected boolean putRecvByte(Collection<Byte> bs) {
+		
+		synchronized ( this ) {
+			
+			try {
+				return recvByteQueue.addAll(bs);
+			}
+			finally {
+				this.notifyAll();
+			}
+		}
+	}
+	
+	protected boolean putRecvByte(byte b) {
+		
+		synchronized ( this ) {
+			
+			try {
+				return recvByteQueue.offer(b);
+			}
+			finally {
+				this.notifyAll();
+			}
+		}
+	}
+	
+	protected boolean putRecvByte(byte... bs) {
+		
+		synchronized ( this ) {
+			
+			try {
+				
+				for ( byte b : bs ) {
+					
+					if ( ! recvByteQueue.offer(b) ) {
+						
+						return false;
+					}
+				}
+				
+				return true;
+			}
+			finally {
+				this.notifyAll();
+			}
+		}
+	}
+	
+	protected Optional<Byte> pollByte() {
+		Byte b = recvByteQueue.poll();
+		return b == null ? Optional.empty() : Optional.of(b);
+	}
+	
+	protected Optional<Byte> pollByte(long timeout, TimeUnit unit) throws InterruptedException {
+		Byte b = recvByteQueue.poll(timeout, unit);
+		return b == null ? Optional.empty() : Optional.of(b);
+	}
 	
 	protected void sendByte(byte b) throws IOException, InterruptedException {
 		sendByte(new byte[] {b});
@@ -86,13 +150,19 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
-		return this.replyManager.send(s1m);
+		try {
+			return replyManager.send(s1m);
+		}
+		catch (SecsException e) {
+			entryLog(new SecsLog(e));
+			throw e;
+		}
 	}
 	
 	private final AtomicInteger autoNumber = new AtomicInteger();
 	
 	@Override
-	public Optional<? extends SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<? extends Secs1Message> send(int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -127,9 +197,13 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 	}
 	
 	@Override
-	public Optional<? extends SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<? extends Secs1Message> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
+		
+		if ( ! ( primary instanceof Secs1Message) ) {
+			throw new ClassCastException("primary is not \"secs.secs1.Secs1Message\"");
+		}
 		
 		byte[] priHead = primary.header10Bytes();
 		
@@ -161,6 +235,13 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 	}
 	
 	
+	/* Secs-Log-Queue */
+	private final BlockingQueue<SecsLog> logQueue = new LinkedBlockingQueue<>();
+	
+	private void entryLog(SecsLog log) {
+		logQueue.offer(log);
+	}
+	
 	private final BlockingQueue<Secs1Message> recvMsgQueue = new LinkedBlockingQueue<>();
 	
 	@Override
@@ -168,9 +249,15 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		
 		super.open();
 		
-		blockManager.addSecs1MessageReceiveListener(msg -> {
+		blockManager.addSecs1MessageReceiveListener(recvMsgQueue::offer);
+		blockManager.addSecsLogListener(this::entryLog);
+		replyManager.addSecsLogListener(this::entryLog);
+		
+		execServ.execute(() -> {
 			try {
-				recvMsgQueue.put(msg);
+				for ( ;; ) {
+					replyManager.receive(recvMsgQueue.take()).ifPresent(this::notifyReceiveMessage);
+				}
 			}
 			catch ( InterruptedException ignore ) {
 			}
@@ -179,7 +266,7 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		execServ.execute(() -> {
 			try {
 				for ( ;; ) {
-					replyManager.receive(recvMsgQueue.take()).ifPresent(this::notifyReceiveMessage);
+					notifyLog(logQueue.take());
 				}
 			}
 			catch ( InterruptedException ignore ) {
@@ -224,7 +311,7 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		}
 	}
 	
-	private BlockingQueue<Secs1MessageBlock> sendBlockQueue = new LinkedBlockingQueue<>();
+	private final BlockingQueue<Secs1MessageBlock> sendBlockQueue = new LinkedBlockingQueue<>();
 	
 	private void loop() throws InterruptedException {
 		
@@ -261,12 +348,12 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 				throw e;
 			}
 			catch ( IOException e ) {
-				//TODO
-				//clear
 				
-				this.notifyLog(new SecsLog(e));
+				sendBlockQueue.clear();
+				entryLog(new SecsLog(e));
 			}
 			catch ( Throwable t ) {
+				entryLog(new SecsLog(t));
 				throw t;
 			}
 		}
@@ -274,22 +361,83 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 	
 	private void circuitControl() throws IOException, InterruptedException {
 		
-		//TODO
+		Secs1MessageBlock block = sendBlockQueue.peek();
+		if ( block == null ) {
+			return;
+		}
 		
-		
-		this.sendByte(ENQ);
-		
-		
-		//TODO
+		for ( int counter = 0 ; counter < secs1Config.retry() ; ) {
 			
+			this.sendByte(ENQ);
+			
+			Optional<Byte> op = pollByteT2();
+			
+			if ( op.isPresent() ) {
+				
+				byte b = op.get();
+				
+				if ( b == ENQ ) {
+					
+					if ( ! secs1Config.isMaster() ) {
+						receiveBlock();
+						return;
+					}
+					
+				} else if ( b == EOT ) {
+					
+					if ( trySendMessageBlock(block) ) {
+						
+						sendBlockQueue.poll();
+						
+						if ( block.ebit() ) {
+							replyManager.notifySendCompleted(block);
+						}
+						
+						
+						//TODO
+						//putLog
+						
+						
+						return;
+						
+					} else {
+						
+						counter += 1;
+					}
+					
+				} else {
+					
+					counter += 1;
+				}
+				
+			} else {
+				
+				counter += 1;
+			}
+		}
+		
+		/* Send-Retry-Over */
+		sendBlockQueue.poll();
+		
+		
+		
 	}
 	
 	private void receiveBlock() throws IOException, InterruptedException {
 		
+		sendByte(EOT);
+		
+		
 		//TODO
 		
 	}
 	
+	private boolean trySendMessageBlock(Secs1MessageBlock block) throws IOException, InterruptedException {
+		
+		//TODO
+		
+		return false;
+	}
 	
 }
 

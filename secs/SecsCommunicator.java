@@ -178,7 +178,7 @@ public abstract class SecsCommunicator implements Closeable {
 	
 	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener lstnr) {
 		
-		synchronized ( this ) {
+		synchronized ( commStateChangeListeners ) {
 			
 			lstnr.changed(lastCommunicatable);
 			
@@ -192,7 +192,7 @@ public abstract class SecsCommunicator implements Closeable {
 	
 	protected void notifyCommunicatableStateChange(boolean communicatable) {
 		
-		synchronized ( this ) {
+		synchronized ( commStateChangeListeners ) {
 			
 			if ( lastCommunicatable != communicatable ) {
 				

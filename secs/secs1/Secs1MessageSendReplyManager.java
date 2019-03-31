@@ -131,4 +131,11 @@ public class Secs1MessageSendReplyManager extends SecsMessageSendReplyManager<Se
 		return Optional.empty();
 	}
 	
+	protected void notifySendCompleted(Secs1MessageBlock block) {
+		notifySendCompleted(block.systemBytesKey());
+	}
+	
+	protected void notifySendFailed(Secs1MessageBlock block) {
+		notifySendFailed(block.systemBytesKey());
+	}
 }

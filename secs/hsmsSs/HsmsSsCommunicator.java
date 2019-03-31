@@ -93,8 +93,8 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 		}
 	}
 	
-	protected void putReceiveDataMessage(HsmsSsMessage msg) throws InterruptedException {
-		recvDataMsgQueue.put(msg);
+	protected void putReceiveDataMessage(HsmsSsMessage msg) {
+		recvDataMsgQueue.offer(msg);
 	}
 	
 	public static HsmsSsCommunicator newInstance(HsmsSsCommunicatorConfig config) {

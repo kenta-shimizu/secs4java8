@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -47,6 +48,23 @@ public abstract class SecsMessageSendReplyManager<T extends SecsMessage> {
 	
 	protected SecsTimeout secsTimeout() {
 		return secsTimeout;
+	}
+	
+	/* Secs-Log-Listener */
+	private final Collection<SecsLogListener> logListeners = new CopyOnWriteArrayList<>();
+	
+	public boolean addSecsLogListener(SecsLogListener lstnr) {
+		return logListeners.add(lstnr);
+	}
+	
+	public boolean removeSecsLogListener(SecsLogListener lstnr) {
+		return logListeners.remove(lstnr);
+	}
+	
+	protected void putLog(SecsLog log) {
+		logListeners.forEach(lstnr -> {
+			lstnr.receive(log);
+		});
 	}
 	
 	/**
@@ -161,7 +179,10 @@ public abstract class SecsMessageSendReplyManager<T extends SecsMessage> {
 	}
 	
 	public void notifySendCompleted(T msg) {
-		final Integer key = msg.systemBytesKey();
+		notifySendCompleted(msg.systemBytesKey());
+	}
+	
+	protected void notifySendCompleted(Integer key) {
 		synchronized ( this ) {
 			sendedMap.put(key, SendStatus.COMPLETED);
 			this.notifyAll();
@@ -169,7 +190,10 @@ public abstract class SecsMessageSendReplyManager<T extends SecsMessage> {
 	}
 	
 	public void notifySendFailed(T msg) {
-		final Integer key = msg.systemBytesKey();
+		notifySendFailed(msg.systemBytesKey());
+	}
+	
+	public void notifySendFailed(Integer key) {
 		synchronized ( this ) {
 			sendedMap.put(key, SendStatus.FAILED);
 			this.notifyAll();

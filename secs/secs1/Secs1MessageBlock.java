@@ -114,4 +114,11 @@ public class Secs1MessageBlock {
 				&& ref.bytes[10] == bytes[10]);
 	}
 	
+	protected String toHeaderBytesString() {
+		
+		//TODO
+		
+		return "[ Secs1MessageBlock#toHeaderBytesString ]";
+	}
+	
 }

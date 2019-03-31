@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import secs.SecsLog;
+import secs.SecsLogListener;
+
 public class Secs1MessageBlockManager {
 	
 	private final Secs1CommunicatorConfig config;
@@ -27,6 +30,24 @@ public class Secs1MessageBlockManager {
 			lstnr.receive(msg);
 		});
 	}
+	
+	/* Secs-Log-Listener */
+	private final Collection<SecsLogListener> logListeners = new CopyOnWriteArrayList<>();
+	
+	public boolean addSecsLogListener(SecsLogListener lstnr) {
+		return logListeners.add(lstnr);
+	}
+	
+	public boolean removeSecsLogListener(SecsLogListener lstnr) {
+		return logListeners.remove(lstnr);
+	}
+	
+	protected void putLog(SecsLog log) {
+		logListeners.forEach(lstnr -> {
+			lstnr.receive(log);
+		});
+	}
+	
 	
 	private final LinkedList<Secs1MessageBlock> blocks = new LinkedList<>();
 	
