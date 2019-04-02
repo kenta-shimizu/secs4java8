@@ -238,23 +238,139 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Boolean(bools);
 	}
 	
+	public static Secs2 int1(int... values) {
+		return new Secs2Int1(values);
+	}
 	
-	//TODO
-	//int1
-	//int2
-	//int4
-	//int8
-	//uint1
-	//uint2
-	//uint4
-	//uint8
+	public static Secs2 int1(long... values) {
+		return new Secs2Int1(values);
+	}
 	
+	public static Secs2 int1(BigInteger... values) {
+		return new Secs2Int1(values);
+	}
+
+	public static Secs2 int1(List<Number> values) {
+		return new Secs2Int1(values);
+	}
+	
+	public static Secs2 int2(int... values) {
+		return new Secs2Int2(values);
+	}
+	
+	public static Secs2 int2(long... values) {
+		return new Secs2Int2(values);
+	}
+	
+	public static Secs2 int2(BigInteger... values) {
+		return new Secs2Int2(values);
+	}
+
+	public static Secs2 int2(List<Number> values) {
+		return new Secs2Int2(values);
+	}
+	
+	public static Secs2 int4(int... values) {
+		return new Secs2Int4(values);
+	}
+	
+	public static Secs2 int4(long... values) {
+		return new Secs2Int4(values);
+	}
+	
+	public static Secs2 int4(BigInteger... values) {
+		return new Secs2Int4(values);
+	}
+
+	public static Secs2 int4(List<Number> values) {
+		return new Secs2Int4(values);
+	}
+	
+	public static Secs2 int8(int... values) {
+		return new Secs2Int8(values);
+	}
+	
+	public static Secs2 int8(long... values) {
+		return new Secs2Int8(values);
+	}
+	
+	public static Secs2 int8(BigInteger... values) {
+		return new Secs2Int8(values);
+	}
+
+	public static Secs2 int8(List<Number> values) {
+		return new Secs2Int8(values);
+	}
+	
+	public static Secs2 Uint1(int... values) {
+		return new Secs2Uint1(values);
+	}
+	
+	public static Secs2 Uint1(long... values) {
+		return new Secs2Uint1(values);
+	}
+	
+	public static Secs2 Uint1(BigInteger... values) {
+		return new Secs2Uint1(values);
+	}
+
+	public static Secs2 Uint1(List<Number> values) {
+		return new Secs2Uint1(values);
+	}
+
+	public static Secs2 Uint2(int... values) {
+		return new Secs2Uint2(values);
+	}
+	
+	public static Secs2 Uint2(long... values) {
+		return new Secs2Uint2(values);
+	}
+	
+	public static Secs2 Uint2(BigInteger... values) {
+		return new Secs2Uint2(values);
+	}
+
+	public static Secs2 Uint2(List<Number> values) {
+		return new Secs2Uint2(values);
+	}
+
+	public static Secs2 Uint4(int... values) {
+		return new Secs2Uint4(values);
+	}
+	
+	public static Secs2 Uint4(long... values) {
+		return new Secs2Uint4(values);
+	}
+	
+	public static Secs2 Uint4(BigInteger... values) {
+		return new Secs2Uint4(values);
+	}
+
+	public static Secs2 Uint4(List<Number> values) {
+		return new Secs2Uint4(values);
+	}
+
+	public static Secs2 Uint8(int... values) {
+		return new Secs2Uint8(values);
+	}
+	
+	public static Secs2 Uint8(long... values) {
+		return new Secs2Uint8(values);
+	}
+	
+	public static Secs2 Uint8(BigInteger... values) {
+		return new Secs2Uint8(values);
+	}
+
+	public static Secs2 Uint8(List<Number> values) {
+		return new Secs2Uint8(values);
+	}
 	
 	public static Secs2 float4(float... values) {
 		return new Secs2Float4(values);
 	}
 	
-	public static Secs2 float4(List<Float> values) {
+	public static Secs2 float4(List<Number> values) {
 		return new Secs2Float4(values);
 	}
 	
@@ -262,7 +378,7 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Float8(values);
 	}
 	
-	public static Secs2 float8(List<Double> values) {
+	public static Secs2 float8(List<Number> values) {
 		return new Secs2Float8(values);
 	}
 	

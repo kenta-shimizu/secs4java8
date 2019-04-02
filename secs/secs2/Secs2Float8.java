@@ -2,8 +2,10 @@ package secs.secs2;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Secs2Float8 extends Secs2Number<Double> {
 	
@@ -12,22 +14,30 @@ public class Secs2Float8 extends Secs2Number<Double> {
 	public Secs2Float8(double... values) {
 		super();
 		
+		Objects.requireNonNull(values);
+		
 		this.values = new ArrayList<>();
 		for ( double v : values ) {
 			this.values.add(v);
 		}
 	}
 	
-	public Secs2Float8(List<Double> values) {
+	public Secs2Float8(List<Number> values) {
 		super();
 		
-		this.values = Collections.unmodifiableList(values);
+		Objects.requireNonNull(values);
+		
+		this.values = values.stream()
+				.map(Number::doubleValue)
+				.collect(Collectors.toList());
 	}
 	
 	protected Secs2Float8(byte[] bs) {
 		super();
 		
-		this.bytes = bs;
+		Objects.requireNonNull(bs);
+		
+		this.bytes = Arrays.copyOf(bs, bs.length);
 	}
 	
 	@Override

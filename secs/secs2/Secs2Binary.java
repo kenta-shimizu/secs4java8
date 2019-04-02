@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Secs2Binary extends Secs2Number<Byte> {
@@ -13,11 +14,15 @@ public class Secs2Binary extends Secs2Number<Byte> {
 	public Secs2Binary(byte... bs) {
 		super();
 		
+		Objects.requireNonNull(bs);
+		
 		this.bytes = Arrays.copyOf(bs, bs.length);
 	}
 	
 	public Secs2Binary(List<Byte> values) {
 		super();
+		
+		Objects.requireNonNull(values);
 		
 		this.values = Collections.unmodifiableList(values);
 	}

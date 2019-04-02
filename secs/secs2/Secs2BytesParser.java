@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class Secs2BytesParser extends Secs2 {
@@ -21,6 +22,8 @@ public class Secs2BytesParser extends Secs2 {
 	
 	protected Secs2BytesParser(byte[] bs) {
 		super();
+		
+		Objects.requireNonNull(bs);
 		
 		this.bytes = Arrays.copyOf(bs, bs.length);
 		this.parsed = null;
@@ -116,13 +119,46 @@ public class Secs2BytesParser extends Secs2 {
 				return new Result(new Secs2Boolean(values), endIndex);
 				/* break; */
 			}
-			
-			
-			//TODO
-			//intx
-			//uintx
-			
-			
+			case INT1: {
+				
+				return new Result(new Secs2Int1(values), endIndex);
+				/* break; */
+			}
+			case INT2: {
+				
+				return new Result(new Secs2Int2(values), endIndex);
+				/* break; */
+			}
+			case INT4: {
+				
+				return new Result(new Secs2Int4(values), endIndex);
+				/* break; */
+			}
+			case INT8: {
+				
+				return new Result(new Secs2Int8(values), endIndex);
+				/* break; */
+			}
+			case UINT1: {
+				
+				return new Result(new Secs2Uint1(values), endIndex);
+				/* break; */
+			}
+			case UINT2: {
+				
+				return new Result(new Secs2Uint2(values), endIndex);
+				/* break; */
+			}
+			case UINT4: {
+				
+				return new Result(new Secs2Uint4(values), endIndex);
+				/* break; */
+			}
+			case UINT8: {
+				
+				return new Result(new Secs2Uint8(values), endIndex);
+				/* break; */
+			}
 			case FLOAT4: {
 				
 				return new Result(new Secs2Float4(values), endIndex);
@@ -133,15 +169,23 @@ public class Secs2BytesParser extends Secs2 {
 				return new Result(new Secs2Float8(values), endIndex);
 				/* break; */
 			}
+			case JIS8: {
+				
+				return new Result(new Secs2Jis8(values), endIndex);
+				/* break; */
+			}
+			case UNICODE: {
+				
+				return new Result(new Secs2Unicode(values), endIndex);
+				/* break; */
+			}
 			default: {
 				
-				//TODO
+				throw new Secs2IrregalDataFormatException("\"" + s2i.symbol() + "\" unknown symbol");
 			}
 			}
 		}
 		}
-		
-		return null;
 	}
 	
 	@Override
