@@ -139,20 +139,20 @@ public class Secs1Message extends SecsMessage {
 				
 				if ( (offset + BODY_SIZE) > bodyLength ) {
 					
-					list.add(new Secs1MessageBlock(headBytes
-							, Arrays.copyOfRange(bodyBytes, offset, offset + BODY_SIZE)));
-					
-					offset += BODY_SIZE;
-					blockNum += 1;
-					
-				} else {
-					
 					headBytes[4] |= (byte)0x80;
 					
 					list.add(new Secs1MessageBlock(headBytes
 							, Arrays.copyOfRange(bodyBytes, offset, bodyLength)));
 					
 					break;
+					
+				} else {
+					
+					list.add(new Secs1MessageBlock(headBytes
+							, Arrays.copyOfRange(bodyBytes, offset, offset + BODY_SIZE)));
+					
+					offset += BODY_SIZE;
+					blockNum += 1;
 				}
 			}
 			
@@ -189,9 +189,48 @@ public class Secs1Message extends SecsMessage {
 	@Override
 	protected String toHeaderBytesString() {
 		
-		//TODO
+		byte[] bs = head();
 		
-		return "[ Secs1Message#toHeaderBytesString ]"; 
+		return new StringBuilder()
+				.append("[").append(String.format("%02X", bs[0]))
+				.append(" ").append(String.format("%02X", bs[1]))
+				.append("|").append(String.format("%02X", bs[2]))
+				.append(" ").append(String.format("%02X", bs[3]))
+				.append("|").append(String.format("%02X", bs[4]))
+				.append(" ").append(String.format("%02X", bs[5]))
+				.append("|").append(String.format("%02X", bs[6]))
+				.append(" ").append(String.format("%02X", bs[7]))
+				.append(" ").append(String.format("%02X", bs[8]))
+				.append(" ").append(String.format("%02X", bs[9]))
+				.append("]")
+				.toString();
+	}
+	
+	private static final String BR = System.lineSeparator();
+	
+	@Override
+	public String toString() {
+		
+		StringBuilder sb = new StringBuilder(toHeaderBytesString())
+				.append(BR)
+				.append("S").append(getStream()).append("F").append(getFunction());
+		
+		if (wbit()) {
+			sb.append(" W");
+		}
+		
+		Secs2 body = secs2();
+		
+		try {
+			if ( body.secs2Bytes().length > 0 ) {
+				sb.append(BR).append(body);
+			}
+		}
+		catch (Secs2Exception e) {
+			sb.append(BR).append("<PARSE FAILED>");
+		}
+		
+		return sb.append(".").toString();
 	}
 
 }

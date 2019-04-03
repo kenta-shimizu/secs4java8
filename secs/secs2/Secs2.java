@@ -222,6 +222,10 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Ascii(cs);
 	}
 	
+	public static Secs2 binary() {
+		return new Secs2Binary();
+	}
+	
 	public static Secs2 binary(byte... bs) {
 		return new Secs2Binary(bs);
 	}
@@ -230,12 +234,20 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Binary(bs);
 	}
 	
+	public static Secs2 bool() {
+		return new Secs2Boolean();
+	}
+	
 	public static Secs2 bool(boolean... bools) {
 		return new Secs2Boolean(bools);
 	}
 	
 	public static Secs2 bool(List<Boolean> bools) {
 		return new Secs2Boolean(bools);
+	}
+	
+	public static Secs2 int1() {
+		return new Secs2Int1();
 	}
 	
 	public static Secs2 int1(int... values) {
@@ -254,6 +266,10 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Int1(values);
 	}
 	
+	public static Secs2 int2() {
+		return new Secs2Int2();
+	}
+	
 	public static Secs2 int2(int... values) {
 		return new Secs2Int2(values);
 	}
@@ -268,6 +284,10 @@ public abstract class Secs2 implements Iterable<Secs2> {
 
 	public static Secs2 int2(List<Number> values) {
 		return new Secs2Int2(values);
+	}
+	
+	public static Secs2 int4() {
+		return new Secs2Int4();
 	}
 	
 	public static Secs2 int4(int... values) {
@@ -286,6 +306,10 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Int4(values);
 	}
 	
+	public static Secs2 int8() {
+		return new Secs2Int8();
+	}
+	
 	public static Secs2 int8(int... values) {
 		return new Secs2Int8(values);
 	}
@@ -300,6 +324,10 @@ public abstract class Secs2 implements Iterable<Secs2> {
 
 	public static Secs2 int8(List<Number> values) {
 		return new Secs2Int8(values);
+	}
+	
+	public static Secs2 Uint1() {
+		return new Secs2Uint1();
 	}
 	
 	public static Secs2 Uint1(int... values) {
@@ -318,6 +346,10 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Uint1(values);
 	}
 
+	public static Secs2 Uint2() {
+		return new Secs2Uint2();
+	}
+	
 	public static Secs2 Uint2(int... values) {
 		return new Secs2Uint2(values);
 	}
@@ -334,6 +366,10 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Uint2(values);
 	}
 
+	public static Secs2 Uint4() {
+		return new Secs2Uint4();
+	}
+	
 	public static Secs2 Uint4(int... values) {
 		return new Secs2Uint4(values);
 	}
@@ -350,6 +386,10 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Uint4(values);
 	}
 
+	public static Secs2 Uint8() {
+		return new Secs2Uint8();
+	}
+	
 	public static Secs2 Uint8(int... values) {
 		return new Secs2Uint8(values);
 	}
@@ -366,12 +406,20 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Uint8(values);
 	}
 	
+	public static Secs2 float4() {
+		return new Secs2Float4();
+	}
+	
 	public static Secs2 float4(float... values) {
 		return new Secs2Float4(values);
 	}
 	
 	public static Secs2 float4(List<Number> values) {
 		return new Secs2Float4(values);
+	}
+	
+	public static Secs2 float8() {
+		return new Secs2Float8();
 	}
 	
 	public static Secs2 float8(double... values) {

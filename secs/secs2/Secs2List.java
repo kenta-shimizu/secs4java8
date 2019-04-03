@@ -22,7 +22,7 @@ public class Secs2List extends Secs2 {
 	public Secs2List() {
 		super();
 		
-		values = Collections.emptyList();
+		this.values = Collections.emptyList();
 	}
 
 	public Secs2List(Secs2... values){

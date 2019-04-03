@@ -8,6 +8,10 @@ public class Secs2Int1 extends Secs2BigInteger {
 	
 	private static final Secs2Item secs2Item = Secs2Item.INT1;
 	
+	public Secs2Int1() {
+		this(new BigInteger[0]);
+	}
+	
 	public Secs2Int1(int... values) {
 		super(values);
 	}

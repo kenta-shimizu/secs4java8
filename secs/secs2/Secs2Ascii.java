@@ -35,7 +35,7 @@ public class Secs2Ascii extends Secs2 {
 	
 	@Override
 	public int size() {
-		return ascii.length();
+		return ascii().length();
 	}
 
 	@Override
@@ -58,19 +58,19 @@ public class Secs2Ascii extends Secs2 {
 	}
 	
 	private synchronized String ascii() {
-		if ( ascii == null ) {
-			ascii = new String(bytes, charset);
+		if ( this.ascii == null ) {
+			this.ascii = new String(bytes, charset);
 		}
 		
-		return ascii;
+		return this.ascii;
 	}
 	
 	private byte[] bytes() {
-		if ( bytes == null ) {
-			bytes = ascii.getBytes(charset);
+		if ( this.bytes == null ) {
+			this.bytes = ascii.getBytes(charset);
 		}
 		
-		return bytes;
+		return this.bytes;
 	}
 	
 	@Override

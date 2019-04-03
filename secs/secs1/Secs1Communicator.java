@@ -238,7 +238,7 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 	/* Secs-Log-Queue */
 	private final BlockingQueue<SecsLog> logQueue = new LinkedBlockingQueue<>();
 	
-	private void entryLog(SecsLog log) {
+	protected void entryLog(SecsLog log) {
 		logQueue.offer(log);
 	}
 	

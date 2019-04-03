@@ -281,21 +281,18 @@ public class Secs2BytesParser extends Secs2 {
 	}
 	
 	@Override
-	protected String toStringValue() {
-		
-		if ( bytes.length > 0 ) {
-			
-			try {
-				return parseBytes().toStringValue();
-			}
-			catch ( Secs2Exception e ) {
-				return PARSE_FAILED;
-			}
-			
-		} else {
-			
-			return "";
+	public String toString() {
+		try {
+			return parseBytes().toString();
 		}
+		catch ( Secs2Exception e ) {
+			return PARSE_FAILED;
+		}
+	}
+	
+	@Override
+	protected String toStringValue() {
+		return "";
 	}
 
 }

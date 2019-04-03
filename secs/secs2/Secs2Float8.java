@@ -11,6 +11,10 @@ public class Secs2Float8 extends Secs2Number<Double> {
 	
 	private static final Secs2Item secs2Item = Secs2Item.FLOAT8;
 	
+	public Secs2Float8() {
+		this(new double[0]);
+	}
+	
 	public Secs2Float8(double... values) {
 		super();
 		

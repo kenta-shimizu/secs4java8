@@ -22,6 +22,10 @@ public class Secs2Boolean extends Secs2 {
 	private List<Boolean> bools;
 	private byte[] bytes;
 	
+	public Secs2Boolean() {
+		this(new boolean[0]);
+	}
+	
 	public Secs2Boolean(boolean... bools) {
 		super();
 		

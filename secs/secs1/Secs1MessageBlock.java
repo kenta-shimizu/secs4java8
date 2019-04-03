@@ -116,9 +116,19 @@ public class Secs1MessageBlock {
 	
 	protected String toHeaderBytesString() {
 		
-		//TODO
-		
-		return "[ Secs1MessageBlock#toHeaderBytesString ]";
+		return new StringBuilder()
+				.append("[").append(String.format("%02X", bytes[1]))
+				.append(" ").append(String.format("%02X", bytes[2]))
+				.append("|").append(String.format("%02X", bytes[3]))
+				.append(" ").append(String.format("%02X", bytes[4]))
+				.append("|").append(String.format("%02X", bytes[5]))
+				.append(" ").append(String.format("%02X", bytes[6]))
+				.append("|").append(String.format("%02X", bytes[7]))
+				.append(" ").append(String.format("%02X", bytes[8]))
+				.append(" ").append(String.format("%02X", bytes[9]))
+				.append(" ").append(String.format("%02X", bytes[10]))
+				.append("] length: ").append(((int)bytes[0] & 0xFF))
+				.toString();
 	}
 	
 }

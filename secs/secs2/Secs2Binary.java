@@ -11,6 +11,10 @@ public class Secs2Binary extends Secs2Number<Byte> {
 	
 	private static final Secs2Item secs2Item = Secs2Item.BINARY;
 
+	public Secs2Binary() {
+		this(new byte[0]);
+	}
+	
 	public Secs2Binary(byte... bs) {
 		super();
 		
