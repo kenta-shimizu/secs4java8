@@ -8,13 +8,13 @@ import secs.secs1.Secs1CommunicatorConfig;
 public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 	
 	private SocketAddress socketAddr;
-	private long reconnectSeconds;
+	private float reconnectSeconds;
 	
 	public Secs1OnTcpIpCommunicatorConfig() {
 		super();
 		
 		socketAddr = null;
-		reconnectSeconds = 5L;
+		reconnectSeconds = 5.0F;
 	}
 	
 	public void socketAddress(SocketAddress socketAddr) {
@@ -29,11 +29,11 @@ public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 		}
 	}
 	
-	public void reconnectSeconds(long seconds) {
+	public void reconnectSeconds(float seconds) {
 		this.reconnectSeconds = seconds;
 	}
 	
-	public long reconnectSeconds() {
+	public float reconnectSeconds() {
 		return this.reconnectSeconds;
 	}
 }

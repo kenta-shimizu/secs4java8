@@ -13,6 +13,7 @@ import java.util.concurrent.TimeoutException;
 import secs.SecsException;
 import secs.SecsMessageSendReplyManager;
 import secs.SecsSendMessageConsumer;
+import secs.SecsSendMessageException;
 import secs.SecsTimeout;
 import secs.SecsWaitReplyMessageException;
 
@@ -138,4 +139,15 @@ public class Secs1MessageSendReplyManager extends SecsMessageSendReplyManager<Se
 	protected void notifySendFailed(Secs1MessageBlock block) {
 		notifySendFailed(block.systemBytesKey());
 	}
+	
+	@Override
+	protected void throwSecsSendMessageException(Secs1Message msg) throws SecsSendMessageException {
+		throw new Secs1RetryOverException(msg);
+	}
+	
+	@Override
+	protected void throwSecsWaitReplyMessageException(Secs1Message msg) throws SecsWaitReplyMessageException {
+		throw new Secs1TimeoutT3Exception(msg);
+	}
+	
 }

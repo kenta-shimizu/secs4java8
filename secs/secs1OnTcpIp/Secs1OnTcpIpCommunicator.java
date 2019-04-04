@@ -5,6 +5,7 @@ import java.net.SocketAddress;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,6 +53,10 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 							throw new IOException("Secs1OnTcpIpCommunicator#sendByte-AsynchronousSocketChannel#write terminate");
 						}
 					}
+					catch ( InterruptedException e ) {
+						f.cancel(true);
+						throw e;
+					}
 					catch (ExecutionException e) {
 						throw new IOException("Secs1OnTcpIpCommunicator#sendByte-AsynchronousSocketChannel#write", e.getCause());
 					}
@@ -64,23 +69,30 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 	@Override
 	public void open() throws IOException {
 		
-		final SocketAddress socetAddr = this.secs1OnTcpIpConfig.socketAddress()
-				.orElseThrow(() -> new IOException("Secs1OnTcpIpCommunicatorConfig#socketAddress not setted"));
-		
 		super.open();
 		
 		executorService().execute(() -> {
 			
 			try {
+				
 				for ( ;; ) {
 					
 					try (
 							AsynchronousSocketChannel ch = AsynchronousSocketChannel.open();
 							) {
 						
+						final SocketAddress socketAddr = secs1OnTcpIpConfig.socketAddress()
+								.orElseThrow(() -> new IOException("Secs1OnTcpIpCommunicatorConfig#socketAddress not setted"));
+						
+						final String socketAddressInfo = secs1OnTcpIpConfig.socketAddress()
+								.map(SocketAddress::toString)
+								.orElse("Not setted");
+						
+						entryLog(new SecsLog("Secs1OnTcpIpCommunicator try-connect", socketAddressInfo));
+						
 						try {
 							
-							ch.connect(socetAddr, null, new CompletionHandler<Void, Void>(){
+							ch.connect(socketAddr, null, new CompletionHandler<Void, Void>(){
 								
 								@Override
 								public void completed(Void none, Void attachemnt) {
@@ -91,10 +103,12 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 									
 									notifyCommunicatableStateChange(true);
 									
+									entryLog(new SecsLog("Secs1OnTcpIpCommunicator connected", socketAddressInfo));
+									
 									final ByteBuffer buffer = ByteBuffer.allocate(1024);
 									
 									ch.read(buffer, null, new CompletionHandler<Integer, Void>(){
-
+	
 										@Override
 										public void completed(Integer r, Void attachment) {
 											
@@ -116,7 +130,7 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 												ch.read(buffer, null, this);
 											}
 										}
-
+	
 										@Override
 										public void failed(Throwable t, Void attachment) {
 											
@@ -128,7 +142,6 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 										}
 										
 									});
-									
 								}
 								
 								@Override
@@ -154,8 +167,12 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 								
 								if ( channels.remove(ch) ) {
 									
+									entryLog(new SecsLog("Secs1OnTcpIpCommunicator disconnected", socketAddressInfo));
+									
 									try {
 										ch.shutdownOutput();
+									}
+									catch (ClosedChannelException ignore) {
 									}
 									catch (IOException e) {
 										
@@ -170,8 +187,12 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 						entryLog(new SecsLog("Secs1OnTcpIpCommunicator#open-AsynchronousSocketChannel#open failed", e));
 					}
 
-					
-					TimeUnit.SECONDS.sleep(secs1OnTcpIpConfig.reconnectSeconds());
+					{
+						long t = (long)(secs1OnTcpIpConfig.reconnectSeconds() * 1000.0F);
+						if ( t > 0 ) {
+							TimeUnit.MILLISECONDS.sleep(t);
+						}
+					}
 				}
 			}
 			catch ( InterruptedException ignore ) {
