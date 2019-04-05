@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import secs.secs2.Secs2;
+import secs.sml.SmlMessage;
 
 public abstract class SecsCommunicator implements Closeable {
 
@@ -135,6 +136,43 @@ public abstract class SecsCommunicator implements Closeable {
 	abstract public Optional<? extends SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException;
+	
+	/**
+	 * Blocking-method<br />
+	 * send primary-message,<br />
+	 * wait until reply-message if exist
+	 * 
+	 * @param sml
+	 * @return reply-message if exist
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<? extends SecsMessage> send(SmlMessage sml)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+			, InterruptedException {
+		
+		return send(sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
+	}
+	
+	/**
+	 * send reply-message
+	 * 
+	 * @param primary-message
+	 * @param sml
+	 * @return Optional.empty()
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<? extends SecsMessage> send(SecsMessage primary, SmlMessage sml)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+			, InterruptedException {
+		
+		return send(primary, sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
+	}
 	
 	
 	/* Secs-Message Receive Listener */

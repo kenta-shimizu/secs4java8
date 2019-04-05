@@ -326,83 +326,83 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Int8(values);
 	}
 	
-	public static Secs2 Uint1() {
+	public static Secs2 uint1() {
 		return new Secs2Uint1();
 	}
 	
-	public static Secs2 Uint1(int... values) {
+	public static Secs2 uint1(int... values) {
 		return new Secs2Uint1(values);
 	}
 	
-	public static Secs2 Uint1(long... values) {
+	public static Secs2 uint1(long... values) {
 		return new Secs2Uint1(values);
 	}
 	
-	public static Secs2 Uint1(BigInteger... values) {
+	public static Secs2 uint1(BigInteger... values) {
 		return new Secs2Uint1(values);
 	}
 
-	public static Secs2 Uint1(List<Number> values) {
+	public static Secs2 uint1(List<Number> values) {
 		return new Secs2Uint1(values);
 	}
 
-	public static Secs2 Uint2() {
+	public static Secs2 uint2() {
 		return new Secs2Uint2();
 	}
 	
-	public static Secs2 Uint2(int... values) {
+	public static Secs2 uint2(int... values) {
 		return new Secs2Uint2(values);
 	}
 	
-	public static Secs2 Uint2(long... values) {
+	public static Secs2 uint2(long... values) {
 		return new Secs2Uint2(values);
 	}
 	
-	public static Secs2 Uint2(BigInteger... values) {
+	public static Secs2 uint2(BigInteger... values) {
 		return new Secs2Uint2(values);
 	}
 
-	public static Secs2 Uint2(List<Number> values) {
+	public static Secs2 uint2(List<Number> values) {
 		return new Secs2Uint2(values);
 	}
 
-	public static Secs2 Uint4() {
+	public static Secs2 uint4() {
 		return new Secs2Uint4();
 	}
 	
-	public static Secs2 Uint4(int... values) {
+	public static Secs2 uint4(int... values) {
 		return new Secs2Uint4(values);
 	}
 	
-	public static Secs2 Uint4(long... values) {
+	public static Secs2 uint4(long... values) {
 		return new Secs2Uint4(values);
 	}
 	
-	public static Secs2 Uint4(BigInteger... values) {
+	public static Secs2 uint4(BigInteger... values) {
 		return new Secs2Uint4(values);
 	}
 
-	public static Secs2 Uint4(List<Number> values) {
+	public static Secs2 uint4(List<Number> values) {
 		return new Secs2Uint4(values);
 	}
 
-	public static Secs2 Uint8() {
+	public static Secs2 uint8() {
 		return new Secs2Uint8();
 	}
 	
-	public static Secs2 Uint8(int... values) {
+	public static Secs2 uint8(int... values) {
 		return new Secs2Uint8(values);
 	}
 	
-	public static Secs2 Uint8(long... values) {
+	public static Secs2 uint8(long... values) {
 		return new Secs2Uint8(values);
 	}
 	
-	public static Secs2 Uint8(BigInteger... values) {
+	public static Secs2 uint8(BigInteger... values) {
 		return new Secs2Uint8(values);
 	}
 
-	public static Secs2 Uint8(List<Number> values) {
+	public static Secs2 uint8(List<Number> values) {
 		return new Secs2Uint8(values);
 	}
 	
