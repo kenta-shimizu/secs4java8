@@ -1,5 +1,7 @@
 package secs.secs1;
 
-public interface Secs1MessageReceiveListener {
+import java.util.EventListener;
+
+public interface Secs1MessageReceiveListener extends EventListener {
 	public void receive(Secs1Message msg);
 }
