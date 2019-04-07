@@ -82,6 +82,11 @@ public class Secs1MessageBlock {
 		return Integer.valueOf(key);
 	}
 	
+	public boolean equalsSystemBytesKey(Secs1MessageBlock ref) {
+		
+		return ref.systemBytesKey().equals(systemBytesKey());
+	}
+	
 	public boolean sameBlock(Secs1MessageBlock ref) {
 		
 		return (ref.bytes[1] == bytes[1]

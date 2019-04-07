@@ -2,6 +2,9 @@ package secs.secs2;
 
 public class Secs2UnsupportedDataFormatException extends Secs2Exception {
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = -8153315104484387599L;
 
 	public Secs2UnsupportedDataFormatException() {

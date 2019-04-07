@@ -2,6 +2,9 @@ package secs.secs2;
 
 public class Secs2IndexOutOfBoundsException extends Secs2Exception {
 	
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 3197519767975463908L;
 
 	public Secs2IndexOutOfBoundsException() {

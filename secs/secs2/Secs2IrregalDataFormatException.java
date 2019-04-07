@@ -2,6 +2,9 @@ package secs.secs2;
 
 public class Secs2IrregalDataFormatException extends Secs2Exception {
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = -3841186584822888760L;
 
 	public Secs2IrregalDataFormatException() {

@@ -1,5 +1,6 @@
 package secs.sml;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,15 +23,15 @@ public class SmlMessageParser {
 	 * 
 	 * @return
 	 */
-	protected SmlSecs2Parser getSmlSecs2Parser() {
-		return SmlSecs2Parser.getInstance();
+	protected SmlDataItemParser getSmlSecs2Parser() {
+		return SmlDataItemParser.getInstance();
 	}
 	
 	protected static final String GROUP_STREAM = "STREAM";
 	protected static final String GROUP_FUNCTION = "FUNCTION";
 	protected static final String GROUP_WBIT = "WBIT";
 	protected static final String GROUP_SECS2 = "SECS2";
-	protected static final String pregMessage = "[Ss](?<" + GROUP_STREAM + ">[0-9]+)[Ff](?<" + GROUP_FUNCTION + ">[0-9]+)\\s*(?<" + GROUP_WBIT + ">[Ww]?)\\s*(?<" + GROUP_SECS2 + ">(<.+>)?)";
+	protected static final String pregMessage = "[Ss](?<" + GROUP_STREAM + ">[0-9]{1,3})[Ff](?<" + GROUP_FUNCTION + ">[0-9]{1,3})\\s*(?<" + GROUP_WBIT + ">[Ww]?)\\s*(?<" + GROUP_SECS2 + ">(<.+>)?)";
 	
 	protected static final Pattern ptnMessage = Pattern.compile("^" + pregMessage + "$");
 
@@ -43,16 +44,17 @@ public class SmlMessageParser {
 	 */
 	public SmlMessage parse(CharSequence cs) throws SmlParseException  {
 		
+		Objects.requireNonNull(cs);
+		
 		String s = trimPeriod(cs);
 		
 		Matcher m = ptnMessage.matcher(s);
 		
 		if ( ! m.matches() ) {
-			throw new SmlParseException();
+			throw new SmlParseException("\"SxFy [W] items.\" parse failed");
 		}
 		
 		try {
-			
 			int strm = Integer.parseInt(m.group(GROUP_STREAM));
 			int func = Integer.parseInt(m.group(GROUP_FUNCTION));
 			boolean wbit = ! m.group(GROUP_WBIT).isEmpty();
@@ -66,12 +68,17 @@ public class SmlMessageParser {
 		}
 	}
 	
-	private String trimPeriod(CharSequence cs) {
-		String s = cs.toString().trim();
+	private String trimPeriod(CharSequence cs) throws SmlParseException {
+		String s = cs.toString().replaceAll("\\r\\n|\\r|\\n|\\t", " ").trim();
+		
 		if ( s.endsWith(".") ) {
-			s = s.substring(0, s.length() - 1);
+			
+			return  s.substring(0, s.length() - 1).trim();
+			
+		} else {
+			
+			throw new SmlParseException("not end \".\"");
 		}
-		return s;
 	}
 
 }

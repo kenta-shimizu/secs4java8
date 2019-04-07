@@ -4,7 +4,10 @@ import java.util.Optional;
 
 public class SecsWaitReplyMessageException extends SecsException {
 	
-	private static final long serialVersionUID = -6658774475699975134L;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -415832641150415192L;
 	
 	private SecsMessage secsMessage;
 	

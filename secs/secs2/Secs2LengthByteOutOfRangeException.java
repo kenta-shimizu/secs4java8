@@ -2,6 +2,9 @@ package secs.secs2;
 
 public class Secs2LengthByteOutOfRangeException extends Secs2Exception {
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = -6096190059870859736L;
 
 	public Secs2LengthByteOutOfRangeException() {

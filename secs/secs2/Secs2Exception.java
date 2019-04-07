@@ -2,6 +2,9 @@ package secs.secs2;
 
 public class Secs2Exception extends Exception {
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 4357717366163333969L;
 
 	public Secs2Exception() {

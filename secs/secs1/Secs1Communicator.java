@@ -445,6 +445,7 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 				
 				entryLog(new Secs1MessageBlockLog("Secs1Communicator#circuitControl-poll failed", block));
 				counter += 1;
+				
 				break;
 			}
 			}
@@ -452,16 +453,15 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		
 		/* Send-Retry-Over */
 		{
-			sendBlockQueue.poll();
-			
 			//TODO
 			replyManager.notifySendFailed(block);
 			
-			
-			//entryLog(new SecsLog(new Secs1RetryOverException(block.toHeaderBytesString())));
+			sendBlockQueue.removeIf(blk -> blk.equalsSystemBytesKey(block));
 			
 			//TODO
-			//remove same block
+			//block
+			//entryLog(new SecsLog(new Secs1RetryOverException(block.toHeaderBytesString())));
+			
 		}
 	}
 	
