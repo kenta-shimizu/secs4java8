@@ -1,5 +1,7 @@
 package secs.secs2;
 
+import java.util.Objects;
+
 public enum Secs2Item {
 	
 	UNDEFINED( (byte)0xFF, -1, "UNDEFINED"),
@@ -20,7 +22,6 @@ public enum Secs2Item {
 	UINT1 ( (byte)0xA4 , 1 , "U1" ),
 	UINT2 ( (byte)0xA8 , 2 , "U2" ),
 	UINT4 ( (byte)0xB0 , 4 , "U4" ),
-	
 	;
 	
 	private final byte code;
@@ -41,10 +42,20 @@ public enum Secs2Item {
 		return size;
 	}
 	
+	/**
+	 * 
+	 * @return SML-Item-type-String
+	 */
 	protected String symbol() {
 		return symbol;
 	}
 	
+	/**
+	 * Secs2Item getter by byte-code
+	 * 
+	 * @param itemCode byte
+	 * @return Secs2Item
+	 */
 	public static Secs2Item get(byte itemCode) {
 		
 		byte b = (byte)( itemCode & 0xFC );
@@ -58,7 +69,15 @@ public enum Secs2Item {
 		return UNDEFINED;
 	}
 	
+	/**
+	 * Secs2Item getter by SML-Item-type-String
+	 * 
+	 * @param symbol
+	 * @return Secs2Item
+	 */
 	public static Secs2Item symbol(CharSequence symbol) {
+		
+		Objects.requireNonNull(symbol);
 		
 		String s = symbol.toString();
 		
