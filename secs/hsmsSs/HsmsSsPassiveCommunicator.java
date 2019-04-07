@@ -19,8 +19,15 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 			throw new IOException("HsmsSsCommunicatorConfig#protocol is not PASSIVE");
 		}
 		
-		
-		//TODO
+		executorService().execute(() -> {
+			try {
+				for ( ;; ) {
+					loop();
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		});
 	}
 	
 	@Override
@@ -42,6 +49,11 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 		if ( ! ioExcepts.isEmpty() ) {
 			throw ioExcepts.get(0);
 		}
+	}
+	
+	private void loop() throws InterruptedException {
+		
+		//TODO
 	}
 
 }

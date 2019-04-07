@@ -6,6 +6,9 @@ public class Secs1MessageBlock {
 	
 	private static final int HEAD_SIZE = 10;
 	
+	private static final int ZERO = 0;
+	private static final int ONE  = 1;
+	
 	private final byte[] bytes;
 	
 	public Secs1MessageBlock(byte[] bs) {
@@ -71,6 +74,28 @@ public class Secs1MessageBlock {
 		return (((int)(bytes[5]) << 8) & 0x7F00) | (bytes[6] & 0xFF);
 	}
 	
+	public boolean isFirstBlock() {
+		
+		int n = blockNumber();
+		
+		if ( ebit() ) {
+			
+			return n == ZERO || n == ONE;
+			
+		} else {
+			
+			return n == ONE;
+		}
+	}
+	
+	public boolean isPrimaryBlock() {
+		return ! isReplyBlock();
+	}
+	
+	public boolean isReplyBlock() {
+		return getFunction() % 2 == 0;
+	}
+	
 	public Integer systemBytesKey() {
 		
 		int key;
@@ -103,9 +128,9 @@ public class Secs1MessageBlock {
 	
 	public boolean expectBlock(Secs1MessageBlock ref) {
 		
-		int expectBlockNumber = ref.blockNumber() + 1;
+		int expectBlockNumber = blockNumber() + 1;
 		
-		if ( blockNumber() != expectBlockNumber ) {
+		if ( ref.blockNumber() != expectBlockNumber ) {
 			return false;
 		}
 		

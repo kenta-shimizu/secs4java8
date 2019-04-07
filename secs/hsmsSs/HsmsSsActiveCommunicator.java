@@ -1,9 +1,14 @@
 package secs.hsmsSs;
 
 import java.io.IOException;
+import java.net.SocketAddress;
+import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import secs.SecsLog;
 
 public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 
@@ -21,7 +26,9 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 		
 		executorService().execute(() -> {
 			try {
-				loop();
+				for ( ;; ) {
+					loop();
+				}
 			}
 			catch ( InterruptedException ignore ) {
 			}
@@ -41,9 +48,6 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 			ioExcepts.add(e);
 		}
 		
-		//TODO
-		
-		
 		if ( ! ioExcepts.isEmpty() ) {
 			throw ioExcepts.get(0);
 		}
@@ -51,15 +55,67 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 	
 	private void loop() throws InterruptedException {
 		
-		for ( ;; ) {
+		try (
+				AsynchronousSocketChannel ch = AsynchronousSocketChannel.open();
+				) {
 			
-			//TODO
-			//circuit
+			SocketAddress socketAddr = hsmsSsConfig().socketAddress()
+					.orElseThrow(() -> new IOException("error"));
 			
+			String socketAddrInfo = hsmsSsConfig().socketAddress()
+					.map(SocketAddress::toString)
+					.orElse("not setted");
 			
-			long t5 = (long)(hsmsSsConfig().timeout().t5() * 1000.0F);
-			TimeUnit.MILLISECONDS.sleep(t5);
+			try {
+				
+				entryLog(new SecsLog("HsmsSsActiveCommunicator try-connect", socketAddrInfo));
+
+				ch.connect(socketAddr, null, new CompletionHandler<Void, Void>(){
+					
+					@Override
+					public void completed(Void none, Void attachment) {
+						
+						notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.CONNECTED);
+						
+						//entryLog
+						//connected.
+						
+						
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void failed(Throwable t, Void attachment) {
+						
+						synchronized ( this ) {
+							this.notifyAll();
+						}
+						
+						entryLog(new SecsLog("HsmsSsActiveCommunicator#open-AsynchronousSocketChannel#connect failed", t));
+					}
+					
+				});
+				
+				synchronized ( this ) {
+					this.wait();
+				}
+			}
+			finally {
+				
+				//TODO
+				notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
+				
+				//TODO
+				
+			}
 		}
+		catch ( IOException e ) {
+			entryLog(new SecsLog(e));
+		}
+		
+		long t5 = (long)(hsmsSsConfig().timeout().t5() * 1000.0F);
+		TimeUnit.MILLISECONDS.sleep(t5);
 	}
 
 }

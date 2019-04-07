@@ -49,7 +49,7 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		super(config);
 		
 		this.secs1Config = config;
-		this.blockManager = new Secs1MessageBlockManager(config);
+		this.blockManager = new Secs1MessageBlockManager(config, execServ);
 		this.replyManager = new Secs1MessageSendReplyManager(execServ, config.timeout(), msg -> {
 			
 			try {
@@ -279,7 +279,9 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		
 		execServ.execute(() -> {
 			try {
-				loop();
+				for ( ;; ) {
+					loop();
+				}
 			}
 			catch ( InterruptedException ignore ) {
 			}
@@ -319,41 +321,38 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 	
 	private void loop() throws InterruptedException {
 		
-		for ( ;; ) {
+		try {
 			
-			try {
+			if ( sendBlockQueue.isEmpty() ) {
 				
-				if ( sendBlockQueue.isEmpty() ) {
+				Optional<Byte> op = this.pollByte(10L, TimeUnit.MILLISECONDS);
+				
+				if ( op.isPresent() ) {
 					
-					Optional<Byte> op = this.pollByte(10L, TimeUnit.MILLISECONDS);
+					byte b = op.get();
 					
-					if ( op.isPresent() ) {
-						
-						byte b = op.get();
-						
-						if ( b == ENQ ) {
-							receiveBlock();
-						}
+					if ( b == ENQ ) {
+						receiveBlock();
 					}
-					
-				} else {
-					
-					circuitControl();
 				}
 				
-			}
-			catch ( InterruptedException e ) {
-				throw e;
-			}
-			catch ( IOException e ) {
+			} else {
 				
-				sendBlockQueue.clear();
-				entryLog(new SecsLog(e));
+				circuitControl();
 			}
-			catch ( Throwable t ) {
-				entryLog(new SecsLog(t));
-				throw t;
-			}
+			
+		}
+		catch ( InterruptedException e ) {
+			throw e;
+		}
+		catch ( IOException e ) {
+			
+			sendBlockQueue.clear();
+			entryLog(new SecsLog(e));
+		}
+		catch ( Throwable t ) {
+			entryLog(new SecsLog(t));
+			throw t;
 		}
 	}
 	
@@ -453,7 +452,6 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		
 		/* Send-Retry-Over */
 		{
-			//TODO
 			replyManager.notifySendFailed(block);
 			
 			sendBlockQueue.removeIf(blk -> blk.equalsSystemBytesKey(block));
@@ -573,8 +571,11 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 				
 				sendByte(ACK);
 				
-				//TODO
-				//block-manager;
+				Secs1MessageBlock block = new Secs1MessageBlock(bs);
+				
+				this.replyManager.resetTimer(block);
+				
+				blockManager.putBlock(block);
 				
 			} else {
 				

@@ -1,8 +1,17 @@
 package secs.secs1;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import secs.SecsLog;
 import secs.SecsLogListener;
@@ -10,9 +19,11 @@ import secs.SecsLogListener;
 public class Secs1MessageBlockManager {
 	
 	private final Secs1CommunicatorConfig config;
+	private final ExecutorService executorService;
 	
-	public Secs1MessageBlockManager(Secs1CommunicatorConfig config) {
+	public Secs1MessageBlockManager(Secs1CommunicatorConfig config, ExecutorService executorService) {
 		this.config = config;
+		this.executorService = executorService;
 	}
 	
 	private final Collection<Secs1MessageReceiveListener> lstnrs = new CopyOnWriteArrayList<>();
@@ -48,43 +59,140 @@ public class Secs1MessageBlockManager {
 		});
 	}
 	
+	private final Collection<Integer> resetKeys = new ArrayList<>();
 	
-	private final LinkedList<Secs1MessageBlock> blocks = new LinkedList<>();
+	private final Map<Integer, LinkedList<Secs1MessageBlock>> blockMap = new HashMap<>();
 	
 	public void putBlock(Secs1MessageBlock block) {
 		
 		synchronized ( this ) {
 			
-			if ( block.deviceId() != config.deviceId() ) {
+			if ( isDoubleBlock(block) ) {
+				putLog(new Secs1MessageBlockLog("Secs1MessageBlock receive double", block));
 				return;
 			}
 			
-			if ( blocks.isEmpty() ) {
+			final Integer systemBytesKey = block.systemBytesKey();
+			
+			final LinkedList<Secs1MessageBlock> ll = blockMap.computeIfAbsent(systemBytesKey, key -> new LinkedList<>());
+			
+			if ( ll.isEmpty() ) {
 				
-				blocks.add(block);
-				
-			} else {
-				
-				Secs1MessageBlock ref = blocks.getLast();
-				
-				if ( block.sameBlock(ref) ) {
+				if ( block.isFirstBlock() ) {
+					
+					ll.add(block);
+					
+				} else {
+					
+					blockMap.remove(systemBytesKey);
+					
+					putLog(new Secs1MessageBlockLog("Secs1MessageBlock receive not 1st-Block", block));
+					
 					return;
 				}
 				
-				if ( ! block.expectBlock(ref) ) {
-					blocks.clear();
-				}
+			} else {
 				
-				blocks.addLast(block);
+				if ( block.isFirstBlock() ) {
+					
+					ll.clear();
+					ll.add(block);
+					
+				} else {
+					
+					if ( ll.getLast().expectBlock(block) ) {
+						
+						ll.add(block);
+						
+						synchronized ( resetKeys ) {
+							resetKeys.add(systemBytesKey);
+							resetKeys.notifyAll();
+						}
+						
+					} else {
+						
+						putLog(new Secs1MessageBlockLog("Secs1MessageBlock receive unexpected-block", block));
+						
+						return;
+					}
+				}
 			}
 			
 			if ( block.ebit() ) {
 				
-				Secs1Message m = new Secs1Message(blocks);
-				putSecs1Message(m);
-				blocks.clear();
+				putSecs1Message(new Secs1Message(ll));
+				blockMap.remove(systemBytesKey);
+				
+			} else {
+				
+				synchronized ( resetKeys ) {
+					resetKeys.remove(systemBytesKey);
+				}
+				
+				executorService.execute(() -> {
+					
+					try {
+						
+						for ( ;; ) {
+							
+							Collection<Callable<Boolean>> tasks = Arrays.asList(() -> {
+								
+								/* reset */
+								synchronized ( resetKeys ) {
+									
+									try {
+										
+										for ( ;; ) {
+											
+											if ( resetKeys.contains(systemBytesKey) ) {
+												
+												resetKeys.remove(systemBytesKey);
+												
+												return Boolean.TRUE;
+											}
+											
+											resetKeys.wait();
+										}
+									}
+									catch ( InterruptedException ignore ) {
+									}
+								}
+								
+								return Boolean.FALSE;
+							});
+							
+							long t4 = (long)(config.timeout().t4() * 1000.0F);
+							boolean f = executorService.invokeAny(tasks, t4, TimeUnit.MILLISECONDS);
+							
+							if ( f ) {
+								return;
+							}
+						}
+					}
+					catch ( TimeoutException e ) {
+						
+						putLog(new Secs1MessageBlockLog("Secs1MessageBlock receive T4-timeout", block));
+						
+						blockMap.remove(systemBytesKey);
+					}
+					catch ( ExecutionException none ) {
+					}
+					catch ( InterruptedException ignore ) {
+					}
+					finally {
+						synchronized ( resetKeys ) {
+							resetKeys.remove(systemBytesKey);
+						}
+					}
+				});
 			}
 		}
 	}
-
+	
+	private boolean isDoubleBlock(Secs1MessageBlock ref) {
+		
+		return blockMap.getOrDefault(ref.systemBytesKey(), new LinkedList<>()).stream()
+				.anyMatch(block -> block.sameBlock(ref));
+	}
+	
 }

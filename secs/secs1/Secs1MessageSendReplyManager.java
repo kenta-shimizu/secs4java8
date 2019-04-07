@@ -2,9 +2,9 @@ package secs.secs1;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -38,16 +38,18 @@ public class Secs1MessageSendReplyManager extends SecsMessageSendReplyManager<Se
 		}
 	}
 	
-	private final Collection<Integer> resetKeys = new CopyOnWriteArraySet<>();
+	private final Collection<Integer> resetKeys = new HashSet<>();
 	
 	protected void resetTimer(Secs1MessageBlock block) {
-		resetTimer(block.systemBytesKey());
+		if ( block.isReplyBlock() ) {
+			resetTimer(block.systemBytesKey());
+		}
 	}
 	
 	protected void resetTimer(Integer key) {
-		synchronized ( this ) {
+		synchronized ( resetKeys ) {
 			resetKeys.add(key);
-			this.notifyAll();
+			resetKeys.notifyAll();
 		}
 	}
 	
@@ -58,6 +60,10 @@ public class Secs1MessageSendReplyManager extends SecsMessageSendReplyManager<Se
 			, InterruptedException {
 		
 		try {
+			
+			synchronized ( resetKeys ) {
+				resetKeys.remove(key);
+			}
 			
 			for ( ;; ) {
 				
@@ -92,19 +98,20 @@ public class Secs1MessageSendReplyManager extends SecsMessageSendReplyManager<Se
 						
 						for ( ;; ) {
 							
-							if ( resetKeys.contains(key) ) {
-								return new InnerReplyMsg(true, null);
-							}
-							
-							synchronized ( this ) {
-								this.wait();
+							synchronized ( resetKeys ) {
+								
+								if ( resetKeys.contains(key) ) {
+									
+									resetKeys.remove(key);
+									
+									return new InnerReplyMsg(true, null);
+								}
+								
+								resetKeys.wait();
 							}
 						}
 					}
 					catch ( InterruptedException ignore ) {
-					}
-					finally {
-						resetKeys.remove(key);
 					}
 					
 					return new InnerReplyMsg(false, null);
