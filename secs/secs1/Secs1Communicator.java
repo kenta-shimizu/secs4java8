@@ -465,6 +465,8 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 	
 	private void receiveBlock() throws IOException, InterruptedException {
 		
+		recvByteQueue.clear();
+		
 		sendByte(EOT);
 		
 		int lengthByte = 0;
@@ -600,6 +602,8 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 	}
 	
 	private boolean trySendMessageBlock(Secs1MessageBlock block) throws IOException, InterruptedException {
+		
+		recvByteQueue.clear();
 		
 		this.sendByte(block.bytes());
 		

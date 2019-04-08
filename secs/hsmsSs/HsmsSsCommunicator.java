@@ -37,6 +37,8 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	private final HsmsSsCommunicatorConfig hsmsSsConfig;
 	private final HsmsSsMessageSendReplyManager sendReplyManager;
 	
+	private HsmsSsCommunicateState hsmsSsCommunicateState;
+	
 	public HsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);
 		
@@ -100,6 +102,9 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 				}
 			}
 		});
+		
+		this.notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
+		
 	}
 	
 	protected ExecutorService executorService() {
@@ -214,12 +219,15 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 		return inst;
 	}
 	
+	protected HsmsSsCommunicateState hsmsSsCommunicateState() {
+		synchronized ( this ) {
+			return hsmsSsCommunicateState;
+		}
+	}
 	
 	protected void notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState state) {
 		synchronized ( this ) {
-			
-			//TODO
-			
+			this.hsmsSsCommunicateState = state;
 			notifyCommunicatableStateChange(state.communicatable());
 		}
 	}
@@ -250,6 +258,32 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 
 	private final AtomicInteger autoNumber = new AtomicInteger();
 	
+	protected int autoNumber() {
+		return autoNumber.incrementAndGet();
+	}
+	
+	protected byte[] systemBytes() {
+		
+		int n = autoNumber();
+		
+		byte[] bs = new byte[] {
+				(byte)0
+				, (byte)0
+				, (byte)(n >> 8)
+				, (byte)n
+		};
+		
+		if ( hsmsSsConfig().isEquip() ) {
+			
+			int sessionid = hsmsSsConfig().sessionId();
+			
+			bs[2] = (byte)(sessionid >> 8);
+			bs[3] = (byte)sessionid;
+		}
+		
+		return bs;
+	}
+	
 	public Optional<HsmsSsMessage> send(HsmsSsMessage msg)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
@@ -270,7 +304,7 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 		
 		HsmsSsMessageType mt = HsmsSsMessageType.DATA;
 		int sessionid = hsmsSsConfig().sessionId();
-		int sysnum = autoNumber.incrementAndGet();
+		byte[] sysbytes = systemBytes();
 		
 		byte[] head = new byte[] {
 				(byte)(sessionid >> 8)
@@ -279,21 +313,16 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 				, (byte)func
 				, mt.pType()
 				, mt.sType()
-				, (byte)0
-				, (byte)0
-				, (byte)(sysnum >> 8)
-				, (byte)sysnum
+				, sysbytes[0]
+				, sysbytes[1]
+				, sysbytes[2]
+				, sysbytes[3]
 		};
 		
 		if ( wbit ) {
 			head[2] |= 0x80;
 		}
 		
-		if ( hsmsSsConfig().isEquip() ) {
-			head[6] = (byte)(sessionid >> 8);
-			head[7] = (byte)sessionid;
-		}
-
 		return send(new HsmsSsMessage(head, secs2));
 	}
 
@@ -302,7 +331,7 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
-		byte[] prihead = primary.header10Bytes();
+		byte[] pri = primary.header10Bytes();
 		
 		HsmsSsMessageType mt = HsmsSsMessageType.DATA;
 		int sessionid = hsmsSsConfig().sessionId();
@@ -314,10 +343,10 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 				, (byte)func
 				, mt.pType()
 				, mt.sType()
-				, prihead[6]
-				, prihead[7]
-				, prihead[8]
-				, prihead[9]
+				, pri[6]
+				, pri[7]
+				, pri[8]
+				, pri[9]
 		};
 		
 		if ( wbit ) {
@@ -325,6 +354,94 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 		}
 		
 		return send(new HsmsSsMessage(head, secs2));
+	}
+	
+	protected HsmsSsMessage createHsmsSsSelectRequest() {
+		return createHsmsSsControlPrimaryMessage(HsmsSsMessageType.SELECT_REQ);
+	}
+	
+	protected HsmsSsMessage createHsmsSsSelectResponse(HsmsSsMessage primary, HsmsSsMessageSelectStatus status) {
+		
+		HsmsSsMessageType mt = HsmsSsMessageType.SELECT_RSP;
+		byte[] pri = primary.header10Bytes();
+		
+		return new HsmsSsMessage(new byte[] {
+				pri[0]
+				, pri[1]
+				, (byte)0
+				, status.statusCode()
+				, mt.pType()
+				, mt.sType()
+				, pri[6]
+				, pri[7]
+				, pri[8]
+				, pri[9]
+		});
+	}
+	
+	protected HsmsSsMessage createLinktestRequest() {
+		return createHsmsSsControlPrimaryMessage(HsmsSsMessageType.LINKTEST_REQ);
+	}
+	
+	protected HsmsSsMessage createLinktestResponse(HsmsSsMessage primary) {
+		
+		HsmsSsMessageType mt = HsmsSsMessageType.LINKTEST_RSP;
+		byte[] pri = primary.header10Bytes();
+		
+		return new HsmsSsMessage(new byte[] {
+				pri[0]
+				, pri[1]
+				, (byte)0
+				, (byte)0
+				, mt.pType()
+				, mt.sType()
+				, pri[6]
+				, pri[7]
+				, pri[8]
+				, pri[9]
+		});
+	}
+	
+	protected HsmsSsMessage createRejectRequest(HsmsSsMessage ref, HsmsSsMessageRejectReason reason) {
+		
+		HsmsSsMessageType mt = HsmsSsMessageType.REJECT_REQ;
+		byte[] bs = ref.header10Bytes();
+		byte b = reason == HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P ? bs[4] : bs[5];
+		
+		return new HsmsSsMessage(new byte[] {
+				bs[0]
+				, bs[1]
+				, b
+				, reason.reasonCode()
+				, mt.pType()
+				, mt.sType()
+				, bs[6]
+				, bs[7]
+				, bs[8]
+				, bs[9]
+		});
+	}
+	
+	protected HsmsSsMessage createSeparateRequest() {
+		return createHsmsSsControlPrimaryMessage(HsmsSsMessageType.SEPARATE_REQ);
+	}
+	
+	private HsmsSsMessage createHsmsSsControlPrimaryMessage(HsmsSsMessageType mt) {
+		
+		byte[] sysbytes = systemBytes();
+		
+		return new HsmsSsMessage(new byte[] {
+				(byte)0xFF
+				, (byte)0xFF
+				, (byte)0
+				, (byte)0
+				, mt.pType()
+				, mt.sType()
+				, sysbytes[0]
+				, sysbytes[1]
+				, sysbytes[2]
+				, sysbytes[3]
+		});
 	}
 	
 }

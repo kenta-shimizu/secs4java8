@@ -38,7 +38,7 @@ public class SmlMessageParser {
 	/**
 	 * parse to SML-Message
 	 * 
-	 * @param SML=Format-Character
+	 * @param SML-Format-Character
 	 * @return SmlMessage
 	 * @throws SmlParseException
 	 */
