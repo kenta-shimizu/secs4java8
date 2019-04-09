@@ -126,7 +126,7 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 												
 												putRecvByte(bs);
 												
-												buffer.clear();
+												((Buffer)buffer).clear();
 												ch.read(buffer, null, this);
 											}
 										}

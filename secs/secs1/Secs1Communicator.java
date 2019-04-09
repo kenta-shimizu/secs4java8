@@ -149,6 +149,10 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		return pollByteTx(secs1Config.timeout().t2());
 	}
 	
+	protected Optional<Byte> pollByteT4() throws InterruptedException {
+		return pollByteTx(secs1Config.timeout().t4());
+	}
+	
 	
 	public Optional<Secs1Message> send(Secs1Message s1m)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
@@ -456,10 +460,7 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 			
 			sendBlockQueue.removeIf(blk -> blk.equalsSystemBytesKey(block));
 			
-			//TODO
-			//block
-			//entryLog(new SecsLog(new Secs1RetryOverException(block.toHeaderBytesString())));
-			
+			entryLog(new Secs1MessageBlockLog("Secs1Communicator#try-send retry-over", block));
 		}
 	}
 	
@@ -578,6 +579,29 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 				this.replyManager.resetTimer(block);
 				
 				blockManager.putBlock(block);
+				
+				if ( ! block.ebit() ) {
+					
+					Optional<Byte> op = pollByteT4();
+					
+					if ( op.isPresent() ) {
+						
+						byte b = op.get();
+						
+						if ( b == ENQ ) {
+							
+							receiveBlock();
+							
+						} else {
+							
+							entryLog(new Secs1MessageBlockLog("Wait next block, receive not ENQ (" + String.format("%02X",  b) + ")", block));
+						}
+						
+					} else {
+						
+						entryLog(new Secs1MessageBlockLog("Wait next block, T4-timeout", block));
+					}
+				}
 				
 			} else {
 				

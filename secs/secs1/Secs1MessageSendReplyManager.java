@@ -130,7 +130,7 @@ public class Secs1MessageSendReplyManager extends SecsMessageSendReplyManager<Se
 				}
 			}
 		}
-		catch (TimeoutException e) {
+		catch ( TimeoutException e ) {
 			throwSecsWaitReplyMessageException(primary);
 		}
 		catch ( ExecutionException none) {

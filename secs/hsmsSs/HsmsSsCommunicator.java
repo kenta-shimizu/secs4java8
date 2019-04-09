@@ -48,10 +48,7 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 			synchronized ( channels ) {
 				
 				if ( channels.isEmpty() ) {
-					
-					//TODO
-					//not-connected
-					throw new HsmsSsSendMessageException(msg);
+					throw new HsmsSsNotConnectedException(msg);
 				}
 				
 				for ( AsynchronousSocketChannel ch : channels ) {
@@ -356,11 +353,11 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 		return send(new HsmsSsMessage(head, secs2));
 	}
 	
-	protected HsmsSsMessage createHsmsSsSelectRequest() {
+	protected HsmsSsMessage createSelectRequest() {
 		return createHsmsSsControlPrimaryMessage(HsmsSsMessageType.SELECT_REQ);
 	}
 	
-	protected HsmsSsMessage createHsmsSsSelectResponse(HsmsSsMessage primary, HsmsSsMessageSelectStatus status) {
+	protected HsmsSsMessage createSelectResponse(HsmsSsMessage primary, HsmsSsMessageSelectStatus status) {
 		
 		HsmsSsMessageType mt = HsmsSsMessageType.SELECT_RSP;
 		byte[] pri = primary.header10Bytes();

@@ -5,10 +5,17 @@ import java.net.SocketAddress;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import secs.SecsLog;
+import secs.SecsWaitReplyMessageException;
 
 public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 
@@ -55,6 +62,8 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 	
 	private void loop() throws InterruptedException {
 		
+		final Object sync = new Object();
+		
 		try (
 				AsynchronousSocketChannel ch = AsynchronousSocketChannel.open();
 				) {
@@ -75,21 +84,106 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 					@Override
 					public void completed(Void none, Void attachment) {
 						
-						notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.CONNECTED);
+						notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_SELECTED);
 						
-						//entryLog
-						//connected.
+						BlockingQueue<HsmsSsMessage> queue = new LinkedBlockingQueue<>();
+						
+						HsmsSsByteReader reader = new HsmsSsByteReader(hsmsSsConfig(), ch);
+						
+						reader.addHsmsSsMessageReceiveListener(msg -> {
+							sendReplyManager().receive(msg).ifPresent(queue::offer);
+						});
 						
 						
-						// TODO Auto-generated method stub
+						//TODO
+						//linktest
 						
+						
+						Collection<Callable<Object>> tasks = Arrays.asList(reader, () -> {
+							
+							final Object rtn = new Object();
+							
+							try {
+								HsmsSsMessageSelectStatus ss = send(createSelectRequest())
+										.map(HsmsSsMessageSelectStatus::get)
+										.orElse(HsmsSsMessageSelectStatus.NOT_SELECT_RSP);
+								
+								switch ( ss ) {
+								case SUCCESS:
+								case ACTIVED: {
+									
+									notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.SELECTED);
+									break;
+								}
+								default: {
+									return rtn;
+								}
+								}
+							}
+							catch ( SecsWaitReplyMessageException e ) {
+								return rtn;
+							}
+							
+							for ( ;; ) {
+								
+								HsmsSsMessage msg = queue.take();
+								
+								HsmsSsMessageType mt = HsmsSsMessageType.get(msg);
+								
+								switch ( mt ) {
+								case DATA: {
+									
+									notifyReceiveMessage(msg);
+									break;
+								}
+								case SELECT_REQ: {
+									
+									//TOOD
+									break;
+								}
+								case LINKTEST_REQ: {
+									
+									send(createLinktestResponse(msg));
+									break;
+								}
+								case SEPARATE_REQ: {
+									
+									return rtn;
+									/* break; */
+								}
+								case SELECT_RSP:
+								case LINKTEST_RSP:
+								case REJECT_REQ:
+								default: {
+									
+									/* ignore */
+								}
+								}
+							}
+						});
+						
+						try {
+							executorService().invokeAny(tasks);
+						}
+						catch ( ExecutionException e ) {
+							
+							Throwable t = e.getCause();
+							
+							//TODOO
+						}
+						catch ( InterruptedException ignore ) {
+						}
+						
+						synchronized ( sync ) {
+							sync.notifyAll();
+						}
 					}
 					
 					@Override
 					public void failed(Throwable t, Void attachment) {
 						
-						synchronized ( this ) {
-							this.notifyAll();
+						synchronized ( sync ) {
+							sync.notifyAll();
 						}
 						
 						entryLog(new SecsLog("HsmsSsActiveCommunicator#open-AsynchronousSocketChannel#connect failed", t));
@@ -97,8 +191,8 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 					
 				});
 				
-				synchronized ( this ) {
-					this.wait();
+				synchronized ( sync ) {
+					sync.wait();
 				}
 			}
 			finally {

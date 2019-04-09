@@ -3,7 +3,7 @@ package secs.hsmsSs;
 public enum HsmsSsCommunicateState {
 	
 	NOT_CONNECTED(false),
-	CONNECTED(false),
+	NOT_SELECTED(false),
 	SELECTED(true),
 	;
 	
