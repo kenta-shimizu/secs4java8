@@ -53,55 +53,61 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 				
 				for ( AsynchronousSocketChannel ch : channels ) {
 					
-					try {
-						byte[] head = msg.header10Bytes();
-						byte[] body = msg.secs2().secs2Bytes();
-						
-						int len = head.length + body.length;
-						
-						int bflen = len + 4;
-						
-						if ( bflen > 0x7FFFFFFF || bflen < 14 ) {
-							throw new HsmsSsSendMessageSizeException(msg);
-						}
-						
-						ByteBuffer bf = ByteBuffer.allocate(bflen);
-						bf.putInt(len);
-						bf.put(head);
-						bf.put(body);
-						((Buffer)bf).flip();
-						
-						while ( bf.hasRemaining() ) {
-							
-							Future<Integer> f = ch.write(bf);
-							
-							try {
-								int w = f.get().intValue();
-								
-								if ( w <= 0 ) {
-									break;
-								}
-							}
-							catch ( InterruptedException e ) {
-								f.cancel(true);
-								throw e;
-							}
-						}
-						
-						sendReplyManager().notifySendCompleted(msg);
-					}
-					catch ( ExecutionException e ) {
-						throw new HsmsSsSendMessageException(msg, e.getCause());
-					}
-					catch ( Secs2Exception e ) {
-						throw new HsmsSsSendMessageException(msg, e);
-					}
+					send(ch, msg);
+					
+					sendReplyManager().notifySendCompleted(msg);
 				}
 			}
 		});
 		
 		this.notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
 		
+	}
+
+	protected void send(AsynchronousSocketChannel ch, HsmsSsMessage msg)
+			throws InterruptedException, HsmsSsSendMessageException {
+		
+		try {
+			byte[] head = msg.header10Bytes();
+			byte[] body = msg.secs2().secs2Bytes();
+			
+			int len = head.length + body.length;
+			
+			int bflen = len + 4;
+			
+			if ( bflen > 0x7FFFFFFF || bflen < 14 ) {
+				throw new HsmsSsSendMessageSizeException(msg);
+			}
+			
+			ByteBuffer bf = ByteBuffer.allocate(bflen);
+			bf.putInt(len);
+			bf.put(head);
+			bf.put(body);
+			((Buffer)bf).flip();
+			
+			while ( bf.hasRemaining() ) {
+				
+				Future<Integer> f = ch.write(bf);
+				
+				try {
+					int w = f.get().intValue();
+					
+					if ( w <= 0 ) {
+						break;
+					}
+				}
+				catch ( InterruptedException e ) {
+					f.cancel(true);
+					throw e;
+				}
+			}
+		}
+		catch ( ExecutionException e ) {
+			throw new HsmsSsSendMessageException(msg, e.getCause());
+		}
+		catch ( Secs2Exception e ) {
+			throw new HsmsSsSendMessageException(msg, e);
+		}
 	}
 	
 	protected ExecutorService executorService() {
@@ -225,6 +231,7 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	protected void notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState state) {
 		synchronized ( this ) {
 			this.hsmsSsCommunicateState = state;
+			entryLog(new SecsLog("HsmsSs-Connect-state-chenged: " + state.toString()));
 			notifyCommunicatableStateChange(state.communicatable());
 		}
 	}
@@ -242,7 +249,11 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	
 	protected boolean addChannel(AsynchronousSocketChannel ch) {
 		synchronized ( channels ) {
-			return channels.add(ch);
+			if ( channels.isEmpty() ) {
+				return channels.add(ch);
+			} else {
+				return false;
+			}
 		}
 	}
 	
@@ -251,8 +262,7 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 			return channels.remove(ch);
 		}
 	}
-
-
+	
 	private final AtomicInteger autoNumber = new AtomicInteger();
 	
 	protected int autoNumber() {

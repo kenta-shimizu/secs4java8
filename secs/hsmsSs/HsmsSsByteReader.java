@@ -22,7 +22,10 @@ public class HsmsSsByteReader implements Callable<Object> {
 		this.config = config;
 		this.channel = channel;
 	}
-
+	
+	/**
+	 * until determinate or Tiemout-T8
+	 */
 	@Override
 	public Object call() throws Exception {
 		
@@ -87,9 +90,6 @@ public class HsmsSsByteReader implements Callable<Object> {
 		}
 		catch ( TimeoutException e ) {
 			throw new HsmsSsTimeoutT8Exception(e);
-		}
-		catch ( ExecutionException e ) {
-			throw e;
 		}
 		catch ( InterruptedException ignore ) {
 		}
