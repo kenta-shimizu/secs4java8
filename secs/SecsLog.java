@@ -30,11 +30,11 @@ public class SecsLog {
 	}
 	
 	public SecsLog(CharSequence subject) {
-		this(subject, null);
+		this(subject, LocalDateTime.now(), null);
 	}
 	
 	public SecsLog(Throwable t) {
-		this(SUBJECT_OF_THROWABLE, t);
+		this(SUBJECT_OF_THROWABLE, LocalDateTime.now(), t);
 	}
 	
 	public String subject() {

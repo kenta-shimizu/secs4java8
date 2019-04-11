@@ -29,6 +29,11 @@ public class Secs2BytesParser extends Secs2 {
 		this.parsed = null;
 	}
 	
+	@Override
+	public boolean isEmpty() {
+		return bytes.length == 0;
+	}
+	
 	private static class Result {
 		
 		private final Secs2 secs2;
@@ -221,7 +226,7 @@ public class Secs2BytesParser extends Secs2 {
 	}
 	
 	@Override
-	public byte[] secs2Bytes() throws Secs2Exception {
+	public byte[] secs2Bytes() {
 		return bytes;
 	}
 	

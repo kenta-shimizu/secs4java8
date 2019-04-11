@@ -17,6 +17,10 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		/* Nothing */
 	}
 	
+	public boolean isEmpty() {
+		return false;
+	}
+	
 	@Override
 	public Iterator<Secs2> iterator() {
 		return Collections.emptyIterator();

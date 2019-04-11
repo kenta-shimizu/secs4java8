@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import secs.SecsMessage;
 import secs.secs2.Secs2;
+import secs.secs2.Secs2Exception;
 
 public class HsmsSsMessage extends SecsMessage {
 
@@ -98,6 +99,40 @@ public class HsmsSsMessage extends SecsMessage {
 				.append(" ").append(String.format("%02X", bs[9]))
 				.append("]")
 				.toString();
+	}
+	
+	private static final String BR = System.lineSeparator();
+	
+	@Override
+	public String toString() {
+		
+		StringBuilder sb = new StringBuilder(toHeaderBytesString());
+		
+		if ( dataMessage() ) {
+			
+			sb.append(BR)
+			.append("S").append(getStream())
+			.append("F").append(getFunction());
+			
+			if (wbit()) {
+				sb.append(" W");
+			}
+			
+			Secs2 body = secs2();
+			
+			try {
+				if ( body.secs2Bytes().length > 0 ) {
+					sb.append(BR).append(body);
+				}
+			}
+			catch (Secs2Exception e) {
+				sb.append(BR).append("<PARSE FAILED>");
+			}
+			
+			sb.append(".");
+		}
+		
+		return sb.toString();
 	}
 
 }

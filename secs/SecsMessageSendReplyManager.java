@@ -86,10 +86,9 @@ public abstract class SecsMessageSendReplyManager<T extends SecsMessage> {
 		
 		final Integer key  = msg.systemBytesKey();
 		
-		synchronized ( this ) {
-			
-			try {
-			
+		try {
+			synchronized ( this ) {
+				
 				/* entry */
 				sendedMap.put(key, SendStatus.YET);
 				replyMap.put(key, null);
@@ -117,12 +116,14 @@ public abstract class SecsMessageSendReplyManager<T extends SecsMessage> {
 				if ( ! isWaitReplyMessage(msg) ) {
 					return Optional.empty();
 				}
-				
-				/* wait until reply */
-				return waitUntilReply(msg, key);
-				
 			}
-			finally {
+			
+			/* wait until reply */
+			return waitUntilReply(msg, key);
+			
+		}
+		finally {
+			synchronized ( this ) {
 				sendedMap.remove(key);
 				replyMap.remove(key);
 			}
@@ -139,19 +140,19 @@ public abstract class SecsMessageSendReplyManager<T extends SecsMessage> {
 			Collection<Callable<T>> tasks = Arrays.asList(() -> {
 				
 				try {
-					
-					for ( ;; ) {
+					synchronized ( this ) {
 						
-						if ( ! replyMap.containsKey(key) ) {
-							break;
-						}
-						
-						T reply = replyMap.get(key);
-						if ( reply != null ) {
-							return reply;
-						}
-						
-						synchronized ( this ) {
+						for ( ;; ) {
+							
+							if ( ! replyMap.containsKey(key) ) {
+								break;
+							}
+							
+							T reply = replyMap.get(key);
+							if ( reply != null ) {
+								return reply;
+							}
+							
 							this.wait();
 						}
 					}
@@ -215,6 +216,7 @@ public abstract class SecsMessageSendReplyManager<T extends SecsMessage> {
 			if ( replyMap.containsKey(key) ) {
 				
 				replyMap.put(key, msg);
+				
 				this.notifyAll();
 				
 				return Optional.empty();

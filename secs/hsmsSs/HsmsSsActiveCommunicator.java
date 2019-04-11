@@ -98,11 +98,16 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 						final HsmsSsCircuitAssurance linktest = new HsmsSsCircuitAssurance(HsmsSsActiveCommunicator.this);
 						
 						reader.addHsmsSsMessageReceiveListener(msg -> {
+							
 							sendReplyManager().receive(msg).ifPresent(queue::offer);
 						});
 						
 						reader.addHsmsSsMessageReceiveListener(msg -> {
 							linktest.reset();
+						});
+						
+						reader.addHsmsSsMessageReceiveListener(msg -> {
+							entryLog(new SecsLog("Receive HsmsSs-Message", msg));
 						});
 						
 						Collection<Callable<Object>> tasks = Arrays.asList(reader, () -> {

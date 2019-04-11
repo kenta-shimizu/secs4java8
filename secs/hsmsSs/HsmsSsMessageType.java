@@ -50,7 +50,7 @@ public enum HsmsSsMessageType {
 		return get(p, s);
 	}
 	
-	public boolean supportPType(byte p) {
+	public static boolean supportPType(byte p) {
 		
 		for ( HsmsSsMessageType t : values() ) {
 			if ( t != UNDEFINED && t.p == p ) {
@@ -61,13 +61,13 @@ public enum HsmsSsMessageType {
 		return false;
 	}
 	
-	public boolean supportPType(HsmsSsMessage msg) {
+	public static boolean supportPType(HsmsSsMessage msg) {
 		byte[] head = msg.header10Bytes();
 		byte p = head[4];
 		return supportPType(p);
 	}
 	
-	public boolean supportSType(byte s) {
+	public static boolean supportSType(byte s) {
 		
 		for ( HsmsSsMessageType t : values() ) {
 			if ( t != UNDEFINED && t.s == s ) {
@@ -78,7 +78,7 @@ public enum HsmsSsMessageType {
 		return false;
 	}
 	
-	public boolean supportSType(HsmsSsMessage msg) {
+	public static boolean supportSType(HsmsSsMessage msg) {
 		byte[] head = msg.header10Bytes();
 		byte s = head[5];
 		return supportPType(s);

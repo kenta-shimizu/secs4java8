@@ -67,6 +67,8 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	protected void send(AsynchronousSocketChannel ch, HsmsSsMessage msg)
 			throws InterruptedException, HsmsSsSendMessageException {
 		
+		entryLog(new SecsLog("Send HsmsSs-Message", msg));
+		
 		try {
 			byte[] head = msg.header10Bytes();
 			byte[] body = msg.secs2().secs2Bytes();
@@ -284,8 +286,8 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 			
 			int sessionid = hsmsSsConfig().sessionId();
 			
-			bs[2] = (byte)(sessionid >> 8);
-			bs[3] = (byte)sessionid;
+			bs[0] = (byte)(sessionid >> 8);
+			bs[1] = (byte)sessionid;
 		}
 		
 		return bs;
