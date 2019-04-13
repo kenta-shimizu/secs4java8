@@ -1,6 +1,7 @@
 package secs.secs1OnTcpIp;
 
 import java.net.SocketAddress;
+import java.util.Objects;
 import java.util.Optional;
 
 import secs.secs1.Secs1CommunicatorConfig;
@@ -19,7 +20,7 @@ public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 	
 	public void socketAddress(SocketAddress socketAddr) {
 		synchronized ( this ) {
-			this.socketAddr = socketAddr;
+			this.socketAddr = Objects.requireNonNull(socketAddr);
 		}
 	}
 	

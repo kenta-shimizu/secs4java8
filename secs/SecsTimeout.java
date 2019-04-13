@@ -28,6 +28,9 @@ public class SecsTimeout {
 	 */
 	public void t1(float v) {
 		synchronized ( this ) {
+			if ( v <= 0 ) {
+				throw new IllegalArgumentException("T1-timeout is >0");
+			}
 			t1 = v;
 		}
 	}
@@ -48,6 +51,9 @@ public class SecsTimeout {
 	 */
 	public void t2(float v) {
 		synchronized ( this ) {
+			if ( v <= 0 ) {
+				throw new IllegalArgumentException("T2-timeout is >0");
+			}
 			t2 = v;
 		}
 	}
@@ -68,6 +74,9 @@ public class SecsTimeout {
 	 */
 	public void t3(float v) {
 		synchronized ( this ) {
+			if ( v <= 0 ) {
+				throw new IllegalArgumentException("T3-timeout is >0");
+			}
 			t3 = v;
 		}
 	}
@@ -88,6 +97,9 @@ public class SecsTimeout {
 	 */
 	public void t4(float v) {
 		synchronized ( this ) {
+			if ( v <= 0 ) {
+				throw new IllegalArgumentException("T4-timeout is >0");
+			}
 			t4 = v;
 		}
 	}
@@ -108,6 +120,9 @@ public class SecsTimeout {
 	 */
 	public void t5(float v) {
 		synchronized ( this ) {
+			if ( v <= 0 ) {
+				throw new IllegalArgumentException("T5-timeout is >0");
+			}
 			t5 = v;
 		}
 	}
@@ -128,6 +143,9 @@ public class SecsTimeout {
 	 */
 	public void t6(float v) {
 		synchronized ( this ) {
+			if ( v <= 0 ) {
+				throw new IllegalArgumentException("T6-timeout is >0");
+			}
 			t6 = v;
 		}
 	}
@@ -148,6 +166,9 @@ public class SecsTimeout {
 	 */
 	public void t7(float v) {
 		synchronized ( this ) {
+			if ( v <= 0 ) {
+				throw new IllegalArgumentException("T7-timeout is >0");
+			}
 			t7 = v;
 		}
 	}
@@ -168,6 +189,9 @@ public class SecsTimeout {
 	 */
 	public void t8(float v) {
 		synchronized ( this ) {
+			if ( v <= 0 ) {
+				throw new IllegalArgumentException("T8-timeout is >0");
+			}
 			t8 = v;
 		}
 	}

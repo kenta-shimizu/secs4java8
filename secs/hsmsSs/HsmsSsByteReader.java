@@ -24,7 +24,7 @@ public class HsmsSsByteReader implements Callable<Object> {
 	}
 	
 	/**
-	 * until determinate or Tiemout-T8
+	 * until detect-terminate or Timeout-T8
 	 */
 	@Override
 	public Object call() throws Exception {
@@ -97,6 +97,15 @@ public class HsmsSsByteReader implements Callable<Object> {
 		return rtn;
 	}
 	
+	/**
+	 * 
+	 * @param buffer
+	 * @param detectT8Timeout
+	 * @return true if detect-terminate
+	 * @throws ExecutionException
+	 * @throws TimeoutException
+	 * @throws InterruptedException
+	 */
 	private boolean reading(ByteBuffer buffer, boolean detectT8Timeout)
 			throws ExecutionException, TimeoutException, InterruptedException {
 		
@@ -116,6 +125,7 @@ public class HsmsSsByteReader implements Callable<Object> {
 			}
 			
 			if ( r < 0 ) {
+				/* detect-terminate */
 				return true;
 			}
 			

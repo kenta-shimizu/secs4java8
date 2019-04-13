@@ -40,11 +40,11 @@ public class Secs1CommunicatorConfig extends SecsCommunicatorConfig {
 	 */
 	public void retry(int retryCount) {
 		
-		if ( retryCount < 0 ) {
-			throw new IllegalArgumentException("retry is >= 0");
-		}
-		
 		synchronized ( this ) {
+			if ( retryCount < 0 ) {
+				throw new IllegalArgumentException("retry is >= 0");
+			}
+			
 			this.retry = retryCount;
 		}
 	}

@@ -25,7 +25,7 @@ public class HsmsSsCommunicatorConfig extends SecsCommunicatorConfig {
 		Objects.requireNonNull(protocol);
 		
 		synchronized ( this ) {
-			this.protocol = protocol;
+			this.protocol = Objects.requireNonNull(protocol);
 		}
 	}
 	
@@ -41,10 +41,8 @@ public class HsmsSsCommunicatorConfig extends SecsCommunicatorConfig {
 	 */
 	public void socketAddress(SocketAddress socketAddress) {
 		
-		Objects.requireNonNull(socketAddress);
-		
 		synchronized ( this ) {
-			this.sockAddr = socketAddress;
+			this.sockAddr = Objects.requireNonNull(socketAddress);
 		}
 	}
 	
@@ -92,11 +90,11 @@ public class HsmsSsCommunicatorConfig extends SecsCommunicatorConfig {
 	 */
 	public void linktest(float v) {
 		
-		if ( v < 0.0F ) {
-			throw new IllegalArgumentException("linktest value is >= 0.0F");
-		}
-		
 		synchronized ( this ) {
+			if ( v < 0.0F ) {
+				throw new IllegalArgumentException("linktest value is >= 0.0F");
+			}
+			
 			this.linktest = v;
 		}
 	}
