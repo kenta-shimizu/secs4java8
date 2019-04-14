@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public class SecsLog {
 	
-	private static final String SUBJECT_OF_THROWABLE = "";
+	private static final String SUBJECT_OF_THROWABLE = "Throwable";
 	
 	private final String subject;
 	private final LocalDateTime timestamp;
