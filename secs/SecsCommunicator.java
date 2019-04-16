@@ -13,8 +13,8 @@ public abstract class SecsCommunicator implements Closeable {
 
 	private final SecsCommunicatorConfig config;
 	
-	private boolean opened;
-	private boolean closed;
+	protected boolean opened;
+	protected boolean closed;
 	private boolean lastCommunicatable;
 	
 	public SecsCommunicator(SecsCommunicatorConfig config) {
@@ -242,9 +242,5 @@ public abstract class SecsCommunicator implements Closeable {
 			}
 		}
 	}
-	
-	
-	//TOOD
-	//communication
 	
 }

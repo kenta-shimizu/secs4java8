@@ -156,6 +156,10 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	@Override
 	public void close() throws IOException {
 		
+		synchronized ( this ) {
+			if ( closed ) return;
+		}
+		
 		final List<IOException> ioExcepts = new ArrayList<>();
 		
 		try {

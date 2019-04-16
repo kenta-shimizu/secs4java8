@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -19,7 +20,7 @@ import secs.SecsLog;
 public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 
 	public HsmsSsActiveCommunicator(HsmsSsCommunicatorConfig config) {
-		super(config);
+		super(Objects.requireNonNull(config));
 	}
 	
 	@Override
@@ -44,6 +45,10 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 	
 	@Override
 	public void close() throws IOException {
+		
+		synchronized ( this ) {
+			if ( closed ) return;
+		}
 		
 		final List<IOException> ioExcepts = new ArrayList<>();
 		
@@ -98,7 +103,6 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 						final HsmsSsCircuitAssurance linktest = new HsmsSsCircuitAssurance(HsmsSsActiveCommunicator.this);
 						
 						reader.addHsmsSsMessageReceiveListener(msg -> {
-							
 							sendReplyManager().receive(msg).ifPresent(queue::offer);
 						});
 						
@@ -141,7 +145,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 									switch ( mt ) {
 									case DATA: {
 										
-										notifyReceiveMessage(msg);
+										putReceiveDataMessage(msg);
 										break;
 									}
 									case SELECT_REQ: {

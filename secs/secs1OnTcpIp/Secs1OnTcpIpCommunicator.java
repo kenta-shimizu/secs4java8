@@ -9,6 +9,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +23,7 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 	private final Collection<AsynchronousSocketChannel> channels = new ArrayList<>();
 	
 	public Secs1OnTcpIpCommunicator(Secs1OnTcpIpCommunicatorConfig config) {
-		super(config);
+		super(Objects.requireNonNull(config));
 		
 		this.secs1OnTcpIpConfig = config;
 	}
@@ -202,6 +203,11 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 	
 	@Override
 	public void close() throws IOException {
+		
+		synchronized ( this ) {
+			if ( closed ) return;
+		}
+		
 		super.close();
 	}
 	

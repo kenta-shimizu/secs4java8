@@ -295,6 +295,10 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 	@Override
 	public void close() throws IOException {
 		
+		synchronized ( this ) {
+			if ( closed ) return;
+		}
+		
 		List<IOException> ioExcepts = new ArrayList<>();
 		
 		try {

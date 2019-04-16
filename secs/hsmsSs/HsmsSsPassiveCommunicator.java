@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -21,8 +22,12 @@ import secs.SecsLog;
 
 public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 
+	private AsynchronousServerSocketChannel server;
+	
 	public HsmsSsPassiveCommunicator(HsmsSsCommunicatorConfig config) {
-		super(config);
+		super(Objects.requireNonNull(config));
+		
+		server = null;
 	}
 	
 	@Override
@@ -34,17 +39,15 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 			throw new IOException("HsmsSsCommunicatorConfig#protocol is not PASSIVE");
 		}
 		
-		executorService().execute(() -> {
-			try {
-				openOnce();
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
+		passiveOpen();
 	}
 	
 	@Override
 	public void close() throws IOException {
+		
+		synchronized ( this ) {
+			if ( closed ) return;
+		}
 		
 		final List<IOException> ioExcepts = new ArrayList<>();
 		
@@ -55,18 +58,31 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 			ioExcepts.add(e);
 		}
 		
+		synchronized ( this ) {
+			
+			if ( server != null ) {
+				
+				try {
+					server.close();
+				}
+				catch ( IOException e ) {
+					ioExcepts.add(e);
+				}
+			}
+		}
+		
 		if ( ! ioExcepts.isEmpty() ) {
 			throw ioExcepts.get(0);
 		}
 	}
 	
-	private void openOnce() throws InterruptedException {
+	private void passiveOpen() throws IOException {
 		
-		final Object sync = new Object();
-		
-		try (
-				AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
-				) {
+		try {
+			
+			synchronized ( this ) {
+				this.server = AsynchronousServerSocketChannel.open();
+			}
 			
 			SocketAddress socketAddr = hsmsSsConfig().socketAddress()
 					.orElseThrow(() -> new IOException("error"));
@@ -74,7 +90,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 			String socketAddrInfo = hsmsSsConfig().socketAddress()
 					.map(SocketAddress::toString)
 					.orElse("not setted");
-
+			
 			server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 			server.bind(socketAddr);
 			
@@ -203,6 +219,10 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 						catch ( InterruptedException ignore ) {
 							return rtn;
 						}
+						catch ( ExecutionException e ) {
+							entryLog(new SecsLog(e.getCause()));
+							return rtn;
+						}
 						
 						Collection<Callable<Object>> selectTasks = Arrays.asList(linktest, () -> {
 							
@@ -217,7 +237,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 									switch ( mt ) {
 									case DATA : {
 										
-										notifyReceiveMessage(msg);
+										putReceiveDataMessage(msg);
 										break;
 									}
 									case SELECT_REQ: {
@@ -270,32 +290,24 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 						}
 						catch ( InterruptedException ignore ) {
 						}
+						catch ( ExecutionException e ) {
+							entryLog(new SecsLog(e.getCause()));
+						}
 						finally {
 							notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
 						}
 						
 						return rtn;
 						
-					}, () -> {
-						
-						try {
-							synchronized ( sync ) {
-								sync.wait();
-							}
-						}
-						catch (InterruptedException ignore) {
-						}
-						
-						return rtn;
 					});
 
 					try {
 						executorService().invokeAny(tasks);
 					}
+					catch ( InterruptedException ignore ) {
+					}
 					catch ( ExecutionException e ) {
 						entryLog(new SecsLog(e.getCause()));
-					}
-					catch ( InterruptedException ignore ) {
 					}
 					finally {
 						
@@ -321,19 +333,19 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 					
 					entryLog(new SecsLog("HsmsSsPassiveCommunicator#loop AsynchronousSeverSocketChannel#accept failed", t));
 					
-					synchronized ( sync ) {
-						sync.notifyAll();
+					try {
+						close();
+					}
+					catch ( IOException e ) {
+						entryLog(new SecsLog(e));
 					}
 				}
 			});
-			
-			synchronized ( sync ) {
-				sync.wait();
-			}
 		}
 		catch ( IOException e ) {
 			entryLog(new SecsLog(e));
+			throw e;
 		}
 	}
-
+	
 }
