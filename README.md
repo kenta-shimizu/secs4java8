@@ -87,7 +87,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
 - Add Listener
 ```
     /* Add-Listener sample */
-    active.addSecsMessageReceiveListener((SecsMessage primaryMsg) -> {
+    active.addSecsMessageReceiveListener((SecsMessage msg) -> {
 
         int strm = msg.getStream();     /* Stream-Number */
         int func = msg.getFunction();   /* Function-Number */
