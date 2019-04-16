@@ -111,7 +111,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
     String altx = msg.secs2().getAscii(2);
 ```
 
-- support parse methods maxtix
+- support parse methods matrix
 
 | method | B | BOOLEAN | A | I1 | I2 | I4 | I8 | F4 | F8 | U1 | U2 | U4 | U8 |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
