@@ -45,14 +45,16 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 	@Override
 	public void close() throws IOException {
 		
-		synchronized ( this ) {
-			if ( closed ) return;
-		}
-		
 		final List<IOException> ioExcepts = new ArrayList<>();
 		
 		try {
-			super.close();
+			synchronized ( this ) {
+				if ( closed ) {
+					return;
+				}
+				
+				super.close();
+			}
 		}
 		catch ( IOException e ) {
 			ioExcepts.add(e);
@@ -152,8 +154,6 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 											
 											send(ch, createSelectResponse(msg, HsmsSsMessageSelectStatus.SUCCESS));
 											
-											notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.SELECTED);
-											
 											return Boolean.TRUE;
 											
 										} else {
@@ -208,7 +208,12 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 							long t7 = (long)(hsmsSsConfig().timeout().t7() * 1000.0F);
 							boolean f = executorService().invokeAny(connectTasks, t7, TimeUnit.MILLISECONDS);
 							
-							if ( ! f ) {
+							if ( f ) {
+								/* selected */
+								notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.SELECTED);
+								
+							} else {
+								
 								/* select faield */
 								return rtn;
 							}

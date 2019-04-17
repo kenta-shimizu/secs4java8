@@ -67,7 +67,7 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	protected void send(AsynchronousSocketChannel ch, HsmsSsMessage msg)
 			throws InterruptedException, HsmsSsSendMessageException {
 		
-		entryLog(new SecsLog("Send HsmsSs-Message", msg));
+		entryLog(new SecsLog("Try Send HsmsSs-Message", msg));
 		
 		try {
 			byte[] head = msg.header10Bytes();
@@ -156,14 +156,16 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	@Override
 	public void close() throws IOException {
 		
-		synchronized ( this ) {
-			if ( closed ) return;
-		}
-		
 		final List<IOException> ioExcepts = new ArrayList<>();
 		
 		try {
-			super.close();
+			synchronized ( this ) {
+				if ( closed ) {
+					return;
+				}
+				
+				super.close();
+			}
 		}
 		catch ( IOException e ) {
 			ioExcepts.add(e);

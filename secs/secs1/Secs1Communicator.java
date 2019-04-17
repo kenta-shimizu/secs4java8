@@ -53,6 +53,8 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		this.replyManager = new Secs1MessageSendReplyManager(execServ, config.timeout(), msg -> {
 			
 			try {
+				entryLog(new SecsLog("Try Send Secs1Message", msg));
+				
 				List<Secs1MessageBlock> blocks = msg.blocks();
 				sendBlockQueue.addAll(blocks);
 			}
@@ -295,14 +297,17 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 	@Override
 	public void close() throws IOException {
 		
-		synchronized ( this ) {
-			if ( closed ) return;
-		}
-		
 		List<IOException> ioExcepts = new ArrayList<>();
 		
+		
 		try {
-			super.close();
+			synchronized ( this ) {
+				if ( closed ) {
+					return;
+				}
+				
+				super.close();
+			}
 		}
 		catch ( IOException e ) {
 			ioExcepts.add(e);

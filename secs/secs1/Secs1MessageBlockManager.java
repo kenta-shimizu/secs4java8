@@ -72,6 +72,8 @@ public class Secs1MessageBlockManager {
 				return;
 			}
 			
+			putLog(new Secs1MessageBlockLog("Receive Secs1MessageBlock", block));
+			
 			final Integer systemBytesKey = block.systemBytesKey();
 			
 			final LinkedList<Secs1MessageBlock> ll = blockMap.computeIfAbsent(systemBytesKey, key -> new LinkedList<>());
@@ -120,14 +122,12 @@ public class Secs1MessageBlockManager {
 			
 			if ( block.ebit() ) {
 				
-				putSecs1Message(new Secs1Message(ll));
+				Secs1Message s1m = new Secs1Message(ll);
+				putSecs1Message(s1m);
+				putLog(new SecsLog("Receive Secs1Message", s1m));
 				blockMap.remove(systemBytesKey);
 				
 			} else {
-				
-				synchronized ( resetKeys ) {
-					resetKeys.remove(systemBytesKey);
-				}
 				
 				executorService.execute(() -> {
 					
@@ -174,15 +174,14 @@ public class Secs1MessageBlockManager {
 						putLog(new Secs1MessageBlockLog("Secs1MessageBlock receive T4-timeout", block));
 						
 						blockMap.remove(systemBytesKey);
+						
+						synchronized ( resetKeys ) {
+							resetKeys.remove(systemBytesKey);
+						}
 					}
 					catch ( ExecutionException none ) {
 					}
 					catch ( InterruptedException ignore ) {
-					}
-					finally {
-						synchronized ( resetKeys ) {
-							resetKeys.remove(systemBytesKey);
-						}
 					}
 				});
 			}

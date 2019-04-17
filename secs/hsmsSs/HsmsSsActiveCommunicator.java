@@ -46,14 +46,16 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 	@Override
 	public void close() throws IOException {
 		
-		synchronized ( this ) {
-			if ( closed ) return;
-		}
-		
 		final List<IOException> ioExcepts = new ArrayList<>();
 		
 		try {
-			super.close();
+			synchronized ( this ) {
+				if ( closed ) {
+					return;
+				}
+				
+				super.close();
+			}
 		}
 		catch ( IOException e ) {
 			ioExcepts.add(e);

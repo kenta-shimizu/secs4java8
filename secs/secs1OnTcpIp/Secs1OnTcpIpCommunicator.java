@@ -205,10 +205,13 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 	public void close() throws IOException {
 		
 		synchronized ( this ) {
-			if ( closed ) return;
+			if ( closed ) {
+				return;
+			}
+			
+			super.close();
 		}
 		
-		super.close();
 	}
 	
 	public static Secs1OnTcpIpCommunicator newInstance(Secs1OnTcpIpCommunicatorConfig config) {
