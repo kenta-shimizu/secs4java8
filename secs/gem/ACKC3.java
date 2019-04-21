@@ -3,24 +3,18 @@ package secs.gem;
 import secs.secs2.Secs2;
 import secs.secs2.Secs2Exception;
 
-public enum HCACK {
+public enum ACKC3 {
 	
 	UNDEFINED((byte)0xFF),
 	
 	OK((byte)0x0),
-	InvalidCommand((byte)0x1),
-	CannotDoNow((byte)0x2),
-	ParameterError((byte)0x3),
-	InitiatedForAsynchronousCompletion((byte)0x4),
-	RejectedAlreadyInDesiredCondition((byte)0x5),
-	InvalidObject((byte)0x6),
 	
 	;
 	
 	private final byte code;
 	private final Secs2 ss;
 	
-	private HCACK(byte b) {
+	private ACKC3(byte b) {
 		this.code = b;
 		this.ss = Secs2.binary(b);
 	}
@@ -33,9 +27,9 @@ public enum HCACK {
 		return ss;
 	}
 	
-	public static HCACK get(byte b) {
+	public static ACKC3 get(byte b) {
 		
-		for ( HCACK v : values() ) {
+		for ( ACKC3 v : values() ) {
 			if ( v == UNDEFINED ) continue;
 			if ( v.code == b ) {
 				return v;
@@ -45,7 +39,7 @@ public enum HCACK {
 		return UNDEFINED;
 	}
 	
-	public static HCACK get(Secs2 value) throws Secs2Exception {
+	public static ACKC3 get(Secs2 value) throws Secs2Exception {
 		byte b = value.getByte(0);
 		return get(b);
 	}

@@ -12,13 +12,19 @@ public enum OFLACK {
 	;
 	
 	private final byte code;
+	private final Secs2 ss;
 	
 	private OFLACK(byte b) {
 		this.code = b;
+		this.ss = Secs2.binary(b);
 	}
 	
 	public byte code() {
 		return code;
+	}
+	
+	public Secs2 secs2() {
+		return ss;
 	}
 	
 	public static OFLACK get(byte b) {

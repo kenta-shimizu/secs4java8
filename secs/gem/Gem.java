@@ -1,6 +1,9 @@
 package secs.gem;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import secs.SecsCommunicator;
 import secs.SecsException;
@@ -28,14 +31,12 @@ public class Gem {
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
 	 * @throws SecsException
-	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
 	public Optional<SecsMessage> s1f1()
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
 		return comm.send(1, 1, true).map(x -> (SecsMessage)x);
@@ -51,14 +52,12 @@ public class Gem {
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
 	 * @throws SecsException
-	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
 	public Optional<SecsMessage> s1f2(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
 		Secs2 ss;
@@ -86,14 +85,12 @@ public class Gem {
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
 	 * @throws SecsException
-	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
 	public Optional<SecsMessage> s1f13()
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
 		Secs2 ss;
@@ -123,14 +120,12 @@ public class Gem {
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
 	 * @throws SecsException
-	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
 	public Optional<SecsMessage> s1f14(SecsMessage primaryMsg, COMMACK commack)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
 		Secs2 ss;
@@ -147,7 +142,7 @@ public class Gem {
 			ss = Secs2.list();
 		}
 		
-		return comm.send(1, 14, false, Secs2.list(Secs2.binary(commack.code()), ss))
+		return comm.send(1, 14, false, Secs2.list(commack.secs2(), ss))
 				.map(x -> (SecsMessage)x);
 	}
 	
@@ -185,17 +180,15 @@ public class Gem {
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
 	 * @throws SecsException
-	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
 	public Optional<SecsMessage> s1f16(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
-		return comm.send(primaryMsg, 1, 16, false, Secs2.binary(OFLACK.OK.code()))
+		return comm.send(primaryMsg, 1, 16, false, OFLACK.OK.secs2())
 				.map(x -> (SecsMessage)x);
 	}
 	
@@ -234,47 +227,419 @@ public class Gem {
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
 	 * @throws SecsException
-	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
 	public Optional<SecsMessage> s1f18(SecsMessage primaryMsg, ONLACK onlack)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
+			, InterruptedException {
+		
+		return comm.send(primaryMsg, 1, 18, false, onlack.secs2())
+				.map(x -> (SecsMessage)x);
+	}
+	
+	/**
+	 * Date and Time Request<br />
+	 * blocking-method
+	 * 
+	 * @return TIME
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws Secs2Exception
+	 * @throws InterruptedException
+	 */
+	public String s2f17()
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
 			, Secs2Exception
 			, InterruptedException {
 		
-		return comm.send(primaryMsg, 1, 18, false, Secs2.binary(onlack.code()))
+		return comm.send(2, 17, true)
+				.filter(msg -> {
+					
+					int strm = msg.getStream();
+					int func = msg.getFunction();
+					
+					return strm == 2 && func == 18;
+				})
+				.map(msg -> msg.secs2())
+				.map(ss -> {
+					
+					try {
+						return ss.getAscii();
+					}
+					catch ( Secs2Exception giveup ) {
+					}
+					
+					return null;
+				})
+				.orElseThrow(() -> new Secs2Exception("s2f18 parse failed"));
+	}
+	
+	/**
+	 * Date and Time Set Acknowledge<br />
+	 * blocking-method
+	 * 
+	 * @param primary-message
+	 * @param TIACK
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s2f32(SecsMessage primaryMsg, TIACK tiack)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return comm.send(primaryMsg, 2, 32, false, tiack.secs2())
+				.map(x -> (SecsMessage)x);
+	}
+	
+	
+	//TODO
+	//s2f33
+	
+	
+	/**
+	 * Define Report Acknowledge<br />
+	 * blocking-method
+	 * 
+	 * @param primary-message
+	 * @param DRACK
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s2f34(SecsMessage primaryMsg, DRACK drack)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return comm.send(primaryMsg, 2, 34, false, drack.secs2())
 				.map(x -> (SecsMessage)x);
 	}
 
 	
-	
-	//TOOD
-	//s2f17
-	//s2f18
-	//s2f31
-	//s2f32
-	
 	//TODO
-	//s2f33
-	//s2f34
 	//s2f35
-	//s2f36
-	//s2f37
-	//s2f38
+
+	
+	/**
+	 * Link Event Report Acknowledge<br />
+	 * blocking-method
+	 * 
+	 * @param primary-message
+	 * @param LRACK
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s2f36(SecsMessage primaryMsg, LRACK lrack)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return comm.send(primaryMsg, 2, 36, false, lrack.secs2())
+				.map(x -> (SecsMessage)x);
+	}
+	
 	
 	//TODO
-	//s5f2
-	//s5f4
+	//comments
+	public ERACK s2f37Enable(List<GemCollectionEvent> events)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, Secs2Exception
+			, InterruptedException {
+		
+		return s2f37p(CEED.ENABLE, events);
+	}
 	
 	//TODO
-	//s6f2
-	//s6f4
-	//s6f6
-	//s6f8
-	//s6f10
-	//s6f12
+	//comment
+	public ERACK s2f37Disable(List<GemCollectionEvent> events)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, Secs2Exception
+			, InterruptedException {
+		
+		return s2f37p(CEED.DISABLE, events);
+	}
+	
+	//TODO
+	//comment
+	public ERACK s2f37EnableAll()
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, Secs2Exception
+			, InterruptedException {
+	
+		return s2f37(CEED.ENABLE, Collections.emptyList());
+	}
+	
+	//TODO
+	//comment
+	public ERACK s2f37DisableAll()
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, Secs2Exception
+			, InterruptedException {
+	
+		return s2f37(CEED.DISABLE, Collections.emptyList());
+	}
+	
+	private ERACK s2f37p(CEED ceed, List<GemCollectionEvent> ceids)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, Secs2Exception
+			, InterruptedException {
+		
+		return s2f37(ceed
+				, ceids.stream()
+				.map(v -> v.secs2())
+				.collect(Collectors.toList()));
+	}
+	
+	//TODO
+	//comment
+	public ERACK s2f37(CEED ceed, List<Secs2> ceids)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, Secs2Exception
+			, InterruptedException {
+		
+		Secs2 ss = Secs2.list(
+				ceed.secs2()
+				, Secs2.list(ceids));
+		
+		return comm.send(2, 37, true, ss)
+				.filter(msg -> msg.getStream() == 2)
+				.filter(msg -> msg.getFunction() == 38)
+				.map(msg -> msg.secs2())
+				.map(v -> {
+					try {
+						return ERACK.get(v);
+					}
+					catch (Secs2Exception giveup) {
+					}
+					
+					return null;
+				})
+				.orElseThrow(() -> new Secs2Exception("s2f38 parse failed"));
+	}
+	
+	/**
+	 * Enable/Disable Event Report Acknowledge<br />
+	 * blocking-method
+	 * 
+	 * @param primary-message
+	 * @param ERACK
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s2f38(SecsMessage primaryMsg, ERACK erack)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return comm.send(primaryMsg, 2, 38, false, erack.secs2())
+				.map(x -> (SecsMessage)x);
+	}
+	
+	/**
+	 * Alarm Report Ack<br />
+	 * blocking-method
+	 * 
+	 * @param primary-message
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s5f2(SecsMessage primaryMsg)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return comm.send(primaryMsg, 5, 2, false, ACKC5.OK.secs2())
+				.map(x -> (SecsMessage)x);
+	}
+	
+	/**
+	 * Enable/Disable Alarm Ack<br />
+	 * blocking-method
+	 * 
+	 * @param primary-message
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s5f4(SecsMessage primaryMsg)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return comm.send(primaryMsg, 5, 4, false, ACKC5.OK.secs2())
+				.map(x -> (SecsMessage)x);
+	}
+	
+	/**
+	 * Trace Data Ack<br />
+	 * blocking-method
+	 * 
+	 * @param primary-message
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s6f2(SecsMessage primaryMsg)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return s6fxa(primaryMsg, 2);
+	}
+	
+	/**
+	 * Discrete Variable Data Send Ack<br />
+	 * blocking-method
+	 * 
+	 * @param primary-messag0
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s6f4(SecsMessage primaryMsg)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return s6fxa(primaryMsg, 4);
+	}
+	
+	/**
+	 * Formatted Variable Ack<br />
+	 * blocking-method
+	 * 
+	 * @param primary-message
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s6f10(SecsMessage primaryMsg)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return s6fxa(primaryMsg, 10);
+	}
+	
+	/**
+	 * Event Report Ack<br />
+	 * blocking-method
+	 * 
+	 * @param primary-message
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s6f12(SecsMessage primaryMsg)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return s6fxa(primaryMsg, 12);
+	}
+	
+	/**
+	 * Annotated Event Report Ack<br />
+	 * blocking-method
+	 * 
+	 * @param primary-message
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s6f14(SecsMessage primaryMsg)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return s6fxa(primaryMsg, 14);
+	}
+	
+	/**
+	 * Notification Report Send Ack<br />
+	 * blocking-method
+	 * 
+	 * @param primary-message
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s6f26(SecsMessage primaryMsg)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return s6fxa(primaryMsg, 26);
+	}
+	
+	private Optional<SecsMessage> s6fxa(SecsMessage primaryMsg, int func)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return comm.send(primaryMsg, 6, func, false, ACKC6.OK.secs2())
+				.map(x -> (SecsMessage)x);
+	}
+	
 	
 	
 	/**
@@ -286,14 +651,12 @@ public class Gem {
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
 	 * @throws SecsException
-	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
 	public Optional<SecsMessage> s9f1(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
 		return s9fx(primaryMsg, 1);
@@ -308,14 +671,12 @@ public class Gem {
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
 	 * @throws SecsException
-	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
 	public Optional<SecsMessage> s9f3(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
 		return s9fx(primaryMsg, 3);
@@ -330,14 +691,12 @@ public class Gem {
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
 	 * @throws SecsException
-	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
 	public Optional<SecsMessage> s9f5(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
 		return s9fx(primaryMsg, 5);
@@ -352,14 +711,12 @@ public class Gem {
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
 	 * @throws SecsException
-	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
 	public Optional<SecsMessage> s9f7(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
 		return s9fx(primaryMsg, 7);
@@ -374,14 +731,12 @@ public class Gem {
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
 	 * @throws SecsException
-	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
 	public Optional<SecsMessage> s9f9(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
 		return s9fx(primaryMsg, 9);
@@ -396,14 +751,12 @@ public class Gem {
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
 	 * @throws SecsException
-	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
 	public Optional<SecsMessage> s9f11(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
 		return s9fx(primaryMsg, 11);
@@ -413,7 +766,6 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
 		return comm.send(9, func, false, Secs2.binary(primaryMsg.header10Bytes()))
@@ -423,10 +775,98 @@ public class Gem {
 	/* HOOK s9f13 */
 	
 	
-	//TODO
-	//s10f1
-	//s10f2
-	//s10f3
-	//s10f4
+	/**
+	 * Terminal Request Acknowledge<br />
+	 * blocking-method
+	 * 
+	 * @param primaryMsg
+	 * @param ackc10
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s10f2(SecsMessage primaryMsg, ACKC10 ackc10)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return s10fx(primaryMsg, 2, ackc10);
+	}
+
+	/**
+	 * Terminal Display, Single Acknowledge<br />
+	 * blocking-method
+	 * 
+	 * @param primaryMsg
+	 * @param ackc10
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s10f4(SecsMessage primaryMsg, ACKC10 ackc10)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return s10fx(primaryMsg, 4, ackc10);
+	}
+
+	/**
+	 * Terminal Display, Multi-Block Acknowledge<br />
+	 * blocking-method
+	 * 
+	 * @param primaryMsg
+	 * @param ackc10
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s10f6(SecsMessage primaryMsg, ACKC10 ackc10)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return s10fx(primaryMsg, 6, ackc10);
+	}
+	
+	/**
+	 * Broadcast Acknowledge<br />
+	 * blocking-method
+	 * 
+	 * @param primaryMsg
+	 * @param ackc10
+	 * @return Optional.empty
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s10f10(SecsMessage primaryMsg, ACKC10 ackc10)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return s10fx(primaryMsg, 10, ackc10);
+	}
+	
+	private Optional<SecsMessage> s10fx(SecsMessage primaryMsg, int func, ACKC10 ackc10)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return comm.send(9, func, false, ackc10.secs2())
+				.map(x -> (SecsMessage)x);
+	}
 	
 }
