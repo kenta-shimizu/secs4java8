@@ -1,15 +1,19 @@
 package secs;
 
+import secs.gem.GemConfig;
+
 public class SecsCommunicatorConfig {
 	
 	private final SecsTimeout timeout = new SecsTimeout();
 	
 	private int deviceId;
 	private boolean isEquip;
+	private GemConfig gem;
 	
 	public SecsCommunicatorConfig() {
 		deviceId = 10;
 		isEquip = false;
+		gem = new GemConfig();
 	}
 	
 	public void deviceId(int id) {
@@ -38,6 +42,10 @@ public class SecsCommunicatorConfig {
 	
 	public SecsTimeout timeout() {
 		return timeout;
+	}
+	
+	public GemConfig gem() {
+		return gem;
 	}
 	
 }

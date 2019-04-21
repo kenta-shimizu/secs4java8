@@ -6,12 +6,14 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import secs.gem.Gem;
 import secs.secs2.Secs2;
 import secs.sml.SmlMessage;
 
 public abstract class SecsCommunicator implements Closeable {
 
 	private final SecsCommunicatorConfig config;
+	private final Gem gem;
 	
 	protected boolean opened;
 	protected boolean closed;
@@ -20,6 +22,7 @@ public abstract class SecsCommunicator implements Closeable {
 	public SecsCommunicator(SecsCommunicatorConfig config) {
 		
 		this.config = config;
+		this.gem = new Gem(this, config.gem());
 		
 		opened = false;
 		closed = false;
@@ -55,8 +58,16 @@ public abstract class SecsCommunicator implements Closeable {
 		}
 	}
 	
-	protected int deviceId() {
+	public Gem gem() {
+		return gem;
+	}
+	
+	public int deviceId() {
 		return config.deviceId();
+	}
+	
+	public boolean isEquip() {
+		return config.isEquip();
 	}
 	
 	/**
