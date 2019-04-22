@@ -3,20 +3,24 @@ package secs.gem;
 import secs.secs2.Secs2;
 import secs.secs2.Secs2Exception;
 
-public enum GRANT6 {
+public enum ACKC7 {
 	
 	UNDEFINED((byte)0xFF),
 	
-	OK((byte)0x0),
-	BUSY((byte)0x1),
-	NotInterested((byte)0x2),
-
+	Accepted((byte)0x0),
+	PermissionNotGranted((byte)0x1),
+	LengthError((byte)0x2),
+	MatrixOverflow((byte)0x3),
+	PpidNotFound((byte)0x4),
+	UnsupportedMode((byte)0x5),
+	OtherError((byte)0x6),
+	
 	;
 	
 	private final byte code;
 	private final Secs2 ss;
 	
-	private GRANT6(byte b) {
+	private ACKC7(byte b) {
 		this.code = b;
 		this.ss = Secs2.binary(b);
 	}
@@ -29,9 +33,9 @@ public enum GRANT6 {
 		return ss;
 	}
 	
-	public static GRANT6 get(byte b) {
+	public static ACKC7 get(byte b) {
 		
-		for ( GRANT6 v : values() ) {
+		for ( ACKC7 v : values() ) {
 			if ( v == UNDEFINED ) continue;
 			if ( v.code == b ) {
 				return v;
@@ -41,7 +45,7 @@ public enum GRANT6 {
 		return UNDEFINED;
 	}
 	
-	public static GRANT6 get(Secs2 value) throws Secs2Exception {
+	public static ACKC7 get(Secs2 value) throws Secs2Exception {
 		byte b = value.getByte(0);
 		return get(b);
 	}

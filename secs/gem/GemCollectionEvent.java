@@ -1,22 +1,31 @@
 package secs.gem;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 import secs.secs2.Secs2;
 import secs.secs2.Secs2Exception;
 
 public class GemCollectionEvent {
 	
-	private String alias;
 	private Secs2 eventId;
+	private String alias;
 	
-	public GemCollectionEvent(CharSequence alias, Secs2 eventId) {
-		this.alias = alias.toString();
-		this.eventId = eventId;
+	public GemCollectionEvent(Secs2 eventId, CharSequence alias) {
+		this.eventId = Objects.requireNonNull(eventId);
+		this.alias = Objects.requireNonNull(alias).toString();
 	}
 	
-	public GemCollectionEvent(CharSequence alias, int eventId) {
-		this(alias, Secs2.uint4(eventId));
+	public GemCollectionEvent(Secs2 eventId) {
+		this(eventId, "");
+	}
+	
+	public GemCollectionEvent(int eventId, CharSequence alias) {
+		this(Secs2.uint4(eventId), alias);
+	}
+	
+	public GemCollectionEvent(int eventId) {
+		this(eventId, "");
 	}
 	
 	public String alias() {

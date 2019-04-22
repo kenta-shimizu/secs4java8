@@ -3,6 +3,7 @@ package secs.gem;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import secs.secs2.Secs2;
@@ -10,20 +11,28 @@ import secs.secs2.Secs2Exception;
 
 public class GemReport {
 	
-	private final String alias;
 	private final Secs2 rptId;
 	private final List<Secs2> vids;
+	private final String alias;
 	
-	public GemReport(CharSequence alias, Secs2 rptId, List<Secs2> vids) {
-		this.alias = alias.toString();
-		this.rptId = rptId;
-		this.vids = Collections.unmodifiableList(vids);
+	public GemReport(Secs2 rptId, List<Secs2> vids, CharSequence alias) {
+		this.rptId = Objects.requireNonNull(rptId);
+		this.vids = Collections.unmodifiableList(Objects.requireNonNull(vids));
+		this.alias = Objects.requireNonNull(alias).toString();
 	}
 	
-	public GemReport(CharSequence alias, int rptId, List<Integer> vids) {
-		this(alias
-				, Secs2.uint4(rptId)
-				, vids.stream().map(vid -> Secs2.uint4(vid)).collect(Collectors.toList()));
+	public GemReport(Secs2 rptId, List<Secs2> vids) {
+		this(rptId, vids, "");
+	}
+	
+	public GemReport(int rptId, List<Integer> vids, CharSequence alias) {
+		this(Secs2.uint4(rptId)
+				, vids.stream().map(vid -> Secs2.uint4(vid)).collect(Collectors.toList())
+				, "");
+	}
+	
+	public GemReport(int rptId, List<Integer> vids) {
+		this(rptId, vids, "");
 	}
 	
 	public String alias() {

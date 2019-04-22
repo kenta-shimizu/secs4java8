@@ -3,20 +3,21 @@ package secs.gem;
 import secs.secs2.Secs2;
 import secs.secs2.Secs2Exception;
 
-public enum GRANT6 {
+public enum GRANT {
 	
 	UNDEFINED((byte)0xFF),
 	
 	OK((byte)0x0),
 	BUSY((byte)0x1),
-	NotInterested((byte)0x2),
-
+	INsufficientSpace((byte)0x2),
+	DuplicateDataId((byte)0x3),
+	
 	;
 	
 	private final byte code;
 	private final Secs2 ss;
 	
-	private GRANT6(byte b) {
+	private GRANT(byte b) {
 		this.code = b;
 		this.ss = Secs2.binary(b);
 	}
@@ -29,9 +30,9 @@ public enum GRANT6 {
 		return ss;
 	}
 	
-	public static GRANT6 get(byte b) {
+	public static GRANT get(byte b) {
 		
-		for ( GRANT6 v : values() ) {
+		for ( GRANT v : values() ) {
 			if ( v == UNDEFINED ) continue;
 			if ( v.code == b ) {
 				return v;
@@ -41,7 +42,7 @@ public enum GRANT6 {
 		return UNDEFINED;
 	}
 	
-	public static GRANT6 get(Secs2 value) throws Secs2Exception {
+	public static GRANT get(Secs2 value) throws Secs2Exception {
 		byte b = value.getByte(0);
 		return get(b);
 	}

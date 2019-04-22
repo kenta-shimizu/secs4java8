@@ -1,5 +1,7 @@
 package secs.gem;
 
+import java.util.Objects;
+
 public class GemConfig {
 
 	private String mdln;
@@ -12,7 +14,7 @@ public class GemConfig {
 	
 	public void mdln(CharSequence cs) {
 		synchronized ( this ) {
-			this.mdln = cs.toString();
+			this.mdln = Objects.requireNonNull(cs).toString();
 		}
 	}
 	
@@ -24,7 +26,7 @@ public class GemConfig {
 	
 	public void softrev(CharSequence cs) {
 		synchronized ( this ) {
-			this.softrev = cs.toString();
+			this.softrev = Objects.requireNonNull(cs).toString();
 		}
 	}
 	

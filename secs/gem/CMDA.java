@@ -3,20 +3,20 @@ package secs.gem;
 import secs.secs2.Secs2;
 import secs.secs2.Secs2Exception;
 
-public enum GRANT6 {
+public enum CMDA {
 	
 	UNDEFINED((byte)0xFF),
 	
 	OK((byte)0x0),
-	BUSY((byte)0x1),
-	NotInterested((byte)0x2),
-
+	CommandDoesNotExist((byte)0x1),
+	NotNow((byte)0x2),
+	
 	;
 	
 	private final byte code;
 	private final Secs2 ss;
 	
-	private GRANT6(byte b) {
+	private CMDA(byte b) {
 		this.code = b;
 		this.ss = Secs2.binary(b);
 	}
@@ -29,9 +29,9 @@ public enum GRANT6 {
 		return ss;
 	}
 	
-	public static GRANT6 get(byte b) {
+	public static CMDA get(byte b) {
 		
-		for ( GRANT6 v : values() ) {
+		for ( CMDA v : values() ) {
 			if ( v == UNDEFINED ) continue;
 			if ( v.code == b ) {
 				return v;
@@ -41,7 +41,7 @@ public enum GRANT6 {
 		return UNDEFINED;
 	}
 	
-	public static GRANT6 get(Secs2 value) throws Secs2Exception {
+	public static CMDA get(Secs2 value) throws Secs2Exception {
 		byte b = value.getByte(0);
 		return get(b);
 	}
