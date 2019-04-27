@@ -139,7 +139,7 @@ public class HsmsSsByteReader implements Callable<Object> {
 	
 	private final Collection<HsmsSsMessageReceiveListener> listeners = new CopyOnWriteArrayList<>();
 	
-	protected boolean addHsmsSsMessageReceiveListener(HsmsSsMessageReceiveListener lstnr) {
+	public boolean addHsmsSsMessageReceiveListener(HsmsSsMessageReceiveListener lstnr) {
 		return listeners.add(lstnr);
 	}
 
