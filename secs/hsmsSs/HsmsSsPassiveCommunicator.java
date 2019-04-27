@@ -78,7 +78,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 		}
 	}
 	
-	private void passiveOpen() throws IOException {
+	protected void passiveOpen() throws IOException {
 		
 		try {
 			

@@ -34,7 +34,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 		executorService().execute(() -> {
 			try {
 				for ( ;; ) {
-					loop();
+					activeLoop();
 				}
 			}
 			catch ( InterruptedException ignore ) {
@@ -66,7 +66,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 		}
 	}
 	
-	private void loop() throws InterruptedException {
+	protected void activeLoop() throws InterruptedException {
 		
 		final Object sync = new Object();
 		
