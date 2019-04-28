@@ -112,7 +112,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
     S5F1 W
     <L [3]
         <B  [1] 0x81>           /* ALCD (0, 0) */
-        <I2 [1] 1000>           /* ALID (1, 0) */
+        <I2 [1] 1001>           /* ALID (1, 0) */
         <A "error message">     /* ALTX (2)    */
     >. 
 
