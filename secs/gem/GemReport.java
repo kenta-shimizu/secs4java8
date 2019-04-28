@@ -28,7 +28,7 @@ public class GemReport {
 	public GemReport(int rptId, List<Integer> vids, CharSequence alias) {
 		this(Secs2.uint4(rptId)
 				, vids.stream().map(vid -> Secs2.uint4(vid)).collect(Collectors.toList())
-				, "");
+				, alias);
 	}
 	
 	public GemReport(int rptId, List<Integer> vids) {

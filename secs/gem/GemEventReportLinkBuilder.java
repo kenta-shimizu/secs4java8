@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 import secs.secs2.Secs2Exception;
 
@@ -136,6 +137,7 @@ public class GemEventReportLinkBuilder {
 				});
 				
 				ll.add(new GemCollectionEventReportLink(ge, rpts));
+				
 			});
 		});
 		
