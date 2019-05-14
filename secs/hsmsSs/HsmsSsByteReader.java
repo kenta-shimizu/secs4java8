@@ -11,15 +11,16 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import secs.SecsLog;
 import secs.secs2.Secs2;
 
 public class HsmsSsByteReader implements Callable<Object> {
 	
+	private final HsmsSsCommunicator parent;
 	private final AsynchronousSocketChannel channel;
-	private final HsmsSsCommunicatorConfig config;
 
-	public HsmsSsByteReader(HsmsSsCommunicatorConfig config, AsynchronousSocketChannel channel) {
-		this.config = config;
+	public HsmsSsByteReader(HsmsSsCommunicator parent, AsynchronousSocketChannel channel) {
+		this.parent = parent;
 		this.channel = channel;
 	}
 	
@@ -28,8 +29,6 @@ public class HsmsSsByteReader implements Callable<Object> {
 	 */
 	@Override
 	public Object call() throws Exception {
-		
-		final Object rtn = new Object();
 		
 		try {
 			
@@ -41,20 +40,14 @@ public class HsmsSsByteReader implements Callable<Object> {
 				((Buffer)lenBf).clear();
 				((Buffer)headBf).clear();
 				
-				if ( reading(lenBf, false) ) {
-					return rtn;
-				}
+				reading(lenBf, false);
 				
 				while ( lenBf.hasRemaining() ) {
-					if ( reading(lenBf, true) ) {
-						return rtn;
-					}
+					reading(lenBf, true);
 				}
 				
 				while ( headBf.hasRemaining() ) {
-					if ( reading(headBf, true) ) {
-						return rtn;
-					}
+					reading(headBf, true);
 				}
 				
 				((Buffer)lenBf).flip();
@@ -68,9 +61,7 @@ public class HsmsSsByteReader implements Callable<Object> {
 				ByteBuffer bodyBf = ByteBuffer.allocate(bodyLength);
 				
 				while ( bodyBf.hasRemaining() ) {
-					if ( reading(bodyBf, true) ) {
-						return rtn;
-					}
+					reading(bodyBf, true);
 				}
 				
 				((Buffer)headBf).flip();
@@ -88,26 +79,18 @@ public class HsmsSsByteReader implements Callable<Object> {
 				});
 			}
 		}
-		catch ( TimeoutException e ) {
-			throw new HsmsSsTimeoutT8Exception(e);
+		catch ( HsmsSsDetectTerminateException | HsmsSsTimeoutT8Exception e ) {
+			parent.entryLog(new SecsLog(e));
 		}
 		catch ( InterruptedException ignore ) {
 		}
 		
-		return rtn;
+		return null;
 	}
 	
-	/**
-	 * 
-	 * @param buffer
-	 * @param detectT8Timeout
-	 * @return true if detect-terminate
-	 * @throws ExecutionException
-	 * @throws TimeoutException
-	 * @throws InterruptedException
-	 */
-	private boolean reading(ByteBuffer buffer, boolean detectT8Timeout)
-			throws ExecutionException, TimeoutException, InterruptedException {
+	
+	private void reading(ByteBuffer buffer, boolean detectT8Timeout)
+			throws HsmsSsDetectTerminateException, HsmsSsTimeoutT8Exception, InterruptedException {
 		
 		Future<Integer> f = channel.read(buffer);
 		
@@ -116,7 +99,7 @@ public class HsmsSsByteReader implements Callable<Object> {
 			
 			if ( detectT8Timeout ) {
 				
-				long t8 = (long)(config.timeout().t8() * 1000.0F);
+				long t8 = (long)(parent.hsmsSsConfig().timeout().t8() * 1000.0F);
 				r = f.get(t8, TimeUnit.MILLISECONDS);
 				
 			} else {
@@ -125,11 +108,16 @@ public class HsmsSsByteReader implements Callable<Object> {
 			}
 			
 			if ( r < 0 ) {
-				/* detect-terminate */
-				return true;
+				throw new HsmsSsDetectTerminateException();
 			}
 			
-			return false;
+		}
+		catch ( TimeoutException e ) {
+			f.cancel(true);
+			throw new HsmsSsTimeoutT8Exception(e);
+		}
+		catch ( ExecutionException e ) {
+			throw new HsmsSsDetectTerminateException(e.getCause());
 		}
 		catch ( InterruptedException e ) {
 			f.cancel(true);

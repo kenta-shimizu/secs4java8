@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import secs.SecsException;
 import secs.SecsLog;
 
 public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
@@ -101,7 +102,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 						
 						final BlockingQueue<HsmsSsMessage> queue = new LinkedBlockingQueue<>();
 						
-						final HsmsSsByteReader reader = new HsmsSsByteReader(hsmsSsConfig(), ch);
+						final HsmsSsByteReader reader = new HsmsSsByteReader(HsmsSsActiveCommunicator.this, ch);
 						final HsmsSsCircuitAssurance linktest = new HsmsSsCircuitAssurance(HsmsSsActiveCommunicator.this);
 						
 						reader.addHsmsSsMessageReceiveListener(msg -> {
@@ -118,71 +119,93 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 						
 						Collection<Callable<Object>> tasks = Arrays.asList(reader, () -> {
 							
-							final Object rtn = new Object();
+							try {
+								HsmsSsMessageSelectStatus ss = send(createSelectRequest())
+										.map(HsmsSsMessageSelectStatus::get)
+										.orElse(HsmsSsMessageSelectStatus.NOT_SELECT_RSP);
 							
-							HsmsSsMessageSelectStatus ss = send(createSelectRequest())
-									.map(HsmsSsMessageSelectStatus::get)
-									.orElse(HsmsSsMessageSelectStatus.NOT_SELECT_RSP);
-							
-							switch ( ss ) {
-							case SUCCESS:
-							case ACTIVED: {
-								
-								notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.SELECTED);
-								break;
+								switch ( ss ) {
+								case SUCCESS:
+								case ACTIVED: {
+									
+									notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.SELECTED);
+									break;
+								}
+								default: {
+									return null;
+								}
+								}
 							}
-							default: {
-								return rtn;
+							catch ( SecsException e ) {
+								entryLog(new SecsLog(e));
+								return null;
 							}
+							catch ( InterruptedException e ) {
+								return null;
 							}
 							
 							Collection<Callable<Object>> selectTasks = Arrays.asList(linktest, () -> {
 								
-								for ( ;; ) {
+								try {
 									
-									HsmsSsMessage msg = queue.take();
-									
-									HsmsSsMessageType mt = HsmsSsMessageType.get(msg);
-									
-									switch ( mt ) {
-									case DATA: {
+									for ( ;; ) {
 										
-										putReceiveDataMessage(msg);
-										break;
-									}
-									case SELECT_REQ: {
+										HsmsSsMessage msg = queue.take();
 										
-										send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
-										break;
-									}
-									case LINKTEST_REQ: {
+										HsmsSsMessageType mt = HsmsSsMessageType.get(msg);
 										
-										send(createLinktestResponse(msg));
-										break;
-									}
-									case SEPARATE_REQ: {
-										
-										return rtn;
-										/* break; */
-									}
-									case SELECT_RSP:
-									case LINKTEST_RSP:
-									case REJECT_REQ:
-									default: {
-										
-										/* ignore */
-									}
+										try {
+											switch ( mt ) {
+											case DATA: {
+												
+												putReceiveDataMessage(msg);
+												break;
+											}
+											case SELECT_REQ: {
+												
+												send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
+												break;
+											}
+											case LINKTEST_REQ: {
+												
+												send(createLinktestResponse(msg));
+												break;
+											}
+											case SEPARATE_REQ: {
+												
+												return null;
+												/* break; */
+											}
+											case SELECT_RSP:
+											case LINKTEST_RSP:
+											case REJECT_REQ:
+											default: {
+												
+												/* ignore */
+											}
+											}
+										}
+										catch ( SecsException e ) {
+											entryLog(new SecsLog(e));
+										}
 									}
 								}
+								catch ( InterruptedException ignore ) {
+								}
+								
+								return null;
 							});
 							
 							try {
-								return executorService().invokeAny(selectTasks);
+								executorService().invokeAny(selectTasks);
 							}
-							catch ( InterruptedException ignore) {
+							catch ( ExecutionException e ) {
+								entryLog(new SecsLog(e.getCause()));
+							}
+							catch ( InterruptedException ignore ) {
 							}
 							
-							return rtn;
+							return null;
 						});
 						
 						try {

@@ -18,6 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import secs.SecsException;
 import secs.SecsLog;
 
 public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
@@ -111,7 +112,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 					
 					final BlockingQueue<HsmsSsMessage> queue = new LinkedBlockingQueue<>();
 					
-					final HsmsSsByteReader reader = new HsmsSsByteReader(hsmsSsConfig(), ch);
+					final HsmsSsByteReader reader = new HsmsSsByteReader(HsmsSsPassiveCommunicator.this, ch);
 					final HsmsSsCircuitAssurance linktest = new HsmsSsCircuitAssurance(HsmsSsPassiveCommunicator.this);
 					
 					reader.addHsmsSsMessageReceiveListener(msg -> {
@@ -126,7 +127,6 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 						entryLog(new SecsLog("Receive HsmsSs-Message", msg));
 					});
 					
-					final Object rtn = new Object();
 					
 					Collection<Callable<Object>> tasks = Arrays.asList(reader, () -> {
 						
@@ -134,66 +134,72 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 							
 							try {
 								/* NOT_SELECTED */
+								
 								for ( ;; ) {
 									
 									HsmsSsMessage msg = queue.take();
 									
 									HsmsSsMessageType mt = HsmsSsMessageType.get(msg);
 									
-									switch ( mt ) {
-									case DATA: {
-										
-										send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SELECTED));
-										break;
-									}
-									case SELECT_REQ: {
-										
-										boolean f = addChannel(ch);
-										
-										if ( f /* success */) {
+									try {
+										switch ( mt ) {
+										case DATA: {
 											
-											send(ch, createSelectResponse(msg, HsmsSsMessageSelectStatus.SUCCESS));
-											
-											return Boolean.TRUE;
-											
-										} else {
-											
-											send(ch, createSelectResponse(msg, HsmsSsMessageSelectStatus.ALREADY_USED));
+											send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SELECTED));
+											break;
 										}
-										
-										break;
-									}
-									case LINKTEST_REQ: {
-										
-										send(ch, createLinktestResponse(msg));
-										break;
-									}
-									case SEPARATE_REQ: {
-										
-										return Boolean.FALSE;
-										/* break; */
-									}
-									case SELECT_RSP:
-									case LINKTEST_RSP:
-									case REJECT_REQ: {
-										
-										send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.TRANSACTION_NOT_OPEN));
-										break;
-									}
-									default: {
-										
-										if ( HsmsSsMessageType.supportSType(msg) ) {
+										case SELECT_REQ: {
 											
-											if ( ! HsmsSsMessageType.supportPType(msg) ) {
+											boolean f = addChannel(ch);
+											
+											if ( f /* success */) {
 												
-												send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P));
+												send(ch, createSelectResponse(msg, HsmsSsMessageSelectStatus.SUCCESS));
+												
+												return Boolean.TRUE;
+												
+											} else {
+												
+												send(ch, createSelectResponse(msg, HsmsSsMessageSelectStatus.ALREADY_USED));
 											}
 											
-										} else {
+											break;
+										}
+										case LINKTEST_REQ: {
 											
-											send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
+											send(ch, createLinktestResponse(msg));
+											break;
+										}
+										case SEPARATE_REQ: {
+											
+											return Boolean.FALSE;
+											/* break; */
+										}
+										case SELECT_RSP:
+										case LINKTEST_RSP:
+										case REJECT_REQ: {
+											
+											send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.TRANSACTION_NOT_OPEN));
+											break;
+										}
+										default: {
+											
+											if ( HsmsSsMessageType.supportSType(msg) ) {
+												
+												if ( ! HsmsSsMessageType.supportPType(msg) ) {
+													
+													send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P));
+												}
+												
+											} else {
+												
+												send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
+											}
+										}
 										}
 									}
+									catch ( SecsException e ) {
+										entryLog(new SecsLog(e));
 									}
 								}
 							}
@@ -215,79 +221,86 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 							} else {
 								
 								/* select faield */
-								return rtn;
+								return null;
 							}
 						}
 						catch ( TimeoutException e ) {
-							throw new HsmsSsTimeoutT7Exception(e);
+							entryLog(new SecsLog(new HsmsSsTimeoutT7Exception(e)));
+							return null;
 						}
 						catch ( InterruptedException ignore ) {
-							return rtn;
+							return null;
 						}
 						catch ( ExecutionException e ) {
 							entryLog(new SecsLog(e.getCause()));
-							return rtn;
+							return null;
 						}
 						
 						Collection<Callable<Object>> selectTasks = Arrays.asList(linktest, () -> {
 							
 							try {
 								/* SELECTED */
+								
 								for ( ;; ) {
 									
 									HsmsSsMessage msg = queue.take();
 									
 									HsmsSsMessageType mt = HsmsSsMessageType.get(msg);
 									
-									switch ( mt ) {
-									case DATA : {
-										
-										putReceiveDataMessage(msg);
-										break;
-									}
-									case SELECT_REQ: {
-										
-										send(ch, createSelectResponse(msg, HsmsSsMessageSelectStatus.ACTIVED));
-										break;
-									}
-									case LINKTEST_REQ: {
-										
-										send(ch, createLinktestResponse(msg));
-										break;
-									}
-									case SEPARATE_REQ: {
-										
-										return rtn;
-										/* break; */
-									}
-									case SELECT_RSP:
-									case LINKTEST_RSP:
-									case REJECT_REQ: {
-										
-										send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.TRANSACTION_NOT_OPEN));
-										break;
-									}
-									default: {
-										
-										if ( HsmsSsMessageType.supportSType(msg) ) {
+									try {
+										switch ( mt ) {
+										case DATA : {
 											
-											if ( ! HsmsSsMessageType.supportPType(msg) ) {
+											putReceiveDataMessage(msg);
+											break;
+										}
+										case SELECT_REQ: {
+											
+											send(ch, createSelectResponse(msg, HsmsSsMessageSelectStatus.ACTIVED));
+											break;
+										}
+										case LINKTEST_REQ: {
+											
+											send(ch, createLinktestResponse(msg));
+											break;
+										}
+										case SEPARATE_REQ: {
+											
+											return null;
+											/* break; */
+										}
+										case SELECT_RSP:
+										case LINKTEST_RSP:
+										case REJECT_REQ: {
+											
+											send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.TRANSACTION_NOT_OPEN));
+											break;
+										}
+										default: {
+											
+											if ( HsmsSsMessageType.supportSType(msg) ) {
 												
-												send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P));
+												if ( ! HsmsSsMessageType.supportPType(msg) ) {
+													
+													send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P));
+												}
+												
+											} else {
+												
+												send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
 											}
-											
-										} else {
-											
-											send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
+										}
 										}
 									}
+									catch ( SecsException e ) {
+										entryLog(new SecsLog(e));
 									}
 								}
 							}
 							catch ( InterruptedException ignore ) {
 							}
 							
-							return rtn;
+							return null;
 						});
 						
 						try {
@@ -302,10 +315,9 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 							notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
 						}
 						
-						return rtn;
-						
+						return null;
 					});
-
+					
 					try {
 						executorService().invokeAny(tasks);
 					}

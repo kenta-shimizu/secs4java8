@@ -22,8 +22,6 @@ public class HsmsSsCircuitAssurance implements Callable<Object> {
 	@Override
 	public Object call() throws Exception {
 		
-		final Object rtn = new Object();
-		
 		try {
 			
 			for ( ;; ) {
@@ -48,15 +46,18 @@ public class HsmsSsCircuitAssurance implements Callable<Object> {
 					}
 				}
 				
-				if ( linktest() ) {
-					return rtn;
+				if ( ! linktest() ) {
+					break;
 				}
 			}
+		}
+		catch ( SecsException ignore ) {
+			/* Linktest failed */
 		}
 		catch ( InterruptedException ignore ) {
 		}
 		
-		return rtn;
+		return null;
 	}
 	
 	public void reset() {
@@ -66,8 +67,14 @@ public class HsmsSsCircuitAssurance implements Callable<Object> {
 		}
 	}
 	
+	/**
+	 * 
+	 * @return true if success
+	 * @throws InterruptedException
+	 * @throws SecsException
+	 */
 	private boolean linktest() throws InterruptedException, SecsException {
-		return ! parent.send(parent.createLinktestRequest()).isPresent();
+		return parent.send(parent.createLinktestRequest()).isPresent();
 	}
 
 }
