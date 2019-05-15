@@ -238,9 +238,14 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	
 	protected void notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState state) {
 		synchronized ( this ) {
-			this.hsmsSsCommunicateState = state;
-			entryLog(new SecsLog("HsmsSs-Connect-state-chenged: " + state.toString()));
-			notifyCommunicatableStateChange(state.communicatable());
+			
+			if ( this.hsmsSsCommunicateState != state ) {
+				
+				this.hsmsSsCommunicateState = state;
+				
+				entryLog(new SecsLog("HsmsSs-Connect-state-chenged: " + state.toString()));
+				notifyCommunicatableStateChange(state.communicatable());
+			}
 		}
 	}
 	
