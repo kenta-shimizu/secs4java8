@@ -318,7 +318,7 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	}
 	
 	@Override
-	public Optional<? extends HsmsSsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -343,11 +343,11 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 			head[2] |= 0x80;
 		}
 		
-		return send(new HsmsSsMessage(head, secs2));
+		return send(new HsmsSsMessage(head, secs2)).map(msg -> (SecsMessage)msg);
 	}
 
 	@Override
-	public Optional<? extends HsmsSsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -373,7 +373,7 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 			head[2] |= 0x80;
 		}
 		
-		return send(new HsmsSsMessage(head, secs2));
+		return send(new HsmsSsMessage(head, secs2)).map(msg -> (SecsMessage)msg);
 	}
 	
 	protected HsmsSsMessage createSelectRequest() {

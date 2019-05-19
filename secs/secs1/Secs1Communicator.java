@@ -172,7 +172,7 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 	private final AtomicInteger autoNumber = new AtomicInteger();
 	
 	@Override
-	public Optional<? extends Secs1Message> send(int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -203,11 +203,11 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 			head[2] |= (byte)0x80;
 		}
 		
-		return send(new Secs1Message(head, secs2));
+		return send(new Secs1Message(head, secs2)).map(msg -> (SecsMessage)msg);
 	}
 	
 	@Override
-	public Optional<? extends Secs1Message> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -241,7 +241,7 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 			head[2] |= (byte)0x80;
 		}
 		
-		return send(new Secs1Message(head, secs2));
+		return send(new Secs1Message(head, secs2)).map(msg -> (SecsMessage)msg);
 	}
 	
 	
