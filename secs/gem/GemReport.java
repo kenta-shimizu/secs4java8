@@ -25,13 +25,13 @@ public class GemReport {
 		this(rptId, vids, "");
 	}
 	
-	public GemReport(int rptId, List<Integer> vids, CharSequence alias) {
+	public GemReport(int rptId, List<? extends Number> vids, CharSequence alias) {
 		this(Secs2.uint4(rptId)
-				, vids.stream().map(vid -> Secs2.uint4(vid)).collect(Collectors.toList())
+				, vids.stream().map(vid -> Secs2.uint4(vid.intValue())).collect(Collectors.toList())
 				, alias);
 	}
 	
-	public GemReport(int rptId, List<Integer> vids) {
+	public GemReport(int rptId, List<? extends Number> vids) {
 		this(rptId, vids, "");
 	}
 	
