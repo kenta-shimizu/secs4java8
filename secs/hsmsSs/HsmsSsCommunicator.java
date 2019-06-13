@@ -230,14 +230,16 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 		return inst;
 	}
 	
+	private final Object syncHsmsSsCommunicateState = new Object();
+	
 	protected HsmsSsCommunicateState hsmsSsCommunicateState() {
-		synchronized ( this ) {
+		synchronized ( syncHsmsSsCommunicateState ) {
 			return hsmsSsCommunicateState;
 		}
 	}
 	
 	protected void notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState state) {
-		synchronized ( this ) {
+		synchronized ( syncHsmsSsCommunicateState ) {
 			
 			if ( this.hsmsSsCommunicateState != state ) {
 				

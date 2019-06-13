@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,6 +41,16 @@ public class Secs2List extends Secs2 {
 	@Override
 	public int size() {
 		return values.size();
+	}
+	
+	@Override
+	public Iterator<Secs2> iterator() {
+		return values.iterator();
+	}
+	
+	@Override
+	public Stream<Secs2> stream() {
+		return values.stream();
 	}
 	
 	@Override
