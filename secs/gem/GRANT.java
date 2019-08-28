@@ -9,7 +9,7 @@ public enum GRANT {
 	
 	OK((byte)0x0),
 	BUSY((byte)0x1),
-	INsufficientSpace((byte)0x2),
+	InsufficientSpace((byte)0x2),
 	DuplicateDataId((byte)0x3),
 	
 	;
