@@ -71,18 +71,19 @@ public class Secs1MessageSendReplyManager extends SecsMessageSendReplyManager<Se
 					
 					try {
 						
-						for ( ;; ) {
+						synchronized ( this ) {
 							
-							if ( ! replyMap.containsKey(key) ) {
-								break;
-							}
-							
-							Secs1Message reply = replyMap.get(key);
-							if ( reply != null ) {
-								return new InnerReplyMsg(false, reply);
-							}
-							
-							synchronized ( this ) {
+							for ( ;; ) {
+								
+								if ( ! replyMap.containsKey(key) ) {
+									break;
+								}
+								
+								Secs1Message reply = replyMap.get(key);
+								if ( reply != null ) {
+									return new InnerReplyMsg(false, reply);
+								}
+								
 								this.wait();
 							}
 						}
@@ -96,9 +97,9 @@ public class Secs1MessageSendReplyManager extends SecsMessageSendReplyManager<Se
 					
 					try {
 						
-						for ( ;; ) {
+						synchronized ( resetKeys ) {
 							
-							synchronized ( resetKeys ) {
+							for ( ;; ) {
 								
 								if ( resetKeys.contains(key) ) {
 									
