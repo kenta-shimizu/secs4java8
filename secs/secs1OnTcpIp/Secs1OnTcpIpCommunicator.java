@@ -205,6 +205,7 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 	public void close() throws IOException {
 		
 		synchronized ( this ) {
+			
 			if ( closed ) {
 				return;
 			}

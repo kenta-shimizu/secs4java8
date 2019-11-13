@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
@@ -156,7 +155,7 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	@Override
 	public void close() throws IOException {
 		
-		final List<IOException> ioExcepts = new ArrayList<>();
+		IOException ioExcept = null;
 		
 		try {
 			synchronized ( this ) {
@@ -168,7 +167,7 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 			}
 		}
 		catch ( IOException e ) {
-			ioExcepts.add(e);
+			ioExcept = e;
 		}
 		
 		try {
@@ -176,15 +175,15 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 			if ( ! execServ.awaitTermination(10L, TimeUnit.MILLISECONDS) ) {
 				execServ.shutdownNow();
 				if ( ! execServ.awaitTermination(5L, TimeUnit.SECONDS) ) {
-					ioExcepts.add(new IOException("ExecutorService#shutdown failed"));
+					ioExcept = new IOException("ExecutorService#shutdown failed");
 				}
 			}
 		}
 		catch ( InterruptedException giveup ) {
 		}
 		
-		if ( ! ioExcepts.isEmpty() ) {
-			throw ioExcepts.get(0);
+		if ( ioExcept != null ) {
+			throw ioExcept;
 		}
 	}
 	

@@ -1,7 +1,6 @@
 package secs.secs1;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -297,8 +296,7 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 	@Override
 	public void close() throws IOException {
 		
-		List<IOException> ioExcepts = new ArrayList<>();
-		
+		IOException ioExcept = null;
 		
 		try {
 			synchronized ( this ) {
@@ -310,7 +308,7 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 			}
 		}
 		catch ( IOException e ) {
-			ioExcepts.add(e);
+			ioExcept = e;
 		}
 		
 		try {
@@ -318,15 +316,15 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 			if ( ! execServ.awaitTermination(10L, TimeUnit.MILLISECONDS) ) {
 				execServ.shutdownNow();
 				if ( ! execServ.awaitTermination(5L, TimeUnit.SECONDS) ) {
-					ioExcepts.add(new IOException("ExecutorService#shutdown failed"));
+					ioExcept = new IOException("ExecutorService#shutdown failed");
 				}
 			}
 		}
 		catch ( InterruptedException giveup ) {
 		}
 		
-		if ( ! ioExcepts.isEmpty() ) {
-			throw ioExcepts.get(0);
+		if ( ioExcept != null ) {
+			throw ioExcept;
 		}
 	}
 	

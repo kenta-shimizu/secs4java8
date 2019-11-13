@@ -6,10 +6,8 @@ import java.net.StandardSocketOptions;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -46,7 +44,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 	@Override
 	public void close() throws IOException {
 		
-		final List<IOException> ioExcepts = new ArrayList<>();
+		IOException ioExcept = null;
 		
 		try {
 			synchronized ( this ) {
@@ -58,7 +56,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 			}
 		}
 		catch ( IOException e ) {
-			ioExcepts.add(e);
+			ioExcept = null;
 		}
 		
 		synchronized ( this ) {
@@ -69,13 +67,13 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 					server.close();
 				}
 				catch ( IOException e ) {
-					ioExcepts.add(e);
+					ioExcept = e;
 				}
 			}
 		}
 		
-		if ( ! ioExcepts.isEmpty() ) {
-			throw ioExcepts.get(0);
+		if ( ioExcept != null) {
+			throw ioExcept;
 		}
 	}
 	
