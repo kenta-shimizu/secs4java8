@@ -15,6 +15,10 @@ public abstract class SecsMessage {
 	
 	abstract public int deviceId();
 	
+	public int sessionId() {
+		return deviceId();
+	}
+	
 	abstract public byte[] header10Bytes();
 	
 	abstract protected Integer systemBytesKey();

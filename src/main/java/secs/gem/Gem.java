@@ -142,7 +142,7 @@ public class Gem {
 			ss = Secs2.list();
 		}
 		
-		return comm.send(1, 14, false, Secs2.list(commack.secs2(), ss));
+		return comm.send(primaryMsg, 1, 14, false, Secs2.list(commack.secs2(), ss));
 	}
 	
 	/**
