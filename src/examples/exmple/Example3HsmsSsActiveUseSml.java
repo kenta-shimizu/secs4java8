@@ -24,7 +24,7 @@ public class Example3HsmsSsActiveUseSml {
 	/*
 	 * Example-3 (Use SML)
 	 * 1. open ACTIVE-instance
-	 * 3. wait until SELECTED
+	 * 2. wait until SELECTED
 	 * 3. get SmlMessageParser
 	 * 4. send S1F13
 	 * 5. send S1F17
