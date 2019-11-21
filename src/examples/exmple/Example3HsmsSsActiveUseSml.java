@@ -10,21 +10,24 @@ import secs.gem.ONLACK;
 import secs.hsmsSs.HsmsSsCommunicator;
 import secs.hsmsSs.HsmsSsCommunicatorConfig;
 import secs.hsmsSs.HsmsSsProtocol;
-import secs.secs2.Secs2;
 import secs.secs2.Secs2Exception;
+import secs.sml.SmlMessage;
+import secs.sml.SmlMessageParser;
+import secs.sml.SmlParseException;
 
-public class Example2HsmsSsActive {
+public class Example3HsmsSsActiveUseSml {
 
-	public Example2HsmsSsActive() {
+	public Example3HsmsSsActiveUseSml() {
 		/* Nothing */
 	}
 	
 	/*
-	 * Example-2
+	 * Example-3 (Use SML)
 	 * 1. open ACTIVE-instance
-	 * 2. wait until SELECTED
-	 * 3. send S1F13
-	 * 4. send S1F17
+	 * 3. wait until SELECTED
+	 * 3. get SmlMessageParser
+	 * 4. send S1F13
+	 * 5. send S1F17
 	 * 
 	 */
 	
@@ -60,17 +63,23 @@ public class Example2HsmsSsActive {
 					
 					if ( state /* SELECTED */ ) {
 						
+						/* get SmlMessageParser */
+						SmlMessageParser parser = SmlMessageParser.getInstance();
+						
 						{
-							/* build <L[0] > */
-							Secs2 ss = Secs2.list();
+							/* parse S1F13 <L[0] >. */
+							SmlMessage sm = parser.parse("S1F13 W <L >.");
 							
-							/* send s1f13 <L[0] > */
-							comm.send(1, 13, true, ss);
+							/* send */
+							comm.send(sm);
 						}
 						
 						{
-							/* send s1f17 W */
-							Optional<SecsMessage> op = comm.send(1, 17, true);
+							/* parse S1F17 W. */
+							SmlMessage sm = parser.parse("S1F17 W.");
+							
+							/* send */
+							Optional<SecsMessage> op = comm.send(sm);
 							
 							ONLACK onlack = ONLACK.get(op.get().secs2());
 							
@@ -80,7 +89,7 @@ public class Example2HsmsSsActive {
 				}
 				catch ( InterruptedException ignore ) {
 				}
-				catch ( SecsException | Secs2Exception e ) {
+				catch ( SecsException | Secs2Exception | SmlParseException e ) {
 					e.printStackTrace();
 				}
 			});
@@ -88,8 +97,8 @@ public class Example2HsmsSsActive {
 			comm.open();
 			
 			
-			synchronized ( Example2HsmsSsActive.class ) {
-				Example2HsmsSsActive.class.wait();
+			synchronized ( Example3HsmsSsActiveUseSml.class ) {
+				Example3HsmsSsActiveUseSml.class.wait();
 			}
 		}
 		catch ( InterruptedException ignore ) {
@@ -97,7 +106,6 @@ public class Example2HsmsSsActive {
 		catch ( IOException e ) {
 			e.printStackTrace();
 		}
-		
 	}
 
 }

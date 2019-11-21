@@ -2,32 +2,29 @@ package exmple;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.Optional;
 
 import secs.SecsException;
-import secs.SecsMessage;
 import secs.gem.ONLACK;
 import secs.hsmsSs.HsmsSsCommunicator;
 import secs.hsmsSs.HsmsSsCommunicatorConfig;
 import secs.hsmsSs.HsmsSsProtocol;
-import secs.secs2.Secs2;
 import secs.secs2.Secs2Exception;
 
-public class Example2HsmsSsActive {
+public class Example4HsmsSsActiveUseGem {
 
-	public Example2HsmsSsActive() {
+	public Example4HsmsSsActiveUseGem() {
 		/* Nothing */
 	}
 	
 	/*
-	 * Example-2
+	 * Example-4
 	 * 1. open ACTIVE-instance
 	 * 2. wait until SELECTED
 	 * 3. send S1F13
 	 * 4. send S1F17
 	 * 
 	 */
-	
+
 	public static void main(String[] args) {
 		
 		HsmsSsCommunicatorConfig config = new HsmsSsCommunicatorConfig();
@@ -60,22 +57,13 @@ public class Example2HsmsSsActive {
 					
 					if ( state /* SELECTED */ ) {
 						
-						{
-							/* build <L[0] > */
-							Secs2 ss = Secs2.list();
-							
-							/* send s1f13 <L[0] > */
-							comm.send(1, 13, true, ss);
-						}
+						/* send S1F13 W */
+						comm.gem().s1f13();
 						
-						{
-							/* send s1f17 W */
-							Optional<SecsMessage> op = comm.send(1, 17, true);
+						/* send S1F17 W */
+						ONLACK onlack = comm.gem().s1f17();
 							
-							ONLACK onlack = ONLACK.get(op.get().secs2());
-							
-							System.out.println("ONLACK: " + onlack);
-						}
+						System.out.println("ONLACK: " + onlack);
 					}
 				}
 				catch ( InterruptedException ignore ) {
@@ -88,8 +76,8 @@ public class Example2HsmsSsActive {
 			comm.open();
 			
 			
-			synchronized ( Example2HsmsSsActive.class ) {
-				Example2HsmsSsActive.class.wait();
+			synchronized ( Example4HsmsSsActiveUseGem.class ) {
+				Example4HsmsSsActiveUseGem.class.wait();
 			}
 		}
 		catch ( InterruptedException ignore ) {
@@ -97,7 +85,6 @@ public class Example2HsmsSsActive {
 		catch ( IOException e ) {
 			e.printStackTrace();
 		}
-		
 	}
 
 }
