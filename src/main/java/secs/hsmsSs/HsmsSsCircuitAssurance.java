@@ -46,7 +46,7 @@ public class HsmsSsCircuitAssurance implements Callable<Object> {
 					}
 				}
 				
-				if ( ! linktest() ) {
+				if ( ! parent.linktest() ) {
 					break;
 				}
 			}
@@ -67,14 +67,4 @@ public class HsmsSsCircuitAssurance implements Callable<Object> {
 		}
 	}
 	
-	/**
-	 * 
-	 * @return true if success
-	 * @throws InterruptedException
-	 * @throws SecsException
-	 */
-	private boolean linktest() throws InterruptedException, SecsException {
-		return parent.send(parent.createLinktestRequest()).isPresent();
-	}
-
 }

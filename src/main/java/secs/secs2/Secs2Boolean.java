@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -44,7 +43,7 @@ public class Secs2Boolean extends Secs2 {
 		
 		Objects.requireNonNull(bools);
 		
-		this.bools = Collections.unmodifiableList(bools);
+		this.bools = new ArrayList<>(bools);
 		this.bytes = null;
 	}
 	

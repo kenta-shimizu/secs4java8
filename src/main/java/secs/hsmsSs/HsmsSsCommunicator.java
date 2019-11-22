@@ -400,6 +400,17 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 		});
 	}
 	
+	/**
+	 *　Blocking-method<br />
+	 * 
+	 * @return true if success
+	 * @throws InterruptedException
+	 * @throws SecsException
+	 */
+	public boolean linktest() throws InterruptedException, SecsException {
+		return send(createLinktestRequest()).isPresent();
+	}
+	
 	protected HsmsSsMessage createLinktestRequest() {
 		return createHsmsSsControlPrimaryMessage(HsmsSsMessageType.LINKTEST_REQ);
 	}

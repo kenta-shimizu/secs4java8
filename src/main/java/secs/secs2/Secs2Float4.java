@@ -26,7 +26,7 @@ public class Secs2Float4 extends Secs2Number<Float> {
 		}
 	}
 	
-	public Secs2Float4(List<Number> values) {
+	public Secs2Float4(List<? extends Number> values) {
 		super();
 		
 		Objects.requireNonNull(values);

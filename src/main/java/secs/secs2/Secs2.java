@@ -218,7 +218,7 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2List(values);
 	}
 	
-	public static Secs2 list(List<Secs2> values) {
+	public static Secs2 list(List<? extends Secs2> values) {
 		return new Secs2List(values);
 	}
 	
@@ -266,7 +266,7 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Int1(values);
 	}
 
-	public static Secs2 int1(List<Number> values) {
+	public static Secs2 int1(List<? extends Number> values) {
 		return new Secs2Int1(values);
 	}
 	
@@ -286,7 +286,7 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Int2(values);
 	}
 
-	public static Secs2 int2(List<Number> values) {
+	public static Secs2 int2(List<? extends Number> values) {
 		return new Secs2Int2(values);
 	}
 	
@@ -306,7 +306,7 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Int4(values);
 	}
 
-	public static Secs2 int4(List<Number> values) {
+	public static Secs2 int4(List<? extends Number> values) {
 		return new Secs2Int4(values);
 	}
 	
@@ -326,7 +326,7 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Int8(values);
 	}
 
-	public static Secs2 int8(List<Number> values) {
+	public static Secs2 int8(List<? extends Number> values) {
 		return new Secs2Int8(values);
 	}
 	
@@ -346,7 +346,7 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Uint1(values);
 	}
 
-	public static Secs2 uint1(List<Number> values) {
+	public static Secs2 uint1(List<? extends Number> values) {
 		return new Secs2Uint1(values);
 	}
 
@@ -366,7 +366,7 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Uint2(values);
 	}
 
-	public static Secs2 uint2(List<Number> values) {
+	public static Secs2 uint2(List<? extends Number> values) {
 		return new Secs2Uint2(values);
 	}
 
@@ -386,7 +386,7 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Uint4(values);
 	}
 
-	public static Secs2 uint4(List<Number> values) {
+	public static Secs2 uint4(List<? extends Number> values) {
 		return new Secs2Uint4(values);
 	}
 
@@ -406,7 +406,7 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Uint8(values);
 	}
 
-	public static Secs2 uint8(List<Number> values) {
+	public static Secs2 uint8(List<? extends Number> values) {
 		return new Secs2Uint8(values);
 	}
 	
@@ -418,7 +418,7 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Float4(values);
 	}
 	
-	public static Secs2 float4(List<Number> values) {
+	public static Secs2 float4(List<? extends Number> values) {
 		return new Secs2Float4(values);
 	}
 	
@@ -430,7 +430,7 @@ public abstract class Secs2 implements Iterable<Secs2> {
 		return new Secs2Float8(values);
 	}
 	
-	public static Secs2 float8(List<Number> values) {
+	public static Secs2 float8(List<? extends Number> values) {
 		return new Secs2Float8(values);
 	}
 	

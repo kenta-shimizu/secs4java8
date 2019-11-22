@@ -24,7 +24,7 @@ public class Secs2Int2 extends Secs2BigInteger {
 		super(values);
 	}
 
-	public Secs2Int2(List<Number> values) {
+	public Secs2Int2(List<? extends Number> values) {
 		super(values);
 	}
 

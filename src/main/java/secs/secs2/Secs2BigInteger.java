@@ -40,7 +40,7 @@ abstract public class Secs2BigInteger extends Secs2Number<BigInteger> {
 		this.values = Stream.of(values).collect(Collectors.toList());
 	}
 	
-	public Secs2BigInteger(List<Number> values) {
+	public Secs2BigInteger(List<? extends Number> values) {
 		super();
 		
 		Objects.requireNonNull(values);

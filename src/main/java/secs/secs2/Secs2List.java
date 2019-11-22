@@ -32,10 +32,10 @@ public class Secs2List extends Secs2 {
 		this.values = Stream.of(values).collect(Collectors.toList());
 	}
 
-	public Secs2List(List<Secs2> values) {
+	public Secs2List(List<? extends Secs2> values) {
 		super();
 		
-		this.values = Collections.unmodifiableList(values);
+		this.values = new ArrayList<>(values);
 	}
 
 	@Override

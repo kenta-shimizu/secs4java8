@@ -24,7 +24,7 @@ public class Secs2Uint2 extends Secs2BigInteger {
 		super(values);
 	}
 
-	protected Secs2Uint2(List<Number> values) {
+	protected Secs2Uint2(List<? extends Number> values) {
 		super(values);
 	}
 
