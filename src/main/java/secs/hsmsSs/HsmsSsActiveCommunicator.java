@@ -73,12 +73,9 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 				AsynchronousSocketChannel ch = AsynchronousSocketChannel.open();
 				) {
 			
-			SocketAddress socketAddr = hsmsSsConfig().socketAddress()
-					.orElseThrow(() -> new IOException("error"));
+			SocketAddress socketAddr = hsmsSsConfig().socketAddress();
 			
-			String socketAddrInfo = hsmsSsConfig().socketAddress()
-					.map(SocketAddress::toString)
-					.orElse("not setted");
+			String socketAddrInfo = socketAddr.toString();
 			
 			try {
 				

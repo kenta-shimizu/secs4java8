@@ -82,12 +82,9 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 							AsynchronousSocketChannel ch = AsynchronousSocketChannel.open();
 							) {
 						
-						final SocketAddress socketAddr = secs1OnTcpIpConfig.socketAddress()
-								.orElseThrow(() -> new IOException("Secs1OnTcpIpCommunicatorConfig#socketAddress not setted"));
+						final SocketAddress socketAddr = secs1OnTcpIpConfig.socketAddress();
 						
-						final String socketAddressInfo = secs1OnTcpIpConfig.socketAddress()
-								.map(SocketAddress::toString)
-								.orElse("Not setted");
+						final String socketAddressInfo = socketAddr.toString();
 						
 						entryLog(new SecsLog("Secs1OnTcpIpCommunicator try-connect", socketAddressInfo));
 						

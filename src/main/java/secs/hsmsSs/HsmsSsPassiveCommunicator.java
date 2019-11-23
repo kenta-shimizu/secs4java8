@@ -85,12 +85,9 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 				this.server = AsynchronousServerSocketChannel.open();
 			}
 			
-			SocketAddress socketAddr = hsmsSsConfig().socketAddress()
-					.orElseThrow(() -> new IOException("error"));
+			SocketAddress socketAddr = hsmsSsConfig().socketAddress();
 			
-			String socketAddrInfo = hsmsSsConfig().socketAddress()
-					.map(SocketAddress::toString)
-					.orElse("not setted");
+			String socketAddrInfo = socketAddr.toString();
 			
 			server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 			server.bind(socketAddr);

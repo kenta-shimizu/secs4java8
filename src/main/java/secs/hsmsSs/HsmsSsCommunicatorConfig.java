@@ -50,9 +50,14 @@ public class HsmsSsCommunicatorConfig extends SecsCommunicatorConfig {
 	 * 
 	 * @return socketAddress of PASSIVE/ACTIVE
 	 */
-	public Optional<SocketAddress> socketAddress() {
+	public SocketAddress socketAddress() {
 		synchronized ( this ) {
-			return sockAddr == null ? Optional.empty() : Optional.of(sockAddr);
+			
+			if ( sockAddr == null ) {
+				throw new IllegalStateException("SocketAddress not setted");
+			}
+			
+			return sockAddr;
 		}
 	}
 	

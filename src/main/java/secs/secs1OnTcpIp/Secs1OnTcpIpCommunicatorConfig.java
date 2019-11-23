@@ -2,7 +2,6 @@ package secs.secs1OnTcpIp;
 
 import java.net.SocketAddress;
 import java.util.Objects;
-import java.util.Optional;
 
 import secs.secs1.Secs1CommunicatorConfig;
 
@@ -24,9 +23,14 @@ public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 		}
 	}
 	
-	public Optional<SocketAddress> socketAddress() {
+	public SocketAddress socketAddress() {
 		synchronized ( this ) {
-			return socketAddr == null ? Optional.empty() : Optional.of(socketAddr);
+			
+			if ( socketAddr == null ) {
+				throw new IllegalStateException("SocketAddress not setted");
+			}
+			
+			return socketAddr;
 		}
 	}
 	
