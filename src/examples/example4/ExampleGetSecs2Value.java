@@ -47,8 +47,7 @@ public class ExampleGetSecs2Value {
 			System.out.println("getInt(3, 0, 1, 2):\t" + ss.getInt(3, 0 , 1, 2));
 			System.out.println("getInt(3, 1, 1, 0):\t" + ss.getInt(3, 1 , 1, 0));
 			System.out.println("getInt(3, 2, 1, 0):\t" + ss.getInt(3, 2 , 1, 0));
-			Secs2 s3 = ss.get(3);
-			System.out.println("get(3):\t" + s3);
+			System.out.println("get(3):\t" + ss.get(3));
 			System.out.println();
 			
 			System.out.println("# Get Item-Type");
@@ -72,6 +71,8 @@ public class ExampleGetSecs2Value {
 			{
 				System.out.println("# Use for-each-loop, getAscii(3, x, 0)");
 				
+				Secs2 s3 = ss.get(3);
+				
 				for ( Secs2 s : s3 ) {
 					System.out.println("getAscii(3, x, 0):\t" + s.getAscii(0));
 				}
@@ -81,6 +82,8 @@ public class ExampleGetSecs2Value {
 			
 			{
 				System.out.println("# Use stream, getInt(3, x, 1, 0)");
+				
+				Secs2 s3 = ss.get(3);
 				
 				s3.stream()
 				.map(s -> {
