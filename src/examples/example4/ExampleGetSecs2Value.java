@@ -1,11 +1,11 @@
-package exmple;
+package example4;
 
 import secs.secs2.Secs2;
 import secs.secs2.Secs2Exception;
 
-public class Example6GetSecs2Value {
+public class ExampleGetSecs2Value {
 
-	public Example6GetSecs2Value() {
+	public ExampleGetSecs2Value() {
 		/* Nothign */
 	}
 
@@ -37,7 +37,7 @@ public class Example6GetSecs2Value {
 		
 		try {
 			
-			System.out.println("# Get by index");
+			System.out.println("# Get value by index");
 			System.out.println("getByte(0, 0):\t" + ss.getByte(0, 0));
 			System.out.println("getAscii(1):\t" + ss.getAscii(1));
 			System.out.println("getBoolean(2, 0):\t" + ss.getBoolean(2, 0));

@@ -1,4 +1,4 @@
-package exmple;
+package example1;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -17,9 +17,9 @@ import secs.hsmsSs.HsmsSsProtocol;
 import secs.secs2.Secs2;
 import secs.secs2.Secs2Exception;
 
-public class Example1HsmsSsPassive {
+public class ExampleHsmsSsPassive {
 
-	public Example1HsmsSsPassive() {
+	public ExampleHsmsSsPassive() {
 		/* Nothing */
 	}
 	
@@ -65,8 +65,8 @@ public class Example1HsmsSsPassive {
 			
 			comm.open();
 			
-			synchronized ( Example1HsmsSsPassive.class ) {
-				Example1HsmsSsPassive.class.wait();
+			synchronized ( ExampleHsmsSsPassive.class ) {
+				ExampleHsmsSsPassive.class.wait();
 			}
 		}
 		catch ( InterruptedException ignore ) {

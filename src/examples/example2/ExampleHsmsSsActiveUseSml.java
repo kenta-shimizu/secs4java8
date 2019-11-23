@@ -1,30 +1,36 @@
-package exmple;
+package example2;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Optional;
 
 import secs.SecsException;
+import secs.SecsMessage;
 import secs.gem.ONLACK;
 import secs.hsmsSs.HsmsSsCommunicator;
 import secs.hsmsSs.HsmsSsCommunicatorConfig;
 import secs.hsmsSs.HsmsSsProtocol;
 import secs.secs2.Secs2Exception;
+import secs.sml.SmlMessage;
+import secs.sml.SmlMessageParser;
+import secs.sml.SmlParseException;
 
-public class Example4HsmsSsActiveUseGem {
+public class ExampleHsmsSsActiveUseSml {
 
-	public Example4HsmsSsActiveUseGem() {
+	public ExampleHsmsSsActiveUseSml() {
 		/* Nothing */
 	}
 	
 	/*
-	 * Example-4
+	 * Example-3 (Use SML)
 	 * 1. open ACTIVE-instance
 	 * 2. wait until SELECTED
-	 * 3. send S1F13
-	 * 4. send S1F17
+	 * 3. get SmlMessageParser
+	 * 4. send S1F13
+	 * 5. send S1F17
 	 * 
 	 */
-
+	
 	public static void main(String[] args) {
 		
 		HsmsSsCommunicatorConfig config = new HsmsSsCommunicatorConfig();
@@ -57,18 +63,33 @@ public class Example4HsmsSsActiveUseGem {
 					
 					if ( state /* SELECTED */ ) {
 						
-						/* send S1F13 W */
-						comm.gem().s1f13();
+						/* get SmlMessageParser */
+						SmlMessageParser parser = SmlMessageParser.getInstance();
 						
-						/* send S1F17 W */
-						ONLACK onlack = comm.gem().s1f17();
+						{
+							/* parse S1F13 <L[0] >. */
+							SmlMessage sm = parser.parse("S1F13 W <L >.");
 							
-						System.out.println("ONLACK: " + onlack);
+							/* send */
+							comm.send(sm);
+						}
+						
+						{
+							/* parse S1F17 W. */
+							SmlMessage sm = parser.parse("S1F17 W.");
+							
+							/* send */
+							Optional<SecsMessage> op = comm.send(sm);
+							
+							ONLACK onlack = ONLACK.get(op.get().secs2());
+							
+							System.out.println("ONLACK: " + onlack);
+						}
 					}
 				}
 				catch ( InterruptedException ignore ) {
 				}
-				catch ( SecsException | Secs2Exception e ) {
+				catch ( SecsException | Secs2Exception | SmlParseException e ) {
 					e.printStackTrace();
 				}
 			});
@@ -76,8 +97,8 @@ public class Example4HsmsSsActiveUseGem {
 			comm.open();
 			
 			
-			synchronized ( Example4HsmsSsActiveUseGem.class ) {
-				Example4HsmsSsActiveUseGem.class.wait();
+			synchronized ( ExampleHsmsSsActiveUseSml.class ) {
+				ExampleHsmsSsActiveUseSml.class.wait();
 			}
 		}
 		catch ( InterruptedException ignore ) {

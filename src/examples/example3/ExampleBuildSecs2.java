@@ -1,13 +1,13 @@
-package exmple;
+package example3;
 
 import java.util.Arrays;
 import java.util.List;
 
 import secs.secs2.Secs2;
 
-public class Example5BuildSecs2 {
+public class ExampleBuildSecs2 {
 
-	public Example5BuildSecs2() {
+	public ExampleBuildSecs2() {
 		/* Nothing */
 	}
 
