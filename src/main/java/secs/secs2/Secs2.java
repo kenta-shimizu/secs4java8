@@ -201,6 +201,14 @@ public abstract class Secs2 implements Iterable<Secs2> {
 	
 	protected abstract String toStringValue();
 	
+	
+	public String parseToJson() {
+		return "{\"f\":\"" + secs2Item().symbol() +  "\",\"v\":" + parsedJsonValue() + "}";
+	}
+	
+	abstract protected String parsedJsonValue();
+	
+	
 	/* builder */
 	public static Secs2 empty() {
 		return new Secs2BytesParser();

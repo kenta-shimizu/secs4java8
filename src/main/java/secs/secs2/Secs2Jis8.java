@@ -57,7 +57,12 @@ public class Secs2Jis8 extends Secs2 {
 	public Secs2Item secs2Item() {
 		return secs2Item;
 	}
-
+	
+	@Override
+	protected String parsedJsonValue() {
+		return "false";
+	}
+	
 	@Override
 	protected String toStringValue() {
 		return "NOT_SUPPORT";

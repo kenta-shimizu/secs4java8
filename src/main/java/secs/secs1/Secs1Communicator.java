@@ -3,6 +3,7 @@ package secs.secs1;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -53,6 +54,10 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 			
 			try {
 				entryLog(new SecsLog("Try Send Secs1Message", msg));
+				
+				notifyTrySendMessagePassThrough(msg);
+				
+				entrySendMessageMap(msg);
 				
 				List<Secs1MessageBlock> blocks = msg.blocks();
 				sendBlockQueue.addAll(blocks);
@@ -259,6 +264,8 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		super.open();
 		
 		blockManager.addSecs1MessageReceiveListener(recvMsgQueue::offer);
+		blockManager.addSecs1MessageReceiveListener(this::notifyReceiveMessagePassThrough);
+		
 		blockManager.addSecsLogListener(this::entryLog);
 		replyManager.addSecsLogListener(this::entryLog);
 		
@@ -439,7 +446,13 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 					sendBlockQueue.poll();
 					
 					if ( block.ebit() ) {
+						
 						replyManager.notifySendCompleted(block);
+						
+						Secs1Message sendedMsg = removeSendMessageMap(block);
+						if ( sendedMsg != null ) {
+							notifySendedMessagePassThrough(sendedMsg);
+						}
 					}
 					
 					return;
@@ -468,6 +481,8 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 			sendBlockQueue.removeIf(blk -> blk.equalsSystemBytesKey(block));
 			
 			entryLog(new Secs1MessageBlockLog("Secs1Communicator#try-send retry-over", block));
+			
+			removeSendMessageMap(block);
 		}
 	}
 	
@@ -665,5 +680,44 @@ public abstract class Secs1Communicator extends SecsCommunicator {
 		}
 	}
 	
+	
+	private final Collection<Secs1Message> sendMsgs = new HashSet<>();
+	
+	protected void entrySendMessageMap(Secs1Message msg) {
+		
+		synchronized ( sendMsgs ) {
+			
+			final Integer i = msg.systemBytesKey();
+			
+			sendMsgs.removeIf(m -> {
+				return m.systemBytesKey().equals(i);
+			});
+			
+			sendMsgs.add(msg);
+		}
+	}
+	
+	protected Secs1Message removeSendMessageMap(Integer key) {
+		
+		synchronized ( sendMsgs ) {
+			
+			Secs1Message rtn = sendMsgs.stream()
+					.filter(m -> {
+						return m.systemBytesKey().equals(key);
+					})
+					.findAny()
+					.orElse(null);
+			
+			sendMsgs.removeIf(m -> {
+				return m.systemBytesKey().equals(key);
+			});
+			
+			return rtn;
+		}
+	}
+	
+	protected Secs1Message removeSendMessageMap(Secs1MessageBlock block) {
+		return removeSendMessageMap(block.systemBytesKey());
+	}
+	
 }
-

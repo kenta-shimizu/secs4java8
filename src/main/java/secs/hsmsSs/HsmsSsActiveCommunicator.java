@@ -112,6 +112,10 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 							entryLog(new SecsLog("Receive HsmsSs-Message", msg));
 						});
 						
+						reader.addHsmsSsMessageReceiveListener(msg -> {
+							notifyReceiveMessagePassThrough(msg);
+						});
+						
 						Collection<Callable<Object>> tasks = Arrays.asList(reader, () -> {
 							
 							try {

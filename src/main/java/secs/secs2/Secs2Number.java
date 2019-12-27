@@ -145,6 +145,19 @@ abstract public class Secs2Number<T extends Number> extends Secs2 {
 	}
 	
 	@Override
+	protected String parsedJsonValue() {
+		
+		try {
+			return values().stream()
+					.map(Number::toString)
+					.collect(Collectors.joining(",", "[", "]"));
+		}
+		catch ( Secs2Exception e ) {
+			return "false";
+		}
+	}
+	
+	@Override
 	protected String toStringValue() {
 		try {
 			return values().stream()

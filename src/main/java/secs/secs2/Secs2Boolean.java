@@ -124,7 +124,15 @@ public class Secs2Boolean extends Secs2 {
 	public Secs2Item secs2Item() {
 		return secs2Item;
 	}
-
+	
+	@Override
+	protected String parsedJsonValue() {
+		
+		return bools().stream()
+				.map(f -> (f ? "true" : "false"))
+				.collect(Collectors.joining(",", "[", "]"));
+	}
+	
 	@Override
 	protected String toStringValue() {
 		

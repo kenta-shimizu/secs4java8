@@ -33,12 +33,12 @@ public class HsmsSsMessage extends SecsMessage {
 	
 	@Override
 	public int getStream() {
-		return (head[2] & 0x7F);
+		return dataMessage() ? (head[2] & 0x7F) : -1;
 	}
 
 	@Override
 	public int getFunction() {
-		return (head[3] & 0xFF);
+		return dataMessage() ? (head[3] & 0xFF) : -1;
 	}
 
 	@Override
@@ -133,6 +133,30 @@ public class HsmsSsMessage extends SecsMessage {
 		}
 		
 		return sb.toString();
+	}
+
+	@Override
+	public String parseToJson() {
+		
+		if ( dataMessage() ) {
+			
+			return super.parseToJson();
+			
+		} else {
+			
+			int type;
+			type =  ((int)(head[4]) << 8) & 0x0000FF00;
+			type |= ((int)(head[5])     ) & 0x000000FF;
+			
+			int p = ((int)(head[2])) & 0x000000FF;
+			int s = ((int)(head[3])) & 0x000000FF;
+			
+			return "{\"messageType\":" + type
+					+ ",\"p\":" + p
+					+ ",\"s\":" + s
+					+ ",\"systemBytes\":"+ systemBytesKey().toString()
+					+ "}";
+		}
 	}
 
 }

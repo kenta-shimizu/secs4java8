@@ -68,6 +68,8 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 		
 		entryLog(new SecsLog("Try Send HsmsSs-Message", msg));
 		
+		notifyTrySendMessagePassThrough(msg);
+		
 		try {
 			byte[] head = msg.header10Bytes();
 			byte[] body = msg.secs2().secs2Bytes();
@@ -102,6 +104,8 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 					throw e;
 				}
 			}
+			
+			notifySendedMessagePassThrough(msg);
 		}
 		catch ( ExecutionException e ) {
 			throw new HsmsSsSendMessageException(msg, e.getCause());
@@ -195,14 +199,24 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 		
 		switch ( config.protocol() ) {
 		case PASSIVE: {
-			return new HsmsSsPassiveCommunicator(config);
+			
+			if ( config.rebindIfPassive().isPresent() ) {
+				
+				return new HsmsSsRebindPassiveCommunicator(config);
+				
+			} else {
+				
+				return new HsmsSsPassiveCommunicator(config);
+			}
 			/* break; */
 		}
 		case ACTIVE: {
+			
 			return new HsmsSsActiveCommunicator(config);
 			/* break; */
 		}
 		default: {
+			
 			throw new IllegalStateException("undefined protocol: " + config.protocol());
 		}
 		}
@@ -401,7 +415,7 @@ public abstract class HsmsSsCommunicator extends SecsCommunicator {
 	}
 	
 	/**
-	 *　Blocking-method<br />
+	 * Blocking-method<br />
 	 * 
 	 * @return true if success
 	 * @throws InterruptedException

@@ -24,4 +24,13 @@ public abstract class SecsMessage {
 	abstract protected Integer systemBytesKey();
 	abstract protected String toHeaderBytesString();
 	
+	public String parseToJson() {
+		return "{\"strm\":" + getStream()
+				+ ",\"func\":" + getFunction()
+				+ ",\"wbit\":" + (wbit() ? "true" : "false")
+				+ ",\"deviceId\":" + deviceId()
+				+ ",\"systemBytes\":"+ systemBytesKey().toString()
+				+ ",\"secs2\":"+ secs2().parseToJson()
+				+ "}";
+	}
 }

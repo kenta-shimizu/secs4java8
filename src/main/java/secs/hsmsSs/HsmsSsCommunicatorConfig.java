@@ -11,6 +11,7 @@ public class HsmsSsCommunicatorConfig extends SecsCommunicatorConfig {
 	private HsmsSsProtocol protocol;
 	private SocketAddress sockAddr;
 	private float linktest;
+	private float rebindIfPassive;
 	
 	public HsmsSsCommunicatorConfig() {
 		super();
@@ -18,6 +19,7 @@ public class HsmsSsCommunicatorConfig extends SecsCommunicatorConfig {
 		protocol = HsmsSsProtocol.PASSIVE;
 		sockAddr = null;
 		linktest = -1.0F;
+		rebindIfPassive = -1.0F;
 	}
 	
 	public void protocol(HsmsSsProtocol protocol) {
@@ -111,6 +113,42 @@ public class HsmsSsCommunicatorConfig extends SecsCommunicatorConfig {
 	public Optional<Float> linktest() {
 		synchronized ( this ) {
 			return linktest >= 0.0F ? Optional.of(linktest) : Optional.empty();
+		}
+	}
+	
+	/**
+	 * 
+	 * Not rebind if Passive-protocol
+	 * 
+	 */
+	public void notRebindIfPassive() {
+		synchronized ( this ) {
+			this.rebindIfPassive = -1.0F;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param rebind after this time if Passive-protocol. value >= 0
+	 */
+	public void rebindIfPassive(float v) {
+		
+		synchronized ( this ) {
+			if ( v < 0.0F ) {
+				throw new IllegalArgumentException("rebindIfPassive value is >= 0.0F");
+			}
+			
+			this.rebindIfPassive = v;
+		}
+	}
+	
+	/**
+	 * 
+	 * @return seconds
+	 */
+	public Optional<Float> rebindIfPassive() {
+		synchronized ( this ) {
+			return rebindIfPassive >= 0 ? Optional.of(rebindIfPassive) : Optional.empty();
 		}
 	}
 	

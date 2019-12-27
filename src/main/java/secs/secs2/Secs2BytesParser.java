@@ -286,6 +286,29 @@ public class Secs2BytesParser extends Secs2 {
 	}
 	
 	@Override
+	public String parseToJson() {
+		
+		if ( isEmpty() ) {
+			
+			return "{}";
+			
+		} else {
+			
+			try {
+				return parseBytes().parseToJson();
+			}
+			catch ( Secs2Exception giveup ) {
+				return "false";
+			}
+		}
+	}
+	
+	@Override
+	protected String parsedJsonValue() {
+		return null;
+	}
+	
+	@Override
 	public String toString() {
 		
 		if ( bytes.length > 0 ) {

@@ -8,7 +8,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -19,71 +19,46 @@ import java.util.concurrent.TimeoutException;
 import secs.SecsException;
 import secs.SecsLog;
 
-public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
-
-	private AsynchronousServerSocketChannel server;
+public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 	
-	public HsmsSsPassiveCommunicator(HsmsSsCommunicatorConfig config) {
-		super(Objects.requireNonNull(config));
-		
-		server = null;
+	public HsmsSsRebindPassiveCommunicator(HsmsSsCommunicatorConfig config) {
+		super(config);
 	}
 	
 	@Override
-	public void open() throws IOException {
+	protected void passiveOpen() {
 		
-		super.open();
-		
-		if ( hsmsSsConfig().protocol() != HsmsSsProtocol.PASSIVE ) {
-			throw new IOException("HsmsSsCommunicatorConfig#protocol is not PASSIVE");
-		}
-		
-		passiveOpen();
+		executorService().execute(() -> {
+			
+			try {
+				for ( ;; ) {
+					
+					innerPassiveOpen();
+					
+					Optional<Long> op = this.hsmsSsConfig().rebindIfPassive()
+							.map(v -> (v * 1000.0F))
+							.map(v -> v.longValue());
+					
+					if ( op.isPresent() ) {
+						
+						TimeUnit.MILLISECONDS.sleep(op.get());
+						
+					} else {
+						
+						break;
+					}
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		});
 	}
 	
-	@Override
-	public void close() throws IOException {
+	private void innerPassiveOpen() throws InterruptedException {
 		
-		IOException ioExcept = null;
-		
-		try {
-			synchronized ( this ) {
-				if ( closed ) {
-					return;
-				}
-				
-				super.close();
-			}
-		}
-		catch ( IOException e ) {
-			ioExcept = null;
-		}
-		
-		synchronized ( this ) {
-			
-			if ( server != null ) {
-				
-				try {
-					server.close();
-				}
-				catch ( IOException e ) {
-					ioExcept = e;
-				}
-			}
-		}
-		
-		if ( ioExcept != null) {
-			throw ioExcept;
-		}
-	}
-	
-	protected void passiveOpen() throws IOException {
-		
-		try {
-			
-			synchronized ( this ) {
-				this.server = AsynchronousServerSocketChannel.open();
-			}
+		try (
+				AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
+				) {
 			
 			SocketAddress socketAddr = hsmsSsConfig().socketAddress();
 			
@@ -92,7 +67,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 			server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 			server.bind(socketAddr);
 			
-			entryLog(new SecsLog("HsmsSsPassiveCommunicator#binded", socketAddrInfo));
+			entryLog(new SecsLog("HsmsSsRebindPassiveCommunicator#binded", socketAddrInfo));
 			
 			server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
 
@@ -103,12 +78,12 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 					
 					String channelString = ch.toString();
 					
-					entryLog(new SecsLog("HsmsSsPassiveCommunicator#loop channel#accept", channelString));
+					entryLog(new SecsLog("HsmsSsRebindPassiveCommunicator#loop channel#accept", channelString));
 					
 					final BlockingQueue<HsmsSsMessage> queue = new LinkedBlockingQueue<>();
 					
-					final HsmsSsByteReader reader = new HsmsSsByteReader(HsmsSsPassiveCommunicator.this, ch);
-					final HsmsSsCircuitAssurance linktest = new HsmsSsCircuitAssurance(HsmsSsPassiveCommunicator.this);
+					final HsmsSsByteReader reader = new HsmsSsByteReader(HsmsSsRebindPassiveCommunicator.this, ch);
+					final HsmsSsCircuitAssurance linktest = new HsmsSsCircuitAssurance(HsmsSsRebindPassiveCommunicator.this);
 					
 					reader.addHsmsSsMessageReceiveListener(msg -> {
 						sendReplyManager().receive(msg).ifPresent(queue::offer);
@@ -315,7 +290,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 						
 						return null;
 					});
-					
+
 					try {
 						executorService().invokeAny(tasks);
 					}
@@ -346,20 +321,21 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 				@Override
 				public void failed(Throwable t, Void attachment) {
 					
-					entryLog(new SecsLog("HsmsSsPassiveCommunicator#loop AsynchronousSeverSocketChannel#accept failed", t));
+					entryLog(new SecsLog("HsmsSsRebindPassiveCommunicator#loop AsynchronousSeverSocketChannel#accept failed", t));
 					
-					try {
-						close();
-					}
-					catch ( IOException e ) {
-						entryLog(new SecsLog(e));
+					synchronized ( server ) {
+						server.notifyAll();
 					}
 				}
 			});
+			
+			synchronized ( server ) {
+				server.wait();
+			}
+			
 		}
 		catch ( IOException e ) {
 			entryLog(new SecsLog(e));
-			throw e;
 		}
 	}
 	

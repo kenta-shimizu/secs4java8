@@ -254,4 +254,58 @@ public abstract class SecsCommunicator implements Closeable {
 		}
 	}
 	
+	
+	/* Try-Send Secs-Message Pass-through Listener */
+	private final Collection<SecsMessagePassThroughListener> trySendMsgPassThroughListeners = new CopyOnWriteArrayList<>();
+	
+	public boolean addTrySendMessagePassThroughListener(SecsMessagePassThroughListener lstnr) {
+		return trySendMsgPassThroughListeners.add(lstnr);
+	}
+	
+	public boolean removeTrySendMessagePassThroughListener(SecsMessagePassThroughListener lstnr) {
+		return trySendMsgPassThroughListeners.remove(lstnr);
+	}
+	
+	protected void notifyTrySendMessagePassThrough(SecsMessage msg) {
+		trySendMsgPassThroughListeners.forEach(lstnr -> {
+			lstnr.passThrough(msg);
+		});
+	}
+	
+	
+	/* Sended Secs-Message Pass-through Listener */
+	private final Collection<SecsMessagePassThroughListener> sendedMsgPassThroughListeners = new CopyOnWriteArrayList<>();
+	
+	public boolean addSendedMessagePassThroughListener(SecsMessagePassThroughListener lstnr) {
+		return sendedMsgPassThroughListeners.add(lstnr);
+	}
+	
+	public boolean removeSendedMessagePassThroughListener(SecsMessagePassThroughListener lstnr) {
+		return sendedMsgPassThroughListeners.remove(lstnr);
+	}
+	
+	protected void notifySendedMessagePassThrough(SecsMessage msg) {
+		sendedMsgPassThroughListeners.forEach(lstnr -> {
+			lstnr.passThrough(msg);
+		});
+	}
+	
+	
+	/* Receive Secs-Message Pass-through Listener */
+	private final Collection<SecsMessagePassThroughListener> recvMsgPassThroughListeners = new CopyOnWriteArrayList<>();
+	
+	public boolean addReceiveMessagePassThroughListener(SecsMessagePassThroughListener lstnr) {
+		return recvMsgPassThroughListeners.add(lstnr);
+	}
+	
+	public boolean removeReceiveMessagePassThroughListener(SecsMessagePassThroughListener lstnr) {
+		return recvMsgPassThroughListeners.remove(lstnr);
+	}
+	
+	protected void notifyReceiveMessagePassThrough(SecsMessage msg) {
+		recvMsgPassThroughListeners.forEach(lstnr -> {
+			lstnr.passThrough(msg);
+		});
+	}
+	
 }

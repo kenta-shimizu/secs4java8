@@ -84,6 +84,23 @@ public class Secs2Ascii extends Secs2 {
 	}
 	
 	@Override
+	protected String parsedJsonValue() {
+		return "\"" + escapeJsonString(ascii()) + "\"";
+	}
+	
+	private static final String escapeJsonString(CharSequence cs) {
+		return cs.toString()
+				.replaceAll("\\\\", "\\\\")
+				.replaceAll("\"", "\\\"")
+				.replaceAll("\\/", "\\/")
+				.replaceAll("\b", "\\b")
+				.replaceAll("\f", "\\f")
+				.replaceAll("\n", "\\n")
+				.replaceAll("\r", "\\r")
+				.replaceAll("\t", "\\t");
+	}
+	
+	@Override
 	protected String toStringValue() {
 		return "\"" + ascii() + "\"";
 	}

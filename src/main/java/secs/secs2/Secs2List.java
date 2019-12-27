@@ -128,7 +128,14 @@ public class Secs2List extends Secs2 {
 		
 		return lines;
 	}
-
+	
+	@Override
+	protected String parsedJsonValue() {
+		
+		return stream().map(ss -> ss.parseToJson())
+				.collect(Collectors.joining(",", "[", "]"));
+	}
+	
 	@Override
 	protected String toStringValue() {
 		return "";
