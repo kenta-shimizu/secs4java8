@@ -89,12 +89,12 @@ public class Secs2Ascii extends Secs2 {
 	}
 	
 	
-	private static final byte BACKSLASH = (byte)0x005C;
-	private static final byte[] BS = new byte[]{BACKSLASH, (byte)0x0062};	/* \\b */
-	private static final byte[] HT = new byte[]{BACKSLASH, (byte)0x0074};	/* \\t */
-	private static final byte[] LF = new byte[]{BACKSLASH, (byte)0x006E};	/* \\n */
-	private static final byte[] FF = new byte[]{BACKSLASH, (byte)0x0066};	/* \\f */
-	private static final byte[] CR = new byte[]{BACKSLASH, (byte)0x0072};	/* \\r */
+	private static final byte BACKSLASH = 0x5C;
+	private static final byte[] BS = new byte[]{BACKSLASH, 0x62};	/* \\b */
+	private static final byte[] HT = new byte[]{BACKSLASH, 0x74};	/* \\t */
+	private static final byte[] LF = new byte[]{BACKSLASH, 0x6E};	/* \\n */
+	private static final byte[] FF = new byte[]{BACKSLASH, 0x66};	/* \\f */
+	private static final byte[] CR = new byte[]{BACKSLASH, 0x72};	/* \\r */
 	
 	private static final String escapeJsonString(CharSequence cs) {
 		
@@ -106,29 +106,29 @@ public class Secs2Ascii extends Secs2 {
 			
 			for (byte b : bb) {
 				
-				if (b == (byte)0x0008 /* BS */) {
+				if (b == 0x08 /* BS */) {
 					
 					strm.write(BS);
 					
-				} else if (b == (byte)0x0009 /* HT */) {
+				} else if (b == 0x09 /* HT */) {
 					
 					strm.write(HT);
 					
-				} else if (b == (byte)0x000A /* LF */) {
+				} else if (b == 0x0A /* LF */) {
 					
 					strm.write(LF);
 					
-				} else if (b == (byte)0x000C /* FF */) {
+				} else if (b == 0x0C /* FF */) {
 					
 					strm.write(FF);
 					
-				} else if (b == (byte)0x000D /* CR */) {
+				} else if (b == 0x0D /* CR */) {
 					
 					strm.write(CR);
 					
 				} else if (
-						b == (byte)0x002F /* / */
-						|| b == (byte)0x0022 /* " */
+						b == 0x2F /* / */
+						|| b == 0x22 /* " */
 						|| b == BACKSLASH /* \\ */
 						) {
 					
