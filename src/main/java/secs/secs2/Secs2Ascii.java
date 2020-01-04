@@ -88,16 +88,66 @@ public class Secs2Ascii extends Secs2 {
 		return "\"" + escapeJsonString(ascii()) + "\"";
 	}
 	
+	
+	private static final byte BACKSLASH = (byte)0x005C;
+	private static final byte[] BS = new byte[]{BACKSLASH, (byte)0x0062};	/* \\b */
+	private static final byte[] HT = new byte[]{BACKSLASH, (byte)0x0074};	/* \\t */
+	private static final byte[] LF = new byte[]{BACKSLASH, (byte)0x006E};	/* \\n */
+	private static final byte[] FF = new byte[]{BACKSLASH, (byte)0x0066};	/* \\f */
+	private static final byte[] CR = new byte[]{BACKSLASH, (byte)0x0072};	/* \\r */
+	
 	private static final String escapeJsonString(CharSequence cs) {
-		return cs.toString()
-				.replaceAll("\\\\", "\\\\")
-				.replaceAll("\"", "\\\"")
-				.replaceAll("\\/", "\\/")
-				.replaceAll("\b", "\\b")
-				.replaceAll("\f", "\\f")
-				.replaceAll("\n", "\\n")
-				.replaceAll("\r", "\\r")
-				.replaceAll("\t", "\\t");
+		
+		try (
+				ByteArrayOutputStream strm = new ByteArrayOutputStream();
+				) {
+			
+			byte[] bb = cs.toString().getBytes(StandardCharsets.US_ASCII);
+			
+			for (byte b : bb) {
+				
+				if (b == (byte)0x0008 /* BS */) {
+					
+					strm.write(BS);
+					
+				} else if (b == (byte)0x0009 /* HT */) {
+					
+					strm.write(HT);
+					
+				} else if (b == (byte)0x000A /* LF */) {
+					
+					strm.write(LF);
+					
+				} else if (b == (byte)0x000C /* FF */) {
+					
+					strm.write(FF);
+					
+				} else if (b == (byte)0x000D /* CR */) {
+					
+					strm.write(CR);
+					
+				} else if (
+						b == (byte)0x002F /* / */
+						|| b == (byte)0x0022 /* " */
+						|| b == BACKSLASH /* \\ */
+						) {
+					
+					strm.write(BACKSLASH);
+					strm.write(b);
+					
+				} else {
+					
+					strm.write(b);
+				}
+			}
+			
+			return new String(strm.toByteArray(), StandardCharsets.US_ASCII);
+		}
+		catch (IOException notHappen) {
+			notHappen.printStackTrace();
+		}
+		
+		return "";
 	}
 	
 	@Override
