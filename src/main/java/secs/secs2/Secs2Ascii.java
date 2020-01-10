@@ -127,8 +127,8 @@ public class Secs2Ascii extends Secs2 {
 					strm.write(CR);
 					
 				} else if (
-						b == 0x2F /* / */
-						|| b == 0x22 /* " */
+						b == 0x22 /* " */
+						|| b == 0x2F /* / */
 						|| b == BACKSLASH /* \\ */
 						) {
 					
