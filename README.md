@@ -124,15 +124,15 @@ This library is SEMI-SECS-communicate implementation on Java8.
 - support parse method matrix
 
 | method | B | BOOLEAN | A | I1 | I2 | I4 | I8 | F4 | F8 | U1 | U2 | U4 | U8 |
-|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| getByte       | ○ |   |   |   |   |   |   |   |   |   |   |   |   |
-| getBoolean    |   | ○ |   |   |   |   |   |   |   |   |   |   |   |
-| getAscii      |   |   | ○ |   |   |   |   |   |   |   |   |   |   |
-| getInt        |   |   |   | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| getLong       |   |   |   | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| getBigInteger |   |   |   | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| getFloat      |   |   |   | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| getDouble     |   |   |   | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+|:-|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| getByte       | ✓ |   |   |   |   |   |   |   |   |   |   |   |   |
+| getBoolean    |   | ✓ |   |   |   |   |   |   |   |   |   |   |   |
+| getAscii      |   |   | ✓ |   |   |   |   |   |   |   |   |   |   |
+| getInt        |   |   |   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| getLong       |   |   |   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| getBigInteger |   |   |   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| getFloat      |   |   |   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| getDouble     |   |   |   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 
 - Send Reply-Message
