@@ -236,5 +236,5 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 		
 		return inst;
 	}
-
+	
 }

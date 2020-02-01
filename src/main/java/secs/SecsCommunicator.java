@@ -2,73 +2,23 @@ package secs;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import secs.gem.Gem;
 import secs.secs2.Secs2;
 import secs.sml.SmlMessage;
 
-public abstract class SecsCommunicator implements Closeable {
-
-	private final SecsCommunicatorConfig config;
-	private final Gem gem;
+public interface SecsCommunicator extends Closeable {
 	
-	protected boolean opened;
-	protected boolean closed;
-	private boolean lastCommunicatable;
+	public void open() throws IOException;
 	
-	public SecsCommunicator(SecsCommunicatorConfig config) {
-		
-		this.config = config;
-		this.gem = new Gem(this, config.gem());
-		
-		opened = false;
-		closed = false;
-		lastCommunicatable = false;
-	}
+	public boolean isOpened();
+	public boolean isClosed();
 	
-	public void open() throws IOException {
-		
-		synchronized ( this ) {
-			
-			if ( closed ) {
-				throw new IOException("Already closed");
-			}
-			
-			if ( opened ) {
-				throw new IOException("Already opened");
-			}
-			
-			opened = true;
-		}
-	}
-
-	@Override
-	public void close() throws IOException {
-		
-		synchronized ( this ) {
-			
-			if ( closed ) {
-				return ;
-			}
-			
-			closed = true;
-		}
-	}
+	public Gem gem();
+	public int deviceId();
+	public boolean isEquip();
 	
-	public Gem gem() {
-		return gem;
-	}
-	
-	public int deviceId() {
-		return config.deviceId();
-	}
-	
-	public boolean isEquip() {
-		return config.isEquip();
-	}
 	
 	/**
 	 * Blocking-method<br />
@@ -84,7 +34,7 @@ public abstract class SecsCommunicator implements Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> send(int strm, int func, boolean wbit)
+	default public Optional<SecsMessage> send(int strm, int func, boolean wbit)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -106,7 +56,7 @@ public abstract class SecsCommunicator implements Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	abstract public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException;
 	
@@ -123,7 +73,7 @@ public abstract class SecsCommunicator implements Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit)
+	default public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -160,7 +110,7 @@ public abstract class SecsCommunicator implements Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> send(SmlMessage sml)
+	default public Optional<SecsMessage> send(SmlMessage sml)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -178,7 +128,7 @@ public abstract class SecsCommunicator implements Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> send(SecsMessage primary, SmlMessage sml)
+	default public Optional<SecsMessage> send(SecsMessage primary, SmlMessage sml)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -187,125 +137,27 @@ public abstract class SecsCommunicator implements Closeable {
 	
 	
 	/* Secs-Message Receive Listener */
-	private final Collection<SecsMessageReceiveListener> msgRecvListeners = new CopyOnWriteArrayList<>();
-	
-	public boolean addSecsMessageReceiveListener(SecsMessageReceiveListener lstnr) {
-		return msgRecvListeners.add(lstnr);
-	}
-	
-	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveListener lstnr) {
-		return msgRecvListeners.remove(lstnr);
-	}
-	
-	protected void notifyReceiveMessage(SecsMessage msg) {
-		msgRecvListeners.forEach(lstnr -> {
-			lstnr.receive(msg);
-		});
-	}
-	
+	public boolean addSecsMessageReceiveListener(SecsMessageReceiveListener lstnr);
+	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveListener lstnr);
 	
 	/* Secs-Log Receive Listener */
-	private final Collection<SecsLogListener> logListeners = new CopyOnWriteArrayList<>();
-	
-	public boolean addSecsLogListener(SecsLogListener lstnr) {
-		return logListeners.add(lstnr);
-	}
-	
-	public boolean removeSecsLogListener(SecsLogListener lstnr) {
-		return logListeners.remove(lstnr);
-	}
-	
-	protected void notifyLog(SecsLog log) {
-		logListeners.forEach(lstnr -> {
-			lstnr.receive(log);
-		});
-	}
-	
+	public boolean addSecsLogListener(SecsLogListener lstnr);
+	public boolean removeSecsLogListener(SecsLogListener lstnr);
 	
 	/* Secs-Communicatable-State-Changed-Listener */
-	private final Collection<SecsCommunicatableStateChangeListener> commStateChangeListeners = new CopyOnWriteArrayList<>();
-	
-	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener lstnr) {
-		
-		synchronized ( commStateChangeListeners ) {
-			
-			lstnr.changed(lastCommunicatable);
-			
-			return commStateChangeListeners.add(lstnr);
-		}
-	}
-	
-	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener lstnr) {
-		return commStateChangeListeners.remove(lstnr);
-	}
-	
-	protected void notifyCommunicatableStateChange(boolean communicatable) {
-		
-		synchronized ( commStateChangeListeners ) {
-			
-			if ( lastCommunicatable != communicatable ) {
-				
-				lastCommunicatable = communicatable;
-				
-				commStateChangeListeners.forEach(lstnr -> {
-					lstnr.changed(lastCommunicatable);
-				});
-			}
-		}
-	}
-	
+	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener lstnr);
+	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener lstnr);	
 	
 	/* Try-Send Secs-Message Pass-through Listener */
-	private final Collection<SecsMessagePassThroughListener> trySendMsgPassThroughListeners = new CopyOnWriteArrayList<>();
-	
-	public boolean addTrySendMessagePassThroughListener(SecsMessagePassThroughListener lstnr) {
-		return trySendMsgPassThroughListeners.add(lstnr);
-	}
-	
-	public boolean removeTrySendMessagePassThroughListener(SecsMessagePassThroughListener lstnr) {
-		return trySendMsgPassThroughListeners.remove(lstnr);
-	}
-	
-	protected void notifyTrySendMessagePassThrough(SecsMessage msg) {
-		trySendMsgPassThroughListeners.forEach(lstnr -> {
-			lstnr.passThrough(msg);
-		});
-	}
-	
+	public boolean addTrySendMessagePassThroughListener(SecsMessagePassThroughListener lstnr);
+	public boolean removeTrySendMessagePassThroughListener(SecsMessagePassThroughListener lstnr);	
 	
 	/* Sended Secs-Message Pass-through Listener */
-	private final Collection<SecsMessagePassThroughListener> sendedMsgPassThroughListeners = new CopyOnWriteArrayList<>();
-	
-	public boolean addSendedMessagePassThroughListener(SecsMessagePassThroughListener lstnr) {
-		return sendedMsgPassThroughListeners.add(lstnr);
-	}
-	
-	public boolean removeSendedMessagePassThroughListener(SecsMessagePassThroughListener lstnr) {
-		return sendedMsgPassThroughListeners.remove(lstnr);
-	}
-	
-	protected void notifySendedMessagePassThrough(SecsMessage msg) {
-		sendedMsgPassThroughListeners.forEach(lstnr -> {
-			lstnr.passThrough(msg);
-		});
-	}
-	
+	public boolean addSendedMessagePassThroughListener(SecsMessagePassThroughListener lstnr);	
+	public boolean removeSendedMessagePassThroughListener(SecsMessagePassThroughListener lstnr);	
 	
 	/* Receive Secs-Message Pass-through Listener */
-	private final Collection<SecsMessagePassThroughListener> recvMsgPassThroughListeners = new CopyOnWriteArrayList<>();
-	
-	public boolean addReceiveMessagePassThroughListener(SecsMessagePassThroughListener lstnr) {
-		return recvMsgPassThroughListeners.add(lstnr);
-	}
-	
-	public boolean removeReceiveMessagePassThroughListener(SecsMessagePassThroughListener lstnr) {
-		return recvMsgPassThroughListeners.remove(lstnr);
-	}
-	
-	protected void notifyReceiveMessagePassThrough(SecsMessage msg) {
-		recvMsgPassThroughListeners.forEach(lstnr -> {
-			lstnr.passThrough(msg);
-		});
-	}
-	
+	public boolean addReceiveMessagePassThroughListener(SecsMessagePassThroughListener lstnr);
+	public boolean removeReceiveMessagePassThroughListener(SecsMessagePassThroughListener lstnr);
+
 }

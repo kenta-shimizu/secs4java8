@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import secs.SecsCommunicator;
+import secs.AbstractSecsCommunicator;
 import secs.SecsException;
 import secs.SecsLog;
 import secs.SecsMessage;
@@ -25,7 +25,7 @@ import secs.SecsWaitReplyMessageException;
 import secs.secs2.Secs2;
 import secs.secs2.Secs2Exception;
 
-public abstract class Secs1Communicator extends SecsCommunicator {
+public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	
 	protected static final byte ENQ = (byte)0x05;
 	protected static final byte EOT = (byte)0x04;

@@ -48,7 +48,7 @@ public class Secs2Ascii extends Secs2 {
 			byte[] bs = bytes();
 			
 			st.write(createHeadBytes(secs2Item, bs.length));
-			st.write(bs);
+			st.write(bs[0]);
 			
 			return st.toByteArray();
 		}
