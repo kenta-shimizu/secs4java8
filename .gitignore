@@ -2,7 +2,7 @@
 *.DS_Store
 
 # sh
-*.sh
+gitauto.sh
 
 # Compiled class file
 *.class
