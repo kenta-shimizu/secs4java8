@@ -1,7 +1,7 @@
 package example4;
 
-import secs.secs2.Secs2;
-import secs.secs2.Secs2Exception;
+import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class ExampleGetSecs2Value {
 

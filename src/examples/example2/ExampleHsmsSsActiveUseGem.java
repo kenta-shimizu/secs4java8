@@ -3,12 +3,12 @@ package example2;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-import secs.SecsException;
-import secs.gem.ONLACK;
-import secs.hsmsSs.HsmsSsCommunicator;
-import secs.hsmsSs.HsmsSsCommunicatorConfig;
-import secs.hsmsSs.HsmsSsProtocol;
-import secs.secs2.Secs2Exception;
+import com.shimizukenta.secs.SecsException;
+import com.shimizukenta.secs.gem.ONLACK;
+import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
+import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
+import com.shimizukenta.secs.hsmsss.HsmsSsProtocol;
+import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class ExampleHsmsSsActiveUseGem {
 

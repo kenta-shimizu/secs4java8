@@ -3,7 +3,7 @@ package example3;
 import java.util.Arrays;
 import java.util.List;
 
-import secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.Secs2;
 
 public class ExampleBuildSecs2 {
 
