@@ -3,12 +3,9 @@ package com.shimizukenta.secs.hsmsss;
 import com.shimizukenta.secs.SecsSendMessageException;
 
 public class HsmsSsSendMessageException extends SecsSendMessageException {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1786959342763025990L;
-
+	
+	private static final long serialVersionUID = -4647225535173892949L;
+	
 	public HsmsSsSendMessageException() {
 		super();
 	}
@@ -25,10 +22,6 @@ public class HsmsSsSendMessageException extends SecsSendMessageException {
 		super(message, cause);
 	}
 
-	public HsmsSsSendMessageException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
-	
 	public HsmsSsSendMessageException(HsmsSsMessage msg) {
 		super(msg);
 	}

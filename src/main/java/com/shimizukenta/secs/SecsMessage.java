@@ -2,35 +2,34 @@ package com.shimizukenta.secs;
 
 import com.shimizukenta.secs.secs2.Secs2;
 
-public abstract class SecsMessage {
-
-	public SecsMessage() {
-		/* Nothing */
-	}
+public interface SecsMessage {
 	
-	abstract public int getStream();
-	abstract public int getFunction();
-	abstract public boolean wbit();
-	abstract public Secs2 secs2();
+	/**
+	 * 
+	 * @return stream-number. -1 if not Data-Message
+	 */
+	public int getStream();
 	
-	abstract public int deviceId();
+	/**
+	 * 
+	 * @return function-number. -1 if not Data-Message
+	 */
+	public int getFunction();
 	
-	public int sessionId() {
+	/**
+	 * 
+	 * @return true if has wbit
+	 */
+	public boolean wbit();
+	
+	public Secs2 secs2();
+	
+	public int deviceId();
+	
+	default public int sessionId() {
 		return deviceId();
 	}
 	
-	abstract public byte[] header10Bytes();
+	public byte[] header10Bytes();
 	
-	abstract protected Integer systemBytesKey();
-	abstract protected String toHeaderBytesString();
-	
-	public String parseToJson() {
-		return "{\"strm\":" + getStream()
-				+ ",\"func\":" + getFunction()
-				+ ",\"wbit\":" + (wbit() ? "true" : "false")
-				+ ",\"deviceId\":" + deviceId()
-				+ ",\"systemBytes\":"+ systemBytesKey().toString()
-				+ ",\"secs2\":"+ secs2().parseToJson()
-				+ "}";
-	}
 }

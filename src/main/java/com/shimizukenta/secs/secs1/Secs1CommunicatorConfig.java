@@ -1,8 +1,8 @@
 package com.shimizukenta.secs.secs1;
 
-import com.shimizukenta.secs.SecsCommunicatorConfig;
+import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 
-public class Secs1CommunicatorConfig extends SecsCommunicatorConfig {
+public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
 	private boolean isMaster;
 	private int retry;

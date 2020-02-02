@@ -17,6 +17,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.shimizukenta.secs.AbstractSecsCommunicator;
+import com.shimizukenta.secs.AbstractSecsMessage;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsLog;
 import com.shimizukenta.secs.SecsMessage;
@@ -207,7 +208,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			head[2] |= (byte)0x80;
 		}
 		
-		return send(new Secs1Message(head, secs2)).map(msg -> (SecsMessage)msg);
+		return send(new Secs1Message(head, secs2)).map(msg -> (AbstractSecsMessage)msg);
 	}
 	
 	@Override
@@ -245,7 +246,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			head[2] |= (byte)0x80;
 		}
 		
-		return send(new Secs1Message(head, secs2)).map(msg -> (SecsMessage)msg);
+		return send(new Secs1Message(head, secs2)).map(msg -> (AbstractSecsMessage)msg);
 	}
 	
 	

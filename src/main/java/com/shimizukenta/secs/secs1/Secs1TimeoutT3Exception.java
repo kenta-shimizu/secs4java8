@@ -1,11 +1,10 @@
 package com.shimizukenta.secs.secs1;
 
-import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 
 public class Secs1TimeoutT3Exception extends SecsWaitReplyMessageException {
-
-	private static final long serialVersionUID = -819647606179236547L;
+	
+	private static final long serialVersionUID = 7313332817972338765L;
 
 	public Secs1TimeoutT3Exception() {
 		super();
@@ -23,15 +22,11 @@ public class Secs1TimeoutT3Exception extends SecsWaitReplyMessageException {
 		super(message, cause);
 	}
 
-	public Secs1TimeoutT3Exception(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
-
-	public Secs1TimeoutT3Exception(SecsMessage primaryMessage) {
+	public Secs1TimeoutT3Exception(Secs1Message primaryMessage) {
 		super(primaryMessage);
 	}
 
-	public Secs1TimeoutT3Exception(SecsMessage primaryMessage, Throwable cause) {
+	public Secs1TimeoutT3Exception(Secs1Message primaryMessage, Throwable cause) {
 		super(primaryMessage, cause);
 	}
 

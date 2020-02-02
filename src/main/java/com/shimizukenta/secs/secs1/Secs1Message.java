@@ -8,11 +8,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import com.shimizukenta.secs.SecsMessage;
+import com.shimizukenta.secs.AbstractSecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
-public class Secs1Message extends SecsMessage {
+public class Secs1Message extends AbstractSecsMessage {
 	
 	private static final int HEAD_SIZE = 10;
 	private static final int BODY_SIZE = 244;

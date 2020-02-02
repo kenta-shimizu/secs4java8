@@ -1,14 +1,10 @@
 package com.shimizukenta.secs.hsmsss;
 
-import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 
 public class HsmsSsTimeoutT6Exception extends SecsWaitReplyMessageException {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1103030516068115495L;
+	
+	private static final long serialVersionUID = -6880723997450961190L;
 
 	public HsmsSsTimeoutT6Exception() {
 		super();
@@ -26,15 +22,11 @@ public class HsmsSsTimeoutT6Exception extends SecsWaitReplyMessageException {
 		super(message, cause);
 	}
 
-	public HsmsSsTimeoutT6Exception(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
-
-	public HsmsSsTimeoutT6Exception(SecsMessage primaryMessage) {
+	public HsmsSsTimeoutT6Exception(HsmsSsMessage primaryMessage) {
 		super(primaryMessage);
 	}
 
-	public HsmsSsTimeoutT6Exception(SecsMessage primaryMessage, Throwable cause) {
+	public HsmsSsTimeoutT6Exception(HsmsSsMessage primaryMessage, Throwable cause) {
 		super(primaryMessage, cause);
 	}
 

@@ -3,12 +3,9 @@ package com.shimizukenta.secs.hsmsss;
 import com.shimizukenta.secs.SecsException;
 
 public class HsmsSsTimeoutT7Exception extends SecsException {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1615739522980830788L;
-
+	
+	private static final long serialVersionUID = -3878238575003772555L;
+	
 	public HsmsSsTimeoutT7Exception() {
 		super();
 	}
@@ -24,9 +21,5 @@ public class HsmsSsTimeoutT7Exception extends SecsException {
 	public HsmsSsTimeoutT7Exception(String message, Throwable cause) {
 		super(message, cause);
 	}
-
-	public HsmsSsTimeoutT7Exception(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
-
+	
 }

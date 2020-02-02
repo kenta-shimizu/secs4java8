@@ -3,9 +3,9 @@ package com.shimizukenta.secs.hsmsss;
 import com.shimizukenta.secs.SecsException;
 
 public class HsmsSsDetectTerminateException extends SecsException {
-
-	private static final long serialVersionUID = 2574348532363243234L;
-
+	
+	private static final long serialVersionUID = -8554637149818638292L;
+	
 	public HsmsSsDetectTerminateException() {
 		super();
 	}
@@ -21,9 +21,5 @@ public class HsmsSsDetectTerminateException extends SecsException {
 	public HsmsSsDetectTerminateException(String message, Throwable cause) {
 		super(message, cause);
 	}
-
-	public HsmsSsDetectTerminateException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
-
+	
 }

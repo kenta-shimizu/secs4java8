@@ -2,7 +2,7 @@ package com.shimizukenta.secs;
 
 import com.shimizukenta.secs.gem.GemConfig;
 
-public class SecsCommunicatorConfig {
+public class AbstractSecsCommunicatorConfig {
 	
 	private final SecsTimeout timeout = new SecsTimeout();
 	
@@ -10,7 +10,7 @@ public class SecsCommunicatorConfig {
 	private boolean isEquip;
 	private GemConfig gem;
 	
-	public SecsCommunicatorConfig() {
+	public AbstractSecsCommunicatorConfig() {
 		deviceId = 10;
 		isEquip = false;
 		gem = new GemConfig();

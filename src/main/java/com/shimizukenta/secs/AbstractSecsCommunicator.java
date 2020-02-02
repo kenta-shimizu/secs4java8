@@ -8,14 +8,14 @@ import com.shimizukenta.secs.gem.Gem;
 
 public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 
-	private final SecsCommunicatorConfig config;
+	private final AbstractSecsCommunicatorConfig config;
 	private final Gem gem;
 	
 	protected boolean opened;
 	protected boolean closed;
 	private boolean lastCommunicatable;
 	
-	public AbstractSecsCommunicator(SecsCommunicatorConfig config) {
+	public AbstractSecsCommunicator(AbstractSecsCommunicatorConfig config) {
 		
 		this.config = config;
 		this.gem = new Gem(this, config.gem());

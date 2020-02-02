@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.shimizukenta.secs.AbstractSecsCommunicator;
+import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
@@ -15,10 +15,10 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class Gem {
 
-	private final AbstractSecsCommunicator comm;
+	private final SecsCommunicator comm;
 	private final GemConfig config;
 	
-	public Gem(AbstractSecsCommunicator communicator, GemConfig config) {
+	public Gem(SecsCommunicator communicator, GemConfig config) {
 		this.comm = communicator;
 		this.config = config;
 	}

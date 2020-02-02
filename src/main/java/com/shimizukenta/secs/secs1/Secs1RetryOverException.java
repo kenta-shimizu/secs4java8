@@ -1,8 +1,8 @@
 package com.shimizukenta.secs.secs1;
 
 public class Secs1RetryOverException extends Secs1SendMessageException {
-
-	private static final long serialVersionUID = -3699602290397266734L;
+	
+	private static final long serialVersionUID = 4550537321253170743L;
 
 	public Secs1RetryOverException() {
 		super();
@@ -18,10 +18,6 @@ public class Secs1RetryOverException extends Secs1SendMessageException {
 
 	public Secs1RetryOverException(String message, Throwable cause) {
 		super(message, cause);
-	}
-
-	public Secs1RetryOverException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
 	}
 	
 	public Secs1RetryOverException(Secs1Message msg) {

@@ -3,11 +3,11 @@ package com.shimizukenta.secs.hsmsss;
 import java.util.Arrays;
 import java.util.Objects;
 
-import com.shimizukenta.secs.SecsMessage;
+import com.shimizukenta.secs.AbstractSecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
-public class HsmsSsMessage extends SecsMessage {
+public class HsmsSsMessage extends AbstractSecsMessage {
 
 	private static final int HEAD_SIZE = 10;
 	

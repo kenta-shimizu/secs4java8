@@ -1,14 +1,10 @@
 package com.shimizukenta.secs.hsmsss;
 
-import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 
 public class HsmsSsRejectException extends SecsWaitReplyMessageException {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3616101304258830704L;
+	
+	private static final long serialVersionUID = 6470225458405714078L;
 
 	public HsmsSsRejectException() {
 		super();
@@ -25,16 +21,12 @@ public class HsmsSsRejectException extends SecsWaitReplyMessageException {
 	public HsmsSsRejectException(String message, Throwable cause) {
 		super(message, cause);
 	}
-
-	public HsmsSsRejectException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
-
-	public HsmsSsRejectException(SecsMessage primaryMessage) {
+	
+	public HsmsSsRejectException(HsmsSsMessage primaryMessage) {
 		super(primaryMessage);
 	}
 
-	public HsmsSsRejectException(SecsMessage primaryMessage, Throwable cause) {
+	public HsmsSsRejectException(HsmsSsMessage primaryMessage, Throwable cause) {
 		super(primaryMessage, cause);
 	}
 	

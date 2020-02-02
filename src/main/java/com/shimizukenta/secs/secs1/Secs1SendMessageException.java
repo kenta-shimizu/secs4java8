@@ -1,14 +1,10 @@
 package com.shimizukenta.secs.secs1;
 
-import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 
 public class Secs1SendMessageException extends SecsSendMessageException {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 694651447953258946L;
+	
+	private static final long serialVersionUID = -8586897718794845589L;
 
 	public Secs1SendMessageException() {
 		super();
@@ -26,15 +22,11 @@ public class Secs1SendMessageException extends SecsSendMessageException {
 		super(message, cause);
 	}
 
-	public Secs1SendMessageException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
-
-	public Secs1SendMessageException(SecsMessage msg) {
+	public Secs1SendMessageException(Secs1Message msg) {
 		super(msg);
 	}
 
-	public Secs1SendMessageException(SecsMessage msg, Throwable cause) {
+	public Secs1SendMessageException(Secs1Message msg, Throwable cause) {
 		super(msg, cause);
 	}
 

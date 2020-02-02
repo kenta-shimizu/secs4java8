@@ -1,11 +1,8 @@
 package com.shimizukenta.secs.hsmsss;
 
 public class HsmsSsSendMessageSizeException extends HsmsSsSendMessageException {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5870531711769626941L;
+	
+	private static final long serialVersionUID = 2220846766540314503L;
 
 	public HsmsSsSendMessageSizeException() {
 		super();
@@ -22,11 +19,7 @@ public class HsmsSsSendMessageSizeException extends HsmsSsSendMessageException {
 	public HsmsSsSendMessageSizeException(String message, Throwable cause) {
 		super(message, cause);
 	}
-
-	public HsmsSsSendMessageSizeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);		// TODO Auto-generated constructor stub
-	}
-
+	
 	public HsmsSsSendMessageSizeException(HsmsSsMessage msg) {
 		super(msg);
 	}

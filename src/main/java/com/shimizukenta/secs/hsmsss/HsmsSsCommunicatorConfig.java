@@ -4,9 +4,9 @@ import java.net.SocketAddress;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.shimizukenta.secs.SecsCommunicatorConfig;
+import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 
-public class HsmsSsCommunicatorConfig extends SecsCommunicatorConfig {
+public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
 	private HsmsSsProtocol protocol;
 	private SocketAddress sockAddr;

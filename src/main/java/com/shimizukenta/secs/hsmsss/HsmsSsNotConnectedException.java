@@ -1,12 +1,9 @@
 package com.shimizukenta.secs.hsmsss;
 
 public class HsmsSsNotConnectedException extends HsmsSsSendMessageException {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1699728336797415989L;
-
+	
+	private static final long serialVersionUID = -4981654208857229126L;
+	
 	public HsmsSsNotConnectedException() {
 		super();
 	}
@@ -22,11 +19,7 @@ public class HsmsSsNotConnectedException extends HsmsSsSendMessageException {
 	public HsmsSsNotConnectedException(String message, Throwable cause) {
 		super(message, cause);
 	}
-
-	public HsmsSsNotConnectedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
-
+	
 	public HsmsSsNotConnectedException(HsmsSsMessage msg) {
 		super(msg);
 	}
