@@ -1,9 +1,11 @@
 # secs4java8
 
 ## Introduction
+
 This library is SEMI-SECS-communicate implementation on Java8.
 
-### Supports
+## Supports
+
 - SECS-I (SEMI-E4)
 - SECS-II (SEMI-E5)
 - GEM (SEMI-E30, partially)
@@ -11,7 +13,9 @@ This library is SEMI-SECS-communicate implementation on Java8.
 - SML (PEER Group)
 
 ## Create Communicator instance and open
+
 - For use HSMS-SS Passive
+
 ```
     /* HSMS-SS Passive open example */
     HsmsSsCommunicatorConfig config = new HsmsSsCommunicatorConfig();
@@ -30,6 +34,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
 ```
 
 - For use HSMS-SS Active
+
 ```
     /* HSMS-SS Active open example */
     HsmsSsCommunicatorConfig config = new HsmsSsCommunicatorConfig();
@@ -46,6 +51,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
 ```
 
 - For use SECS-I (onTcpIp)
+
 ```
     /* SECS-I (onTcpIp) open example */
     Secs1OnTcpIpConfig config = new Secs1OnTcpIpConfig();
@@ -63,7 +69,9 @@ This library is SEMI-SECS-communicate implementation on Java8.
 ```
 
 ## Send Primary-Message, and receive Reply-Message
-- Create SECS-II
+
+1. Create SECS-II
+
 ```
     /* example */
     Secs2 secs2 = Secs2.list(               /* <L                       */
@@ -73,7 +81,8 @@ This library is SEMI-SECS-communicate implementation on Java8.
     );                                      /* >.                       */
 ```
 
-- Send Primary-Message
+2. Send Primary-Message
+
 ```
     /* Send S5F1 W. example */
     Optional<SecsMessage> reply = passive.send(
@@ -84,7 +93,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
     );
 ```
 
-- Receive Reply-Message
+3. Receive Reply-Message
 
     SecsCommunicator#send is blocking-method.  
     Blocking until reply-message received.  
@@ -94,7 +103,8 @@ This library is SEMI-SECS-communicate implementation on Java8.
 
 ## Received Primary-Message, parse, and send Reply-Message
 
-- Add Listener
+1. Add Listener
+
 ```
     /* Add-Listener example */
     active.addSecsMessageReceiveListener((SecsMessage msg) -> {
@@ -106,7 +116,8 @@ This library is SEMI-SECS-communicate implementation on Java8.
     });
 ```
 
-- SECS-II parse
+2. SECS-II parse
+
 ```
     /* example Receive Message */
     S5F1 W
@@ -121,7 +132,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
     String altx = msg.secs2().getAscii(2);
 ```
 
-- support parse method matrix
+### Support parse methods
 
 | method | B | BOOLEAN | A | I1 | I2 | I4 | I8 | F4 | F8 | U1 | U2 | U4 | U8 |
 |:-|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
@@ -135,7 +146,8 @@ This library is SEMI-SECS-communicate implementation on Java8.
 | getDouble     |   |   |   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 
-- Send Reply-Message
+3. Send Reply-Message
+
 ```
     Secs2 reply = Secs2.binary((byte)0x0);  /* <B 0x0> */
 
@@ -149,12 +161,15 @@ This library is SEMI-SECS-communicate implementation on Java8.
 ```
 
 ## SML
-- GetInstance SML-Parser
+
+1. GetInstance SML-Parser
+
 ```
     SmlMessageParser parser = SmlMessageParser.getInstance();
 ```
 
-- Send Primary-Message
+2. Send Primary-Message
+
 ```
     /* Send S1F1 W. example */
     SmlMessage primarySml = parser.parse(
@@ -163,7 +178,9 @@ This library is SEMI-SECS-communicate implementation on Java8.
 
     active.send(primarySml);
 ```
-- Send Reply-Message
+
+3. Send Reply-Message
+
 ```
     /* Send S1F2. example */
     SmlMessage replySml = parser.parse(
@@ -178,6 +195,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
 ```
 
 ## GEM
+
 Access by SecsCommunicator#gem
 
 ```
