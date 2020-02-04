@@ -17,13 +17,14 @@ public abstract class AbstractSecsMessage implements SecsMessage {
 	
 	abstract protected String toHeaderBytesString();
 	
-	public String parseToJson() {
+	@Override
+	public String toJson() {
 		return "{\"strm\":" + getStream()
 				+ ",\"func\":" + getFunction()
 				+ ",\"wbit\":" + (wbit() ? "true" : "false")
 				+ ",\"deviceId\":" + deviceId()
 				+ ",\"systemBytes\":"+ systemBytesKey().toString()
-				+ ",\"secs2\":"+ secs2().parseToJson()
+				+ ",\"secs2\":"+ secs2().toJson()
 				+ "}";
 	}
 }

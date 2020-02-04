@@ -84,6 +84,10 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 		return config.isEquip();
 	}
 	
+	protected SecsTimeout timeout() {
+		return config.timeout();
+	}
+	
 	
 	/* Secs-Message Receive Listener */
 	private final Collection<SecsMessageReceiveListener> msgRecvListeners = new CopyOnWriteArrayList<>();

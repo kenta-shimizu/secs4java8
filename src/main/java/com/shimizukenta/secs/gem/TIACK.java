@@ -1,6 +1,6 @@
 package com.shimizukenta.secs.gem;
 
-import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.AbstractSecs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public enum TIACK {
@@ -13,18 +13,18 @@ public enum TIACK {
 	;
 	
 	private final byte code;
-	private final Secs2 ss;
+	private final AbstractSecs2 ss;
 	
 	private TIACK(byte b) {
 		this.code = b;
-		this.ss = Secs2.binary(b);
+		this.ss = AbstractSecs2.binary(b);
 	}
 	
 	public byte code() {
 		return code;
 	}
 	
-	public Secs2 secs2() {
+	public AbstractSecs2 secs2() {
 		return ss;
 	}
 	
@@ -40,7 +40,7 @@ public enum TIACK {
 		return UNDEFINED;
 	}
 	
-	public static TIACK get(Secs2 value) throws Secs2Exception {
+	public static TIACK get(AbstractSecs2 value) throws Secs2Exception {
 		byte b = value.getByte(0);
 		return get(b);
 	}

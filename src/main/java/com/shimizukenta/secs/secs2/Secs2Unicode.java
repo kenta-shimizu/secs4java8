@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class Secs2Unicode extends Secs2 {
+public class Secs2Unicode extends AbstractSecs2 {
 
 	private static final Secs2Item secs2Item = Secs2Item.UNICODE;
 	
@@ -59,7 +59,7 @@ public class Secs2Unicode extends Secs2 {
 	}
 	
 	@Override
-	protected String parsedJsonValue() {
+	protected String toJsonValue() {
 		return "false";
 	}
 	

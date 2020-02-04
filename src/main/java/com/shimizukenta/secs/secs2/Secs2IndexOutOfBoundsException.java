@@ -2,10 +2,7 @@ package com.shimizukenta.secs.secs2;
 
 public class Secs2IndexOutOfBoundsException extends Secs2Exception {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3197519767975463908L;
+	private static final long serialVersionUID = -9048679220913013292L;
 
 	public Secs2IndexOutOfBoundsException() {
 		super();
@@ -21,10 +18,6 @@ public class Secs2IndexOutOfBoundsException extends Secs2Exception {
 
 	public Secs2IndexOutOfBoundsException(String message, Throwable cause) {
 		super(message, cause);
-	}
-
-	public Secs2IndexOutOfBoundsException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
 	}
 
 }

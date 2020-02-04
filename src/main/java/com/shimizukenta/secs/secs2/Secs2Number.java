@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-abstract public class Secs2Number<T extends Number> extends Secs2 {
+abstract public class Secs2Number<T extends Number> extends AbstractSecs2 {
 	
 	protected List<T> values;
 	protected byte[] bytes;
@@ -145,7 +145,7 @@ abstract public class Secs2Number<T extends Number> extends Secs2 {
 	}
 	
 	@Override
-	protected String parsedJsonValue() {
+	protected String toJsonValue() {
 		
 		try {
 			return values().stream()

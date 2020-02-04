@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Secs2List extends Secs2 {
+public class Secs2List extends AbstractSecs2 {
 
 	private static final Secs2Item secs2Item = Secs2Item.LIST;
 	
@@ -49,7 +49,7 @@ public class Secs2List extends Secs2 {
 	}
 	
 	@Override
-	public Stream<Secs2> stream() {
+	public Stream<AbstractSecs2> stream() {
 		return values.stream();
 	}
 	
@@ -61,7 +61,7 @@ public class Secs2List extends Secs2 {
 				) {
 			
 			st.write(createHeadBytes(secs2Item, size()));
-			for ( Secs2 ss : values ) {
+			for ( AbstractSecs2 ss : values ) {
 				st.write(ss.secs2Bytes());
 			}
 			
@@ -73,7 +73,7 @@ public class Secs2List extends Secs2 {
 	}
 
 	@Override
-	protected Secs2 get( LinkedList<Integer> list ) throws Secs2Exception {
+	protected AbstractSecs2 get( LinkedList<Integer> list ) throws Secs2Exception {
 		
 		if ( list.isEmpty() ) {
 			
@@ -130,7 +130,7 @@ public class Secs2List extends Secs2 {
 	}
 	
 	@Override
-	protected String parsedJsonValue() {
+	protected String toJsonValue() {
 		
 		return stream().map(ss -> ss.parseToJson())
 				.collect(Collectors.joining(",", "[", "]"));

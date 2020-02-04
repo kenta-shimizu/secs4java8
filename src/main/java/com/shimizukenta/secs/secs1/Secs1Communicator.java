@@ -23,7 +23,7 @@ import com.shimizukenta.secs.SecsLog;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
-import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.AbstractSecs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public abstract class Secs1Communicator extends AbstractSecsCommunicator {
@@ -177,7 +177,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	private final AtomicInteger autoNumber = new AtomicInteger();
 	
 	@Override
-	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(int strm, int func, boolean wbit, AbstractSecs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -212,7 +212,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, AbstractSecs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		

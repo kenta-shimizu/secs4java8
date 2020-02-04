@@ -32,4 +32,5 @@ public interface SecsMessage {
 	
 	public byte[] header10Bytes();
 	
+	public String toJson();
 }

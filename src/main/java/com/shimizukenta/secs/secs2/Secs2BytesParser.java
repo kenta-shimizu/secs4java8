@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class Secs2BytesParser extends Secs2 {
+public class Secs2BytesParser extends AbstractSecs2 {
 	
 	private static final String PARSE_FAILED = "<PARSE_FAILED [0] >";
 	
 	private final byte[] bytes;
-	private Secs2 parsed;
+	private AbstractSecs2 parsed;
 	
 	protected Secs2BytesParser() {
 		this(new byte[0]);
@@ -36,16 +36,16 @@ public class Secs2BytesParser extends Secs2 {
 	
 	private static class Result {
 		
-		private final Secs2 secs2;
+		private final AbstractSecs2 secs2;
 		private final int endIndex;
 		
-		private Result(Secs2 secs2, int endIndex) {
+		private Result(AbstractSecs2 secs2, int endIndex) {
 			this.secs2 = secs2;
 			this.endIndex = endIndex;
 		}
 	}
 	
-	private synchronized Secs2 parseBytes() throws Secs2Exception {
+	private synchronized AbstractSecs2 parseBytes() throws Secs2Exception {
 		
 		if ( this.parsed == null ) {
 			
@@ -90,7 +90,7 @@ public class Secs2BytesParser extends Secs2 {
 			
 			int endIndex = startIndex;
 			
-			List<Secs2> values = new ArrayList<>();
+			List<AbstractSecs2> values = new ArrayList<>();
 			
 			for ( int i = 0 ; i < dataSize ; ++ i ) {
 				
@@ -194,7 +194,7 @@ public class Secs2BytesParser extends Secs2 {
 	}
 	
 	@Override
-	public Iterator<Secs2> iterator() {
+	public Iterator<AbstractSecs2> iterator() {
 		
 		try {
 			return parseBytes().iterator();
@@ -205,7 +205,7 @@ public class Secs2BytesParser extends Secs2 {
 	}
 	
 	@Override
-	public Stream<Secs2> stream() {
+	public Stream<AbstractSecs2> stream() {
 		
 		try {
 			return parseBytes().stream();
@@ -241,7 +241,7 @@ public class Secs2BytesParser extends Secs2 {
 	}
 	
 	@Override
-	protected Secs2 get( LinkedList<Integer> list ) throws Secs2Exception {
+	protected AbstractSecs2 get( LinkedList<Integer> list ) throws Secs2Exception {
 		return parseBytes().get(list);
 	}
 	
@@ -304,7 +304,7 @@ public class Secs2BytesParser extends Secs2 {
 	}
 	
 	@Override
-	protected String parsedJsonValue() {
+	protected String toJsonValue() {
 		return null;
 	}
 	

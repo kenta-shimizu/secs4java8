@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.SecsLog;
-import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.AbstractSecs2;
 
 public class HsmsSsByteReader implements Callable<Object> {
 	
@@ -72,7 +72,7 @@ public class HsmsSsByteReader implements Callable<Object> {
 				byte[] bodyBytes = new byte[bodyBf.remaining()];
 				bodyBf.get(bodyBytes);
 				
-				final HsmsSsMessage msg = new HsmsSsMessage(headBytes, Secs2.parse(bodyBytes));
+				final HsmsSsMessage msg = new HsmsSsMessage(headBytes, AbstractSecs2.parse(bodyBytes));
 				
 				listeners.forEach(lstnr -> {
 					lstnr.receive(msg);

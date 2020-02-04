@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import com.shimizukenta.secs.AbstractSecsMessage;
-import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.AbstractSecs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class HsmsSsMessage extends AbstractSecsMessage {
@@ -12,9 +12,9 @@ public class HsmsSsMessage extends AbstractSecsMessage {
 	private static final int HEAD_SIZE = 10;
 	
 	private byte[] head;
-	private Secs2  body;
+	private AbstractSecs2  body;
 	
-	public HsmsSsMessage(byte[] head, Secs2 body) {
+	public HsmsSsMessage(byte[] head, AbstractSecs2 body) {
 		
 		Objects.requireNonNull(head);
 		Objects.requireNonNull(body);
@@ -28,7 +28,7 @@ public class HsmsSsMessage extends AbstractSecsMessage {
 	}
 	
 	public HsmsSsMessage(byte[] head) {
-		this(head, Secs2.empty());
+		this(head, AbstractSecs2.empty());
 	}
 	
 	@Override
@@ -47,7 +47,7 @@ public class HsmsSsMessage extends AbstractSecsMessage {
 	}
 
 	@Override
-	public Secs2 secs2() {
+	public AbstractSecs2 secs2() {
 		return body;
 	}
 
@@ -118,7 +118,7 @@ public class HsmsSsMessage extends AbstractSecsMessage {
 				sb.append(" W");
 			}
 			
-			Secs2 body = secs2();
+			AbstractSecs2 body = secs2();
 			
 			try {
 				if ( body.secs2Bytes().length > 0 ) {

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Secs2Boolean extends Secs2 {
+public class Secs2Boolean extends AbstractSecs2 {
 	
 	private static Secs2Item secs2Item = Secs2Item.BOOLEAN;
 	
@@ -126,7 +126,7 @@ public class Secs2Boolean extends Secs2 {
 	}
 	
 	@Override
-	protected String parsedJsonValue() {
+	protected String toJsonValue() {
 		
 		return bools().stream()
 				.map(f -> (f ? "true" : "false"))

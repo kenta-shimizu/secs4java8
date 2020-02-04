@@ -28,10 +28,10 @@ public class SmlDataItemParser {
 	}
 	
 	/**
-	 * parse to Secs2
+	 * parse to AbstractSecs2
 	 * 
-	 * @param SML-Format-Secs2-part-Character (<A "ascii">)
-	 * @return Secs2
+	 * @param SML-Format-AbstractSecs2-part-Character (<A "ascii">)
+	 * @return AbstractSecs2
 	 * @throws SmlParseException
 	 */
 	public Secs2 parse(CharSequence cs) throws SmlParseException {

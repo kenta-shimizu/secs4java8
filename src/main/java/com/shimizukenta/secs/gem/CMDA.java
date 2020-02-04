@@ -1,6 +1,6 @@
 package com.shimizukenta.secs.gem;
 
-import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.AbstractSecs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public enum CMDA {
@@ -14,18 +14,18 @@ public enum CMDA {
 	;
 	
 	private final byte code;
-	private final Secs2 ss;
+	private final AbstractSecs2 ss;
 	
 	private CMDA(byte b) {
 		this.code = b;
-		this.ss = Secs2.binary(b);
+		this.ss = AbstractSecs2.binary(b);
 	}
 	
 	public byte code() {
 		return code;
 	}
 	
-	public Secs2 secs2() {
+	public AbstractSecs2 secs2() {
 		return ss;
 	}
 	
@@ -41,7 +41,7 @@ public enum CMDA {
 		return UNDEFINED;
 	}
 	
-	public static CMDA get(Secs2 value) throws Secs2Exception {
+	public static CMDA get(AbstractSecs2 value) throws Secs2Exception {
 		byte b = value.getByte(0);
 		return get(b);
 	}

@@ -14,7 +14,7 @@ import com.shimizukenta.secs.gem.TIACK;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
 import com.shimizukenta.secs.hsmsss.HsmsSsProtocol;
-import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.AbstractSecs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class ExampleHsmsSsPassive {
@@ -83,7 +83,7 @@ public class ExampleHsmsSsPassive {
 		int strm = msg.getStream();
 		int func = msg.getFunction();
 		boolean wbit = msg.wbit();
-		Secs2 secs2 = msg.secs2();
+		AbstractSecs2 secs2 = msg.secs2();
 		
 		try {
 			
@@ -209,10 +209,10 @@ public class ExampleHsmsSsPassive {
 					 * >
 					 */
 					
-					Secs2 ss = secs2.get(1);
+					AbstractSecs2 ss = secs2.get(1);
 					
-					/* Secs2 implements Iterable */
-					for ( Secs2 s : ss ) {
+					/* AbstractSecs2 implements Iterable */
+					for ( AbstractSecs2 s : ss ) {
 						String dispText = s.getAscii();
 						System.out.println(dispText);
 					}

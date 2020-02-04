@@ -10,7 +10,7 @@ import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
-import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.AbstractSecs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class Gem {
@@ -60,18 +60,18 @@ public class Gem {
 			, SecsException
 			, InterruptedException {
 		
-		Secs2 ss;
+		AbstractSecs2 ss;
 		
 		if ( comm.isEquip() ) {
 			
-			ss = Secs2.list(
-					Secs2.ascii(config.mdln())
-					, Secs2.ascii(config.softrev())
+			ss = AbstractSecs2.list(
+					AbstractSecs2.ascii(config.mdln())
+					, AbstractSecs2.ascii(config.softrev())
 					);
 			
 		} else {
 			
-			ss = Secs2.list();
+			ss = AbstractSecs2.list();
 		}
 		
 		return comm.send(primaryMsg, 1, 2, false, ss);
@@ -93,18 +93,18 @@ public class Gem {
 			, SecsException
 			, InterruptedException {
 		
-		Secs2 ss;
+		AbstractSecs2 ss;
 		
 		if ( comm.isEquip() ) {
 			
-			ss = Secs2.list(
-					Secs2.ascii(config.mdln())
-					, Secs2.ascii(config.softrev())
+			ss = AbstractSecs2.list(
+					AbstractSecs2.ascii(config.mdln())
+					, AbstractSecs2.ascii(config.softrev())
 					);
 			
 		} else {
 			
-			ss = Secs2.list();
+			ss = AbstractSecs2.list();
 		}
 		
 		return comm.send(1, 13, true, ss);
@@ -128,21 +128,21 @@ public class Gem {
 			, SecsException
 			, InterruptedException {
 		
-		Secs2 ss;
+		AbstractSecs2 ss;
 		
 		if ( comm.isEquip() ) {
 			
-			ss = Secs2.list(
-					Secs2.ascii(config.mdln())
-					, Secs2.ascii(config.softrev())
+			ss = AbstractSecs2.list(
+					AbstractSecs2.ascii(config.mdln())
+					, AbstractSecs2.ascii(config.softrev())
 					);
 			
 		} else {
 			
-			ss = Secs2.list();
+			ss = AbstractSecs2.list();
 		}
 		
-		return comm.send(primaryMsg, 1, 14, false, Secs2.list(commack.secs2(), ss));
+		return comm.send(primaryMsg, 1, 14, false, AbstractSecs2.list(commack.secs2(), ss));
 	}
 	
 	/**
@@ -163,7 +163,7 @@ public class Gem {
 			, Secs2Exception
 			, InterruptedException {
 		
-		Secs2 ss = comm.send(1, 15, true)
+		AbstractSecs2 ss = comm.send(1, 15, true)
 				.filter(msg -> msg.getStream() == 1)
 				.filter(msg -> msg.getFunction() == 16)
 				.map(msg -> msg.secs2())
@@ -210,7 +210,7 @@ public class Gem {
 			, Secs2Exception
 			, InterruptedException {
 		
-		Secs2 ss = comm.send(1, 17, true)
+		AbstractSecs2 ss = comm.send(1, 17, true)
 				.filter(msg -> msg.getStream() == 1)
 				.filter(msg -> msg.getFunction() == 18)
 				.map(msg -> msg.secs2())
@@ -258,7 +258,7 @@ public class Gem {
 			, Secs2Exception
 			, InterruptedException {
 		
-		Secs2 ss = comm.send(2, 17, true)
+		AbstractSecs2 ss = comm.send(2, 17, true)
 				.filter(msg -> msg.getStream() == 2)
 				.filter(msg -> msg.getFunction() == 18)
 				.map(msg -> msg.secs2())
@@ -342,7 +342,7 @@ public class Gem {
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
-	public DRACK s2f33DeleteAll(Secs2 dataId)
+	public DRACK s2f33DeleteAll(AbstractSecs2 dataId)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -365,7 +365,7 @@ public class Gem {
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
-	public DRACK s2f33Define(Secs2 dataId, List<GemReport> reports)
+	public DRACK s2f33Define(AbstractSecs2 dataId, List<GemReport> reports)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -388,16 +388,16 @@ public class Gem {
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
-	public DRACK s2f33(Secs2 dataId, List<Secs2> reports)
+	public DRACK s2f33(AbstractSecs2 dataId, List<AbstractSecs2> reports)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
 			, InterruptedException {
 		
-		Secs2 ss = Secs2.list(dataId, Secs2.list(reports));
+		AbstractSecs2 ss = AbstractSecs2.list(dataId, AbstractSecs2.list(reports));
 		
-		Secs2 r = comm.send(2, 33, true, ss)
+		AbstractSecs2 r = comm.send(2, 33, true, ss)
 				.filter(msg -> msg.getStream() == 2)
 				.filter(msg -> msg.getFunction() == 34)
 				.map(msg -> msg.secs2())
@@ -440,7 +440,7 @@ public class Gem {
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
-	public LRACK s2f35Link(Secs2 dataId, List<GemCollectionEventReportLink> links)
+	public LRACK s2f35Link(AbstractSecs2 dataId, List<GemCollectionEventReportLink> links)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -463,16 +463,16 @@ public class Gem {
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
-	public LRACK s2f35(Secs2 dataId, List<Secs2> links)
+	public LRACK s2f35(AbstractSecs2 dataId, List<AbstractSecs2> links)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
 			, InterruptedException {
 		
-		Secs2 ss = Secs2.list(dataId, Secs2.list(links));
+		AbstractSecs2 ss = AbstractSecs2.list(dataId, AbstractSecs2.list(links));
 		
-		Secs2 r = comm.send(2, 35, true, ss)
+		AbstractSecs2 r = comm.send(2, 35, true, ss)
 				.filter(msg -> msg.getStream() == 2)
 				.filter(msg -> msg.getFunction() == 36)
 				.map(msg -> msg.secs2())
@@ -614,18 +614,18 @@ public class Gem {
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
-	public ERACK s2f37(CEED ceed, List<Secs2> ceids)
+	public ERACK s2f37(CEED ceed, List<AbstractSecs2> ceids)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
 			, InterruptedException {
 		
-		Secs2 ss = Secs2.list(
+		AbstractSecs2 ss = AbstractSecs2.list(
 				ceed.secs2()
-				, Secs2.list(ceids));
+				, AbstractSecs2.list(ceids));
 		
-		Secs2 r = comm.send(2, 37, true, ss)
+		AbstractSecs2 r = comm.send(2, 37, true, ss)
 				.filter(msg -> msg.getStream() == 2)
 				.filter(msg -> msg.getFunction() == 38)
 				.map(msg -> msg.secs2())
@@ -1253,7 +1253,7 @@ public class Gem {
 			, SecsException
 			, InterruptedException {
 		
-		return comm.send(9, func, false, Secs2.binary(refMsg.header10Bytes()));
+		return comm.send(9, func, false, AbstractSecs2.binary(refMsg.header10Bytes()));
 	}
 	
 	/* HOOK s9f13 */

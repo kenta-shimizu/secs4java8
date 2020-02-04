@@ -1,12 +1,9 @@
 package com.shimizukenta.secs.secs2;
 
 public class Secs2IrregalDataFormatException extends Secs2Exception {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3841186584822888760L;
-
+	
+	private static final long serialVersionUID = -2801232481812100207L;
+	
 	public Secs2IrregalDataFormatException() {
 		super();
 	}
@@ -21,10 +18,6 @@ public class Secs2IrregalDataFormatException extends Secs2Exception {
 
 	public Secs2IrregalDataFormatException(String message, Throwable cause) {
 		super(message, cause);
-	}
-
-	public Secs2IrregalDataFormatException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
 	}
 
 }

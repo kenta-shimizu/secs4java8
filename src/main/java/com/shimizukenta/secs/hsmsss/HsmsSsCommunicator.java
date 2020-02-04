@@ -23,7 +23,7 @@ import com.shimizukenta.secs.SecsLog;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
-import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.AbstractSecs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
@@ -35,7 +35,6 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	});
 	
 	private final HsmsSsCommunicatorConfig hsmsSsConfig;
-	private final HsmsSsMessageSendReplyManager sendReplyManager;
 	
 	private HsmsSsCommunicateState hsmsSsCommunicateState;
 	
@@ -43,25 +42,8 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		super(config);
 		
 		this.hsmsSsConfig = config;
-		this.sendReplyManager = new HsmsSsMessageSendReplyManager(execServ, config.timeout(), msg -> {
-			
-			synchronized ( channels ) {
-				
-				if ( channels.isEmpty() ) {
-					throw new HsmsSsNotConnectedException(msg);
-				}
-				
-				for ( AsynchronousSocketChannel ch : channels ) {
-					
-					send(ch, msg);
-					
-					sendReplyManager().notifySendCompleted(msg);
-				}
-			}
-		});
 		
 		this.notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
-		
 	}
 
 	protected void send(AsynchronousSocketChannel ch, HsmsSsMessage msg)
@@ -122,10 +104,6 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	
 	protected HsmsSsCommunicatorConfig hsmsSsConfig() {
 		return hsmsSsConfig;
-	}
-	
-	protected HsmsSsMessageSendReplyManager sendReplyManager() {
-		return sendReplyManager;
 	}
 	
 	private final BlockingQueue<HsmsSsMessage> recvDataMsgQueue = new LinkedBlockingQueue<>();
@@ -334,7 +312,7 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(int strm, int func, boolean wbit, AbstractSecs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -363,7 +341,7 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	}
 
 	@Override
-	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, AbstractSecs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		

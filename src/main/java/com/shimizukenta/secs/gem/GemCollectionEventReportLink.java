@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.AbstractSecs2;
 
 public class GemCollectionEventReportLink {
 	
@@ -17,15 +17,15 @@ public class GemCollectionEventReportLink {
 		this.reports = Collections.unmodifiableList(Objects.requireNonNull(reports));
 	}
 	
-	public Secs2 secs2() {
+	public AbstractSecs2 secs2() {
 		
-		List<Secs2> rpts = reports.stream()
+		List<AbstractSecs2> rpts = reports.stream()
 				.map(r -> r.reportIdSecs2())
 				.collect(Collectors.toList());
 		
-		return Secs2.list(
+		return AbstractSecs2.list(
 				ce.secs2()
-				, Secs2.list(rpts));
+				, AbstractSecs2.list(rpts));
 	}
 
 }

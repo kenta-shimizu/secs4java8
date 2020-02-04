@@ -1,11 +1,8 @@
 package com.shimizukenta.secs.secs2;
 
-public class Secs2LengthByteOutOfRangeException extends Secs2Exception {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6096190059870859736L;
+public class Secs2LengthByteOutOfRangeException extends Secs2BuildException {
+	
+	private static final long serialVersionUID = -4790954656700659624L;
 
 	public Secs2LengthByteOutOfRangeException() {
 		super();
@@ -21,10 +18,6 @@ public class Secs2LengthByteOutOfRangeException extends Secs2Exception {
 
 	public Secs2LengthByteOutOfRangeException(String message, Throwable cause) {
 		super(message, cause);
-	}
-
-	public Secs2LengthByteOutOfRangeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
 	}
 
 }

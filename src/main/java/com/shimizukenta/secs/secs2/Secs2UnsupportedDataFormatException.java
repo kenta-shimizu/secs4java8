@@ -1,11 +1,8 @@
 package com.shimizukenta.secs.secs2;
 
 public class Secs2UnsupportedDataFormatException extends Secs2Exception {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8153315104484387599L;
+	
+	private static final long serialVersionUID = -305868137866435475L;
 
 	public Secs2UnsupportedDataFormatException() {
 		super();
@@ -22,9 +19,5 @@ public class Secs2UnsupportedDataFormatException extends Secs2Exception {
 	public Secs2UnsupportedDataFormatException(String message, Throwable cause) {
 		super(message, cause);
 	}
-
-	public Secs2UnsupportedDataFormatException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
-
+	
 }

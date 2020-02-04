@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class Secs2Ascii extends Secs2 {
+public class Secs2Ascii extends AbstractSecs2 {
 	
 	private static Secs2Item secs2Item = Secs2Item.ASCII;
 	private static Charset charset = StandardCharsets.US_ASCII;
@@ -15,12 +15,10 @@ public class Secs2Ascii extends Secs2 {
 	private String ascii;
 	private byte[] bytes;
 	
-	public Secs2Ascii(CharSequence cs) {
+	protected Secs2Ascii(CharSequence cs) {
 		super();
 		
-		Objects.requireNonNull(cs);
-		
-		this.ascii = cs.toString();
+		this.ascii = Objects.requireNonNull(cs).toString();
 		this.bytes = null;
 	}
 	
@@ -37,24 +35,12 @@ public class Secs2Ascii extends Secs2 {
 	public int size() {
 		return ascii().length();
 	}
-
+	
 	@Override
-	public byte[] secs2Bytes() throws Secs2Exception {
-		
-		try (
-				ByteArrayOutputStream st = new ByteArrayOutputStream();
-				) {
-			
-			byte[] bs = bytes();
-			
-			st.write(createHeadBytes(secs2Item, bs.length));
-			st.write(bs[0]);
-			
-			return st.toByteArray();
-		}
-		catch ( IOException e ) {
-			throw new Secs2Exception(e);
-		}
+	protected void putByteBuffers(Secs2ByteBuffers buffers) throws Secs2BuildException {
+		byte[] bs = bytes();
+		putHeaderBytesToByteBuffers(buffers, bs.length);
+		buffers.put(bs);
 	}
 	
 	private synchronized String ascii() {
@@ -65,7 +51,7 @@ public class Secs2Ascii extends Secs2 {
 		return this.ascii;
 	}
 	
-	private byte[] bytes() {
+	private synchronized byte[] bytes() {
 		if ( this.bytes == null ) {
 			this.bytes = ascii.getBytes(charset);
 		}
@@ -84,7 +70,7 @@ public class Secs2Ascii extends Secs2 {
 	}
 	
 	@Override
-	protected String parsedJsonValue() {
+	protected String toJsonValue() {
 		return "\"" + escapeJsonString(ascii()) + "\"";
 	}
 	

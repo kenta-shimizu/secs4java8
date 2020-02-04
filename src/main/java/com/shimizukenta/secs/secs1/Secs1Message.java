@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.shimizukenta.secs.AbstractSecsMessage;
-import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.AbstractSecs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class Secs1Message extends AbstractSecsMessage {
@@ -18,10 +18,10 @@ public class Secs1Message extends AbstractSecsMessage {
 	private static final int BODY_SIZE = 244;
 	
 	private byte[] head;
-	private Secs2  body;
+	private AbstractSecs2  body;
 	private List<Secs1MessageBlock> blocks;
 	
-	public Secs1Message(byte[] head, Secs2 body) {
+	public Secs1Message(byte[] head, AbstractSecs2 body) {
 		super();
 		
 		Objects.requireNonNull(head);
@@ -37,7 +37,7 @@ public class Secs1Message extends AbstractSecsMessage {
 	}
 	
 	public Secs1Message(byte[] head) {
-		this(head, Secs2.empty());
+		this(head, AbstractSecs2.empty());
 	}
 	
 	public Secs1Message(List<Secs1MessageBlock> blocks) {
@@ -57,7 +57,7 @@ public class Secs1Message extends AbstractSecsMessage {
 		return this.head;
 	}
 	
-	private synchronized Secs2 body() {
+	private synchronized AbstractSecs2 body() {
 		
 		if ( this.body == null ) {
 			
@@ -73,7 +73,7 @@ public class Secs1Message extends AbstractSecsMessage {
 					st.write(bs, 11, (len - 13));
 				}
 				
-				this.body = Secs2.parse(st.toByteArray());
+				this.body = AbstractSecs2.parse(st.toByteArray());
 				
 			}
 			catch ( IOException e ) {
@@ -104,7 +104,7 @@ public class Secs1Message extends AbstractSecsMessage {
 	}
 	
 	@Override
-	public Secs2 secs2() {
+	public AbstractSecs2 secs2() {
 		return body();
 	}
 	
@@ -124,7 +124,7 @@ public class Secs1Message extends AbstractSecsMessage {
 			int bodyLength = bodyBytes.length;
 			
 			if ( bodyLength > (BODY_SIZE * (0x7FFF - 1)) ) {
-				throw new Secs2Exception("Secs2 overflow");
+				throw new Secs2Exception("AbstractSecs2 overflow");
 			}
 			
 			int blockNum = 1;
@@ -219,7 +219,7 @@ public class Secs1Message extends AbstractSecsMessage {
 			sb.append(" W");
 		}
 		
-		Secs2 body = secs2();
+		AbstractSecs2 body = secs2();
 		
 		try {
 			if ( body.secs2Bytes().length > 0 ) {
