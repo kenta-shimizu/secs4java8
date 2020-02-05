@@ -12,9 +12,9 @@ public abstract class AbstractSecs2 implements Secs2 {
 	}
 	
 	
-	abstract protected void putByteBuffers(Secs2ByteBuffers buffers) throws Secs2BuildException;
+	abstract protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException;
 	
-	protected void putHeaderBytesToByteBuffers(Secs2ByteBuffers buffers, int length) throws Secs2BuildException {
+	protected void putHeaderBytesToByteBuffers(Secs2ByteBuffersBuilder buffers, int length) throws Secs2BuildException {
 		
 		if ( length > 0xFFFFFF || length < 0 ) {
 			throw new Secs2LengthByteOutOfRangeException("length: " + length);

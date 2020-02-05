@@ -1,7 +1,5 @@
 package com.shimizukenta.secs.secs2;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -33,26 +31,13 @@ public class Secs2Jis8 extends AbstractSecs2 {
 	public int size() {
 		return bytes().length;
 	}
-
+	
 	@Override
-	public byte[] secs2Bytes() throws Secs2Exception {
-		
-		try (
-				ByteArrayOutputStream st = new ByteArrayOutputStream();
-				) {
-			
-			byte[] bs = bytes();
-			
-			st.write(createHeadBytes(secs2Item, bs.length));
-			st.write(bs);
-			
-			return st.toByteArray();
-		}
-		catch ( IOException e ) {
-			throw new Secs2Exception(e);
-		}
+	protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException {
+		putHeaderBytesToByteBuffers(buffers, size());
+		buffers.put(bytes());
 	}
-
+	
 	@Override
 	public Secs2Item secs2Item() {
 		return secs2Item;

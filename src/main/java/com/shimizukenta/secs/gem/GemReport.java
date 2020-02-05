@@ -6,28 +6,28 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.shimizukenta.secs.secs2.AbstractSecs2;
+import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class GemReport {
 	
-	private final AbstractSecs2 rptId;
-	private final List<AbstractSecs2> vids;
+	private final Secs2 rptId;
+	private final List<Secs2> vids;
 	private final String alias;
 	
-	public GemReport(AbstractSecs2 rptId, List<AbstractSecs2> vids, CharSequence alias) {
+	public GemReport(Secs2 rptId, List<Secs2> vids, CharSequence alias) {
 		this.rptId = Objects.requireNonNull(rptId);
 		this.vids = Collections.unmodifiableList(Objects.requireNonNull(vids));
 		this.alias = Objects.requireNonNull(alias).toString();
 	}
 	
-	public GemReport(AbstractSecs2 rptId, List<AbstractSecs2> vids) {
+	public GemReport(Secs2 rptId, List<Secs2> vids) {
 		this(rptId, vids, "");
 	}
 	
 	public GemReport(int rptId, List<? extends Number> vids, CharSequence alias) {
-		this(AbstractSecs2.uint4(rptId)
-				, vids.stream().map(vid -> AbstractSecs2.uint4(vid.intValue())).collect(Collectors.toList())
+		this(Secs2.uint4(rptId)
+				, vids.stream().map(vid -> Secs2.uint4(vid.intValue())).collect(Collectors.toList())
 				, alias);
 	}
 	
@@ -43,14 +43,14 @@ public class GemReport {
 		return rptId.getBigInteger(0);
 	}
 	
-	public AbstractSecs2 reportIdSecs2() {
+	public Secs2 reportIdSecs2() {
 		return rptId;
 	}
 	
-	public AbstractSecs2 secs2() {
-		return AbstractSecs2.list(
+	public Secs2 secs2() {
+		return Secs2.list(
 				rptId
-				, AbstractSecs2.list(vids));
+				, Secs2.list(vids));
 	}
 	
 	@Override

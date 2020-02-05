@@ -3,7 +3,7 @@ package example3;
 import java.util.Arrays;
 import java.util.List;
 
-import com.shimizukenta.secs.secs2.AbstractSecs2;
+import com.shimizukenta.secs.secs2.Secs2;
 
 public class ExampleBuildSecs2 {
 
@@ -15,7 +15,7 @@ public class ExampleBuildSecs2 {
 		
 		{
 			/* build <A "ASCII"> */
-			AbstractSecs2 ss = AbstractSecs2.ascii("ASCII");
+			Secs2 ss = Secs2.ascii("ASCII");
 			
 			System.out.println("build <A \"ASCII\">");
 			System.out.println(ss);
@@ -24,7 +24,7 @@ public class ExampleBuildSecs2 {
 		
 		{
 			/* build <B 0x0> */
-			AbstractSecs2 ss = AbstractSecs2.binary((byte)0x0);
+			Secs2 ss = Secs2.binary((byte)0x0);
 			
 			System.out.println("build <B 0x0>");
 			System.out.println(ss);
@@ -33,7 +33,7 @@ public class ExampleBuildSecs2 {
 		
 		{
 			/* build <I4 100> */
-			AbstractSecs2 ss = AbstractSecs2.int4(100);
+			Secs2 ss = Secs2.int4(100);
 			
 			System.out.println("build <I4 100>");
 			System.out.println(ss);
@@ -42,7 +42,7 @@ public class ExampleBuildSecs2 {
 		
 		{
 			/* build <U4 100 200 300> */
-			AbstractSecs2 ss = AbstractSecs2.uint4(100, 200, 300);
+			Secs2 ss = Secs2.uint4(100, 200, 300);
 			
 			System.out.println("build <U4 100 200 300>");
 			System.out.println(ss);
@@ -51,7 +51,7 @@ public class ExampleBuildSecs2 {
 		
 		{
 			/* build <F4 1.23> */
-			AbstractSecs2 ss = AbstractSecs2.float4(1.23F);
+			Secs2 ss = Secs2.float4(1.23F);
 			
 			System.out.println("build <F4 1.23>");
 			System.out.println(ss);
@@ -60,7 +60,7 @@ public class ExampleBuildSecs2 {
 		
 		{
 			/* build <BOOLEAN TRUE> */
-			AbstractSecs2 ss = AbstractSecs2.bool(true);
+			Secs2 ss = Secs2.bool(true);
 			
 			System.out.println("build <BOOLEAN TRUE>");
 			System.out.println(ss);
@@ -69,7 +69,7 @@ public class ExampleBuildSecs2 {
 		
 		{
 			/* build <L[0] > */
-			AbstractSecs2 ss = AbstractSecs2.list();
+			Secs2 ss = Secs2.list();
 			
 			System.out.println("build <L[0] >");
 			System.out.println(ss);
@@ -85,10 +85,10 @@ public class ExampleBuildSecs2 {
 			 *   <A "MESSAGE">
 			 * >
 			 */
-			AbstractSecs2 ss = AbstractSecs2.list(
-					AbstractSecs2.binary((byte)0x0)
-					, AbstractSecs2.int4(1001)
-					, AbstractSecs2.ascii("MESSAGE")
+			Secs2 ss = Secs2.list(
+					Secs2.binary((byte)0x0)
+					, Secs2.int4(1001)
+					, Secs2.ascii("MESSAGE")
 					);
 			
 			System.out.println("build <L ...>");
@@ -106,13 +106,13 @@ public class ExampleBuildSecs2 {
 			 * >
 			 */
 			
-			List<AbstractSecs2> ll = Arrays.asList(
-					AbstractSecs2.binary((byte)0x0)
-					, AbstractSecs2.int4(1001)
-					, AbstractSecs2.ascii("MESSAGE")
+			List<Secs2> ll = Arrays.asList(
+					Secs2.binary((byte)0x0)
+					, Secs2.int4(1001)
+					, Secs2.ascii("MESSAGE")
 					);
 			
-			AbstractSecs2 ss = AbstractSecs2.list(ll);
+			Secs2 ss = Secs2.list(ll);
 			
 			System.out.println("build <L list>");
 			System.out.println(ss);
@@ -121,7 +121,7 @@ public class ExampleBuildSecs2 {
 		
 		{
 			/* build empty */
-			AbstractSecs2 ss = AbstractSecs2.empty();
+			Secs2 ss = Secs2.empty();
 			
 			System.out.println("build empty");
 			System.out.println(ss);

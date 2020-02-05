@@ -1,9 +1,6 @@
 package com.shimizukenta.secs.secs2;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.Buffer;
-import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -49,23 +46,18 @@ abstract public class Secs2Number<T extends Number> extends AbstractSecs2 {
 		return this.values;
 	}
 	
-	protected synchronized byte[] bytes() throws Secs2Exception {
+	protected synchronized byte[] bytes() {
 		
 		if ( this.bytes == null ) {
 			
-			try {
-				int size = secs2Item().size() * this.values.size();
-				
-				ByteBuffer bf = ByteBuffer.allocate(size);
-				this.values.forEach(v -> { byteBufferPutter(bf, v); });
-				((Buffer)bf).flip();
-				
-				this.bytes = new byte[size];
-				bf.get(this.bytes);
-			}
-			catch (BufferOverflowException e) {
-				throw new Secs2Exception(e);
-			}
+			int size = secs2Item().size() * this.values.size();
+			
+			ByteBuffer bf = ByteBuffer.allocate(size);
+			this.values.forEach(v -> { byteBufferPutter(bf, v); });
+			((Buffer)bf).flip();
+			
+			this.bytes = new byte[size];
+			bf.get(this.bytes);
 		}
 		
 		return this.bytes;
@@ -82,22 +74,10 @@ abstract public class Secs2Number<T extends Number> extends AbstractSecs2 {
 	}
 	
 	@Override
-	public byte[] secs2Bytes() throws Secs2Exception {
-		
-		try (
-				ByteArrayOutputStream st = new ByteArrayOutputStream();
-				) {
-			
-			byte[] bs = bytes();
-			
-			st.write(createHeadBytes(secs2Item(), bs.length));
-			st.write(bs);
-			
-			return st.toByteArray();
-		}
-		catch ( IOException e ) {
-			throw new Secs2Exception(e);
-		}
+	protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException {
+		byte[] bs = bytes();
+		putHeaderBytesToByteBuffers(buffers, bs.length);
+		buffers.put(bs);
 	}
 	
 	@Override

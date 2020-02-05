@@ -1,6 +1,6 @@
 package example4;
 
-import com.shimizukenta.secs.secs2.AbstractSecs2;
+import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class ExampleGetSecs2Value {
@@ -11,22 +11,22 @@ public class ExampleGetSecs2Value {
 
 	public static void main(String[] args) {
 
-		AbstractSecs2 ss = AbstractSecs2.list(
-				AbstractSecs2.binary((byte)0xA)	/* 0 */
-				, AbstractSecs2.ascii("MESSAGE-1")	/* 1 */
-				, AbstractSecs2.bool(true)	/* 2 */
-				, AbstractSecs2.list(	/* 3 */
-						AbstractSecs2.list(	/* 3,0 */
-								AbstractSecs2.ascii("KEY-1")	/* 3,0,0 */
-								, AbstractSecs2.int4(100, 101, 102)	/* 3,0,1 */
+		Secs2 ss = Secs2.list(
+				Secs2.binary((byte)0xA)	/* 0 */
+				, Secs2.ascii("MESSAGE-1")	/* 1 */
+				, Secs2.bool(true)	/* 2 */
+				, Secs2.list(	/* 3 */
+						Secs2.list(	/* 3,0 */
+								Secs2.ascii("KEY-1")	/* 3,0,0 */
+								, Secs2.int4(100, 101, 102)	/* 3,0,1 */
 								)
-						, AbstractSecs2.list(	/* 3,1 */
-								AbstractSecs2.ascii("KEY-2")	/* 3,1,0 */
-								, AbstractSecs2.int4(200, 201, 202)	/* 3,1,1 */
+						, Secs2.list(	/* 3,1 */
+								Secs2.ascii("KEY-2")	/* 3,1,0 */
+								, Secs2.int4(200, 201, 202)	/* 3,1,1 */
 								)
-						, AbstractSecs2.list(	/* 3,2 */
-								AbstractSecs2.ascii("KEY-3")	/* 3,2,0 */
-								, AbstractSecs2.int4(300, 301, 302)	/* 3,2,1 */
+						, Secs2.list(	/* 3,2 */
+								Secs2.ascii("KEY-3")	/* 3,2,0 */
+								, Secs2.int4(300, 301, 302)	/* 3,2,1 */
 								)
 						)
 				);
@@ -71,9 +71,9 @@ public class ExampleGetSecs2Value {
 			{
 				System.out.println("# Use for-each-loop, getAscii(3, x, 0)");
 				
-				AbstractSecs2 s3 = ss.get(3);
+				Secs2 s3 = ss.get(3);
 				
-				for ( AbstractSecs2 s : s3 ) {
+				for ( Secs2 s : s3 ) {
 					System.out.println("getAscii(3, x, 0):\t" + s.getAscii(0));
 				}
 				
@@ -83,7 +83,7 @@ public class ExampleGetSecs2Value {
 			{
 				System.out.println("# Use stream, getInt(3, x, 1, 0)");
 				
-				AbstractSecs2 s3 = ss.get(3);
+				Secs2 s3 = ss.get(3);
 				
 				s3.stream()
 				.map(s -> {

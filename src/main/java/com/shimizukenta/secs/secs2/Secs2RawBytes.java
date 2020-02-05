@@ -25,7 +25,7 @@ public class Secs2RawBytes extends AbstractSecs2 {
 	}
 
 	@Override
-	protected void putByteBuffers(Secs2ByteBuffers buffers) {
+	protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) {
 		buffers.put(bs);
 	}
 	

@@ -2,26 +2,28 @@ package com.shimizukenta.secs.secs2;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
-public class Secs2ByteBuffers {
+public class Secs2ByteBuffersBuilder {
 	
 	private final int byteBufferSize;
 	private final LinkedList<ByteBuffer> buffers = new LinkedList<>();
 	
-	private ByteBuffer[] proxyBuffers;
+	private List<ByteBuffer> proxyBuffers;
 	private long length;
 	private int blocks;
 	
-	private Secs2ByteBuffers(int byteBufferSize) {
+	private Secs2ByteBuffersBuilder(int byteBufferSize) {
 		this.byteBufferSize = byteBufferSize;
 		this.buffers.add(ByteBuffer.allocate(byteBufferSize));
 		proxyBuffers = null;
 	}
 	
-	public static Secs2ByteBuffers build(int byteBufferSize, Secs2 secs2) throws Secs2BuildException {
+	public static Secs2ByteBuffersBuilder build(int byteBufferSize, Secs2 secs2) throws Secs2BuildException {
 		
-		Secs2ByteBuffers inst = new Secs2ByteBuffers(byteBufferSize);
+		Secs2ByteBuffersBuilder inst = new Secs2ByteBuffersBuilder(byteBufferSize);
 		
 		if ( secs2 instanceof AbstractSecs2 ) {
 			
@@ -52,7 +54,7 @@ public class Secs2ByteBuffers {
 		}
 	}
 	
-	public ByteBuffer[] getByteBuffers() {
+	public List<ByteBuffer> getByteBuffers() {
 		synchronized ( this ) {
 			if ( proxyBuffers == null ) {
 				build();
@@ -87,11 +89,7 @@ public class Secs2ByteBuffers {
 			((Buffer)bf).flip();
 		});
 		
-		this.proxyBuffers = new ByteBuffer[this.blocks];
-		
-		for ( int i = 0; i < this.blocks; ++i ) {
-			this.proxyBuffers[i] = buffers.get(i);
-		}
+		this.proxyBuffers = Collections.unmodifiableList(buffers);
 		
 		this.length = buffers.stream()
 				.mapToLong(bf -> bf.remaining())

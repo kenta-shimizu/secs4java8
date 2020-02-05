@@ -49,31 +49,27 @@ public class Secs2List extends AbstractSecs2 {
 	}
 	
 	@Override
-	public Stream<AbstractSecs2> stream() {
+	public Stream<Secs2> stream() {
 		return values.stream();
 	}
 	
 	@Override
-	public byte[] secs2Bytes() throws Secs2Exception {
+	protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException {
 		
-		try (
-				ByteArrayOutputStream st = new ByteArrayOutputStream();
-				) {
+		putHeaderBytesToByteBuffers(buffers, size());
+		
+		for ( Secs2 ss : values ) {
 			
-			st.write(createHeadBytes(secs2Item, size()));
-			for ( AbstractSecs2 ss : values ) {
-				st.write(ss.secs2Bytes());
+			if ( ss instanceof AbstractSecs2 ) {
+				((AbstractSecs2)ss).putByteBuffers(buffers);
+			} else {
+				throw new Secs2BuildException("cast failed");
 			}
-			
-			return st.toByteArray();
-		}
-		catch ( IOException e ) {
-			throw new Secs2Exception(e);
 		}
 	}
-
+	
 	@Override
-	protected AbstractSecs2 get( LinkedList<Integer> list ) throws Secs2Exception {
+	protected Secs2 get( LinkedList<Integer> list ) throws Secs2Exception {
 		
 		if ( list.isEmpty() ) {
 			
@@ -83,7 +79,16 @@ public class Secs2List extends AbstractSecs2 {
 			
 			try {
 				int index = list.removeFirst();
-				return values.get(index).get(list);
+				Secs2 ss = values.get(index);
+				
+				if ( ss instanceof AbstractSecs2 ) {
+					
+					return ((AbstractSecs2)ss).get(list);
+					
+				} else {
+					
+					throw new Secs2Exception("cast failed");
+				}
 			}
 			catch ( IndexOutOfBoundsException e ) {
 				throw new Secs2IndexOutOfBoundsException(e);
@@ -132,7 +137,7 @@ public class Secs2List extends AbstractSecs2 {
 	@Override
 	protected String toJsonValue() {
 		
-		return stream().map(ss -> ss.parseToJson())
+		return stream().map(ss -> ss.toJson())
 				.collect(Collectors.joining(",", "[", "]"));
 	}
 	

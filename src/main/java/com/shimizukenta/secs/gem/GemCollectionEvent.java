@@ -3,25 +3,25 @@ package com.shimizukenta.secs.gem;
 import java.math.BigInteger;
 import java.util.Objects;
 
-import com.shimizukenta.secs.secs2.AbstractSecs2;
+import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class GemCollectionEvent {
 	
-	private AbstractSecs2 eventId;
+	private Secs2 eventId;
 	private String alias;
 	
-	public GemCollectionEvent(AbstractSecs2 eventId, CharSequence alias) {
+	public GemCollectionEvent(Secs2 eventId, CharSequence alias) {
 		this.eventId = Objects.requireNonNull(eventId);
 		this.alias = Objects.requireNonNull(alias).toString();
 	}
 	
-	public GemCollectionEvent(AbstractSecs2 eventId) {
+	public GemCollectionEvent(Secs2 eventId) {
 		this(eventId, "");
 	}
 	
 	public GemCollectionEvent(int eventId, CharSequence alias) {
-		this(AbstractSecs2.uint4(eventId), alias);
+		this(Secs2.uint4(eventId), alias);
 	}
 	
 	public GemCollectionEvent(int eventId) {
@@ -36,7 +36,7 @@ public class GemCollectionEvent {
 		return eventId.getBigInteger(0);
 	}
 	
-	public AbstractSecs2 secs2() {
+	public Secs2 secs2() {
 		return eventId;
 	}
 	

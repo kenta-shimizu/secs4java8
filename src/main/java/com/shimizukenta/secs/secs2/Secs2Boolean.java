@@ -1,7 +1,5 @@
 package com.shimizukenta.secs.secs2;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,24 +58,11 @@ public class Secs2Boolean extends AbstractSecs2 {
 	public int size() {
 		return bools().size();
 	}
-
+	
 	@Override
-	public byte[] secs2Bytes() throws Secs2Exception {
-		
-		try (
-				ByteArrayOutputStream st = new ByteArrayOutputStream();
-				) {
-			
-			byte[] bs = bytes();
-			
-			st.write(createHeadBytes(secs2Item, bs.length));
-			st.write(bs);
-			
-			return st.toByteArray();
-		}
-		catch ( IOException e ) {
-			throw new Secs2Exception(e);
-		}
+	protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException {
+		putHeaderBytesToByteBuffers(buffers, size());
+		buffers.put(bytes());
 	}
 	
 	private synchronized List<Boolean> bools() {

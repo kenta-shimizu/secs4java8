@@ -10,7 +10,7 @@ import com.shimizukenta.secs.gem.ONLACK;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
 import com.shimizukenta.secs.hsmsss.HsmsSsProtocol;
-import com.shimizukenta.secs.secs2.AbstractSecs2;
+import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class ExampleHsmsSsActive {
@@ -62,7 +62,7 @@ public class ExampleHsmsSsActive {
 						
 						{
 							/* build <L[0] > */
-							AbstractSecs2 ss = AbstractSecs2.list();
+							Secs2 ss = Secs2.list();
 							
 							/* send s1f13 <L[0] > */
 							comm.send(1, 13, true, ss);

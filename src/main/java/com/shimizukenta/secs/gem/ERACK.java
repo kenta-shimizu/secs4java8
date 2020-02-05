@@ -1,6 +1,6 @@
 package com.shimizukenta.secs.gem;
 
-import com.shimizukenta.secs.secs2.AbstractSecs2;
+import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public enum ERACK {
@@ -13,18 +13,18 @@ public enum ERACK {
 	;
 	
 	private final byte code;
-	private final AbstractSecs2 ss;
+	private final Secs2 ss;
 	
 	private ERACK(byte b) {
 		this.code = b;
-		this.ss = AbstractSecs2.binary(b);
+		this.ss = Secs2.binary(b);
 	}
 	
 	public byte code() {
 		return code;
 	}
 	
-	public AbstractSecs2 secs2() {
+	public Secs2 secs2() {
 		return ss;
 	}
 	
@@ -40,7 +40,7 @@ public enum ERACK {
 		return UNDEFINED;
 	}
 	
-	public static ERACK get(AbstractSecs2 value) throws Secs2Exception {
+	public static ERACK get(Secs2 value) throws Secs2Exception {
 		byte b = value.getByte(0);
 		return get(b);
 	}
