@@ -79,7 +79,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 			
 			try {
 				
-				entryLog(new SecsLog("HsmsSsActiveCommunicator try-connect", socketAddrInfo));
+				notifyLog(new SecsLog("HsmsSsActiveCommunicator try-connect", socketAddrInfo));
 
 				ch.connect(socketAddr, null, new CompletionHandler<Void, Void>(){
 					
@@ -109,7 +109,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 						});
 						
 						reader.addHsmsSsMessageReceiveListener(msg -> {
-							entryLog(new SecsLog("Receive HsmsSs-Message", msg));
+							notifyLog(new SecsLog("Receive HsmsSs-Message", msg));
 						});
 						
 						reader.addHsmsSsMessageReceiveListener(msg -> {

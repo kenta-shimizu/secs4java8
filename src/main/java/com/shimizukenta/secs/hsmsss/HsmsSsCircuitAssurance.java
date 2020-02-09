@@ -1,6 +1,5 @@
 package com.shimizukenta.secs.hsmsss;
 
-import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import com.shimizukenta.secs.SecsException;
@@ -26,7 +25,9 @@ public class HsmsSsCircuitAssurance implements Callable<Object> {
 			
 			for ( ;; ) {
 				
-				Optional<Long> op = parent.hsmsSsConfig().linktest().map(v -> (long)(v * 1000.0F));
+				long t = parent.hsmsSsConfig().linktest()
+						.map(v -> (long)(v * 1000.0F))
+						.orElse(-1L);
 				
 				synchronized ( this ) {
 					
@@ -34,8 +35,8 @@ public class HsmsSsCircuitAssurance implements Callable<Object> {
 						resetted = false;
 					}
 					
-					if ( op.isPresent() ) {
-						this.wait(op.get().longValue());
+					if ( t > 0 ) {
+						this.wait(t);
 					} else {
 						this.wait();
 					}

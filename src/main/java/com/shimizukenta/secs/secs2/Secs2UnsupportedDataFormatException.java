@@ -1,6 +1,6 @@
 package com.shimizukenta.secs.secs2;
 
-public class Secs2UnsupportedDataFormatException extends Secs2Exception {
+public class Secs2UnsupportedDataFormatException extends Secs2BytesParseException {
 	
 	private static final long serialVersionUID = -305868137866435475L;
 

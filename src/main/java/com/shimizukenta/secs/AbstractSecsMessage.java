@@ -15,7 +15,22 @@ public abstract class AbstractSecsMessage implements SecsMessage {
 		return Integer.valueOf(i);
 	}
 	
-	abstract protected String toHeaderBytesString();
+	protected String toHeaderBytesString() {
+		byte[] bs = header10Bytes();
+		return new StringBuilder()
+				.append("[").append(String.format("%02X", bs[0]))
+				.append(" ").append(String.format("%02X", bs[1]))
+				.append("|").append(String.format("%02X", bs[2]))
+				.append(" ").append(String.format("%02X", bs[3]))
+				.append("|").append(String.format("%02X", bs[4]))
+				.append(" ").append(String.format("%02X", bs[5]))
+				.append("|").append(String.format("%02X", bs[6]))
+				.append(" ").append(String.format("%02X", bs[7]))
+				.append(" ").append(String.format("%02X", bs[8]))
+				.append(" ").append(String.format("%02X", bs[9]))
+				.append("]")
+				.toString();
+	}
 	
 	@Override
 	public String toJson() {

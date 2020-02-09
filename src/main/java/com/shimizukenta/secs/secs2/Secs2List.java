@@ -1,7 +1,5 @@
 package com.shimizukenta.secs.secs2;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -61,8 +59,11 @@ public class Secs2List extends AbstractSecs2 {
 		for ( Secs2 ss : values ) {
 			
 			if ( ss instanceof AbstractSecs2 ) {
+				
 				((AbstractSecs2)ss).putByteBuffers(buffers);
+				
 			} else {
+				
 				throw new Secs2BuildException("cast failed");
 			}
 		}

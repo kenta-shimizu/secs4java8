@@ -4,15 +4,19 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.SecsLog;
-import com.shimizukenta.secs.secs2.AbstractSecs2;
+import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.Secs2BytesParser;
 
 public class HsmsSsByteReader implements Callable<Object> {
 	
@@ -32,13 +36,16 @@ public class HsmsSsByteReader implements Callable<Object> {
 		
 		try {
 			
-			final ByteBuffer lenBf = ByteBuffer.allocate(4);
+			final ByteBuffer lenBf = ByteBuffer.allocate(8);
 			final ByteBuffer headBf = ByteBuffer.allocate(10);
+			final byte[] emptyBytes = new byte[]{0, 0, 0, 0};
 			
 			for ( ;; ) {
 				
 				((Buffer)lenBf).clear();
 				((Buffer)headBf).clear();
+				
+				lenBf.put(emptyBytes);
 				
 				reading(lenBf, false);
 				
@@ -52,27 +59,24 @@ public class HsmsSsByteReader implements Callable<Object> {
 				
 				((Buffer)lenBf).flip();
 				
-				int bodyLength = lenBf.getInt() - 10;
+				long bodyLength = lenBf.getLong() - 10;
 				
 				if ( bodyLength < 0 ) {
 					continue;
 				}
 				
-				ByteBuffer bodyBf = ByteBuffer.allocate(bodyLength);
+				BodyReader bodyReader = new BodyReader(this, bodyLength);
 				
-				while ( bodyBf.hasRemaining() ) {
-					reading(bodyBf, true);
+				while ( ! bodyReader.completed() ) {
+					bodyReader.reading();
 				}
 				
 				((Buffer)headBf).flip();
-				byte[] headBytes = new byte[headBf.remaining()];
-				headBf.get(headBytes);
+				byte[] head = new byte[10];
+				headBf.get(head);
 				
-				((Buffer)bodyBf).flip();
-				byte[] bodyBytes = new byte[bodyBf.remaining()];
-				bodyBf.get(bodyBytes);
-				
-				final HsmsSsMessage msg = new HsmsSsMessage(headBytes, AbstractSecs2.parse(bodyBytes));
+				Secs2 body = Secs2BytesParser.getInstance().parse(bodyReader.getByteBuffers());
+				HsmsSsMessage msg = parent.createHsmsSsMessage(head, body);
 				
 				listeners.forEach(lstnr -> {
 					lstnr.receive(msg);
@@ -80,7 +84,7 @@ public class HsmsSsByteReader implements Callable<Object> {
 			}
 		}
 		catch ( HsmsSsDetectTerminateException | HsmsSsTimeoutT8Exception e ) {
-			parent.entryLog(new SecsLog(e));
+			parent.notifyLog(new SecsLog(e));
 		}
 		catch ( InterruptedException ignore ) {
 		}
@@ -89,7 +93,7 @@ public class HsmsSsByteReader implements Callable<Object> {
 	}
 	
 	
-	private void reading(ByteBuffer buffer, boolean detectT8Timeout)
+	private int reading(ByteBuffer buffer, boolean detectT8Timeout)
 			throws HsmsSsDetectTerminateException, HsmsSsTimeoutT8Exception, InterruptedException {
 		
 		Future<Integer> f = channel.read(buffer);
@@ -111,6 +115,7 @@ public class HsmsSsByteReader implements Callable<Object> {
 				throw new HsmsSsDetectTerminateException();
 			}
 			
+			return r;
 		}
 		catch ( TimeoutException e ) {
 			f.cancel(true);
@@ -122,6 +127,63 @@ public class HsmsSsByteReader implements Callable<Object> {
 		catch ( InterruptedException e ) {
 			f.cancel(true);
 			throw e;
+		}
+	}
+	
+	private static final int bufferSize = 1024;
+	
+	private class BodyReader {
+		
+		private final HsmsSsByteReader parent;
+		private final long size;
+		private long present;
+		private final LinkedList<ByteBuffer> buffers = new LinkedList<>();
+		
+		public BodyReader(HsmsSsByteReader parent, long size) {
+			this.parent = parent;
+			this.size = size;
+			this.present = 0;
+			addBuffer();
+		}
+		
+		private void addBuffer() {
+			long i = size - present;
+			if ( i > bufferSize ) {
+				buffers.add(ByteBuffer.allocate(bufferSize));
+			} else {
+				buffers.add(ByteBuffer.allocate((int)i));
+			}
+		}
+		
+		public void reading()
+				throws HsmsSsDetectTerminateException, HsmsSsTimeoutT8Exception
+				, InterruptedException {
+			
+			ByteBuffer bf = buffers.getLast();
+			
+			int r = parent.reading(bf, true);
+			
+			this.present += r;
+			
+			if ( ! bf.hasRemaining() ) {
+				
+				if ( present < size ) {
+					addBuffer();
+				}
+			}
+		}
+		
+		public boolean completed() {
+			return present == size;
+		}
+		
+		public List<ByteBuffer> getByteBuffers() {
+			return buffers.stream()
+					.map(bf -> {
+						((Buffer)bf).flip();
+						return bf;
+					})
+					.collect(Collectors.toList());
 		}
 	}
 	

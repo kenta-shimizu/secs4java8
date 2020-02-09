@@ -4,17 +4,16 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import com.shimizukenta.secs.AbstractSecsMessage;
-import com.shimizukenta.secs.secs2.AbstractSecs2;
-import com.shimizukenta.secs.secs2.Secs2Exception;
+import com.shimizukenta.secs.secs2.Secs2;
 
 public class HsmsSsMessage extends AbstractSecsMessage {
 
 	private static final int HEAD_SIZE = 10;
 	
-	private byte[] head;
-	private AbstractSecs2  body;
+	private final byte[] head;
+	private final Secs2 body;
 	
-	public HsmsSsMessage(byte[] head, AbstractSecs2 body) {
+	protected HsmsSsMessage(byte[] head, Secs2 body) {
 		
 		Objects.requireNonNull(head);
 		Objects.requireNonNull(body);
@@ -27,8 +26,8 @@ public class HsmsSsMessage extends AbstractSecsMessage {
 		this.body = body;
 	}
 	
-	public HsmsSsMessage(byte[] head) {
-		this(head, AbstractSecs2.empty());
+	protected HsmsSsMessage(byte[] head) {
+		this(head, Secs2.empty());
 	}
 	
 	@Override
@@ -47,7 +46,7 @@ public class HsmsSsMessage extends AbstractSecsMessage {
 	}
 
 	@Override
-	public AbstractSecs2 secs2() {
+	public Secs2 secs2() {
 		return body;
 	}
 
@@ -81,25 +80,6 @@ public class HsmsSsMessage extends AbstractSecsMessage {
 		return Integer.valueOf(key);
 	}
 	
-	@Override
-	protected String toHeaderBytesString() {
-		
-		byte[] bs = header10Bytes();
-		
-		return new StringBuilder()
-				.append("[").append(String.format("%02X", bs[0]))
-				.append(" ").append(String.format("%02X", bs[1]))
-				.append("|").append(String.format("%02X", bs[2]))
-				.append(" ").append(String.format("%02X", bs[3]))
-				.append("|").append(String.format("%02X", bs[4]))
-				.append(" ").append(String.format("%02X", bs[5]))
-				.append("|").append(String.format("%02X", bs[6]))
-				.append(" ").append(String.format("%02X", bs[7]))
-				.append(" ").append(String.format("%02X", bs[8]))
-				.append(" ").append(String.format("%02X", bs[9]))
-				.append("]")
-				.toString();
-	}
 	
 	private static final String BR = System.lineSeparator();
 	
@@ -118,15 +98,10 @@ public class HsmsSsMessage extends AbstractSecsMessage {
 				sb.append(" W");
 			}
 			
-			AbstractSecs2 body = secs2();
+			String body = secs2().toString();
 			
-			try {
-				if ( body.secs2Bytes().length > 0 ) {
-					sb.append(BR).append(body);
-				}
-			}
-			catch (Secs2Exception e) {
-				sb.append(BR).append("<PARSE FAILED>");
+			if ( ! body.isEmpty() ) {
+				sb.append(BR).append(body);
 			}
 			
 			sb.append(".");
@@ -136,11 +111,11 @@ public class HsmsSsMessage extends AbstractSecsMessage {
 	}
 
 	@Override
-	public String parseToJson() {
+	public String toJson() {
 		
 		if ( dataMessage() ) {
 			
-			return super.parseToJson();
+			return super.toJson();
 			
 		} else {
 			
