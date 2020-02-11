@@ -2,8 +2,6 @@ package com.shimizukenta.secs.hsmsss;
 
 import java.util.concurrent.Callable;
 
-import com.shimizukenta.secs.SecsException;
-
 public class HsmsSsCircuitAssurance implements Callable<Object> {
 	
 	private final HsmsSsCommunicator parent;
@@ -51,9 +49,6 @@ public class HsmsSsCircuitAssurance implements Callable<Object> {
 					break;
 				}
 			}
-		}
-		catch ( SecsException ignore ) {
-			/* Linktest failed */
 		}
 		catch ( InterruptedException ignore ) {
 		}

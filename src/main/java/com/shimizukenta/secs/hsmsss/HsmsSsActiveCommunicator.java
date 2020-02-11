@@ -24,16 +24,22 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 	
 	@Override
 	public void open() throws IOException {
-		super.open();
 		
 		if ( hsmsSsConfig().protocol() != HsmsSsProtocol.ACTIVE ) {
 			throw new IOException("HsmsSsCommunicatorConfig#protocol is not ACTIVE");
 		}
 		
+		super.open();
+		
 		executorService().execute(() -> {
 			try {
 				for ( ;; ) {
 					activeLoop();
+					
+					sendReplyManager.reset();
+					
+					long t5 = (long)(hsmsSsConfig().timeout().t5() * 1000.0F);
+					TimeUnit.MILLISECONDS.sleep(t5);
 				}
 			}
 			catch ( InterruptedException ignore ) {
@@ -44,33 +50,13 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 	
 	@Override
 	public void close() throws IOException {
-		
-		IOException ioExcept = null;
-		
-		try {
-			synchronized ( this ) {
-				if ( closed ) {
-					return;
-				}
-				
-				super.close();
-			}
-		}
-		catch ( IOException e ) {
-			ioExcept = e;
-		}
-		
-		if ( ioExcept != null ) {
-			throw ioExcept;
-		}
+		super.close();
 	}
 	
 	protected void activeLoop() throws InterruptedException {
 		
-		final Object sync = new Object();
-		
 		try (
-				AsynchronousSocketChannel ch = AsynchronousSocketChannel.open();
+				AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
 				) {
 			
 			SocketAddress socketAddr = hsmsSsConfig().socketAddress();
@@ -81,173 +67,173 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 				
 				notifyLog(new SecsLog("HsmsSsActiveCommunicator try-connect", socketAddrInfo));
 
-				ch.connect(socketAddr, null, new CompletionHandler<Void, Void>(){
+				channel.connect(socketAddr, null, new CompletionHandler<Void, Void>(){
 					
 					@Override
 					public void completed(Void none, Void attachment) {
 						
-						if ( ! addChannel(ch) ) {
-							synchronized ( sync ) {
-								sync.notifyAll();
-								return;
-							}
-						}
-						
-						notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_SELECTED);
-						
-						final BlockingQueue<HsmsSsMessage> queue = new LinkedBlockingQueue<>();
-						
-						final HsmsSsByteReader reader = new HsmsSsByteReader(HsmsSsActiveCommunicator.this, ch);
-						final HsmsSsCircuitAssurance linktest = new HsmsSsCircuitAssurance(HsmsSsActiveCommunicator.this);
-						
-						reader.addHsmsSsMessageReceiveListener(msg -> {
-							sendReplyManager().receive(msg).ifPresent(queue::offer);
-						});
-						
-						reader.addHsmsSsMessageReceiveListener(msg -> {
-							linktest.reset();
-						});
-						
-						reader.addHsmsSsMessageReceiveListener(msg -> {
-							notifyLog(new SecsLog("Receive HsmsSs-Message", msg));
-						});
-						
-						reader.addHsmsSsMessageReceiveListener(msg -> {
-							notifyReceiveMessagePassThrough(msg);
-						});
-						
-						Collection<Callable<Object>> tasks = Arrays.asList(reader, () -> {
+						try {
 							
-							try {
-								HsmsSsMessageSelectStatus ss = send(createSelectRequest())
-										.map(HsmsSsMessageSelectStatus::get)
-										.orElse(HsmsSsMessageSelectStatus.NOT_SELECT_RSP);
-							
-								switch ( ss ) {
-								case SUCCESS:
-								case ACTIVED: {
-									
-									notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.SELECTED);
-									break;
-								}
-								default: {
-									return null;
-								}
+							if ( ! addChannel(channel) ) {
+								synchronized ( channel ) {
+									channel.notifyAll();
+									return;
 								}
 							}
-							catch ( SecsException e ) {
-								entryLog(new SecsLog(e));
-								return null;
-							}
-							catch ( InterruptedException e ) {
-								return null;
-							}
 							
-							Collection<Callable<Object>> selectTasks = Arrays.asList(linktest, () -> {
-								
-								try {
-									
-									for ( ;; ) {
-										
-										HsmsSsMessage msg = queue.take();
-										
-										HsmsSsMessageType mt = HsmsSsMessageType.get(msg);
+							notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_SELECTED);
+							
+							final BlockingQueue<HsmsSsMessage> queue = new LinkedBlockingQueue<>();
+							
+							final HsmsSsByteReader reader = new HsmsSsByteReader(HsmsSsActiveCommunicator.this, channel);
+							final HsmsSsCircuitAssurance linktest = new HsmsSsCircuitAssurance(HsmsSsActiveCommunicator.this);
+							
+							reader.addHsmsSsMessageReceiveListener(msg -> {
+								sendReplyManager.put(msg).ifPresent(queue::offer);
+							});
+							
+							reader.addHsmsSsMessageReceiveListener(msg -> {
+								linktest.reset();
+							});
+							
+							Collection<Callable<Object>> tasks = Arrays.asList(
+									reader,
+									() -> {
 										
 										try {
-											switch ( mt ) {
-											case DATA: {
+											HsmsSsMessageSelectStatus ss = send(createSelectRequest())
+													.map(HsmsSsMessageSelectStatus::get)
+													.orElse(HsmsSsMessageSelectStatus.NOT_SELECT_RSP);
+										
+											switch ( ss ) {
+											case SUCCESS:
+											case ACTIVED: {
 												
-												putReceiveDataMessage(msg);
+												notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.SELECTED);
 												break;
 											}
-											case SELECT_REQ: {
-												
-												send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
-												break;
-											}
-											case LINKTEST_REQ: {
-												
-												send(createLinktestResponse(msg));
-												break;
-											}
-											case SEPARATE_REQ: {
-												
-												return null;
-												/* break; */
-											}
-											case SELECT_RSP:
-											case LINKTEST_RSP:
-											case REJECT_REQ:
 											default: {
-												
-												/* ignore */
+												return null;
 											}
 											}
 										}
 										catch ( SecsException e ) {
-											entryLog(new SecsLog(e));
+											notifyLog(new SecsLog(e));
+											return null;
 										}
-									}
-								}
-								catch ( InterruptedException ignore ) {
-								}
-								
-								return null;
-							});
+										catch ( InterruptedException e ) {
+											return null;
+										}
+										
+										Collection<Callable<Object>> selectTasks = Arrays.asList(
+												linktest,
+												() -> {
+													
+													try {
+														for ( ;; ) {
+															
+															HsmsSsMessage msg = queue.take();
+															
+															HsmsSsMessageType mt = HsmsSsMessageType.get(msg);
+															
+															try {
+																switch ( mt ) {
+																case DATA: {
+																	
+																	putReceiveDataMessage(msg);
+																	break;
+																}
+																case SELECT_REQ: {
+																	
+																	send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
+																	break;
+																}
+																case LINKTEST_REQ: {
+																	
+																	send(createLinktestResponse(msg));
+																	break;
+																}
+																case SEPARATE_REQ: {
+																	
+																	return null;
+																	/* break; */
+																}
+																case SELECT_RSP:
+																case LINKTEST_RSP:
+																case REJECT_REQ:
+																default: {
+																	
+																	/* ignore */
+																}
+																}
+															}
+															catch ( SecsException e ) {
+																notifyLog(new SecsLog(e));
+															}
+														}
+													}
+													catch ( InterruptedException ignore ) {
+													}
+													
+													return null;
+												});
+										
+										try {
+											executorService().invokeAny(selectTasks);
+										}
+										catch ( ExecutionException e ) {
+											notifyLog(new SecsLog(e));
+										}
+										catch ( InterruptedException ignore ) {
+										}
+										
+										return null;
+									});
 							
-							try {
-								executorService().invokeAny(selectTasks);
-							}
-							catch ( ExecutionException e ) {
-								entryLog(new SecsLog(e.getCause()));
-							}
-							catch ( InterruptedException ignore ) {
-							}
-							
-							return null;
-						});
-						
-						try {
 							executorService().invokeAny(tasks);
 						}
 						catch ( ExecutionException e ) {
-							entryLog(new SecsLog(e.getCause()));
+							notifyLog(new SecsLog(e));
 						}
 						catch ( InterruptedException ignore ) {
 						}
+						finally {
+							
+							try {
+								channel.shutdownOutput();
+							}
+							catch (IOException giveup) {
+							}
+						}
 						
-						synchronized ( sync ) {
-							sync.notifyAll();
+						synchronized ( channel ) {
+							channel.notifyAll();
 						}
 					}
 					
 					@Override
 					public void failed(Throwable t, Void attachment) {
 						
-						synchronized ( sync ) {
-							sync.notifyAll();
+						synchronized ( channel ) {
+							channel.notifyAll();
 						}
 						
-						entryLog(new SecsLog("HsmsSsActiveCommunicator#open-AsynchronousSocketChannel#connect failed", t));
+						notifyLog(new SecsLog("HsmsSsActiveCommunicator#open-AsynchronousSocketChannel#connect failed", t));
 					}
-					
 				});
 				
-				synchronized ( sync ) {
-					sync.wait();
+				synchronized ( channel ) {
+					channel.wait();
 				}
 			}
 			finally {
-				removeChannel(ch);
+				removeChannel(channel);
 				notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
 			}
 		}
 		catch ( IOException e ) {
-			entryLog(new SecsLog(e));
+			notifyLog(new SecsLog(e));
 		}
-		
-		long t5 = (long)(hsmsSsConfig().timeout().t5() * 1000.0F);
-		TimeUnit.MILLISECONDS.sleep(t5);
 	}
 
 }

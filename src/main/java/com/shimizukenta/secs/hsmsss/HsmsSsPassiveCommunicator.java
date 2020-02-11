@@ -32,11 +32,11 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 	@Override
 	public void open() throws IOException {
 		
-		super.open();
-		
 		if ( hsmsSsConfig().protocol() != HsmsSsProtocol.PASSIVE ) {
 			throw new IOException("HsmsSsCommunicatorConfig#protocol is not PASSIVE");
 		}
+		
+		super.open();
 		
 		passiveOpen();
 	}
@@ -48,7 +48,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 		
 		try {
 			synchronized ( this ) {
-				if ( closed ) {
+				if ( isClosed() ) {
 					return;
 				}
 				
@@ -80,7 +80,6 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 	protected void passiveOpen() throws IOException {
 		
 		try {
-			
 			synchronized ( this ) {
 				this.server = AsynchronousServerSocketChannel.open();
 			}
@@ -92,274 +91,273 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 			server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 			server.bind(socketAddr);
 			
-			entryLog(new SecsLog("HsmsSsPassiveCommunicator#binded", socketAddrInfo));
+			notifyLog(new SecsLog("HsmsSsPassiveCommunicator#binded", socketAddrInfo));
 			
 			server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
-
+				
 				@Override
-				public void completed(AsynchronousSocketChannel ch, Void attachment) {
-					
-					server.accept(null, this);
-					
-					String channelString = ch.toString();
-					
-					entryLog(new SecsLog("HsmsSsPassiveCommunicator#loop channel#accept", channelString));
-					
-					final BlockingQueue<HsmsSsMessage> queue = new LinkedBlockingQueue<>();
-					
-					final HsmsSsByteReader reader = new HsmsSsByteReader(HsmsSsPassiveCommunicator.this, ch);
-					final HsmsSsCircuitAssurance linktest = new HsmsSsCircuitAssurance(HsmsSsPassiveCommunicator.this);
-					
-					reader.addHsmsSsMessageReceiveListener(msg -> {
-						sendReplyManager().receive(msg).ifPresent(queue::offer);
-					});
-					
-					reader.addHsmsSsMessageReceiveListener(msg -> {
-						linktest.reset();
-					});
-					
-					reader.addHsmsSsMessageReceiveListener(msg -> {
-						entryLog(new SecsLog("Receive HsmsSs-Message", msg));
-					});
-					
-					reader.addHsmsSsMessageReceiveListener(msg -> {
-						notifyReceiveMessagePassThrough(msg);
-					});
-					
-					Collection<Callable<Object>> tasks = Arrays.asList(reader, () -> {
-						
-						Collection<Callable<Boolean>> connectTasks = Arrays.asList(() -> {
-							
-							try {
-								/* NOT_SELECTED */
-								
-								for ( ;; ) {
-									
-									HsmsSsMessage msg = queue.take();
-									
-									HsmsSsMessageType mt = HsmsSsMessageType.get(msg);
-									
-									try {
-										switch ( mt ) {
-										case DATA: {
-											
-											send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SELECTED));
-											break;
-										}
-										case SELECT_REQ: {
-											
-											boolean f = addChannel(ch);
-											
-											if ( f /* success */) {
-												
-												send(ch, createSelectResponse(msg, HsmsSsMessageSelectStatus.SUCCESS));
-												
-												return Boolean.TRUE;
-												
-											} else {
-												
-												send(ch, createSelectResponse(msg, HsmsSsMessageSelectStatus.ALREADY_USED));
-											}
-											
-											break;
-										}
-										case LINKTEST_REQ: {
-											
-											send(ch, createLinktestResponse(msg));
-											break;
-										}
-										case SEPARATE_REQ: {
-											
-											return Boolean.FALSE;
-											/* break; */
-										}
-										case SELECT_RSP:
-										case LINKTEST_RSP:
-										case REJECT_REQ: {
-											
-											send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.TRANSACTION_NOT_OPEN));
-											break;
-										}
-										default: {
-											
-											if ( HsmsSsMessageType.supportSType(msg) ) {
-												
-												if ( ! HsmsSsMessageType.supportPType(msg) ) {
-													
-													send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P));
-												}
-												
-											} else {
-												
-												send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
-											}
-										}
-										}
-									}
-									catch ( SecsException e ) {
-										entryLog(new SecsLog(e));
-									}
-								}
-							}
-							catch ( InterruptedException ignore ) {
-							}
-							
-							return Boolean.FALSE;
-						});
-						
-						try {
-							
-							long t7 = (long)(hsmsSsConfig().timeout().t7() * 1000.0F);
-							boolean f = executorService().invokeAny(connectTasks, t7, TimeUnit.MILLISECONDS);
-							
-							if ( f ) {
-								/* selected */
-								notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.SELECTED);
-								
-							} else {
-								
-								/* select faield */
-								return null;
-							}
-						}
-						catch ( TimeoutException e ) {
-							entryLog(new SecsLog(new HsmsSsTimeoutT7Exception(e)));
-							return null;
-						}
-						catch ( InterruptedException ignore ) {
-							return null;
-						}
-						catch ( ExecutionException e ) {
-							entryLog(new SecsLog(e.getCause()));
-							return null;
-						}
-						
-						Collection<Callable<Object>> selectTasks = Arrays.asList(linktest, () -> {
-							
-							try {
-								/* SELECTED */
-								
-								for ( ;; ) {
-									
-									HsmsSsMessage msg = queue.take();
-									
-									HsmsSsMessageType mt = HsmsSsMessageType.get(msg);
-									
-									try {
-										switch ( mt ) {
-										case DATA : {
-											
-											putReceiveDataMessage(msg);
-											break;
-										}
-										case SELECT_REQ: {
-											
-											send(ch, createSelectResponse(msg, HsmsSsMessageSelectStatus.ACTIVED));
-											break;
-										}
-										case LINKTEST_REQ: {
-											
-											send(ch, createLinktestResponse(msg));
-											break;
-										}
-										case SEPARATE_REQ: {
-											
-											return null;
-											/* break; */
-										}
-										case SELECT_RSP:
-										case LINKTEST_RSP:
-										case REJECT_REQ: {
-											
-											send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.TRANSACTION_NOT_OPEN));
-											break;
-										}
-										default: {
-											
-											if ( HsmsSsMessageType.supportSType(msg) ) {
-												
-												if ( ! HsmsSsMessageType.supportPType(msg) ) {
-													
-													send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P));
-												}
-												
-											} else {
-												
-												send(ch, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
-											}
-										}
-										}
-									}
-									catch ( SecsException e ) {
-										entryLog(new SecsLog(e));
-									}
-								}
-							}
-							catch ( InterruptedException ignore ) {
-							}
-							
-							return null;
-						});
-						
-						try {
-							executorService().invokeAny(selectTasks);
-						}
-						catch ( InterruptedException ignore ) {
-						}
-						catch ( ExecutionException e ) {
-							entryLog(new SecsLog(e.getCause()));
-						}
-						finally {
-							notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
-						}
-						
-						return null;
-					});
-					
-					try {
-						executorService().invokeAny(tasks);
-					}
-					catch ( InterruptedException ignore ) {
-					}
-					catch ( ExecutionException e ) {
-						entryLog(new SecsLog(e.getCause()));
-					}
-					finally {
-						
-						removeChannel(ch);
-						
-						try {
-							ch.shutdownOutput();
-						}
-						catch ( IOException ignore ) {
-						}
-						
-						try {
-							ch.close();
-						}
-						catch ( IOException e ) {
-							entryLog(new SecsLog(e));
-						}
-					}
+				public void completed(AsynchronousSocketChannel channel, Void attachment) {
+					completedAction(server, this, channel, attachment);
 				}
 
 				@Override
 				public void failed(Throwable t, Void attachment) {
-					
-					entryLog(new SecsLog("HsmsSsPassiveCommunicator#loop AsynchronousSeverSocketChannel#accept failed", t));
-					
-					try {
-						close();
-					}
-					catch ( IOException e ) {
-						entryLog(new SecsLog(e));
-					}
+					notifyLog(new SecsLog("HsmsSsPassiveCommunicator AsynchronousSeverSocketChannel#accept failed", t));
 				}
 			});
 		}
 		catch ( IOException e ) {
-			entryLog(new SecsLog(e));
+			notifyLog(new SecsLog(e));
 			throw e;
+		}
+	}
+	
+	protected void completedAction(
+			AsynchronousServerSocketChannel server
+			, CompletionHandler<AsynchronousSocketChannel, Void> handler
+			, AsynchronousSocketChannel channel
+			, Void attachment) {
+		
+		server.accept(null, handler);
+		
+		String channelString = channel.toString();
+		
+		notifyLog(new SecsLog("HsmsSsPassiveCommunicator channel#accept", channelString));
+		
+		final BlockingQueue<HsmsSsMessage> queue = new LinkedBlockingQueue<>();
+		
+		final HsmsSsByteReader reader = new HsmsSsByteReader(HsmsSsPassiveCommunicator.this, channel);
+		final HsmsSsCircuitAssurance linktest = new HsmsSsCircuitAssurance(HsmsSsPassiveCommunicator.this);
+		
+		reader.addHsmsSsMessageReceiveListener(msg -> {
+			sendReplyManager.put(msg).ifPresent(queue::offer);
+		});
+		
+		reader.addHsmsSsMessageReceiveListener(msg -> {
+			linktest.reset();
+		});
+		
+		Collection<Callable<Object>> tasks = Arrays.asList(
+				reader,
+				() -> {
+					
+					Collection<Callable<Boolean>> connectTasks = Arrays.asList(
+							() -> {
+								
+								try {
+									/* NOT_SELECTED */
+									
+									for ( ;; ) {
+										
+										HsmsSsMessage msg = queue.take();
+										
+										HsmsSsMessageType mt = HsmsSsMessageType.get(msg);
+										
+										try {
+											switch ( mt ) {
+											case DATA: {
+												
+												send(channel, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SELECTED));
+												break;
+											}
+											case SELECT_REQ: {
+												
+												boolean f = addChannel(channel);
+												
+												if ( f /* success */) {
+													
+													send(channel, createSelectResponse(msg, HsmsSsMessageSelectStatus.SUCCESS));
+													
+													return Boolean.TRUE;
+													
+												} else {
+													
+													send(channel, createSelectResponse(msg, HsmsSsMessageSelectStatus.ALREADY_USED));
+												}
+												
+												break;
+											}
+											case LINKTEST_REQ: {
+												
+												send(channel, createLinktestResponse(msg));
+												break;
+											}
+											case SEPARATE_REQ: {
+												
+												return Boolean.FALSE;
+												/* break; */
+											}
+											case SELECT_RSP:
+											case LINKTEST_RSP:
+											case REJECT_REQ: {
+												
+												send(channel, createRejectRequest(msg, HsmsSsMessageRejectReason.TRANSACTION_NOT_OPEN));
+												break;
+											}
+											default: {
+												
+												if ( HsmsSsMessageType.supportSType(msg) ) {
+													
+													if ( ! HsmsSsMessageType.supportPType(msg) ) {
+														
+														send(channel, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P));
+													}
+													
+												} else {
+													
+													send(channel, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
+												}
+											}
+											}
+										}
+										catch ( SecsException e ) {
+											notifyLog(new SecsLog(e));
+										}
+									}
+								}
+								catch ( InterruptedException ignore ) {
+								}
+								
+								return Boolean.FALSE;
+							});
+					
+					try {
+						
+						long t7 = (long)(hsmsSsConfig().timeout().t7() * 1000.0F);
+						boolean f = executorService().invokeAny(connectTasks, t7, TimeUnit.MILLISECONDS);
+						
+						if ( f ) {
+							/* selected */
+							notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.SELECTED);
+							
+						} else {
+							
+							/* select faield */
+							return null;
+						}
+					}
+					catch ( TimeoutException e ) {
+						notifyLog(new SecsLog(new HsmsSsTimeoutT7Exception(e)));
+						return null;
+					}
+					catch ( InterruptedException ignore ) {
+						return null;
+					}
+					catch ( ExecutionException e ) {
+						notifyLog(new SecsLog(e));
+						return null;
+					}
+					
+					Collection<Callable<Object>> selectTasks = Arrays.asList(
+							linktest,
+							() -> {
+								
+								try {
+									/* SELECTED */
+									
+									for ( ;; ) {
+										
+										HsmsSsMessage msg = queue.take();
+										
+										HsmsSsMessageType mt = HsmsSsMessageType.get(msg);
+										
+										try {
+											switch ( mt ) {
+											case DATA : {
+												
+												putReceiveDataMessage(msg);
+												break;
+											}
+											case SELECT_REQ: {
+												
+												send(channel, createSelectResponse(msg, HsmsSsMessageSelectStatus.ACTIVED));
+												break;
+											}
+											case LINKTEST_REQ: {
+												
+												send(channel, createLinktestResponse(msg));
+												break;
+											}
+											case SEPARATE_REQ: {
+												
+												return null;
+												/* break; */
+											}
+											case SELECT_RSP:
+											case LINKTEST_RSP:
+											case REJECT_REQ: {
+												
+												send(channel, createRejectRequest(msg, HsmsSsMessageRejectReason.TRANSACTION_NOT_OPEN));
+												break;
+											}
+											default: {
+												
+												if ( HsmsSsMessageType.supportSType(msg) ) {
+													
+													if ( ! HsmsSsMessageType.supportPType(msg) ) {
+														
+														send(channel, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P));
+													}
+													
+												} else {
+													
+													send(channel, createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
+												}
+											}
+											}
+										}
+										catch ( SecsException e ) {
+											notifyLog(new SecsLog(e));
+										}
+									}
+								}
+								catch ( InterruptedException ignore ) {
+								}
+								
+								return null;
+							});
+					
+					try {
+						executorService().invokeAny(selectTasks);
+					}
+					catch ( InterruptedException ignore ) {
+					}
+					catch ( ExecutionException e ) {
+						notifyLog(new SecsLog(e));
+					}
+					finally {
+						notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
+					}
+					
+					return null;
+				});
+		
+		try {
+			executorService().invokeAny(tasks);
+		}
+		catch ( InterruptedException ignore ) {
+		}
+		catch ( ExecutionException e ) {
+			notifyLog(new SecsLog(e));
+		}
+		finally {
+			
+			sendReplyManager.reset();
+			
+			removeChannel(channel);
+			
+			try {
+				channel.shutdownOutput();
+			}
+			catch ( IOException ignore ) {
+			}
+			
+			try {
+				channel.close();
+			}
+			catch ( IOException e ) {
+				notifyLog(new SecsLog(e));
+			}
 		}
 	}
 	

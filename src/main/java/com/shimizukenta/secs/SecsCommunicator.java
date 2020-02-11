@@ -145,6 +145,13 @@ public interface SecsCommunicator extends Closeable {
 	public boolean removeSecsLogListener(SecsLogListener lstnr);
 	
 	/* Secs-Communicatable-State-Changed-Listener */
+	/**
+	 * Blocking-Listener<br />
+	 * Pass through quickly.
+	 * 
+	 * @param lstnr
+	 * @return true if success.
+	 */
 	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener lstnr);
 	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener lstnr);	
 	

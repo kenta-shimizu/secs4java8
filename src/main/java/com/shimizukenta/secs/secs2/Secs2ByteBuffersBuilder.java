@@ -12,7 +12,7 @@ public class Secs2ByteBuffersBuilder {
 	private final LinkedList<ByteBuffer> buffers = new LinkedList<>();
 	
 	private List<ByteBuffer> proxyBuffers;
-	private long length;
+	private long size;
 	private int blocks;
 	
 	private Secs2ByteBuffersBuilder(int byteBufferSize) {
@@ -63,12 +63,12 @@ public class Secs2ByteBuffersBuilder {
 		}
 	}
 	
-	public long lentgh() {
+	public long size() {
 		synchronized ( this ) {
 			if ( proxyBuffers == null ) {
 				build();
 			}
-			return length;
+			return size;
 		}
 	}
 	
@@ -91,7 +91,7 @@ public class Secs2ByteBuffersBuilder {
 		
 		this.proxyBuffers = Collections.unmodifiableList(buffers);
 		
-		this.length = buffers.stream()
+		this.size = buffers.stream()
 				.mapToLong(bf -> bf.remaining())
 				.sum();
 	}

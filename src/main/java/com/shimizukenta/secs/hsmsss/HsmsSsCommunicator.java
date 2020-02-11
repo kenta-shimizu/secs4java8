@@ -1,17 +1,13 @@
 package com.shimizukenta.secs.hsmsss;
 
 import java.io.IOException;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,7 +19,6 @@ import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
-import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	
@@ -34,13 +29,14 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	});
 	
 	private final HsmsSsCommunicatorConfig hsmsSsConfig;
-	
+	protected final HsmsSsSendReplyManager sendReplyManager;
 	private HsmsSsCommunicateState hsmsSsCommunicateState;
 	
 	protected HsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);
 		
 		this.hsmsSsConfig = config;
+		this.sendReplyManager = new HsmsSsSendReplyManager(this);
 		
 		this.notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
 	}
@@ -146,59 +142,6 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		
 		if ( ioExcept != null ) {
 			throw ioExcept;
-		}
-	}
-	
-	
-	protected void send(AsynchronousSocketChannel ch, HsmsSsMessage msg)
-			throws InterruptedException, HsmsSsSendMessageException {
-		
-		notifyLog(new SecsLog("Try Send HsmsSs-Message", msg));
-		
-		notifyTrySendMessagePassThrough(msg);
-		
-		try {
-			byte[] head = msg.header10Bytes();
-			byte[] body = msg.secs2().secs2Bytes();
-			
-			int len = head.length + body.length;
-			
-			int bflen = len + 4;
-			
-			if ( bflen > 0x7FFFFFFF || bflen < 14 ) {
-				throw new HsmsSsSendMessageSizeException(msg);
-			}
-			
-			ByteBuffer bf = ByteBuffer.allocate(bflen);
-			bf.putInt(len);
-			bf.put(head);
-			bf.put(body);
-			((Buffer)bf).flip();
-			
-			while ( bf.hasRemaining() ) {
-				
-				Future<Integer> f = ch.write(bf);
-				
-				try {
-					int w = f.get().intValue();
-					
-					if ( w <= 0 ) {
-						break;
-					}
-				}
-				catch ( InterruptedException e ) {
-					f.cancel(true);
-					throw e;
-				}
-			}
-			
-			notifySendedMessagePassThrough(msg);
-		}
-		catch ( ExecutionException e ) {
-			throw new HsmsSsSendMessageException(msg, e.getCause());
-		}
-		catch ( Secs2Exception e ) {
-			throw new HsmsSsSendMessageException(msg, e);
 		}
 	}
 	
@@ -337,6 +280,12 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		}
 	}
 	
+	protected Optional<AsynchronousSocketChannel> optionalChannel() {
+		synchronized ( channels ) {
+			return channels.stream().findAny();
+		}
+	}
+	
 	
 	/* HSMS Communicate State */
 	private final Object syncHsmsSsCommunicateState = new Object();
@@ -348,6 +297,7 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	}
 	
 	protected void notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState state) {
+		
 		synchronized ( syncHsmsSsCommunicateState ) {
 			
 			if ( this.hsmsSsCommunicateState != state ) {
@@ -368,8 +318,13 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	 * @throws InterruptedException
 	 * @throws SecsException
 	 */
-	public boolean linktest() throws InterruptedException, SecsException {
-		return send(createLinktestRequest()).isPresent();
+	public boolean linktest() throws InterruptedException {
+		try {
+			return send(createLinktestRequest()).isPresent();
+		}
+		catch ( SecsException e ) {
+			return false;
+		}
 	}
 	
 	
@@ -404,14 +359,18 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		return bs;
 	}
 	
+	protected void send(AsynchronousSocketChannel channel, HsmsSsMessage msg)
+			throws SecsSendMessageException, SecsException
+			, InterruptedException {
+		
+		sendReplyManager.send(channel, msg);
+	}
 	
 	public Optional<HsmsSsMessage> send(HsmsSsMessage msg)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
 		try {
-			//TODO
-			
 			return sendReplyManager.send(msg);
 		}
 		catch ( SecsException e ) {

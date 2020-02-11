@@ -81,6 +81,9 @@ public class HsmsSsByteReader implements Callable<Object> {
 				listeners.forEach(lstnr -> {
 					lstnr.receive(msg);
 				});
+				
+				parent.notifyReceiveMessagePassThrough(msg);
+				parent.notifyLog(new SecsLog("Received HsmsSs-Message", msg));
 			}
 		}
 		catch ( HsmsSsDetectTerminateException | HsmsSsTimeoutT8Exception e ) {
@@ -122,7 +125,7 @@ public class HsmsSsByteReader implements Callable<Object> {
 			throw new HsmsSsTimeoutT8Exception(e);
 		}
 		catch ( ExecutionException e ) {
-			throw new HsmsSsDetectTerminateException(e.getCause());
+			throw new HsmsSsDetectTerminateException(e);
 		}
 		catch ( InterruptedException e ) {
 			f.cancel(true);
