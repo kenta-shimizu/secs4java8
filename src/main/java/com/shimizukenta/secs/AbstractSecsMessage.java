@@ -6,7 +6,7 @@ public abstract class AbstractSecsMessage implements SecsMessage {
 		/* Nothing */
 	}
 	
-	protected Integer systemBytesKey() {
+	public Integer systemBytesKey() {
 		byte[] bs = this.header10Bytes();
 		int i = ((int)(bs[6]) << 24) & 0xFF000000;
 		i |= ((int)(bs[7]) << 16) & 0x00FF0000;

@@ -5,211 +5,36 @@ import java.net.SocketAddress;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsLog;
+import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.secs1.Secs1Communicator;
+import com.shimizukenta.secs.secs1.Secs1DetectTerminateException;
+import com.shimizukenta.secs.secs1.Secs1SendMessageException;
 
 public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 	
 	private final Secs1OnTcpIpCommunicatorConfig secs1OnTcpIpConfig;
-	private final Collection<AsynchronousSocketChannel> channels = new ArrayList<>();
+	private AsynchronousSocketChannel channel;
 	
 	public Secs1OnTcpIpCommunicator(Secs1OnTcpIpCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
 		
 		this.secs1OnTcpIpConfig = config;
-	}
-
-	@Override
-	protected void sendByte(byte[] bs) throws IOException, InterruptedException {
-		
-		synchronized ( channels ) {
-			
-			if ( channels.isEmpty() ) {
-				throw new IOException("Channel not opened");
-			}
-			
-			for ( AsynchronousSocketChannel ch : channels ) {
-				
-				ByteBuffer buffer = ByteBuffer.allocate(bs.length);
-				buffer.put(bs);
-				((Buffer)buffer).flip();
-				
-				while ( buffer.hasRemaining() ) {
-					
-					Future<Integer> f = ch.write(buffer);
-					
-					try {
-						Integer w = f.get();
-						
-						if ( w <= 0 ) {
-							throw new IOException("Secs1OnTcpIpCommunicator#sendByte-AsynchronousSocketChannel#write terminate");
-						}
-					}
-					catch ( InterruptedException e ) {
-						f.cancel(true);
-						throw e;
-					}
-					catch (ExecutionException e) {
-						throw new IOException("Secs1OnTcpIpCommunicator#sendByte-AsynchronousSocketChannel#write", e.getCause());
-					}
-				}
-			}
-			
-		}
-	}
-	
-	@Override
-	public void open() throws IOException {
-		
-		super.open();
-		
-		executorService().execute(() -> {
-			
-			try {
-				
-				for ( ;; ) {
-					
-					try (
-							AsynchronousSocketChannel ch = AsynchronousSocketChannel.open();
-							) {
-						
-						final SocketAddress socketAddr = secs1OnTcpIpConfig.socketAddress();
-						
-						final String socketAddressInfo = socketAddr.toString();
-						
-						entryLog(new SecsLog("Secs1OnTcpIpCommunicator try-connect", socketAddressInfo));
-						
-						try {
-							
-							ch.connect(socketAddr, null, new CompletionHandler<Void, Void>(){
-								
-								@Override
-								public void completed(Void none, Void attachemnt) {
-									
-									synchronized ( channels ) {
-										channels.add(ch);
-									}
-									
-									notifyCommunicatableStateChange(true);
-									
-									entryLog(new SecsLog("Secs1OnTcpIpCommunicator connected", socketAddressInfo));
-									
-									final ByteBuffer buffer = ByteBuffer.allocate(1024);
-									
-									ch.read(buffer, null, new CompletionHandler<Integer, Void>(){
-	
-										@Override
-										public void completed(Integer r, Void attachment) {
-											
-											if ( r < 0 ) {
-												
-												synchronized ( channels ) {
-													channels.notifyAll();
-												}
-												
-											} else {
-												
-												((Buffer)buffer).flip();
-												byte[] bs = new byte[buffer.remaining()];
-												buffer.get(bs);
-												
-												putRecvByte(bs);
-												
-												((Buffer)buffer).clear();
-												ch.read(buffer, null, this);
-											}
-										}
-	
-										@Override
-										public void failed(Throwable t, Void attachment) {
-											
-											synchronized ( channels ) {
-												channels.notifyAll();
-											}
-											
-											entryLog(new SecsLog("Secs1OnTcpIpCommunicator#open-AsynchronousSocketChannel#read failed", t));
-										}
-										
-									});
-								}
-								
-								@Override
-								public void failed(Throwable t, Void attachment) {
-									
-									synchronized ( channels ) {
-										channels.notifyAll();
-									}
-									
-									entryLog(new SecsLog("Secs1OnTcpIpCommunicator#open-AsynchronousSocketChannel#connect failed", t));
-								}
-							});
-							
-							synchronized ( channels ) {
-								channels.wait();
-							}
-						}
-						finally {
-							
-							notifyCommunicatableStateChange(false);
-							
-							synchronized ( channels ) {
-								
-								if ( channels.remove(ch) ) {
-									
-									entryLog(new SecsLog("Secs1OnTcpIpCommunicator disconnected", socketAddressInfo));
-									
-									try {
-										ch.shutdownOutput();
-									}
-									catch (ClosedChannelException ignore) {
-									}
-									catch (IOException e) {
-										
-										entryLog(new SecsLog("Secs1OnTcpIpCommunicator#open-AsynchronousSocketChannel#shutdownOutput failed", e));
-									}
-								}
-							}
-						}
-					}
-					catch ( IOException e ) {
-						
-						entryLog(new SecsLog("Secs1OnTcpIpCommunicator#open-AsynchronousSocketChannel#open failed", e));
-					}
-
-					{
-						long t = (long)(secs1OnTcpIpConfig.reconnectSeconds() * 1000.0F);
-						if ( t > 0 ) {
-							TimeUnit.MILLISECONDS.sleep(t);
-						}
-					}
-				}
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
-	}
-	
-	@Override
-	public void close() throws IOException {
-		
-		synchronized ( this ) {
-			
-			if ( closed ) {
-				return;
-			}
-			
-			super.close();
-		}
-		
+		this.channel = null;
 	}
 	
 	public static Secs1OnTcpIpCommunicator newInstance(Secs1OnTcpIpCommunicatorConfig config) {
@@ -237,4 +62,224 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 		return inst;
 	}
 	
+	@Override
+	public void open() throws IOException {
+		
+		super.open();
+		
+		executorService().execute(task);
+	}
+	
+	@Override
+	public void close() throws IOException {
+		super.close();
+	}
+	
+	private final Runnable task = new Runnable() {
+
+		@Override
+		public void run() {
+			
+			try {
+				for ( ;; ) {
+					
+					try (
+							AsynchronousSocketChannel ch = AsynchronousSocketChannel.open();
+							) {
+						
+						SocketAddress socketAddr = secs1OnTcpIpConfig.socketAddress();
+						
+						String socketAddrString = socketAddr.toString();
+						
+						notifyLog(new SecsLog("Secs1OnTcpIpCommunicator#try-connect", socketAddrString));
+						
+						ch.connect(socketAddr, null, new CompletionHandler<Void, Void>() {
+
+							@Override
+							public void completed(Void none, Void attachment) {
+								
+								try {
+									
+									synchronized ( Secs1OnTcpIpCommunicator.this ) {
+										Secs1OnTcpIpCommunicator.this.channel = ch;
+									}
+									
+									notifyLog(new SecsLog("Secs1OnTcpIpCommunicator#connected", ch));
+									
+									final ByteBuffer buffer = ByteBuffer.allocate(1024);
+									
+									for ( ;; ) {
+										
+										((Buffer)buffer).clear();
+										
+										Future<Integer> f = ch.read(buffer);
+										
+										try {
+											int r = f.get().intValue();
+											
+											if ( r < 0 ) {
+												break;
+											}
+											
+											((Buffer)buffer).flip();
+											
+											putByte(buffer);
+										}
+										catch ( InterruptedException e ) {
+											f.cancel(true);
+											throw e;
+										}
+									}
+								}
+								catch ( InterruptedException ignore) {
+								}
+								catch ( ExecutionException e ) {
+									notifyLog(new SecsLog(e));
+								}
+								finally {
+									
+									synchronized ( Secs1OnTcpIpCommunicator.this ) {
+										Secs1OnTcpIpCommunicator.this.channel = null;
+									}
+									
+									try {
+										ch.shutdownOutput();
+									}
+									catch ( IOException giveup ) {
+									}
+									
+									notifyLog(new SecsLog("Secs1OnTcpIpCommunicator#closed", socketAddrString));
+									
+									synchronized ( ch ) {
+										ch.notifyAll();
+									}
+								}
+							}
+
+							@Override
+							public void failed(Throwable t, Void attachment) {
+								
+								notifyLog(new SecsLog(t));
+								
+								synchronized ( ch ) {
+									ch.notifyAll();
+								}
+							}
+						});
+						
+						synchronized ( ch ) {
+							ch.wait();
+						}
+					}
+					catch ( IOException e ) {
+						notifyLog(new SecsLog(e));
+					}
+					
+					{
+						long t = (long)(secs1OnTcpIpConfig.reconnectSeconds() * 1000.0F);
+						TimeUnit.MILLISECONDS.sleep(t);
+					}
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		}
+	};
+	
+	private final BlockingQueue<Byte> byteQueue = new LinkedBlockingQueue<>();
+	
+	protected void putByte(ByteBuffer buffer) {
+		while ( buffer.hasRemaining() ) {
+			byteQueue.offer(buffer.get());
+		}
+	}
+
+	@Override
+	protected Optional<Byte> pollByte() {
+		Byte b = byteQueue.poll();
+		return b == null ? Optional.empty() : Optional.of(b);
+	}
+
+	@Override
+	protected Optional<Byte> pollByte(long timeout, TimeUnit unit) throws InterruptedException {
+		Byte b = byteQueue.poll(timeout, unit);
+		return b == null ? Optional.empty() : Optional.of(b);
+	}
+	
+	@Override
+	protected Optional<Byte> pollByte(byte[] request, long timeout, TimeUnit unit) throws InterruptedException {
+		
+		Collection<Callable<Byte>> tasks = Arrays.asList(() -> {
+			
+			try {
+				
+				for ( ;; ) {
+					
+					byte b = byteQueue.take();
+					
+					for ( byte r : request ) {
+						if ( r == b ) {
+							return Byte.valueOf(b);
+						}
+					}
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+			
+			return null;
+		});
+		
+		try {
+			Byte b = executorService().invokeAny(tasks, timeout, unit);
+			
+			if ( b != null ) {
+				return Optional.of(b);
+			}
+		}
+		catch ( TimeoutException | ExecutionException e ) {
+		}
+		
+		return Optional.empty();
+	}
+	
+	@Override
+	protected void sendByte(byte[] bs)
+			throws SecsSendMessageException, SecsException, InterruptedException {
+		
+		final AsynchronousSocketChannel ch;
+		
+		synchronized ( this ) {
+			ch = channel;
+		}
+		
+		if ( ch == null ) {
+			throw new Secs1OnTcpIpNotConnectedException();
+		}
+		
+		ByteBuffer buffer = ByteBuffer.allocate(bs.length);
+		buffer.put(bs);
+		((Buffer)buffer).flip();
+		
+		while ( buffer.hasRemaining() ) {
+			
+			Future<Integer> f = ch.write(buffer);
+			
+			try {
+				int w = f.get().intValue();
+				
+				if ( w <= 0 ) {
+					throw new Secs1DetectTerminateException();
+				}
+			}
+			catch ( ExecutionException e ) {
+				throw new Secs1SendMessageException(e);
+			}
+			catch ( InterruptedException e ) {
+				f.cancel(true);
+				throw e;
+			}
+		}
+	}
+
 }
