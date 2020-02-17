@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +28,12 @@ public class Secs1SendReplyManager {
 	
 	protected Secs1SendReplyManager(Secs1Communicator parent) {
 		this.parent = parent;
+	}
+	
+	private final Collection<Secs1MessageReceiveListener> listeners = new CopyOnWriteArrayList<>();
+	
+	public boolean addListener(Secs1MessageReceiveListener listener) {
+		return listeners.add(listener);
 	}
 	
 	public Optional<Secs1Message> send(Secs1Message msg)
@@ -125,6 +132,10 @@ public class Secs1SendReplyManager {
 	private Secs1Message reply(Pack p)
 			throws SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
+		
+		//TODO
+		//resetTImeout
+		
 		Collection<Callable<Secs1Message>> tasks = Arrays.asList(
 				() -> {
 					
@@ -184,7 +195,7 @@ public class Secs1SendReplyManager {
 		return blockQueue.poll();
 	}
 	
-	public Optional<Secs1Message> put(Secs1Message msg) {
+	private void put(Secs1Message msg) {
 		
 		final Integer key = msg.systemBytesKey();
 		
@@ -194,11 +205,12 @@ public class Secs1SendReplyManager {
 				if ( p.key().equals(key) ) {
 					p.put(msg);
 					packs.notifyAll();
-					return Optional.empty();
 				}
 			}
 			
-			return Optional.of(msg);
+			listeners.forEach(lstnr -> {
+				lstnr.receive(msg);
+			});
 		}
 	}
 	
@@ -277,12 +289,28 @@ public class Secs1SendReplyManager {
 		}
 	}
 	
+	public void received(Secs1MessageBlock block) {
+		
+		if ( block.ebit() ) {
+			
+			//TOODO
+			
+		} else {
+			
+			//TODO
+			
+			//resetTimerT3
+			
+		}
+	}
+	
 	private class Pack {
 		
 		private final Secs1Message primary;
 		private final Integer key;
 		private Secs1Message reply;
 		private boolean sended;
+		private boolean timeT3Reset;
 		private Exception failedCause;
 		
 		public Pack(Secs1Message primaryMsg) {
@@ -290,6 +318,7 @@ public class Secs1SendReplyManager {
 			this.key = primaryMsg.systemBytesKey();
 			this.reply = null;
 			this.sended = false;
+			this.timeT3Reset = false;
 			this.failedCause = null;
 		}
 		

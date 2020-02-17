@@ -1,7 +1,6 @@
 package com.shimizukenta.secs.secs1;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -40,7 +39,9 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		super(config);
 		
 		this.secs1Config = config;
+		
 		this.sendReplyManager = new Secs1SendReplyManager(this);
+		this.sendReplyManager.addListener(this::putReceiveDataMessage);
 	}
 	
 	protected Secs1CommunicatorConfig secs1Config() {
@@ -243,7 +244,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		return pollByteTx(secs1Config.timeout().t4());
 	}
 	
-	private void pollByteUntilEmpty() {
+	protected void pollByteUntilEmpty() {
 		while (pollByte().isPresent());
 	}
 	
@@ -351,10 +352,10 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	
 	private class Loop implements Runnable {
 		
-		private Secs1MessageBlock block;
+		private Secs1MessageBlock presentBlock;
 		
 		public Loop() {
-			block = null;
+			presentBlock = null;
 		}
 		
 		public void run() {
@@ -364,11 +365,11 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 				for ( ;; ) {
 					
 					try {
-						if ( block == null ) {
-							block = sendReplyManager.pollBlock();
+						if ( presentBlock == null ) {
+							presentBlock = sendReplyManager.pollBlock();
 						}
 						
-						if ( block == null ) {
+						if ( presentBlock == null ) {
 							
 							Optional<Byte> op = pollByte(new byte[]{ENQ}, 10L, TimeUnit.MILLISECONDS);
 							
@@ -376,7 +377,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 								
 								if ( op.get() == ENQ ) {
 
-									receiveBlock(new LinkedList<>());
+									receiveBlock();
 								}
 							}
 							
@@ -426,7 +427,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 				switch ( pollCircuitControl() ) {
 				case RX: {
 					
-					receiveBlock(new LinkedList<>());
+					receiveBlock();
 					return;
 					/* break; */
 				}
@@ -454,21 +455,106 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			}
 			
 			{
-				sendReplyManager.sendFailed(block, new Secs1RetryOverException());
+				sendReplyManager.sendFailed(presentBlock, new Secs1RetryOverException());
 				
-				this.block = null;
+				this.presentBlock = null;
 			}
 
 		}
 		
-		private void receiveBlock(LinkedList<Secs1MessageBlock> blocks) throws SecsException, InterruptedException {
+		private void receiveBlock() throws SecsException, InterruptedException {
 			
 			pollByteUntilEmpty();
 			
 			sendByte(EOT);
 			
+			int lengthByte = 0;
+			byte[] bs;
 			
-			//TODO
+			{
+				/*** read Length-Byte ***/
+				
+				Optional<Byte> op = pollByteT2();
+				
+				if ( op.isPresent() ) {
+					
+					byte b = op.get().byteValue();
+					
+					lengthByte = ((int)b) & 0xFF;
+					
+					if ( lengthByte < 10 || lengthByte > 254 ) {
+						
+						receiveBlockGarbage("Receieve Secs1Message LengthByte failed (length=" + lengthByte + ")");
+						
+						return;
+					}
+					
+					bs = new byte[lengthByte + 3];
+					bs[0] = b;
+					
+				} else {
+					
+					sendByte(NAK);
+					
+					notifyLog(new SecsLog("Receive Secs1MessageBlock T2-Timeout (Length-byte)"));
+					
+					return;
+				}
+			}
+			
+			for ( int i = 1, m = bs.length ; i < m ; ++i ) {
+				
+				Optional<Byte> op = pollByteT1();
+				
+				if ( op.isPresent() ) {
+					
+					bs[i] = op.get().byteValue();
+					
+				} else {
+					
+					sendByte(NAK);
+					
+					notifyLog(new SecsLog("Receive Secs1MessageBlock T1-Timeout (pos=" + i + ")"));
+					
+					return;
+				}
+			}
+			
+			Secs1MessageBlock block = new Secs1MessageBlock(bs);
+			
+			if ( block.sumCheck() ) {
+				
+				sendByte(ACK);
+				
+				sendReplyManager.sended(block);
+				
+				if ( ! block.ebit() ) {
+					
+					Optional<Byte> op = pollByteT4();
+					
+					if ( op.isPresent() ) {
+						
+						byte b = op.get();
+						
+						if ( b == ENQ ) {
+							
+							receiveBlock();
+							
+						} else {
+							
+							notifyLog(new SecsLog("Wait next Block, receive not ENQ (" + String.format("%02X",  b) + ")", block));
+						}
+						
+					} else {
+						
+						notifyLog(new SecsLog("Wait next presentBlock, T4-timeout", block));
+					}
+				}
+				
+			} else {
+				
+				receiveBlockGarbage("Receieve Secs1Message sum-check failed");
+			}
 		}
 		
 		private void receiveBlockGarbage(String reason) throws SecsException, InterruptedException {
@@ -488,7 +574,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			
 			pollByteUntilEmpty();
 			
-			sendByte(block.getBytes());
+			sendByte(presentBlock.getBytes());
 			
 			Optional<Byte> op = pollByteT2();
 			
@@ -498,328 +584,26 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 				
 				if ( b == ACK ) {
 					
-					sendReplyManager.sended(block);
+					sendReplyManager.received(presentBlock);
 					
-					notifyLog(new SecsLog("Secs1Communicator#sendBlock completed", block));
+					notifyLog(new SecsLog("Secs1Communicator#sendBlock completed", presentBlock));
 					
-					this.block = null;
+					this.presentBlock = null;
 					
 					return true;
 					
 				} else {
 					
-					notifyLog(new SecsLog("Secs1Communicator#sendBlock revieve-not-ACK (" + String.format("%02X", b) + ")", block));
+					notifyLog(new SecsLog("Secs1Communicator#sendBlock revieve-not-ACK (" + String.format("%02X", b) + ")", presentBlock));
 				}
 				
 			} else {
 				
-				notifyLog(new SecsLog("Secs1Communicator#sendBlock Timeout-T2", block));
+				notifyLog(new SecsLog("Secs1Communicator#sendBlock Timeout-T2", presentBlock));
 			}
 			
 			return false;
 		}
 	}
-	
-	
-	
-	
-//	private CircuitControlPoll pollCircuitControl() throws InterruptedException {
-//		
-//		Collection<Callable<CircuitControlPoll>> tasks = Arrays.asList(() -> {
-//			
-//			try {
-//				for ( ;; ) {
-//					byte b = recvByteQueue.take();
-//					
-//					if ( ! secs1Config.isMaster() && b == ENQ ) {
-//						
-//						return CircuitControlPoll.RX;
-//						
-//					} else if ( b == EOT ){
-//						
-//						return CircuitControlPoll.TX;
-//					}
-//				}
-//			}
-//			catch ( InterruptedException ignore ) {
-//			}
-//			
-//			return null;
-//		});
-//		
-//		try {
-//			long t2 = (long)(secs1Config.timeout().t2() * 1000.0F);
-//			return executorService().invokeAny(tasks, t2, TimeUnit.MILLISECONDS);
-//		}
-//		catch ( ExecutionException none ) {
-//			
-//			return CircuitControlPoll.RETRY;
-//		}
-//		catch ( TimeoutException e ) {
-//			
-//			return CircuitControlPoll.RETRY;
-//		}
-//	}
-	
-//	private void circuitControl() throws IOException, InterruptedException {
-//		
-//		Secs1MessageBlock block = sendBlockQueue.peek();
-//		if ( block == null ) {
-//			return;
-//		}
-//		
-//		for ( int counter = 0 ; counter < secs1Config.retry() ; ) {
-//			
-//			this.sendByte(ENQ);
-//			
-//			switch ( pollCircuitControl() ) {
-//			case RX: {
-//				
-//				receiveBlock();
-//				return;
-//				/* break; */
-//			}
-//			case TX: {
-//				
-//				if ( trySendMessageBlock(block) ) {
-//					
-//					sendBlockQueue.poll();
-//					
-//					if ( block.ebit() ) {
-//						
-//						replyManager.notifySendCompleted(block);
-//						
-//						Secs1Message sendedMsg = removeSendMessageMap(block);
-//						if ( sendedMsg != null ) {
-//							notifySendedMessagePassThrough(sendedMsg);
-//						}
-//					}
-//					
-//					return;
-//					
-//				} else {
-//					
-//					counter += 1;
-//				}
-//				
-//				break;
-//			}
-//			case RETRY: {
-//				
-//				entryLog(new Secs1MessageBlockLog("Secs1Communicator#circuitControl-poll failed", block));
-//				counter += 1;
-//				
-//				break;
-//			}
-//			}
-//		}
-//		
-//		/* Send-Retry-Over */
-//		{
-//			replyManager.notifySendFailed(block);
-//			
-//			sendBlockQueue.removeIf(blk -> blk.equalsSystemBytesKey(block));
-//			
-//			entryLog(new Secs1MessageBlockLog("Secs1Communicator#try-send retry-over", block));
-//			
-//			removeSendMessageMap(block);
-//		}
-//	}
-	
-	private void receiveBlock() throws IOException, InterruptedException {
-		
-		recvByteQueue.clear();
-		
-		sendByte(EOT);
-		
-		int lengthByte = 0;
-		byte[] bs;
-		
-		{
-			/*** read Length-Byte ***/
-			
-			Optional<Byte> op = pollByteT2();
-			
-			if ( op.isPresent() ) {
-				
-				byte b = op.get();
-				
-				lengthByte = ((int)b) & 0xFF;
-				
-				if ( lengthByte < 10 || lengthByte > 254 ) {
-					
-					receiveBlockGarbage("Receieve Secs1Message LengthByte failed (length=" + lengthByte + ")");
-					
-					return;
-				}
-				
-				bs = new byte[lengthByte + 3];
-				bs[0] = b;
-				
-			} else {
-				
-				sendByte(NAK);
-				
-				entryLog(new SecsLog("Receive Secs1MessageBlock T2-Timeout (Length-byte)"));
-				
-				return;
-			}
-		}
-
-		{
-			/*** Reading ***/
-			
-			int sum = 0;
-	
-			for ( int i = 1, m = lengthByte + 1 ; i < m ; ++i ) {
-				
-				Optional<Byte> op = pollByteT1();
-				
-				if ( op.isPresent() ) {
-					
-					byte b = op.get();
-					bs[i] = b;
-					sum += ((int)b) & 0xFF;
-					
-				} else {
-					
-					sendByte(NAK);
-					
-					entryLog(new SecsLog("Receive Secs1MessageBlock T1-Timeout (pos=" + i + ")"));
-					
-					return;
-				}
-			}
-			
-			{
-				int pos = lengthByte + 1;
-				Optional<Byte> op = pollByteT1();
-				
-				if ( op.isPresent() ) {
-					
-					byte b = op.get();
-					bs[pos] = b;
-					sum -= (((int)b) << 8) & 0xFF00;
-					
-				} else {
-					
-					sendByte(NAK);
-					
-					entryLog(new SecsLog("Receive Secs1MessageBlock T1-Timeout (pos=" + pos + ")"));
-					
-					return;
-				}
-			}
-			
-			{
-				int pos = lengthByte + 2;
-				Optional<Byte> op = pollByteT1();
-				
-				if ( op.isPresent() ) {
-					
-					byte b = op.get();
-					bs[pos] = b;
-					sum -= ((int)b) & 0xFF;
-					
-				} else {
-					
-					sendByte(NAK);
-					
-					entryLog(new SecsLog("Receive Secs1MessageBlock T1-Timeout (pos=" + pos + ")"));
-					
-					return;
-				}
-			}
-			
-			/*** SUM-check ***/
-			if ( sum == 0 /* O.K. */) {
-				
-				sendByte(ACK);
-				
-				Secs1MessageBlock block = new Secs1MessageBlock(bs);
-				
-				this.replyManager.resetTimer(block);
-				
-				blockManager.putBlock(block);
-				
-				if ( ! block.ebit() ) {
-					
-					Optional<Byte> op = pollByteT4();
-					
-					if ( op.isPresent() ) {
-						
-						byte b = op.get();
-						
-						if ( b == ENQ ) {
-							
-							receiveBlock();
-							
-						} else {
-							
-							entryLog(new Secs1MessageBlockLog("Wait next block, receive not ENQ (" + String.format("%02X",  b) + ")", block));
-						}
-						
-					} else {
-						
-						entryLog(new Secs1MessageBlockLog("Wait next block, T4-timeout", block));
-					}
-				}
-				
-			} else {
-				
-				receiveBlockGarbage("Receieve Secs1Message sum-check failed (sum=" + sum + ")");
-			}
-
-		}
-		
-	}
-	
-//	private void receiveBlockGarbage(CharSequence reason) throws IOException, InterruptedException {
-//		
-//		for ( ;; ) {
-//			if ( ! pollByteT1().isPresent() ) {
-//				break;
-//			}
-//		}
-//		
-//		sendByte(NAK);
-//		
-//		entryLog(new SecsLog(reason));
-//	}
-//	
-//	private boolean trySendMessageBlock(Secs1MessageBlock block) throws IOException, InterruptedException {
-//		
-//		recvByteQueue.clear();
-//		
-//		this.sendByte(block.bytes());
-//		
-//		Optional<Byte> op = pollByteT2();
-//		
-//		if ( op.isPresent() ) {
-//			
-//			byte b = op.get();
-//			
-//			if ( b == ACK ) {
-//				
-//				entryLog(new Secs1MessageBlockLog("Send Secs1MessageBlock completed", block));
-//				
-//				return true;
-//				
-//			} else {
-//				
-//				entryLog(new Secs1MessageBlockLog("Send Secs1MessageBlock Not-ACK (" + String.format("%02X", b) + ")", block));
-//				
-//				return false;
-//			}
-//			
-//		} else {
-//			
-//			entryLog(new Secs1MessageBlockLog("Send Secs1MessageBlock T2-Timeout(ACK)", block));
-//			
-//			return false;
-//		}
-//	}
-	
-	
 	
 }

@@ -244,6 +244,11 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 	}
 	
 	@Override
+	protected void pollByteUntilEmpty() {
+		byteQueue.clear();
+	}
+	
+	@Override
 	protected void sendByte(byte[] bs)
 			throws SecsSendMessageException, SecsException, InterruptedException {
 		
