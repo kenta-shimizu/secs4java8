@@ -591,7 +591,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 				
 				if ( b == ACK ) {
 					
-					sendReplyManager.received(presentBlock);
+					sendReplyManager.sended(presentBlock);
 					
 					notifyLog(new SecsLog("Secs1Communicator#sendBlock completed", presentBlock));
 					

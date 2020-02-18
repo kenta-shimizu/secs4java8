@@ -51,6 +51,7 @@ public class Secs1SendReplyManager {
 			parent.notifyTrySendMessagePassThrough(msg);
 			waitUntilSended(p);
 			parent.notifySendedMessagePassThrough(msg);
+			parent.notifyLog(new SecsLog("Sended Secs1-Message", msg));
 			
 			if ( msg.wbit() ) {
 				
@@ -331,6 +332,7 @@ public class Secs1SendReplyManager {
 			
 			try {
 				Secs1Message msg = Secs1MessageBlockConverter.toSecs1Message(recvBlocks);
+				parent.notifyLog(new SecsLog("Received Secs1-Message", msg));
 				put(msg);
 			}
 			catch ( Secs2Exception e ) {
