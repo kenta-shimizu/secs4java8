@@ -104,6 +104,8 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 										Secs1OnTcpIpCommunicator.this.channel = ch;
 									}
 									
+									notifyCommunicatableStateChange(true);
+									
 									notifyLog(new SecsLog("Secs1OnTcpIpCommunicator#connected", ch));
 									
 									final ByteBuffer buffer = ByteBuffer.allocate(1024);
@@ -137,6 +139,8 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 									notifyLog(new SecsLog(e));
 								}
 								finally {
+									
+									notifyCommunicatableStateChange(false);
 									
 									synchronized ( Secs1OnTcpIpCommunicator.this ) {
 										Secs1OnTcpIpCommunicator.this.channel = null;
