@@ -1,14 +1,11 @@
 package com.shimizukenta.secs.secs1;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class Secs1MessageBlock {
 	
-	private static final int ZERO = 0;
-	private static final int ONE  = 1;
+	public static final int ZERO = 0;
+	public static final int ONE  = 1;
 	
 	private final byte[] bytes;
 	
@@ -67,6 +64,14 @@ public class Secs1MessageBlock {
 		}
 	}
 	
+	public boolean sameSystemBytes(Secs1MessageBlock block) {
+		return block.systemBytesKey().equals(systemBytesKey());
+	}
+	
+	public boolean isNextBlock(Secs1MessageBlock block) {
+		return block.blockNumber() == (this.blockNumber() + 1);
+	}
+	
 	@Override
 	public String toString() {
 		
@@ -90,68 +95,4 @@ public class Secs1MessageBlock {
 		}
 	}
 	
-	public static List<Secs1MessageBlock> buildBlocks(byte[] head, List<ByteBuffer> buffers) {
-		
-		if ( head.length != 10 ) {
-			throw new IllegalArgumentException("head not 10 bytes");
-		}
-		
-		List<Secs1MessageBlock> blocks = new ArrayList<>();
-		
-		int bufferSize = buffers.size();
-		int blockNum = ONE;
-		
-		for ( int i = 0, m = (bufferSize - 1); i < m; ++i ) {
-			blocks.add(buildBlock(head, buffers.get(i), false, blockNum));
-			++ blockNum;
-		}
-		
-		blocks.add(buildBlock(head, buffers.get(bufferSize - 1), true, blockNum));
-		
-		return blocks;
-	}
-	
-	private static Secs1MessageBlock buildBlock(byte[] head, ByteBuffer buffer, boolean ebit, int blockNumber) {
-		
-		int len = head.length + buffer.remaining();
-		
-		int sum = 0;
-		
-		byte[] bs = new byte[len + 3];
-		
-		bs[0] = (byte)len;
-		bs[1] = head[0];
-		bs[2] = head[1];
-		bs[3] = head[2];
-		bs[4] = head[3];
-		
-		bs[5] = (byte)(blockNumber >> 8);
-		if ( ebit ) {
-			bs[5] |= (byte)0x80;
-		}
-		
-		bs[6] = (byte)blockNumber;
-		
-		bs[7] = head[6];
-		bs[8] = head[7];
-		bs[9] = head[8];
-		bs[10] = head[9];
-		
-		int i = 1;
-		for (; i < 11; ++i) {
-			sum += (int)(bs[i]) & 0xFF;
-		}
-		
-		for (; buffer.hasRemaining(); ++i) {
-			byte b = buffer.get();
-			bs[i] = b;
-			sum += ((int)b) & 0xFF;
-		}
-		
-		bs[i] = (byte)(sum >> 8);
-		bs[i + 1] = (byte)sum;
-		
-		return new Secs1MessageBlock(bs);
-	}
-
 }

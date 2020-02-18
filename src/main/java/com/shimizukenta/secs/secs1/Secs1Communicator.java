@@ -39,9 +39,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		super(config);
 		
 		this.secs1Config = config;
-		
 		this.sendReplyManager = new Secs1SendReplyManager(this);
-		this.sendReplyManager.addListener(this::putReceiveDataMessage);
 	}
 	
 	protected Secs1CommunicatorConfig secs1Config() {
@@ -270,6 +268,15 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	}
 	
 	
+	public Secs1Message createSecs1Message(byte[] head) {
+		return createSecs1Message(head, Secs2.empty());
+	}
+	
+	public Secs1Message createSecs1Message(byte[] head, Secs2 body) {
+		return new Secs1Message(head, body);
+	}
+	
+	
 	private final AtomicInteger autoNumber = new AtomicInteger();
 	
 	@Override
@@ -304,7 +311,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			head[2] |= (byte)0x80;
 		}
 		
-		return send(new Secs1Message(head, secs2)).map(msg -> (SecsMessage)msg);
+		return send(createSecs1Message(head, secs2)).map(msg -> (SecsMessage)msg);
 	}
 	
 	@Override
@@ -338,7 +345,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			head[2] |= (byte)0x80;
 		}
 		
-		return send(new Secs1Message(head, secs2)).map(msg -> (SecsMessage)msg);
+		return send(createSecs1Message(head, secs2)).map(msg -> (SecsMessage)msg);
 	}
 	
 	
@@ -526,7 +533,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 				
 				sendByte(ACK);
 				
-				sendReplyManager.sended(block);
+				sendReplyManager.received(block);
 				
 				if ( ! block.ebit() ) {
 					
@@ -547,7 +554,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 						
 					} else {
 						
-						notifyLog(new SecsLog("Wait next presentBlock, T4-timeout", block));
+						notifyLog(new SecsLog("Wait next Block, T4-timeout", block));
 					}
 				}
 				

@@ -70,11 +70,11 @@ public class Secs2List extends AbstractSecs2 {
 	}
 	
 	@Override
-	protected Secs2 get( LinkedList<Integer> list ) throws Secs2Exception {
+	protected AbstractSecs2 get( LinkedList<Integer> list ) throws Secs2Exception {
 		
 		if ( list.isEmpty() ) {
 			
-			return get();
+			return this;
 			
 		} else {
 			

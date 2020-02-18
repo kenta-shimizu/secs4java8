@@ -3,37 +3,41 @@ package com.shimizukenta.secs.secs1;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.SecsException;
+import com.shimizukenta.secs.SecsLog;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
-import com.shimizukenta.secs.secs2.Secs2BuildException;
-import com.shimizukenta.secs.secs2.Secs2ByteBuffersBuilder;
+import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class Secs1SendReplyManager {
 	
 	private final Collection<Pack> packs = new ArrayList<>();
-	private final BlockingQueue<Secs1MessageBlock> blockQueue = new LinkedBlockingQueue<>();
+	private final BlockingQueue<Secs1MessageBlock> sendBlockQueue = new LinkedBlockingQueue<>();
+	private final LinkedList<Secs1MessageBlock> recvBlocks = new LinkedList<>();
+	
+	private final ReplyStatus resetTimerStatus;
+	private final ReplyStatus terminateStatus;
 	
 	private final Secs1Communicator parent;
 	
 	protected Secs1SendReplyManager(Secs1Communicator parent) {
 		this.parent = parent;
-	}
-	
-	private final Collection<Secs1MessageReceiveListener> listeners = new CopyOnWriteArrayList<>();
-	
-	public boolean addListener(Secs1MessageReceiveListener listener) {
-		return listeners.add(listener);
+		
+		this.resetTimerStatus = new ReplyStatus();
+		this.resetTimerStatus.resetTimer = true;
+		
+		this.terminateStatus = new ReplyStatus();
+		this.terminateStatus.terminate = true;
 	}
 	
 	public Optional<Secs1Message> send(Secs1Message msg)
@@ -129,14 +133,11 @@ public class Secs1SendReplyManager {
 		
 	}
 	
+	
 	private Secs1Message reply(Pack p)
 			throws SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
-		
-		//TODO
-		//resetTImeout
-		
-		Collection<Callable<Secs1Message>> tasks = Arrays.asList(
+		Collection<Callable<ReplyStatus>> tasks = Arrays.asList(
 				() -> {
 					
 					try {
@@ -144,7 +145,7 @@ public class Secs1SendReplyManager {
 							for ( ;; ) {
 								Secs1Message reply = p.replyMsg();
 								if ( reply != null ) {
-									return reply;
+									return new ReplyStatus(reply);
 								}
 								packs.wait();
 							}
@@ -153,7 +154,20 @@ public class Secs1SendReplyManager {
 					catch ( InterruptedException ignore ) {
 					}
 					
-					return null;
+					return terminateStatus;
+				},
+				() -> {
+					
+					try {
+						synchronized (resetTimerStatus) {
+							resetTimerStatus.wait();
+							return resetTimerStatus;
+						}
+					}
+					catch ( InterruptedException ignore ) {
+					}
+					
+					return terminateStatus;
 				},
 				() -> {
 					
@@ -170,18 +184,26 @@ public class Secs1SendReplyManager {
 					catch ( InterruptedException ignore ) {
 					}
 					
-					return null;
+					return terminateStatus;
 				});
 		
 		try {
-			long t = (long)(parent.secs1Config().timeout().t3() * 1000.0F);
-			Secs1Message reply = parent.executorService().invokeAny(tasks, t, TimeUnit.MILLISECONDS);
 			
-			if ( reply == null ) {
-				throw new Secs1DetectTerminateException(p.primaryMsg());
+			for ( ;; ) {
+				
+				long t = (long)(parent.secs1Config().timeout().t3() * 1000.0F);
+				ReplyStatus r = parent.executorService().invokeAny(tasks, t, TimeUnit.MILLISECONDS);
+				
+				if ( r.resetTimer() ) {
+					continue;
+				}
+				
+				if ( r.terminate() ) {
+					throw new Secs1DetectTerminateException(p.primaryMsg());
+				}
+				
+				return r.reply();
 			}
-			
-			return reply;
 		}
 		catch ( TimeoutException e ) {
 			throw new Secs1TimeoutT3Exception(p.primaryMsg(), e);
@@ -192,7 +214,7 @@ public class Secs1SendReplyManager {
 	}
 	
 	public Secs1MessageBlock pollBlock() {
-		return blockQueue.poll();
+		return sendBlockQueue.poll();
 	}
 	
 	private void put(Secs1Message msg) {
@@ -205,18 +227,17 @@ public class Secs1SendReplyManager {
 				if ( p.key().equals(key) ) {
 					p.put(msg);
 					packs.notifyAll();
+					return;
 				}
 			}
-			
-			listeners.forEach(lstnr -> {
-				lstnr.receive(msg);
-			});
 		}
+		
+		parent.putReceiveDataMessage(msg);
 	}
 	
 	public void clear() {
 		synchronized ( packs ) {
-			blockQueue.clear();
+			sendBlockQueue.clear();
 			packs.clear();
 			packs.notifyAll();
 		}
@@ -226,25 +247,14 @@ public class Secs1SendReplyManager {
 		
 		synchronized ( packs ) {
 			
-			try {
-				Secs2ByteBuffersBuilder bb = Secs2ByteBuffersBuilder.build(244, msg.secs2());
-				
-				if ( bb.blocks() > 0x7FFF) {
-					throw new Secs1TooBigSendMessageException(msg);
-				}
-				
-				List<Secs1MessageBlock> blocks = Secs1MessageBlock.buildBlocks(msg.header10Bytes(), bb.getByteBuffers());
-				
-				Pack p = new Pack(msg);
-				packs.add(p);
-				
-				blocks.forEach(blockQueue::offer);
-				
-				return p;
-			}
-			catch (Secs2BuildException e) {
-				throw new Secs1SendMessageException(msg, e);
-			}
+			List<Secs1MessageBlock> blocks = Secs1MessageBlockConverter.toBlocks(msg);
+			
+			Pack p = new Pack(msg);
+			packs.add(p);
+			
+			blocks.forEach(sendBlockQueue::offer);
+			
+			return p;
 		}
 	}
 	
@@ -283,7 +293,7 @@ public class Secs1SendReplyManager {
 				}
 			}
 			
-			blockQueue.removeIf(q -> q.systemBytesKey().equals(key));
+			sendBlockQueue.removeIf(q -> q.systemBytesKey().equals(key));
 			
 			packs.notifyAll();
 		}
@@ -291,16 +301,49 @@ public class Secs1SendReplyManager {
 	
 	public void received(Secs1MessageBlock block) {
 		
-		if ( block.ebit() ) {
+		if ( recvBlocks.isEmpty() ) {
 			
-			//TOODO
+			if ( block.isFirst() ) {
+				recvBlocks.add(block);
+			}
 			
 		} else {
 			
-			//TODO
+			Secs1MessageBlock prevBlock = recvBlocks.getLast();
 			
-			//resetTimerT3
+			if ( prevBlock.sameSystemBytes(block) ) {
+				
+				if ( prevBlock.isNextBlock(block) ) {
+					recvBlocks.add(block);
+				}
+				
+			} else {
+				
+				if ( block.isFirst() ) {
+					
+					recvBlocks.clear();
+					recvBlocks.add(block);
+				}
+			}
+		}
+		
+		if ( block.ebit() ) {
 			
+			try {
+				Secs1Message msg = Secs1MessageBlockConverter.toSecs1Message(recvBlocks);
+				put(msg);
+			}
+			catch ( Secs2Exception e ) {
+				parent.notifyLog(new SecsLog(e));
+			}
+			
+			recvBlocks.clear();
+			
+		} else {
+			
+			synchronized ( resetTimerStatus ) {
+				resetTimerStatus.notifyAll();
+			}
 		}
 	}
 	
@@ -310,7 +353,6 @@ public class Secs1SendReplyManager {
 		private final Integer key;
 		private Secs1Message reply;
 		private boolean sended;
-		private boolean timeT3Reset;
 		private Exception failedCause;
 		
 		public Pack(Secs1Message primaryMsg) {
@@ -318,7 +360,6 @@ public class Secs1SendReplyManager {
 			this.key = primaryMsg.systemBytesKey();
 			this.reply = null;
 			this.sended = false;
-			this.timeT3Reset = false;
 			this.failedCause = null;
 		}
 		
@@ -378,6 +419,35 @@ public class Secs1SendReplyManager {
 			} else {
 				return false;
 			}
+		}
+	}
+	
+	private class ReplyStatus {
+		
+		private Secs1Message reply;
+		private boolean resetTimer;
+		private boolean terminate;
+		
+		public ReplyStatus() {
+			this(null);
+		}
+		
+		public ReplyStatus(Secs1Message msg) {
+			reply = msg;
+			resetTimer = false;
+			terminate = false;
+		}
+		
+		public Secs1Message reply() {
+			return reply;
+		}
+		
+		public boolean resetTimer() {
+			return resetTimer;
+		}
+		
+		public boolean terminate() {
+			return terminate;
 		}
 	}
 	

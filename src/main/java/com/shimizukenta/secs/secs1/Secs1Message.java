@@ -1,7 +1,6 @@
 package com.shimizukenta.secs.secs1;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 import com.shimizukenta.secs.AbstractSecsMessage;
@@ -83,12 +82,4 @@ public class Secs1Message extends AbstractSecsMessage {
 		
 		return sb.append(".").toString();
 	}
-	
-	public static Secs1Message create(List<Secs1MessageBlock> blocks) {
-		
-		//TODO
-		
-		return null;
-	}
-
 }

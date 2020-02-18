@@ -2,7 +2,6 @@ package com.shimizukenta.secs.secs2;
 
 import java.math.BigInteger;
 import java.util.LinkedList;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public abstract class AbstractSecs2 implements Secs2 {
@@ -44,8 +43,9 @@ public abstract class AbstractSecs2 implements Secs2 {
 	
 	
 	private static LinkedList<Integer> createLinkedList(int... indices) {
-		return IntStream.of(indices).boxed()
-				.collect(Collectors.toCollection(LinkedList<Integer>::new));
+		LinkedList<Integer> ll = new LinkedList<>();
+		IntStream.of(indices).boxed().forEach(ll::add);
+		return ll;
 	}
 	
 	@Override
@@ -58,9 +58,9 @@ public abstract class AbstractSecs2 implements Secs2 {
 		return get(createLinkedList(indices));
 	}
 	
-	protected Secs2 get(LinkedList<Integer> list) throws Secs2Exception {
+	protected AbstractSecs2 get(LinkedList<Integer> list) throws Secs2Exception {
 		if ( list.isEmpty() ) {
-			return get();
+			return this;
 		} else {
 			throw new Secs2IrregalDataFormatException("Not Secs2List");
 		}
