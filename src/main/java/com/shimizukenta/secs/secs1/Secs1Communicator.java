@@ -1,12 +1,18 @@
 package com.shimizukenta.secs.secs1;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.shimizukenta.secs.AbstractSecsCommunicator;
@@ -102,8 +108,8 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	/* Receive Message Queue */
 	private final BlockingQueue<Secs1Message> recvDataMsgQueue = new LinkedBlockingQueue<>();
 	
-	protected void putReceiveDataMessage(Secs1Message msg) {
-		recvDataMsgQueue.offer(msg);
+	protected void putReceiveDataMessage(Secs1Message msg) throws InterruptedException {
+		recvDataMsgQueue.put(msg);
 	}
 	
 	private final Runnable taskRecvMsg = new Runnable() {
@@ -222,20 +228,12 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		return pollByte((long)(timeout * 1000.0F), TimeUnit.MILLISECONDS);
 	}
 	
-	private Optional<Byte> pollByteTx(byte[] request, float timeout) throws InterruptedException {
-		return pollByte(request, (long)(timeout * 1000.0F), TimeUnit.MILLISECONDS);
-	}
-	
 	private Optional<Byte> pollByteT1() throws InterruptedException {
 		return pollByteTx(secs1Config.timeout().t1());
 	}
 	
 	private Optional<Byte> pollByteT2() throws InterruptedException {
 		return pollByteTx(secs1Config.timeout().t2());
-	}
-	
-	private Optional<Byte> pollByteT2(byte[] request) throws InterruptedException {
-		return pollByteTx(request, secs1Config.timeout().t2());
 	}
 	
 	private Optional<Byte> pollByteT4() throws InterruptedException {
@@ -378,7 +376,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 						
 						if ( presentBlock == null ) {
 							
-							Optional<Byte> op = pollByte(new byte[]{ENQ}, 10L, TimeUnit.MILLISECONDS);
+							Optional<Byte> op = pollByte(10L, TimeUnit.MILLISECONDS);
 							
 							if ( op.isPresent() ) {
 								
@@ -406,28 +404,64 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			}
 			catch ( InterruptedException ignore ) {
 			}
+			catch ( RejectedExecutionException e ) {
+				if ( ! isClosed() ) {
+					throw e;
+				}
+			}
 		}
+		
+		private final byte[] request = new byte[] {ENQ, EOT};
 		
 		private PollCircuitControl pollCircuitControl() throws InterruptedException {
 			
-			byte[] request = secs1Config.isMaster() ? new byte[]{EOT} : new byte[]{ENQ, EOT};
-			
-			return pollByteT2(request)
-					.map(b -> {
-						if ( b == ENQ ) {
-							return PollCircuitControl.RX;
-						} else if ( b == EOT ) {
-							return PollCircuitControl.TX;
-						} else {
-							return PollCircuitControl.RETRY;
+			Collection<Callable<PollCircuitControl>> tasks = Arrays.asList(
+					() -> {
+						
+						try {
+							long t = (long)(secs1Config().timeout().t2() * 2000.0F);
+							
+							for ( ;; ) {
+								
+								Optional<Byte> op = pollByte(request, t, TimeUnit.MILLISECONDS);
+								
+								if ( op.isPresent() ) {
+									
+									byte b = op.get();
+									
+									if ( ! secs1Config().isMaster() && b == ENQ ) {
+										return PollCircuitControl.RX;
+									}
+									
+									if ( b == EOT ) {
+										return PollCircuitControl.TX;
+									}
+								}
+							}
 						}
-					})
-					.orElse(PollCircuitControl.RETRY);
+						catch ( InterruptedException ignore ) {
+						}
+						
+						return PollCircuitControl.RETRY;
+					}
+					);
+			
+			try {
+				long t = (long)(secs1Config().timeout().t2() * 1000.0F);
+				return executorService().invokeAny(tasks, t, TimeUnit.MILLISECONDS);
+			}
+			catch ( TimeoutException giveup ) {
+			}
+			catch ( ExecutionException e ) {
+				notifyLog(new SecsLog(e));
+			}
+			
+			return PollCircuitControl.RETRY;
 		}
 		
 		private void circuitControl() throws SecsException, InterruptedException {
 			
-			for ( int counter = 0 ; counter < secs1Config.retry() ; ) {
+			for ( int counter = 0 ; counter <= secs1Config.retry() ; ) {
 				
 				sendByte(ENQ);
 				
@@ -592,8 +626,6 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 				if ( b == ACK ) {
 					
 					sendReplyManager.sended(presentBlock);
-					
-					notifyLog(new SecsLog("Secs1Communicator#sendBlock completed", presentBlock));
 					
 					this.presentBlock = null;
 					

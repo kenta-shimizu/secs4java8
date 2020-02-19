@@ -192,9 +192,9 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 	
 	private final BlockingQueue<Byte> byteQueue = new LinkedBlockingQueue<>();
 	
-	protected void putByte(ByteBuffer buffer) {
+	protected void putByte(ByteBuffer buffer) throws InterruptedException {
 		while ( buffer.hasRemaining() ) {
-			byteQueue.offer(buffer.get());
+			byteQueue.put(buffer.get());
 		}
 	}
 
@@ -235,13 +235,17 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 		});
 		
 		try {
+			
 			Byte b = executorService().invokeAny(tasks, timeout, unit);
 			
 			if ( b != null ) {
 				return Optional.of(b);
 			}
 		}
-		catch ( TimeoutException | ExecutionException e ) {
+		catch ( TimeoutException giveup ) {
+		}
+		catch ( ExecutionException e ) {
+			notifyLog(new SecsLog(e));
 		}
 		
 		return Optional.empty();

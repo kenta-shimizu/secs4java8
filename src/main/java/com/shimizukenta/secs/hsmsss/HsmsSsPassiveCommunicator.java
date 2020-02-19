@@ -13,6 +13,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -243,6 +244,12 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 					catch ( InterruptedException ignore ) {
 						return null;
 					}
+					catch ( RejectedExecutionException e ) {
+						if ( ! isClosed() ) {
+							throw e;
+						}
+						return null;
+					}
 					catch ( ExecutionException e ) {
 						notifyLog(new SecsLog(e));
 						return null;
@@ -322,6 +329,11 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 					}
 					catch ( InterruptedException ignore ) {
 					}
+					catch ( RejectedExecutionException e ) {
+						if ( ! isClosed() ) {
+							throw e;
+						}
+					}
 					catch ( ExecutionException e ) {
 						notifyLog(new SecsLog(e));
 					}
@@ -336,6 +348,11 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 			executorService().invokeAny(tasks);
 		}
 		catch ( InterruptedException ignore ) {
+		}
+		catch ( RejectedExecutionException e ) {
+			if ( ! isClosed() ) {
+				throw e;
+			}
 		}
 		catch ( ExecutionException e ) {
 			notifyLog(new SecsLog(e));

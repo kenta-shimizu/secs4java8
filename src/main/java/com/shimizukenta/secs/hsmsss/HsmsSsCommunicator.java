@@ -149,8 +149,8 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	/* Receive Message Queue */
 	private final BlockingQueue<HsmsSsMessage> recvDataMsgQueue = new LinkedBlockingQueue<>();
 	
-	protected void putReceiveDataMessage(HsmsSsMessage msg) {
-		recvDataMsgQueue.offer(msg);
+	protected void putReceiveDataMessage(HsmsSsMessage msg) throws InterruptedException {
+		recvDataMsgQueue.put(msg);
 	}
 	
 	private final Runnable taskRecvMsg = new Runnable() {

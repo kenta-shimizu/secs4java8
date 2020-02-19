@@ -1,9 +1,10 @@
-package com.shimizukenta.testutil.tcpipadapter;
+package com.shimizukenta.testutil;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.net.StandardSocketOptions;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
@@ -19,18 +20,45 @@ public class TcpIpAdapter implements Closeable {
 	private final Inner a;
 	private final Inner b;
 	
+	private boolean opened;
+	private boolean closed;
+	
 	public TcpIpAdapter(SocketAddress a, SocketAddress b) {
 		this.a = new Inner(a);
 		this.b = new Inner(b);
+		this.opened = false;
+		this.closed = false;
 	}
 	
 	public void open() throws IOException {
+		
+		synchronized (this) {
+			if ( this.closed ) {
+				throw new IOException("Already closed");
+			}
+			
+			if ( this.opened ) {
+				throw new IOException("Already opened");
+			}
+			
+			this.opened = true;
+		}
+		
 		this.a.open(this.b);
 		this.b.open(this.a);
 	}
 
 	@Override
 	public void close() throws IOException {
+		
+		synchronized ( this ) {
+			
+			if ( this.closed ) {
+				return;
+			}
+			
+			this.closed = true;
+		}
 		
 		IOException ioExcept = null;
 		
@@ -84,16 +112,20 @@ public class TcpIpAdapter implements Closeable {
 		
 		private final SocketAddress addr;
 		private AsynchronousServerSocketChannel server;
-		private Collection<AsynchronousSocketChannel> channels = new CopyOnWriteArrayList<>();
+		private final Collection<AsynchronousSocketChannel> channels = new CopyOnWriteArrayList<>();
+		
+		private boolean closed;
 		
 		public Inner(SocketAddress socketAddress) {
 			this.addr = socketAddress;
 			this.server = null;
+			this.closed = false;
 		}
 		
 		public void open(Inner another) throws IOException {
 			
 			server = AsynchronousServerSocketChannel.open();
+			server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 			server.bind(addr);
 			
 			server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
@@ -137,7 +169,13 @@ public class TcpIpAdapter implements Closeable {
 					catch ( InterruptedException ignore ) {
 					}
 					catch ( ExecutionException e ) {
-						e.printStackTrace();
+						
+						synchronized ( this ) {
+							
+							if ( ! closed ) {
+								e.printStackTrace();
+							}
+						}
 					}
 					finally {
 						
@@ -149,12 +187,22 @@ public class TcpIpAdapter implements Closeable {
 
 				@Override
 				public void failed(Throwable t, Void attachment) {
-					t.printStackTrace();
+					
+					synchronized ( this ) {
+						
+						if ( ! closed ) {
+							t.printStackTrace();
+						}
+					}
 				}
 			});
 		}
 		
 		public void close() throws IOException {
+			
+			synchronized ( this ) {
+				closed = true;
+			}
 			
 			channels.forEach(this::closeChannel);
 			

@@ -48,10 +48,10 @@ public class Secs1SendReplyManager {
 		
 		try {
 			
+			parent.notifyLog(new SecsLog("Secs1-Message entry-send", msg));
 			parent.notifyTrySendMessagePassThrough(msg);
 			waitUntilSended(p);
 			parent.notifySendedMessagePassThrough(msg);
-			parent.notifyLog(new SecsLog("Sended Secs1-Message", msg));
 			
 			if ( msg.wbit() ) {
 				
@@ -91,9 +91,8 @@ public class Secs1SendReplyManager {
 					try {
 						synchronized ( packs ) {
 							for ( ;; ) {
-								Exception e = p.failedCause();
-								if ( e != null ) {
-									throw e;
+								if ( p.failedCause() != null ) {
+									break;
 								}
 								packs.wait();
 							}
@@ -102,7 +101,7 @@ public class Secs1SendReplyManager {
 					catch ( InterruptedException ignore ) {
 					}
 					
-					return null;
+					return p;
 				},
 				() -> {
 					try {
@@ -126,6 +125,10 @@ public class Secs1SendReplyManager {
 			
 			if ( pp == null ) {
 				throw new Secs1DetectTerminateException(p.primaryMsg());
+			}
+			
+			if ( pp.failedCause() != null ) {
+				throw new Secs1SendMessageException(pp.primaryMsg(), pp.failedCause());
 			}
 		}
 		catch ( ExecutionException e ) {
@@ -218,7 +221,7 @@ public class Secs1SendReplyManager {
 		return sendBlockQueue.poll();
 	}
 	
-	private void put(Secs1Message msg) {
+	private void put(Secs1Message msg) throws InterruptedException {
 		
 		final Integer key = msg.systemBytesKey();
 		
@@ -267,6 +270,8 @@ public class Secs1SendReplyManager {
 	
 	public void sended(Secs1MessageBlock block) {
 		
+		parent.notifyLog(new SecsLog("Secs1-Message-Block sended", block));
+		
 		if ( block.ebit() ) {
 			final Integer key = block.systemBytesKey();
 			
@@ -300,12 +305,19 @@ public class Secs1SendReplyManager {
 		}
 	}
 	
-	public void received(Secs1MessageBlock block) {
+	public void received(Secs1MessageBlock block) throws InterruptedException {
+		
+		parent.notifyLog(new SecsLog("Secs1-Message-Block received", block));
 		
 		if ( recvBlocks.isEmpty() ) {
 			
 			if ( block.isFirst() ) {
+				
 				recvBlocks.add(block);
+				
+			} else {
+				
+				return;
 			}
 			
 		} else {
@@ -315,7 +327,12 @@ public class Secs1SendReplyManager {
 			if ( prevBlock.sameSystemBytes(block) ) {
 				
 				if ( prevBlock.isNextBlock(block) ) {
+					
 					recvBlocks.add(block);
+					
+				} else {
+					
+					return;
 				}
 				
 			} else {
@@ -324,6 +341,10 @@ public class Secs1SendReplyManager {
 					
 					recvBlocks.clear();
 					recvBlocks.add(block);
+					
+				} else {
+					
+					return;
 				}
 			}
 		}
@@ -332,7 +353,7 @@ public class Secs1SendReplyManager {
 			
 			try {
 				Secs1Message msg = Secs1MessageBlockConverter.toSecs1Message(recvBlocks);
-				parent.notifyLog(new SecsLog("Received Secs1-Message", msg));
+				parent.notifyLog(new SecsLog("Secs1-Message received", msg));
 				put(msg);
 			}
 			catch ( Secs2Exception e ) {

@@ -11,6 +11,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import com.shimizukenta.secs.SecsException;
@@ -186,6 +187,11 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 										}
 										catch ( InterruptedException ignore ) {
 										}
+										catch ( RejectedExecutionException e ) {
+											if ( ! isClosed() ) {
+												throw e;
+											}
+										}
 										
 										return null;
 									});
@@ -196,6 +202,11 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 							notifyLog(new SecsLog(e));
 						}
 						catch ( InterruptedException ignore ) {
+						}
+						catch ( RejectedExecutionException e ) {
+							if ( ! isClosed() ) {
+								throw e;
+							}
 						}
 						finally {
 							
