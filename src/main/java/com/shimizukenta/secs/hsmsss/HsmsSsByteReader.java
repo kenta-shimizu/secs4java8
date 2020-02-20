@@ -82,7 +82,7 @@ public class HsmsSsByteReader implements Callable<Object> {
 					lstnr.receive(msg);
 				});
 				
-				parent.notifyReceiveMessagePassThrough(msg);
+				parent.putReceiveMessagePassThrough(msg);
 				parent.notifyLog(new SecsLog("Received HsmsSs-Message", msg));
 			}
 		}
@@ -115,7 +115,8 @@ public class HsmsSsByteReader implements Callable<Object> {
 			}
 			
 			if ( r < 0 ) {
-				throw new HsmsSsDetectTerminateException();
+				String errMsg = "protocol: " + parent.hsmsSsConfig().protocol() + ", address: " + parent.hsmsSsConfig().socketAddress();
+				throw new HsmsSsDetectTerminateException(errMsg);
 			}
 			
 			return r;
@@ -125,7 +126,15 @@ public class HsmsSsByteReader implements Callable<Object> {
 			throw new HsmsSsTimeoutT8Exception(e);
 		}
 		catch ( ExecutionException e ) {
-			throw new HsmsSsDetectTerminateException(e);
+			
+			Throwable t = e.getCause();
+			
+			if ( t instanceof RuntimeException ) {
+				throw (RuntimeException)t;
+			}
+			
+			String errMsg = "protocol: " + parent.hsmsSsConfig().protocol() + ", address: " + parent.hsmsSsConfig().socketAddress();
+			throw new HsmsSsDetectTerminateException(errMsg, e);
 		}
 		catch ( InterruptedException e ) {
 			f.cancel(true);

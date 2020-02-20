@@ -112,6 +112,11 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		recvDataMsgQueue.put(msg);
 	}
 	
+	@Override
+	protected void notifyReceiveMessage(SecsMessage msg) {
+		throw new UnsupportedOperationException("use #putReceiveDataMessage");
+	}
+	
 	private final Runnable taskRecvMsg = new Runnable() {
 
 		@Override
@@ -119,7 +124,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			
 			try {
 				for ( ;; ) {
-					notifyReceiveMessage(recvDataMsgQueue.take());
+					Secs1Communicator.super.notifyReceiveMessage(recvDataMsgQueue.take());
 				}
 			}
 			catch ( InterruptedException ignore ) {
@@ -152,11 +157,15 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	
 	
 	/* trySendMsgPassThroughQueue */
-	private final BlockingQueue<SecsMessage> trySendMsgPassThroughQueue = new LinkedBlockingQueue<>();
+	private final BlockingQueue<Secs1Message> trySendMsgPassThroughQueue = new LinkedBlockingQueue<>();
 	
 	@Override
 	protected void notifyTrySendMessagePassThrough(SecsMessage msg) {
-		trySendMsgPassThroughQueue.offer(msg);
+		throw new UnsupportedOperationException("use #putTrySendMessagePassThrough");
+	}
+	
+	protected void putTrySendMessagePassThrough(Secs1Message msg) throws InterruptedException {
+		trySendMsgPassThroughQueue.put(msg);
 	}
 	
 	private final Runnable taskTrySendMsgPassThroughQueue = new Runnable() {
@@ -175,11 +184,15 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	
 	
 	/* sendedPassThroughQueue */
-	private final BlockingQueue<SecsMessage> sendedMsgPassThroughQueue = new LinkedBlockingQueue<>();
+	private final BlockingQueue<Secs1Message> sendedMsgPassThroughQueue = new LinkedBlockingQueue<>();
 	
 	@Override
 	protected void notifySendedMessagePassThrough(SecsMessage msg) {
-		sendedMsgPassThroughQueue.offer(msg);
+		throw new UnsupportedOperationException("use #putSendedMessagePassThrough");
+	}
+	
+	protected void putSendedMessagePassThrough(Secs1Message msg) throws InterruptedException {
+		sendedMsgPassThroughQueue.put(msg);
 	}
 	
 	private final Runnable taskSendedMsgPassThroughQueue = new Runnable() {
@@ -198,11 +211,15 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 
 	
 	/* sendedPassThroughQueue */
-	private final BlockingQueue<SecsMessage> recvMsgPassThroughQueue = new LinkedBlockingQueue<>();
+	private final BlockingQueue<Secs1Message> recvMsgPassThroughQueue = new LinkedBlockingQueue<>();
 	
 	@Override
 	protected void notifyReceiveMessagePassThrough(SecsMessage msg) {
-		recvMsgPassThroughQueue.offer(msg);
+		throw new UnsupportedOperationException("use #putReceiveMessagePassThrough");
+	}
+	
+	protected void putReceiveMessagePassThrough(Secs1Message msg) throws InterruptedException {
+		recvMsgPassThroughQueue.put(msg);
 	}
 	
 	private final Runnable taskRecvMsgPassThroughQueue = new Runnable() {
@@ -453,6 +470,13 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			catch ( TimeoutException giveup ) {
 			}
 			catch ( ExecutionException e ) {
+				
+				Throwable t = e.getCause();
+				
+				if ( t instanceof RuntimeException ) {
+					throw (RuntimeException)t;
+				}
+				
 				notifyLog(new SecsLog(e));
 			}
 			

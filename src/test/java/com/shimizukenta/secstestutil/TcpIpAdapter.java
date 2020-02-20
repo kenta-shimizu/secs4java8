@@ -1,4 +1,4 @@
-package com.shimizukenta.testutil;
+package com.shimizukenta.secstestutil;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -79,6 +79,27 @@ public class TcpIpAdapter implements Closeable {
 		if ( ioExcept != null ) {
 			throw ioExcept;
 		}
+	}
+	
+	public static TcpIpAdapter open(SocketAddress a, SocketAddress b) throws IOException {
+		
+		final TcpIpAdapter inst = new TcpIpAdapter(a, b);
+		
+		try {
+			inst.open();
+		}
+		catch ( IOException e ) {
+			
+			try {
+				inst.close();
+			}
+			catch ( IOException giveup ) {
+			}
+			
+			throw e;
+		}
+		
+		return inst;
 	}
 	
 	public static void main(String[] args) {

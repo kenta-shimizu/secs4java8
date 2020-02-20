@@ -1,4 +1,4 @@
-package com.shimizukenta.testutil;
+package com.shimizukenta.secstestutil;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -9,18 +9,24 @@ import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
 import com.shimizukenta.secs.hsmsss.HsmsSsMessage;
 import com.shimizukenta.secs.hsmsss.HsmsSsMessageType;
+import com.shimizukenta.secs.secs1.Secs1Communicator;
 import com.shimizukenta.secs.secs1.Secs1Message;
 import com.shimizukenta.secs.secs1.Secs1TooBigSendMessageException;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicator;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicatorConfig;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpNotConnectedException;
 
+/**
+ * 
+ * run like SH-2000
+ *
+ */
 public class Secs1OnTcpIpHsmsSsConverter implements Closeable {
 	
-	public static final byte REJECT_BY_OVERFLOW = (byte)0xFD;
-	public static final byte REJECT_BY_NOT_CONNECT = (byte)0xFE;
+	public static final byte REJECT_BY_OVERFLOW = (byte)0x80;
+	public static final byte REJECT_BY_NOT_CONNECT = (byte)0x81;
 	
-	private final Secs1OnTcpIpCommunicator secs1;
+	private final Secs1Communicator secs1;
 	private final HsmsSsCommunicator hsmsSs;
 	private boolean closed;
 	
@@ -115,18 +121,18 @@ public class Secs1OnTcpIpHsmsSsConverter implements Closeable {
 		
 		byte[] ref = msg.header10Bytes();
 		
-		byte[] head = new byte[10];
-		
-		head[0] = ref[0];
-		head[1] = ref[1];
-		head[2] = ref[2];
-		head[3] = ref[3];
-		head[4] = (byte)0x0;
-		head[5] = (byte)0x0;
-		head[6] = ref[6];
-		head[7] = ref[7];
-		head[8] = ref[8];
-		head[9] = ref[9];
+		byte[] head = new byte[] {
+				ref[0],
+				ref[1],
+				ref[2],
+				ref[3],
+				(byte)0x0,
+				(byte)0x0,
+				ref[6],
+				ref[7],
+				ref[8],
+				ref[9]
+		};
 		
 		if ( secs1.isEquip() ) {
 			head[0] |= (byte)0x80;
@@ -139,18 +145,18 @@ public class Secs1OnTcpIpHsmsSsConverter implements Closeable {
 		
 		byte[] ref = msg.header10Bytes();
 		
-		byte[] head = new byte[10];
-		
-		head[0] = (byte)(ref[0] & 0x7F);
-		head[1] = ref[1];
-		head[2] = ref[2];
-		head[3] = ref[3];
-		head[4] = (byte)0x0;
-		head[5] = (byte)0x0;
-		head[6] = ref[6];
-		head[7] = ref[7];
-		head[8] = ref[8];
-		head[9] = ref[9];
+		byte[] head = new byte[] {
+				(byte)(ref[0] & 0x7F),
+				ref[1],
+				ref[2],
+				ref[3],
+				(byte)0x0,
+				(byte)0x0,
+				ref[6],
+				ref[7],
+				ref[8],
+				ref[9]
+		};
 		
 		return head;
 	}
@@ -184,19 +190,19 @@ public class Secs1OnTcpIpHsmsSsConverter implements Closeable {
 		byte[] ref = primary.header10Bytes();
 		HsmsSsMessageType mt = HsmsSsMessageType.REJECT_REQ;
 		
-		byte[] head = new byte[10];
+		byte[] head = new byte[] {
+				(byte)0xFF,
+				(byte)0xFF,
+				(byte)0x0,
+				reason,
+				mt.pType(),
+				mt.sType(),
+				ref[6],
+				ref[7],
+				ref[8],
+				ref[9]
+		};
 		
-		head[0] = ref[0];
-		head[1] = ref[1];
-		head[2] = (byte)0x0;
-		head[3] = reason;
-		head[4] = mt.pType();
-		head[5] = mt.sType();
-		head[6] = ref[6];
-		head[7] = ref[7];
-		head[8] = ref[8];
-		head[9] = ref[9];
-
 		try {
 			hsmsSs.send(hsmsSs.createHsmsSsMessage(head));
 		}
@@ -205,4 +211,29 @@ public class Secs1OnTcpIpHsmsSsConverter implements Closeable {
 		catch ( SecsException giveup ) {
 		}
 	}
+	
+	public static Secs1OnTcpIpHsmsSsConverter open(
+			Secs1OnTcpIpCommunicatorConfig secs1Config,
+			HsmsSsCommunicatorConfig hsmsSsConfig)
+					throws IOException {
+		
+		final Secs1OnTcpIpHsmsSsConverter inst = new Secs1OnTcpIpHsmsSsConverter(secs1Config, hsmsSsConfig);
+		
+		try {
+			inst.open();
+		}
+		catch ( IOException e ) {
+			
+			try {
+				inst.close();
+			}
+			catch ( IOException giveup ) {
+			}
+			
+			throw e;
+		}
+		
+		return inst;
+	}
+	
 }

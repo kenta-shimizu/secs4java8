@@ -2,6 +2,7 @@ package com.shimizukenta.secs.hsmsss;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.Arrays;
@@ -37,7 +38,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 				for ( ;; ) {
 					activeLoop();
 					
-					sendReplyManager.reset();
+					sendReplyManager.clear();
 					
 					long t5 = (long)(hsmsSsConfig().timeout().t5() * 1000.0F);
 					TimeUnit.MILLISECONDS.sleep(t5);
@@ -183,6 +184,13 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 											executorService().invokeAny(selectTasks);
 										}
 										catch ( ExecutionException e ) {
+											
+											Throwable t = e.getCause();
+											
+											if ( t instanceof RuntimeException ) {
+												throw (RuntimeException)t;
+											}
+											
 											notifyLog(new SecsLog(e));
 										}
 										catch ( InterruptedException ignore ) {
@@ -199,11 +207,21 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 							executorService().invokeAny(tasks);
 						}
 						catch ( ExecutionException e ) {
-							notifyLog(new SecsLog(e));
+							
+							Throwable t = e.getCause();
+							
+							if ( t instanceof RuntimeException ) {
+								throw (RuntimeException)t;
+							}
+							
+							if ( ! (t instanceof AsynchronousCloseException) ) {
+								notifyLog(new SecsLog(e));
+							}
 						}
 						catch ( InterruptedException ignore ) {
 						}
 						catch ( RejectedExecutionException e ) {
+							
 							if ( ! isClosed() ) {
 								throw e;
 							}
@@ -238,7 +256,16 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 				}
 			}
 			finally {
-				removeChannel(channel);
+				
+				if ( removeChannel(channel) ) {
+					
+					try {
+						channel.shutdownOutput();
+					}
+					catch ( IOException giveup ) {
+					}
+				}
+				
 				notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
 			}
 		}

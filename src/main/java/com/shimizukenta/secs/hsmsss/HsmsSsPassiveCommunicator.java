@@ -251,6 +251,13 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 						return null;
 					}
 					catch ( ExecutionException e ) {
+						
+						Throwable t = e.getCause();
+						
+						if ( t instanceof RuntimeException ) {
+							throw (RuntimeException)t;
+						}
+						
 						notifyLog(new SecsLog(e));
 						return null;
 					}
@@ -335,6 +342,13 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 						}
 					}
 					catch ( ExecutionException e ) {
+						
+						Throwable t = e.getCause();
+						
+						if ( t instanceof RuntimeException ) {
+							throw (RuntimeException)t;
+						}
+						
 						notifyLog(new SecsLog(e));
 					}
 					finally {
@@ -355,11 +369,18 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 			}
 		}
 		catch ( ExecutionException e ) {
+			
+			Throwable t = e.getCause();
+			
+			if ( t instanceof RuntimeException ) {
+				throw (RuntimeException)t;
+			}
+			
 			notifyLog(new SecsLog(e));
 		}
 		finally {
 			
-			sendReplyManager.reset();
+			sendReplyManager.clear();
 			
 			removeChannel(channel);
 			

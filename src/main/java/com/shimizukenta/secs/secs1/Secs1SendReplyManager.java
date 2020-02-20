@@ -49,9 +49,9 @@ public class Secs1SendReplyManager {
 		try {
 			
 			parent.notifyLog(new SecsLog("Secs1-Message entry-send", msg));
-			parent.notifyTrySendMessagePassThrough(msg);
+			parent.putTrySendMessagePassThrough(msg);
 			waitUntilSended(p);
-			parent.notifySendedMessagePassThrough(msg);
+			parent.putSendedMessagePassThrough(msg);
 			
 			if ( msg.wbit() ) {
 				
@@ -132,6 +132,13 @@ public class Secs1SendReplyManager {
 			}
 		}
 		catch ( ExecutionException e ) {
+			
+			Throwable t = e.getCause();
+			
+			if ( t instanceof RuntimeException ) {
+				throw (RuntimeException)t;
+			}
+			
 			throw new Secs1SendMessageException(p.primaryMsg(), e.getCause());
 		}
 		
@@ -213,6 +220,13 @@ public class Secs1SendReplyManager {
 			throw new Secs1TimeoutT3Exception(p.primaryMsg(), e);
 		}
 		catch ( ExecutionException e ) {
+			
+			Throwable t = e.getCause();
+			
+			if ( t instanceof RuntimeException ) {
+				throw (RuntimeException)t;
+			}
+			
 			throw new SecsException(e);
 		}
 	}
@@ -251,7 +265,7 @@ public class Secs1SendReplyManager {
 		
 		synchronized ( packs ) {
 			
-			List<Secs1MessageBlock> blocks = Secs1MessageBlockConverter.toBlocks(msg);
+			List<Secs1MessageBlock> blocks = msg.toBlocks();
 			
 			Pack p = new Pack(msg);
 			packs.add(p);
@@ -353,6 +367,7 @@ public class Secs1SendReplyManager {
 			
 			try {
 				Secs1Message msg = Secs1MessageBlockConverter.toSecs1Message(recvBlocks);
+				parent.putReceiveMessagePassThrough(msg);
 				parent.notifyLog(new SecsLog("Secs1-Message received", msg));
 				put(msg);
 			}

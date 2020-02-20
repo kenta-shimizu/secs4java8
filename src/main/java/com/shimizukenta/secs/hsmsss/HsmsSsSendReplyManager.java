@@ -110,7 +110,7 @@ public class HsmsSsSendReplyManager {
 					throw new HsmsSsTooBigSendMessageException(msg);
 				}
 				
-				parent.notifyTrySendMessagePassThrough(msg);
+				parent.putTrySendMessagePassThrough(msg);
 				
 				{
 					ByteBuffer buffer = ByteBuffer.allocate(14);
@@ -130,10 +130,20 @@ public class HsmsSsSendReplyManager {
 					send(channel, buffer);
 				}
 				
-				parent.notifySendedMessagePassThrough(msg);
+				parent.putSendedMessagePassThrough(msg);
 				parent.notifyLog(new SecsLog("Sended HsmsSs-Message", msg));
 			}
-			catch ( Secs2BuildException | ExecutionException | HsmsSsDetectTerminateException e ) {
+			catch ( ExecutionException e ) {
+				
+				Throwable t = e.getCause();
+				
+				if ( t instanceof RuntimeException ) {
+					throw (RuntimeException)t;
+				}
+				
+				throw new HsmsSsSendMessageException(msg, e);
+			}
+			catch ( Secs2BuildException | HsmsSsDetectTerminateException e ) {
 				throw new HsmsSsSendMessageException(msg, e);
 			}
 		}
@@ -219,11 +229,18 @@ public class HsmsSsSendReplyManager {
 			return msg;
 		}
 		catch ( ExecutionException e ) {
+			
+			Throwable t = e.getCause();
+			
+			if ( t instanceof RuntimeException ) {
+				throw (RuntimeException)t;
+			}
+			
 			throw new SecsException(e);
 		}
 	}
 	
-	public void reset() {
+	public void clear() {
 		synchronized ( packs ) {
 			packs.clear();
 			packs.notifyAll();
