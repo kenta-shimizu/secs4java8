@@ -14,7 +14,7 @@ reconnect="--reconnect 5"
 sockets="${bind1} ${bind2} ${connect1}"
 timeouts="${rebind} ${reconnect}"
 
-p1="--device /dev/ttyUSB0"
+p1="--device /dev/ttyAMA0"
 p2="--baudrate 9600"
 p3="--bytesize 8"
 p4="--parity N"
