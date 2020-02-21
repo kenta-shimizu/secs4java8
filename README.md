@@ -68,7 +68,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
     SecsCommunicator secs1 = Secs1OnTcpIpCommunicator.open(config);
 ```
 
-[How to TCP/IP <-> RS232C convert sample](/src/main/raspi-python/TcpIpSerialConverter)
+    [How to TCP/IP <-> RS232C convert sample](/src/main/raspi-python/TcpIpSerialConverter)
 
 ## Send Primary-Message, and receive Reply-Message
 
