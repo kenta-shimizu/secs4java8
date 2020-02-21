@@ -9,7 +9,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Secs2List extends AbstractSecs2 {
-
+	
+	private static final long serialVersionUID = -2380901931225887256L;
+	
 	private static final Secs2Item secs2Item = Secs2Item.LIST;
 	
 	private static final String SPACE = "  ";

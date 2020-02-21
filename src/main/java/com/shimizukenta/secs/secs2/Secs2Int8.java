@@ -6,6 +6,8 @@ import java.util.List;
 
 public class Secs2Int8 extends Secs2BigInteger {
 	
+	private static final long serialVersionUID = 3193235846279817791L;
+	
 	private static final Secs2Item secs2Item = Secs2Item.INT8;
 
 	public Secs2Int8() {

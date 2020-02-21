@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.SecsException;
-import com.shimizukenta.secs.SecsLog;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.secs1.Secs1Communicator;
 import com.shimizukenta.secs.secs1.Secs1DetectTerminateException;
@@ -92,7 +91,7 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 						
 						String socketAddrString = socketAddr.toString();
 						
-						notifyLog(new SecsLog("Secs1OnTcpIpCommunicator#try-connect", socketAddrString));
+						notifyLog("Secs1OnTcpIpCommunicator#try-connect", socketAddrString);
 						
 						try {
 							ch.connect(socketAddr, null, new CompletionHandler<Void, Void>() {
@@ -108,7 +107,7 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 										
 										notifyCommunicatableStateChange(true);
 										
-										notifyLog(new SecsLog("Secs1OnTcpIpCommunicator#connected", ch));
+										notifyLog("Secs1OnTcpIpCommunicator#connected", ch);
 										
 										final ByteBuffer buffer = ByteBuffer.allocate(1024);
 										
@@ -146,7 +145,7 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 										}
 										
 										if ( ! (t instanceof AsynchronousCloseException) ) {
-											notifyLog(new SecsLog(e));
+											notifyLog(e);
 										}
 									}
 									finally {
@@ -163,7 +162,7 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 										catch ( IOException giveup ) {
 										}
 										
-										notifyLog(new SecsLog("Secs1OnTcpIpCommunicator#closed", socketAddrString));
+										notifyLog("Secs1OnTcpIpCommunicator#closed", socketAddrString);
 										
 										synchronized ( ch ) {
 											ch.notifyAll();
@@ -179,7 +178,7 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 											throw (RuntimeException)t;
 										}
 										
-										notifyLog(new SecsLog(t));
+										notifyLog(t);
 									}
 									finally {
 										
@@ -210,7 +209,7 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 						}
 					}
 					catch ( IOException e ) {
-						notifyLog(new SecsLog(e));
+						notifyLog(e);
 					}
 					
 					{
@@ -286,7 +285,7 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 				throw (RuntimeException)t;
 			}
 			
-			notifyLog(new SecsLog(e));
+			notifyLog(e);
 		}
 		
 		return Optional.empty();

@@ -1,6 +1,10 @@
 package com.shimizukenta.secs;
 
-public class SecsTimeout {
+import java.io.Serializable;
+
+public class SecsTimeout implements Serializable {
+	
+	private static final long serialVersionUID = -510498497880412809L;
 	
 	private float t1;
 	private float t2;

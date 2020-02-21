@@ -39,6 +39,14 @@ public class Secs1OnTcpIpHsmsSsConverter implements Closeable {
 		this.closed = false;
 	}
 	
+	public Secs1OnTcpIpHsmsSsConverter(
+			HsmsSsCommunicatorConfig hsmsSsConfig,
+			Secs1OnTcpIpCommunicatorConfig secs1Config
+			) {
+		
+		this(secs1Config, hsmsSsConfig);
+	}
+	
 	public void open() throws IOException {
 		
 		synchronized ( this ) {
@@ -212,20 +220,30 @@ public class Secs1OnTcpIpHsmsSsConverter implements Closeable {
 		}
 	}
 	
-	public static Secs1OnTcpIpHsmsSsConverter open(
+	public static Secs1OnTcpIpHsmsSsConverter newInstance(
 			Secs1OnTcpIpCommunicatorConfig secs1Config,
-			HsmsSsCommunicatorConfig hsmsSsConfig)
-					throws IOException {
+			HsmsSsCommunicatorConfig hsmsSsConfig) {
 		
-		final Secs1OnTcpIpHsmsSsConverter inst = new Secs1OnTcpIpHsmsSsConverter(secs1Config, hsmsSsConfig);
+		return new Secs1OnTcpIpHsmsSsConverter(secs1Config, hsmsSsConfig);
+	}
+	
+	public static Secs1OnTcpIpHsmsSsConverter newInstance(
+			HsmsSsCommunicatorConfig hsmsSsConfig,
+			Secs1OnTcpIpCommunicatorConfig secs1Config
+			) {
+		
+		return new Secs1OnTcpIpHsmsSsConverter(hsmsSsConfig, secs1Config);
+	}
+	
+	private static Secs1OnTcpIpHsmsSsConverter open(Secs1OnTcpIpHsmsSsConverter i) throws IOException {
 		
 		try {
-			inst.open();
+			i.open();
 		}
 		catch ( IOException e ) {
 			
 			try {
-				inst.close();
+				i.close();
 			}
 			catch ( IOException giveup ) {
 			}
@@ -233,7 +251,24 @@ public class Secs1OnTcpIpHsmsSsConverter implements Closeable {
 			throw e;
 		}
 		
-		return inst;
+		return i;
+	}
+	
+	public static Secs1OnTcpIpHsmsSsConverter open(
+			Secs1OnTcpIpCommunicatorConfig secs1Config,
+			HsmsSsCommunicatorConfig hsmsSsConfig)
+					throws IOException {
+		
+		return open(new Secs1OnTcpIpHsmsSsConverter(secs1Config, hsmsSsConfig));
+	}
+	
+	public static Secs1OnTcpIpHsmsSsConverter open(
+			HsmsSsCommunicatorConfig hsmsSsConfig,
+			Secs1OnTcpIpCommunicatorConfig secs1Config)
+					throws IOException {
+		
+		return open(new Secs1OnTcpIpHsmsSsConverter(hsmsSsConfig, secs1Config));
 	}
 	
 }
+

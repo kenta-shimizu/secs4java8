@@ -8,8 +8,6 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.concurrent.TimeUnit;
 
-import com.shimizukenta.secs.SecsLog;
-
 public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 	
 	public HsmsSsRebindPassiveCommunicator(HsmsSsCommunicatorConfig config) {
@@ -68,7 +66,7 @@ public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 			server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 			server.bind(socketAddr);
 			
-			notifyLog(new SecsLog("HsmsSsRebindPassiveCommunicator#binded", socketAddrInfo));
+			notifyLog("HsmsSsRebindPassiveCommunicator#binded", socketAddrInfo);
 			
 			server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
 
@@ -80,7 +78,7 @@ public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 				@Override
 				public void failed(Throwable t, Void attachment) {
 					
-					notifyLog(new SecsLog("HsmsSsRebindPassiveCommunicator AsynchronousSeverSocketChannel#accept failed", t));
+					notifyLog("HsmsSsRebindPassiveCommunicator AsynchronousSeverSocketChannel#accept failed", t);
 					
 					synchronized ( server ) {
 						server.notifyAll();
@@ -94,7 +92,7 @@ public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 			
 		}
 		catch ( IOException e ) {
-			notifyLog(new SecsLog(e));
+			notifyLog(e);
 		}
 	}
 	

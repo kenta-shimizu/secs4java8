@@ -4,6 +4,8 @@ import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 
 public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
+	private static final long serialVersionUID = -4179240764890047723L;
+	
 	private boolean isMaster;
 	private int retry;
 	

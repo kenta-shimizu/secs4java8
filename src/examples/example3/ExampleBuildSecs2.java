@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.sml.SmlDataItemParser;
+import com.shimizukenta.secs.sml.SmlParseException;
 
 public class ExampleBuildSecs2 {
 
@@ -126,6 +128,22 @@ public class ExampleBuildSecs2 {
 			System.out.println("build empty");
 			System.out.println(ss);
 			System.out.println();
+		}
+		
+		{
+			try {
+				SmlDataItemParser parser = SmlDataItemParser.getInstance();
+				
+				Secs2 ss = parser.parse("<L <B 0x01><I4 100><A \"ERROR-MSG\">>");
+				
+				System.out.println("build by SML");
+				System.out.println(ss);
+				System.out.println();
+			}
+			catch ( SmlParseException e ) {
+				e.printStackTrace();
+			}
+			
 		}
 
 	}

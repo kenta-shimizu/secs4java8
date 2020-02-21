@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 abstract public class Secs2Number<T extends Number> extends AbstractSecs2 {
 	
+	private static final long serialVersionUID = -5315163278193292437L;
+	
 	protected List<T> values;
 	protected byte[] bytes;
 	

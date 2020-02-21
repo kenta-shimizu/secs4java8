@@ -7,7 +7,9 @@ import com.shimizukenta.secs.AbstractSecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 
 public class HsmsSsMessage extends AbstractSecsMessage {
-
+	
+	private static final long serialVersionUID = 7062413563321894477L;
+	
 	private static final int HEAD_SIZE = 10;
 	
 	private final byte[] head;

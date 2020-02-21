@@ -16,7 +16,6 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import com.shimizukenta.secs.SecsException;
-import com.shimizukenta.secs.SecsLog;
 
 public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 
@@ -67,7 +66,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 			
 			try {
 				
-				notifyLog(new SecsLog("HsmsSsActiveCommunicator try-connect", socketAddrInfo));
+				notifyLog("HsmsSsActiveCommunicator try-connect", socketAddrInfo);
 
 				channel.connect(socketAddr, null, new CompletionHandler<Void, Void>(){
 					
@@ -120,7 +119,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 											}
 										}
 										catch ( SecsException e ) {
-											notifyLog(new SecsLog(e));
+											notifyLog(e);
 											return null;
 										}
 										catch ( InterruptedException e ) {
@@ -170,7 +169,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 																}
 															}
 															catch ( SecsException e ) {
-																notifyLog(new SecsLog(e));
+																notifyLog(e);
 															}
 														}
 													}
@@ -191,7 +190,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 												throw (RuntimeException)t;
 											}
 											
-											notifyLog(new SecsLog(e));
+											notifyLog(e);
 										}
 										catch ( InterruptedException ignore ) {
 										}
@@ -215,7 +214,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 							}
 							
 							if ( ! (t instanceof AsynchronousCloseException) ) {
-								notifyLog(new SecsLog(e));
+								notifyLog(e);
 							}
 						}
 						catch ( InterruptedException ignore ) {
@@ -247,7 +246,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 							channel.notifyAll();
 						}
 						
-						notifyLog(new SecsLog("HsmsSsActiveCommunicator#open-AsynchronousSocketChannel#connect failed", t));
+						notifyLog("HsmsSsActiveCommunicator#open-AsynchronousSocketChannel#connect failed", t);
 					}
 				});
 				
@@ -270,7 +269,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 			}
 		}
 		catch ( IOException e ) {
-			notifyLog(new SecsLog(e));
+			notifyLog(e);
 		}
 	}
 

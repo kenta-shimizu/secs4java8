@@ -1,12 +1,15 @@
 package com.shimizukenta.secs.gem;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Objects;
 
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
-public class GemCollectionEvent {
+public class GemCollectionEvent implements Serializable {
+	
+	private static final long serialVersionUID = 1001765191425950520L;
 	
 	private Secs2 eventId;
 	private String alias;

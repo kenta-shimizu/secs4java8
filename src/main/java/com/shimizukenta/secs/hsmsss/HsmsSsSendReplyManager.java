@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.SecsException;
-import com.shimizukenta.secs.SecsLog;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2BuildException;
@@ -131,7 +130,7 @@ public class HsmsSsSendReplyManager {
 				}
 				
 				parent.putSendedMessagePassThrough(msg);
-				parent.notifyLog(new SecsLog("Sended HsmsSs-Message", msg));
+				parent.notifyLog("Sended HsmsSs-Message", msg);
 			}
 			catch ( ExecutionException e ) {
 				

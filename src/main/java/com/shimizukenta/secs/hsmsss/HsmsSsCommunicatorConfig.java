@@ -8,6 +8,8 @@ import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 
 public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
+	private static final long serialVersionUID = -5737187045438763249L;
+	
 	private HsmsSsProtocol protocol;
 	private SocketAddress sockAddr;
 	private float linktest;

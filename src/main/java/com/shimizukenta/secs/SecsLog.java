@@ -2,14 +2,17 @@ package com.shimizukenta.secs;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-public class SecsLog {
+public class SecsLog implements Serializable {
 	
-	private static final String SUBJECT_OF_THROWABLE = "Throwable";
+	private static final long serialVersionUID = 3912865343300189344L;
+
+	public static final String SUBJECT_OF_THROWABLE = "Throwable";
 	
 	private final String subject;
 	private final LocalDateTime timestamp;

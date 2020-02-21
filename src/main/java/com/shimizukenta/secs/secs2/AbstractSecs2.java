@@ -1,15 +1,17 @@
 package com.shimizukenta.secs.secs2;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.stream.IntStream;
 
-public abstract class AbstractSecs2 implements Secs2 {
+public abstract class AbstractSecs2 implements Secs2, Serializable {
+	
+	private static final long serialVersionUID = 7168919889159900080L;
 
 	public AbstractSecs2() {
 		/* Nothing */
 	}
-	
 	
 	abstract protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException;
 	

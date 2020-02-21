@@ -3,12 +3,10 @@ package com.shimizukenta.secs.sml;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Item;
@@ -28,215 +26,289 @@ public class SmlDataItemParser {
 	}
 	
 	/**
-	 * parse to AbstractSecs2
+	 * parse to Secs2
 	 * 
-	 * @param SML-Format-AbstractSecs2-part-Character (<A "ascii">)
-	 * @return AbstractSecs2
+	 * @param SML-Format-Secs2-part-Character (<A "ascii">)
+	 * @return Secs2
 	 * @throws SmlParseException
 	 */
 	public Secs2 parse(CharSequence cs) throws SmlParseException {
 		
-		String s = cs.toString().trim();
+		String s = Objects.requireNonNull(cs).toString().trim();
 		
 		if ( s.isEmpty() ) {
 			return Secs2.empty();
 		}
-			
-		SmlDataItemParseResult r = pickSmlDataItemParseResult(s);
 		
-		switch ( r.secs2Item ) {
-		case LIST: {
-			
-			String v = r.value();
-			List<Secs2> values = parseList(v);
-			r.checkCount(values.size());
-			return Secs2.list(values);
-			/* break; */
+		SeekValueResult r = parsing(s, 0);
+		
+		if ( r.endIndex < s.length() ) {
+			throw new SmlParseException("SML not end. index: " + r.endIndex);
 		}
-		case ASCII : {
+		
+		return r.value;
+	}
+	
+	protected SeekValueResult parsing(String s, int fromIndex) throws SmlParseException {
+		
+		try {
+			SeekCharResult r = seekAngleBlankBegin(s, fromIndex);
+			SeekStringResult s2ir = this.seekSecs2ItemString(s, r.index + 1);
+			SeekStringResult s2sr = this.seekSizeString(s, s2ir.endIndex);
 			
-			String v = r.value();
-			String a = parseAscii(v);
-			r.checkCount(a.length());
-			return Secs2.ascii(a);
-			/* break; */
+			int nextIndex = s2sr.endIndex;
+			String secs2ItemStr = s2ir.str;
+			Secs2Item secs2Item = Secs2Item.symbol(secs2ItemStr);
+			
+			switch ( secs2Item ) {
+			case LIST: {
+				
+				return parseList(s, nextIndex);
+				/* break; */
+			}
+			case ASCII: {
+				
+				return parseAscii(s, nextIndex);
+				/* break; */
+			}
+			case UNDEFINED: {
+				
+				int size = -1;
+				if ( ! s2sr.str.isEmpty() ) {
+					
+					String ss = s2sr.str;
+					ss = ss.substring(1, (ss.length() - 1));
+					
+					try {
+						size = Integer.valueOf(ss);
+					}
+					catch ( NumberFormatException e ) {
+						throw new SmlParseException("size parse failed. index: " + s2ir.endIndex, e);
+					}
+				}
+				
+				return parseExtend(s, nextIndex, secs2ItemStr, size);
+				/* break; */
+			}
+			default: {
+				
+				return parseDefaults(s, nextIndex, secs2Item);
+			}
+			}
 		}
-		case BOOLEAN: {
+		catch ( IndexOutOfBoundsException e ) {
+			throw new SmlParseException(("parse failed. index: " + fromIndex), e);
+		}
+	}
+	
+	private SeekValueResult parseList(String str, int fromIndex) throws SmlParseException {
+		
+		List<Secs2> ll = new ArrayList<>();
+		
+		for ( int i = fromIndex ;; ) {
 			
-			List<Boolean> bools = new ArrayList<>();
-			for ( String v : r.values() ) {
+			SeekCharResult r = seekNextChar(str, i);
+			
+			if ( r.c == ABE ) {
+				
+				return new SeekValueResult(Secs2.list(ll), (r.index + 1));
+				
+			} else if ( r.c == ABB ) {
+				
+				SeekValueResult v = parsing(str, r.index);
+				ll.add(v.value);
+				i = v.endIndex;
+				
+			} else {
+				
+				throw new SmlParseException("List not found '<' or '>'. index: " + fromIndex);
+			}
+		}
+	}
+	
+	private SeekValueResult parseAscii(String str, int fromIndex) throws SmlParseException {
+		
+		StringBuilder sb = new StringBuilder();
+		
+		for ( int i = fromIndex;; ) {
+			
+			SeekCharResult r = seekNextChar(str, i);
+			
+			if ( r.c == ABE ) {
+				
+				return new SeekValueResult(Secs2.ascii(sb), (r.index + 1));
+				
+			} else if ( r.c == DQUOT )  {
+				
+				SeekCharResult x = seekNextChar(str, (r.index + 1), DQUOT);
+				
+				String s = str.substring((r.index + 1), x.index);
+				
+				sb.append(s);
+				i = x.index + 1;
+				
+			} else if ( r.c == ZERO ) {
+				
+				SeekCharResult x = seekNextChar(str, (r.index + 1), ABE, SPACE, DQUOT);
+				
+				String s = str.substring(r.index, x.index);
+				byte[] bs = new byte[] {toByte(s).byteValue()};
+				
+				sb.append(new String(bs, StandardCharsets.US_ASCII));
+				i = x.index;
+				
+			} else {
+				
+				throw new SmlParseException("Ascii not found '\"' or '0' or '>'. index: " + fromIndex);
+			}
+		}
+	}
+	
+	private SeekValueResult parseDefaults(String str, int fromIndex, Secs2Item secs2Item)
+			throws SmlParseException {
+		
+		SeekCharResult r = this.seekAngleBlankEnd(str, fromIndex);
+		
+		String ss = str.substring(fromIndex, r.index).trim();
+		
+		String[] values = ss.isEmpty() ? new String[0] : ss.split("\\s+");
+		
+		int endIndex = r.index + 1;
+		
+		switch ( secs2Item ) {
+		case BOOLEAN :{
+			List<Boolean> ll = new ArrayList<>();
+			for ( String v : values ) {
 				
 				if ( v.equals("T") || v.equalsIgnoreCase("true") ) {
 					
-					bools.add(Boolean.TRUE);
+					ll.add(Boolean.TRUE);
 					
 				} else if ( v.equals("F") || v.equalsIgnoreCase("false") ) {
 					
-					bools.add(Boolean.FALSE);
+					ll.add(Boolean.FALSE);
 					
 				} else {
 					
-					throw new SmlParseException("BOOLEAN parse failed");
+					try {
+						if ( toByte(v).byteValue() == (byte)0x00 ) {
+							
+							ll.add(Boolean.FALSE);
+							
+						} else {
+							
+							ll.add(Boolean.TRUE);
+						}
+					}
+					catch ( SmlParseException e ) {
+						
+						throw new SmlParseException("BOOLEAN parse failed", e);
+					}
 				}
 			}
-			return Secs2.bool(bools);
+			return new SeekValueResult(Secs2.bool(ll), endIndex);
 			/* break; */
 		}
-		case BINARY : {
-			
-			List<Byte> nums = new ArrayList<>();
-			for ( String v : r.values() ) {
-				nums.add(parseBinary(v));
+		case BINARY:{
+			List<Byte> ll = new ArrayList<>();
+			for ( String v : values ) {
+				ll.add(toByte(v));
 			}
-			return Secs2.binary(nums);
-			/* break; */
+			return new SeekValueResult(Secs2.binary(ll), endIndex);
+			/* break */
 		}
 		case INT1: {
-			
-			List<Number> nums = new ArrayList<>();
-			for ( String v : r.values() ) {
-				nums.add(new BigInteger(v));
+			List<Number> ll = new ArrayList<>();
+			for ( String v : values ) {
+				ll.add(new BigInteger(v));
 			}
-			return Secs2.int1(nums);
+			return new SeekValueResult(Secs2.int1(ll), endIndex);
 			/* break; */
 		}
 		case INT2: {
-			
-			List<Number> nums = new ArrayList<>();
-			for ( String v : r.values() ) {
-				nums.add(new BigInteger(v));
+			List<Number> ll = new ArrayList<>();
+			for ( String v : values ) {
+				ll.add(new BigInteger(v));
 			}
-			return Secs2.int2(nums);
+			return new SeekValueResult(Secs2.int2(ll), endIndex);
 			/* break; */
 		}
 		case INT4: {
-			
-			List<Number> nums = new ArrayList<>();
-			for ( String v : r.values() ) {
-				nums.add(new BigInteger(v));
+			List<Number> ll = new ArrayList<>();
+			for ( String v : values ) {
+				ll.add(new BigInteger(v));
 			}
-			return Secs2.int4(nums);
+			return new SeekValueResult(Secs2.int4(ll), endIndex);
 			/* break; */
 		}
 		case INT8: {
-			
-			List<Number> nums = new ArrayList<>();
-			for ( String v : r.values() ) {
-				nums.add(new BigInteger(v));
+			List<Number> ll = new ArrayList<>();
+			for ( String v : values ) {
+				ll.add(new BigInteger(v));
 			}
-			return Secs2.int8(nums);
+			return new SeekValueResult(Secs2.int8(ll), endIndex);
 			/* break; */
 		}
 		case UINT1: {
-			
-			List<Number> nums = new ArrayList<>();
-			for ( String v : r.values() ) {
-				nums.add(new BigInteger(v).abs());
+			List<Number> ll = new ArrayList<>();
+			for ( String v : values ) {
+				ll.add(new BigInteger(v).abs());
 			}
-			return Secs2.uint1(nums);
+			return new SeekValueResult(Secs2.uint1(ll), endIndex);
 			/* break; */
 		}
 		case UINT2: {
-			
-			List<Number> nums = new ArrayList<>();
-			for ( String v : r.values() ) {
-				nums.add(new BigInteger(v).abs());
+			List<Number> ll = new ArrayList<>();
+			for ( String v : values ) {
+				ll.add(new BigInteger(v).abs());
 			}
-			return Secs2.uint2(nums);
+			return new SeekValueResult(Secs2.uint2(ll), endIndex);
 			/* break; */
 		}
 		case UINT4: {
-			
-			List<Number> nums = new ArrayList<>();
-			for ( String v : r.values() ) {
-				nums.add(new BigInteger(v).abs());
+			List<Number> ll = new ArrayList<>();
+			for ( String v : values ) {
+				ll.add(new BigInteger(v).abs());
 			}
-			return Secs2.uint4(nums);
+			return new SeekValueResult(Secs2.uint4(ll), endIndex);
 			/* break; */
 		}
 		case UINT8: {
-			
-			List<Number> nums = new ArrayList<>();
-			for ( String v : r.values() ) {
-				nums.add(new BigInteger(v).abs());
+			List<Number> ll = new ArrayList<>();
+			for ( String v : values ) {
+				ll.add(new BigInteger(v).abs());
 			}
-			return Secs2.uint8(nums);
+			return new SeekValueResult(Secs2.uint8(ll), endIndex);
 			/* break; */
 		}
 		case FLOAT4: {
-			
-			List<Number> nums = new ArrayList<>();
-			for ( String v : r.values() ) {
-				nums.add(Float.valueOf(v));
+			List<Number> ll = new ArrayList<>();
+			for ( String v : values ) {
+				ll.add(Float.valueOf(v));
 			}
-			return Secs2.float4(nums);
+			return new SeekValueResult(Secs2.float4(ll), endIndex);
 			/* break; */
 		}
 		case FLOAT8: {
-			
-			List<Number> nums = new ArrayList<>();
-			for ( String v : r.values() ) {
-				nums.add(Double.valueOf(v));
+			List<Number> ll = new ArrayList<>();
+			for ( String v : values ) {
+				ll.add(Double.valueOf(v));
 			}
-			return Secs2.float8(nums);
+			return new SeekValueResult(Secs2.float8(ll), endIndex);
 			/* break; */
 		}
-		default :
-			
-			throw new SmlParseException(r.secs2Item.toString() + " not support");
+		default: {
+			throw new SmlParseException("Unsupport Format " + secs2Item);
+		}
 		}
 	}
 	
 	
-	private static final String GROUP_ITEM   = "ITEM";
-	private static final String GROUP_COUNT  = "COUNT";
-	private static final String GROUP_VALUES = "VALUES";
-	private static final String pregDataItem = "<\\s*(?<" + GROUP_ITEM + ">[0-9A-Za-z]+)\\s*(\\[\\s*(?<" + GROUP_COUNT + ">[0-9]+)\\s*\\])?\\s*(?<" + GROUP_VALUES + ">.*)\\s*>";
-	protected static final Pattern ptnDataItem = Pattern.compile("^" + pregDataItem + "$");
+	private static String GROUP_BYTE = "BYTE";
+	private static final String pregByte = "0[Xx](?<" + GROUP_BYTE + ">[0-9A-Fa-f]{1,2})";
+	private static final Pattern ptnByte = Pattern.compile("^" + pregByte + "$");
 	
-	private SmlDataItemParseResult pickSmlDataItemParseResult(String value) throws SmlParseException {
-		
-		Matcher m = ptnDataItem.matcher(value);
-		
-		if ( ! m.matches() ) {
-			
-			String err = value;
-			if ( err.length() > 50 ) {
-				err = err.substring(0, 50);
-			}
-			
-			throw new SmlParseException("\"<type [count] value>\" parse failed. \"" + err + "\"");
-		}
-		
-		String item   = m.group(GROUP_ITEM);
-		String countStr  = m.group(GROUP_COUNT);
-		String values = m.group(GROUP_VALUES);
-		
-		Secs2Item s2i = Secs2Item.symbol(item);
-		
-		if ( s2i == Secs2Item.UNDEFINED ) {
-			throw new SmlParseException("Secs2Item symbol \"" + item + "\" not undefined");
-		}
-		
-		int count = -1;
-		if ( countStr != null ) {
-			try {
-				count = Integer.parseInt(countStr);
-			}
-			catch ( NumberFormatException e ) {
-				throw new SmlParseException("Item [count] parse failed", e);
-			}
-		}
-		
-		return new SmlDataItemParseResult(s2i, values, count);
-	}
-	
-	
-	protected static String GROUP_BYTE = "BYTE";
-	protected static final String pregByte = "0[Xx](?<" + GROUP_BYTE + ">[0-9A-Fa-f]{1,2})";
-	protected static final Pattern ptnByte = Pattern.compile("^" + pregByte + "$");
-
-	private Byte parseBinary(String value) throws SmlParseException {
+	private Byte toByte(String value) throws SmlParseException {
 		
 		Matcher m = ptnByte.matcher(value);
 		
@@ -256,267 +328,131 @@ public class SmlDataItemParser {
 			throw new SmlParseException("Binary parse failed \"" + value + "\"", e);
 		}
 	}
+
 	
-	private String parseAscii(String value) throws SmlParseException {
+	/**
+	 * 
+	 * prototype-pattern
+	 * 
+	 * @param str
+	 * @param fromIndex
+	 * @param secs2ItemString
+	 * @param size
+	 * @return
+	 * @throws SmlParseException
+	 */
+	protected SeekValueResult parseExtend(String str, int fromIndex, String secs2ItemString, int size)
+			throws SmlParseException {
 		
-		final AsciiSpecialCharacterCounter counter = new AsciiSpecialCharacterCounter();
+		throw new SmlParseException("UNKNOWN SECS2ITEM type: " + secs2ItemString);
+	}
+	
+	
+	protected static final char SPACE = (char)0x20;
+	protected static final char ABB = '<';
+	protected static final char ABE = '>';
+	protected static final char SBB = '[';
+	protected static final char SBE = ']';
+	protected static final char DQUOT = '"';
+	protected static final char ZERO = '0';
+	
+	protected class SeekCharResult {
 		
-		final StringBuilder ascii = new StringBuilder();
-		final StringBuilder sb = new StringBuilder();
-		boolean inQuote = false;
+		private final char c;
+		private final int index;
 		
-		for ( int i = 0, m = value.length(); i < m ; ++i ) {
-			
-			char c = value.charAt(i);
-			
-			boolean f = counter.put(c);
-			
-			if ( f != inQuote ) {
-				
-				inQuote = f;
-				
-				if ( f /* inQUote */) {
-					
-					for ( String v : splitValue(sb) ) {
-						byte b = parseBinary(v);
-						String a = new String(new byte[] {b}, StandardCharsets.US_ASCII);
-						ascii.append(a);
-					}
-					
-				} else {
-					
-					ascii.append(sb.toString());
-				}
-				
-				sb.setLength(0);	/* clear */
-				
-			} else {
-				
-				sb.append(c);
+		protected SeekCharResult(char c, int index) {
+			this.c = c;
+			this.index = index;
+		}
+	}
+	
+	protected class SeekStringResult {
+		
+		private final String str;
+		private final int endIndex;
+		
+		protected SeekStringResult(String str, int endIndex) {
+			this.str = str;
+			this.endIndex = endIndex;
+		}
+	}
+	
+	protected class SeekValueResult {
+		
+		private final Secs2 value;
+		private final int endIndex;
+		
+		protected SeekValueResult(Secs2 value, int endIndex) {
+			this.value = value;
+			this.endIndex = endIndex;
+		}
+	}
+	
+	
+	protected SeekCharResult seekNextChar(String s, int fromIndex) {
+		for (int i = fromIndex; ; ++i) {
+			char c = s.charAt(i);
+			if ( c > SPACE ) {
+				return new SeekCharResult(c, i);
 			}
 		}
-		
-		if ( counter.inQuote() ) {
-			throw new SmlParseException("<A> not closed");
-		}
-		
-		/* Insert bytes */
-		for ( String v : splitValue(sb) ) {
-			byte b = parseBinary(v);
-			String a = new String(new byte[] {b}, StandardCharsets.US_ASCII);
-			ascii.append(a);
-		}
-		
-		return ascii.toString();
 	}
 	
-	
-	private List<Secs2> parseList(String value) throws SmlParseException {
-		
-		final ListSpecialCharacterCounter counter = new ListSpecialCharacterCounter();
-		
-		final List<String> values = new ArrayList<>();
-		final StringBuilder sb = new StringBuilder();
-		boolean closed = true;
-		
-		for ( int i = 0, m = value.length(); i < m ; ++i ) {
-			
-			char c = value.charAt(i);
-			
-			boolean f = counter.put(c);
-			
-			if ( f != closed ) {
-				
-				closed = f;
-				
-				sb.append(c);
-				
-				if ( f /* closed */) {
-					
-					values.add(sb.toString());
-					sb.setLength(0);	/* clear */
-				}
-				
-			} else {
-				
-				if ( ! closed ) {
-					
-					sb.append(c);
-				}
-			}
-		}
-		
-		if ( ! counter.closed() ) {
-			throw new SmlParseException("");
-		}
-		
-		List<Secs2> ss = new ArrayList<>();
-		for ( String v : values ) {
-			ss.add(parse(v));
-		}
-		
-		return ss;
-	}
-	
-	private static List<String> splitValue(CharSequence cs) {
-		
-		String v = cs.toString().trim();
-		
-		if ( v.isEmpty() ) {
-			
-			return Collections.emptyList();
-			
-		} else {
-			
-			return Stream.of(v.split("\\s+")).collect(Collectors.toList());
-		}
-	}
-	
-	private class SmlDataItemParseResult {
-		
-		private final Secs2Item secs2Item;
-		private final String value;
-		private final int count;
-		
-		private SmlDataItemParseResult(Secs2Item s2i, String values, int count) {
-			this.secs2Item = s2i;
-			this.value = values;
-			this.count = count;
-		}
-		
-		private String value() {
-			return value;
-		}
-		
-		private List<String> values() throws SmlParseException {
-			List<String> vs = splitValue(value);
-			checkCount(vs.size());
-			return vs;
-		}
-		
-		private void checkCount(int count) throws SmlParseException {
-			
-			if ( this.count >= 0 ) {
-				
-				if ( count != this.count ) {
-					throw new SmlParseException("Item [count] unmatch. count=" + this.count + ", items=" + count);
+	protected SeekCharResult seekNextChar(String s, int fromIndex, char... seekChar) {
+		for (int i = fromIndex; ; ++i) {
+			char c = s.charAt(i);
+			for ( char sc : seekChar ) {
+				if ( c == sc ) {
+					return new SeekCharResult(c, i);
 				}
 			}
 		}
 	}
 	
-	private class ListSpecialCharacterCounter {
-		
-		private static final char ABS = '<';
-		private static final char ABE = '>';
-		private static final char DQ  = '"';
-		private static final char SQ  = '\'';
-		
-		/**
-		 * Angle-Bracket count
-		 */
-		private int ab;
-		
-		/**
-		 * in Double-Quote
-		 */
-		private boolean dq;
-		
-		/**
-		 * in Single-Quote
-		 */
-		private boolean sq;
-		
-		private ListSpecialCharacterCounter() {
-			ab = 0;
-			dq = false;
-			sq = false;
-		}
-		
-		private boolean closed() {
-			return ab == 0 && ! dq && ! sq;
-		}
-		
-		private boolean inQuote() {
-			return dq || sq;
-		}
-		
-		private boolean put(char c) throws SmlParseException {
-			
-			if ( c == ABS ) {
-				
-				if ( ! inQuote() ) {
-					ab += 1;
-				}
-				
-			} else if ( c == ABE ) {
-				
-				if ( ! inQuote() ) {
-					ab -= 1;
-					
-					if ( ab < 0 ) {
-						throw new SmlParseException("Item not too closed.");
-					}
-				}
-				
-			} else if ( c == DQ ) {
-				
-				if ( ! sq ) {
-					dq = ! dq;
-				}
-				
-			} else if ( c == SQ ) {
-				
-				if ( ! dq ) {
-					sq = ! sq;
-				}
-			}
-			
-			return closed();
-		}
+	protected SeekCharResult seekAngleBlankBegin(String s, int fromIndex) {
+		return seekNextChar(s, fromIndex, ABB);
 	}
 	
-	private class AsciiSpecialCharacterCounter {
+	protected SeekCharResult seekAngleBlankEnd(String s, int fromIndex) {
+		return seekNextChar(s, fromIndex, ABE);
+	}
+	
+	protected SeekStringResult seekSecs2ItemString(String s, int fromIndex) {
 		
-		private static final char DQ  = '"';
-		private static final char SQ  = '\'';
+		int beginIndex;
+		int endIndex;
 		
-		/**
-		 * in Double-Quote
-		 */
-		private boolean dq;
-		
-		/**
-		 * in Single-Quote
-		 */
-		private boolean sq;
-		
-		private AsciiSpecialCharacterCounter() {
-			dq = false;
-			sq = false;
+		{
+			SeekCharResult r = seekNextChar(s, fromIndex);
+			beginIndex = r.index;
+		}
+		{
+			SeekCharResult r = seekNextChar(s, (beginIndex + 1), SPACE, ABB, ABE, SBB, DQUOT);
+			endIndex = r.index;
 		}
 		
-		private boolean inQuote() {
-			return dq || sq;
-		}
+		return new SeekStringResult(s.substring(beginIndex, endIndex), endIndex);
+	}
+	
+	protected SeekStringResult seekSizeString(String s, int fromIndex) {
 		
-		private boolean put(char c) {
-			
-			if ( c == DQ ) {
-				
-				if ( ! sq ) {
-					dq = ! dq;
-				}
-				
-			} else if ( c == SQ ) {
-				
-				if ( ! dq ) {
-					sq = ! sq;
-				}
+		int beginIndex;
+		int endIndex;
+		
+		{
+			SeekCharResult r = seekNextChar(s, fromIndex);
+			if ( r.c != SBB ) {
+				return new SeekStringResult("", fromIndex);
 			}
-			
-			return inQuote();
+			beginIndex = r.index;
 		}
+		{
+			SeekCharResult r = seekNextChar(s, (beginIndex + 1), SBE);
+			endIndex = r.index + 1;
+		}
+		
+		return new SeekStringResult(s.substring(beginIndex, endIndex), endIndex);
 	}
 	
 }

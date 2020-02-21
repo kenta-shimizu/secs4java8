@@ -7,6 +7,8 @@ import com.shimizukenta.secs.secs1.Secs1CommunicatorConfig;
 
 public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 	
+	private static final long serialVersionUID = -7468433384957790240L;
+	
 	private SocketAddress socketAddr;
 	private float reconnectSeconds;
 	

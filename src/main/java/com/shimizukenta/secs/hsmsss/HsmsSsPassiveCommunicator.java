@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.SecsException;
-import com.shimizukenta.secs.SecsLog;
 
 public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 
@@ -92,7 +91,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 			server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 			server.bind(socketAddr);
 			
-			notifyLog(new SecsLog("HsmsSsPassiveCommunicator#binded", socketAddrInfo));
+			notifyLog("HsmsSsPassiveCommunicator#binded", socketAddrInfo);
 			
 			server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
 				
@@ -103,12 +102,12 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 
 				@Override
 				public void failed(Throwable t, Void attachment) {
-					notifyLog(new SecsLog("HsmsSsPassiveCommunicator AsynchronousSeverSocketChannel#accept failed", t));
+					notifyLog("HsmsSsPassiveCommunicator AsynchronousSeverSocketChannel#accept failed", t);
 				}
 			});
 		}
 		catch ( IOException e ) {
-			notifyLog(new SecsLog(e));
+			notifyLog(e);
 			throw e;
 		}
 	}
@@ -123,7 +122,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 		
 		String channelString = channel.toString();
 		
-		notifyLog(new SecsLog("HsmsSsPassiveCommunicator channel#accept", channelString));
+		notifyLog("HsmsSsPassiveCommunicator channel#accept", channelString);
 		
 		final BlockingQueue<HsmsSsMessage> queue = new LinkedBlockingQueue<>();
 		
@@ -212,7 +211,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 											}
 										}
 										catch ( SecsException e ) {
-											notifyLog(new SecsLog(e));
+											notifyLog(e);
 										}
 									}
 								}
@@ -238,7 +237,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 						}
 					}
 					catch ( TimeoutException e ) {
-						notifyLog(new SecsLog(new HsmsSsTimeoutT7Exception(e)));
+						notifyLog(new HsmsSsTimeoutT7Exception(e));
 						return null;
 					}
 					catch ( InterruptedException ignore ) {
@@ -258,7 +257,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 							throw (RuntimeException)t;
 						}
 						
-						notifyLog(new SecsLog(e));
+						notifyLog(e);
 						return null;
 					}
 					
@@ -321,7 +320,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 											}
 										}
 										catch ( SecsException e ) {
-											notifyLog(new SecsLog(e));
+											notifyLog(e);
 										}
 									}
 								}
@@ -349,7 +348,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 							throw (RuntimeException)t;
 						}
 						
-						notifyLog(new SecsLog(e));
+						notifyLog(e);
 					}
 					finally {
 						notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
@@ -376,7 +375,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 				throw (RuntimeException)t;
 			}
 			
-			notifyLog(new SecsLog(e));
+			notifyLog(e);
 		}
 		finally {
 			
@@ -394,7 +393,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 				channel.close();
 			}
 			catch ( IOException e ) {
-				notifyLog(new SecsLog(e));
+				notifyLog(e);
 			}
 		}
 	}

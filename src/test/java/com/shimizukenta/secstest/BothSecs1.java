@@ -20,12 +20,34 @@ public class BothSecs1 {
 	
 	private static final int testCycle = 100;
 	
+	private boolean equipComm;
+	private boolean hostComm;
 	public int equipCounter;
 	public int hostCounter;
 	
 	public BothSecs1() {
+		this.equipComm = false;
+		this.hostComm = false;
 		this.equipCounter = 0;
 		this.hostCounter = 0;
+	}
+	
+	public void equipCommunicateState(boolean f) {
+		synchronized ( this ) {
+			equipComm = f;
+		}
+	}
+	
+	public void hostCommunicateState(boolean f) {
+		synchronized ( this ) {
+			hostComm = f;
+		}
+	}
+	
+	public boolean bothCommunicatable() {
+		synchronized ( this ) {
+			return equipComm && hostComm;
+		}
 	}
 	
 	public static void main(String[] args) {
@@ -36,6 +58,7 @@ public class BothSecs1 {
 		Secs1OnTcpIpCommunicatorConfig equipConfig = new Secs1OnTcpIpCommunicatorConfig();
 		Secs1OnTcpIpCommunicatorConfig hostConfig  = new Secs1OnTcpIpCommunicatorConfig();
 		
+		equipConfig.communicatorName("Equip");
 		equipConfig.deviceId(10);
 		equipConfig.isEquip(true);
 		equipConfig.isMaster(true);
@@ -44,6 +67,7 @@ public class BothSecs1 {
 		equipConfig.timeout().t3(45.0F);
 		equipConfig.retry(3);
 		
+		hostConfig.communicatorName("Host");
 		hostConfig.deviceId(10);
 		hostConfig.isEquip(false);
 		hostConfig.isMaster(false);
@@ -67,11 +91,17 @@ public class BothSecs1 {
 				host.addSecsLogListener(BothSecs1::echo);
 				
 				equip.addSecsCommunicatableStateChangeListener(state -> {
-					echo("equip-communicate: " + state);
+					synchronized ( inst ) {
+						inst.equipCommunicateState(state);
+						inst.notifyAll();
+					}
 				});
 				
 				host.addSecsCommunicatableStateChangeListener(state -> {
-					echo("host-communicate: " + state);
+					synchronized ( inst ) {
+						inst.hostCommunicateState(state);
+						inst.notifyAll();
+					}
 				});
 				
 				equip.addTrySendMessagePassThroughListener(msg -> {
@@ -191,7 +221,20 @@ public class BothSecs1 {
 				equip.open();
 				host.open();
 				
-				Thread.sleep(1000L);
+				synchronized ( inst ) {
+					
+					echo("wait-until-both-communicatable");
+					
+					for ( ;; ) {
+						if ( inst.bothCommunicatable() ) {
+							break;
+						}
+						inst.wait();
+					}
+					
+					echo("both-communicated");
+				}
+				
 				
 				final int m = testCycle;
 				
@@ -215,13 +258,9 @@ public class BothSecs1 {
 								}
 							}
 							catch ( SecsException e ) {
-								
-								threads.forEach(th -> {
-									th.interrupt();
-								});
+								threads.forEach(Thread::interrupt);
 								
 								echo(e);
-								
 								throw new RuntimeException(e);
 							}
 							catch ( InterruptedException e ) {
@@ -258,11 +297,7 @@ public class BothSecs1 {
 								}
 							}
 							catch ( SecsException e ) {
-								
-								threads.forEach(th -> {
-									th.interrupt();
-								});
-								
+								threads.forEach(Thread::interrupt);
 								echo(e);
 								
 								throw new RuntimeException(e);

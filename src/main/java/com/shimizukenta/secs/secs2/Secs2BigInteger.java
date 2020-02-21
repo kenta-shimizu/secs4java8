@@ -11,6 +11,8 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 abstract public class Secs2BigInteger extends Secs2Number<BigInteger> {
+	
+	private static final long serialVersionUID = 6007516711524334157L;
 
 	public Secs2BigInteger(int... values) {
 		super();

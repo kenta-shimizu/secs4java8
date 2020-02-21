@@ -4,7 +4,9 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class Secs2Unicode extends AbstractSecs2 {
-
+	
+	private static final long serialVersionUID = -6855718016536094781L;
+	
 	private static final Secs2Item secs2Item = Secs2Item.UNICODE;
 	
 	private byte[] bytes;

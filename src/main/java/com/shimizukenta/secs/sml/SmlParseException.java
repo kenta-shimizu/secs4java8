@@ -2,9 +2,6 @@ package com.shimizukenta.secs.sml;
 
 public class SmlParseException extends Exception {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 6933932663095380472L;
 
 	public SmlParseException() {

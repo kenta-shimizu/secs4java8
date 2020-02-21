@@ -1,9 +1,12 @@
 package com.shimizukenta.secs.gem;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class GemConfig {
-
+public class GemConfig implements Serializable {
+	
+	private static final long serialVersionUID = 1130854092113358850L;
+	
 	private String mdln;
 	private String softrev;
 	

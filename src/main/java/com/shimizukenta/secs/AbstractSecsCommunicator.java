@@ -128,6 +128,23 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 		});
 	}
 	
+	protected void notifyLog(CharSequence subject) {
+		notifyLog(new SecsLog(createLogSubject(subject)));
+	}
+	
+	protected void notifyLog(CharSequence subject, Object value) {
+		notifyLog(new SecsLog(createLogSubject(subject), value));
+	}
+	
+	protected void notifyLog(Throwable t) {
+		notifyLog(SecsLog.SUBJECT_OF_THROWABLE, t);
+	}
+	
+	private String createLogSubject(CharSequence subject) {
+		return config.communicatorName()
+				.map(s -> s + ": " + subject.toString())
+				.orElse(subject.toString());
+	}
 	
 	/* Secs-Communicatable-State-Changed-Listener */
 	private final Collection<SecsCommunicatableStateChangeListener> commStateChangeListeners = new CopyOnWriteArrayList<>();

@@ -9,6 +9,8 @@ import com.shimizukenta.secs.secs2.Secs2;
 
 public class Secs1Message extends AbstractSecsMessage {
 	
+	private static final long serialVersionUID = -5892491853890818330L;
+
 	private static final int HEAD_SIZE = 10;
 	
 	private final byte[] head;

@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.SecsException;
-import com.shimizukenta.secs.SecsLog;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2Exception;
@@ -48,7 +47,7 @@ public class Secs1SendReplyManager {
 		
 		try {
 			
-			parent.notifyLog(new SecsLog("Secs1-Message entry-send", msg));
+			parent.notifyLog("Secs1-Message entry-send", msg);
 			parent.putTrySendMessagePassThrough(msg);
 			waitUntilSended(p);
 			parent.putSendedMessagePassThrough(msg);
@@ -284,7 +283,7 @@ public class Secs1SendReplyManager {
 	
 	public void sended(Secs1MessageBlock block) {
 		
-		parent.notifyLog(new SecsLog("Secs1-Message-Block sended", block));
+		parent.notifyLog("Secs1-Message-Block sended", block);
 		
 		if ( block.ebit() ) {
 			final Integer key = block.systemBytesKey();
@@ -321,7 +320,7 @@ public class Secs1SendReplyManager {
 	
 	public void received(Secs1MessageBlock block) throws InterruptedException {
 		
-		parent.notifyLog(new SecsLog("Secs1-Message-Block received", block));
+		parent.notifyLog("Secs1-Message-Block received", block);
 		
 		if ( recvBlocks.isEmpty() ) {
 			
@@ -368,11 +367,11 @@ public class Secs1SendReplyManager {
 			try {
 				Secs1Message msg = Secs1MessageBlockConverter.toSecs1Message(recvBlocks);
 				parent.putReceiveMessagePassThrough(msg);
-				parent.notifyLog(new SecsLog("Secs1-Message received", msg));
+				parent.notifyLog("Secs1-Message received", msg);
 				put(msg);
 			}
 			catch ( Secs2Exception e ) {
-				parent.notifyLog(new SecsLog(e));
+				parent.notifyLog(e);
 			}
 			
 			recvBlocks.clear();

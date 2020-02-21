@@ -9,6 +9,8 @@ import java.util.Objects;
 
 public class Secs2Ascii extends AbstractSecs2 {
 	
+	private static final long serialVersionUID = -1511335317630097868L;
+	
 	private static Secs2Item secs2Item = Secs2Item.ASCII;
 	private static Charset charset = StandardCharsets.US_ASCII;
 

@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class Secs2Jis8 extends AbstractSecs2 {
+	
+	private static final long serialVersionUID = 4496230020131931885L;
 
 	private static final Secs2Item secs2Item = Secs2Item.JIS8;
 	

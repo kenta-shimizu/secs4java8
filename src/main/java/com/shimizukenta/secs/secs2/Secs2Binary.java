@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 public class Secs2Binary extends Secs2Number<Byte> {
 	
+	private static final long serialVersionUID = 7808005179649220096L;
+	
 	private static final Secs2Item secs2Item = Secs2Item.BINARY;
 
 	public Secs2Binary() {

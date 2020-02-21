@@ -1,9 +1,12 @@
 package com.shimizukenta.secs.sml;
 
+import java.io.Serializable;
+
 import com.shimizukenta.secs.secs2.Secs2;
 
-public class SmlMessage {
-
+public class SmlMessage implements Serializable {
+	
+	private static final long serialVersionUID = 630517337022434278L;
 	
 	private final int strm;
 	private final int func;

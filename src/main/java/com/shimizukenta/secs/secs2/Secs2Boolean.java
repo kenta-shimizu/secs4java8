@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 public class Secs2Boolean extends AbstractSecs2 {
 	
+	private static final long serialVersionUID = -7190678080526078554L;
+	
 	private static Secs2Item secs2Item = Secs2Item.BOOLEAN;
 	
 	private static final byte BYTE_TRUE = (byte)0xFF;

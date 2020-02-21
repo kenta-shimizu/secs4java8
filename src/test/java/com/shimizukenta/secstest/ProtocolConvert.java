@@ -24,12 +24,34 @@ public class ProtocolConvert {
 	
 	private static final int testCycle = 100;
 	
+	private boolean equipComm;
+	private boolean hostComm;
 	public int equipCounter;
 	public int hostCounter;
 	
 	public ProtocolConvert() {
-		equipCounter = 0;
-		hostCounter = 0;
+		this.equipComm = false;
+		this.hostComm = false;
+		this.equipCounter = 0;
+		this.hostCounter = 0;
+	}
+	
+	public void equipCommunicateState(boolean f) {
+		synchronized ( this ) {
+			equipComm = f;
+		}
+	}
+	
+	public void hostCommunicateState(boolean f) {
+		synchronized ( this ) {
+			hostComm = f;
+		}
+	}
+	
+	public boolean bothCommunicatable() {
+		synchronized ( this ) {
+			return equipComm && hostComm;
+		}
 	}
 	
 	public static void main(String[] args) {
@@ -39,7 +61,7 @@ public class ProtocolConvert {
 		SocketAddress secs1Addr  = new InetSocketAddress("127.0.0.1", 23000);
 		SocketAddress hsmsSsAddr = new InetSocketAddress("127.0.0.1", 5000);
 		
-		final PairHsmsSs inst = new PairHsmsSs();
+		final ProtocolConvert inst = new ProtocolConvert();
 		
 		/*
 		 * connection
@@ -51,14 +73,12 @@ public class ProtocolConvert {
 				TcpIpAdapter adapter = TcpIpAdapter.open(secs1Addr, innerAddr);
 				) {
 			
-			Thread.sleep(100L);
-			
 			Secs1OnTcpIpCommunicatorConfig secs1ConverterConfig = new Secs1OnTcpIpCommunicatorConfig();
 			secs1ConverterConfig.socketAddress(innerAddr);
 			secs1ConverterConfig.deviceId(deviceId);
 			secs1ConverterConfig.isEquip(false);
 			secs1ConverterConfig.isMaster(false);
-			secs1ConverterConfig.retry(3);
+			secs1ConverterConfig.retry(0);
 			
 			HsmsSsCommunicatorConfig hsmsSsConverterConfig = new HsmsSsCommunicatorConfig();
 			hsmsSsConverterConfig.socketAddress(hsmsSsAddr);
@@ -71,9 +91,8 @@ public class ProtocolConvert {
 					Secs1OnTcpIpHsmsSsConverter converter = Secs1OnTcpIpHsmsSsConverter.open(secs1ConverterConfig, hsmsSsConverterConfig);
 					) {
 				
-				Thread.sleep(100L);
-				
 				Secs1OnTcpIpCommunicatorConfig equipConfig = new Secs1OnTcpIpCommunicatorConfig();
+				equipConfig.communicatorName("Equip");
 				equipConfig.socketAddress(secs1Addr);
 				equipConfig.deviceId(deviceId);
 				equipConfig.isEquip(true);
@@ -81,6 +100,7 @@ public class ProtocolConvert {
 				equipConfig.retry(0);
 				
 				HsmsSsCommunicatorConfig hostConfig = new HsmsSsCommunicatorConfig();
+				hostConfig.communicatorName("Host");
 				hostConfig.socketAddress(hsmsSsAddr);
 				hostConfig.protocol(HsmsSsProtocol.ACTIVE);
 				hostConfig.sessionId(deviceId);
@@ -94,7 +114,10 @@ public class ProtocolConvert {
 					equip.addSecsLogListener(ProtocolConvert::echo);
 					
 					equip.addSecsCommunicatableStateChangeListener(state -> {
-						echo("equip-communicate: " + state);
+						synchronized ( inst ) {
+							inst.equipCommunicateState(state);
+							inst.notifyAll();
+						}
 					});
 					
 					equip.addTrySendMessagePassThroughListener(msg -> {
@@ -158,7 +181,10 @@ public class ProtocolConvert {
 					host.addSecsLogListener(ProtocolConvert::echo);
 					
 					host.addSecsCommunicatableStateChangeListener(state -> {
-						echo("host-communicate: " + state);
+						synchronized ( inst ) {
+							inst.hostCommunicateState(state);
+							inst.notifyAll();
+						}
 					});
 					
 					host.addTrySendMessagePassThroughListener(msg -> {
@@ -222,7 +248,20 @@ public class ProtocolConvert {
 					equip.open();
 					host.open();
 					
-					Thread.sleep(500L);
+					synchronized ( inst ) {
+						
+						echo("wait-until-both-communicatable");
+						
+						for ( ;; ) {
+							if ( inst.bothCommunicatable() ) {
+								break;
+							}
+							inst.wait();
+						}
+						
+						echo("both-communicated");
+					}
+					
 					
 					final int m = testCycle;
 					
@@ -247,10 +286,7 @@ public class ProtocolConvert {
 								}
 								catch ( SecsException e ) {
 									
-									threads.forEach(th -> {
-										th.interrupt();
-									});
-									
+									threads.forEach(Thread::interrupt);
 									echo(e);
 									
 									throw new RuntimeException(e);
@@ -288,10 +324,7 @@ public class ProtocolConvert {
 								}
 								catch ( SecsException e ) {
 									
-									threads.forEach(th -> {
-										th.interrupt();
-									});
-									
+									threads.forEach(Thread::interrupt);
 									echo(e);
 									
 									throw new RuntimeException(e);

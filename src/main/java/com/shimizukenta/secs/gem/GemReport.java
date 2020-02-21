@@ -1,5 +1,6 @@
 package com.shimizukenta.secs.gem;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
@@ -9,7 +10,9 @@ import java.util.stream.Collectors;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
-public class GemReport {
+public class GemReport implements Serializable {
+	
+	private static final long serialVersionUID = -5697966473492819356L;
 	
 	private final Secs2 rptId;
 	private final List<Secs2> vids;

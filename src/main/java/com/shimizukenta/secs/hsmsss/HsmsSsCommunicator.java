@@ -196,6 +196,21 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		}
 	};
 	
+	@Override
+	protected void notifyLog(CharSequence subject) {
+		super.notifyLog(subject);
+	}
+	
+	@Override
+	protected void notifyLog(CharSequence subject, Object value) {
+		super.notifyLog(subject, value);
+	}
+	
+	@Override
+	protected void notifyLog(Throwable t) {
+		super.notifyLog(t);
+	}
+	
 	
 	/* trySendMsgPassThroughQueue */
 	private final BlockingQueue<HsmsSsMessage> trySendMsgPassThroughQueue = new LinkedBlockingQueue<>();
@@ -321,7 +336,7 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 				
 				this.hsmsSsCommunicateState = state;
 				
-				notifyLog(new SecsLog("HsmsSs-Connect-state-chenged: " + state.toString()));
+				notifyLog("HsmsSs-Connect-state-chenged: " + state.toString());
 				notifyCommunicatableStateChange(state.communicatable());
 			}
 		}
@@ -391,7 +406,7 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 			return sendReplyManager.send(msg);
 		}
 		catch ( SecsException e ) {
-			notifyLog(new SecsLog(e));
+			notifyLog(e);
 			throw e;
 		}
 	}

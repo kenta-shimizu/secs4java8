@@ -155,6 +155,21 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		}
 	};
 	
+	@Override
+	protected void notifyLog(CharSequence subject) {
+		super.notifyLog(subject);
+	}
+	
+	@Override
+	protected void notifyLog(CharSequence subject, Object value) {
+		super.notifyLog(subject, value);
+	}
+	
+	@Override
+	protected void notifyLog(Throwable t) {
+		super.notifyLog(t);
+	}
+	
 	
 	/* trySendMsgPassThroughQueue */
 	private final BlockingQueue<Secs1Message> trySendMsgPassThroughQueue = new LinkedBlockingQueue<>();
@@ -277,7 +292,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			return sendReplyManager.send(msg);
 		}
 		catch (SecsException e) {
-			notifyLog(new SecsLog(e));
+			notifyLog(e);
 			throw e;
 		}
 	}
@@ -412,7 +427,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 						throw e;
 					}
 					catch ( SecsException e ) {
-						notifyLog(new SecsLog(e));
+						notifyLog(e);
 					}
 					catch ( Throwable t ) {
 						throw t;
@@ -477,7 +492,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 					throw (RuntimeException)t;
 				}
 				
-				notifyLog(new SecsLog(e));
+				notifyLog(e);
 			}
 			
 			return PollCircuitControl.RETRY;
@@ -511,7 +526,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 				}
 				case RETRY: {
 					
-					notifyLog(new SecsLog("Secs1Communicator#circuitControl pollByte RETRY"));
+					notifyLog("Secs1Communicator#circuitControl pollByte RETRY");
 					
 					counter += 1;
 					break;
@@ -561,7 +576,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 					
 					sendByte(NAK);
 					
-					notifyLog(new SecsLog("Receive Secs1MessageBlock T2-Timeout (Length-byte)"));
+					notifyLog("Receive Secs1MessageBlock T2-Timeout (Length-byte)");
 					
 					return;
 				}
@@ -579,7 +594,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 					
 					sendByte(NAK);
 					
-					notifyLog(new SecsLog("Receive Secs1MessageBlock T1-Timeout (pos=" + i + ")"));
+					notifyLog("Receive Secs1MessageBlock T1-Timeout (pos=" + i + ")");
 					
 					return;
 				}
@@ -607,12 +622,12 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 							
 						} else {
 							
-							notifyLog(new SecsLog("Wait next Block, receive not ENQ (" + String.format("%02X",  b) + ")", block));
+							notifyLog("Wait next Block, receive not ENQ (" + String.format("%02X",  b) + ")", block);
 						}
 						
 					} else {
 						
-						notifyLog(new SecsLog("Wait next Block, T4-timeout", block));
+						notifyLog("Wait next Block, T4-timeout", block);
 					}
 				}
 				
@@ -632,7 +647,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			
 			sendByte(NAK);
 			
-			notifyLog(new SecsLog(reason));
+			notifyLog(reason);
 		}
 		
 		private boolean sendBlock() throws SecsException, InterruptedException {
@@ -657,12 +672,12 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 					
 				} else {
 					
-					notifyLog(new SecsLog("Secs1Communicator#sendBlock revieve-not-ACK (" + String.format("%02X", b) + ")", presentBlock));
+					notifyLog("Secs1Communicator#sendBlock revieve-not-ACK (" + String.format("%02X", b) + ")", presentBlock);
 				}
 				
 			} else {
 				
-				notifyLog(new SecsLog("Secs1Communicator#sendBlock Timeout-T2", presentBlock));
+				notifyLog("Secs1Communicator#sendBlock Timeout-T2", presentBlock);
 			}
 			
 			return false;

@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 public class Secs2RawBytes extends AbstractSecs2 {
 	
+	private static final long serialVersionUID = 696538383179762711L;
+	
 	private final byte[] bs;
 	
 	protected Secs2RawBytes() {

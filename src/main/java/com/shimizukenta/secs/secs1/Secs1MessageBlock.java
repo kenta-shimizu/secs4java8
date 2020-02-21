@@ -1,8 +1,11 @@
 package com.shimizukenta.secs.secs1;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class Secs1MessageBlock {
+public class Secs1MessageBlock implements Serializable {
+	
+	private static final long serialVersionUID = -4733761372402097825L;
 	
 	public static final int ZERO = 0;
 	public static final int ONE  = 1;

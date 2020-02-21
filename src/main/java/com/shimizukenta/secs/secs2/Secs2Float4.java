@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 public class Secs2Float4 extends Secs2Number<Float> {
 	
+	private static final long serialVersionUID = -171221679009478611L;
+	
 	private static final Secs2Item secs2Item = Secs2Item.FLOAT4;
 	
 	public Secs2Float4() {

@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import com.shimizukenta.secs.SecsLog;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BytesParser;
 
@@ -83,11 +82,11 @@ public class HsmsSsByteReader implements Callable<Object> {
 				});
 				
 				parent.putReceiveMessagePassThrough(msg);
-				parent.notifyLog(new SecsLog("Received HsmsSs-Message", msg));
+				parent.notifyLog("Received HsmsSs-Message", msg);
 			}
 		}
 		catch ( HsmsSsDetectTerminateException | HsmsSsTimeoutT8Exception e ) {
-			parent.notifyLog(new SecsLog(e));
+			parent.notifyLog(e);
 		}
 		catch ( InterruptedException ignore ) {
 		}
@@ -115,8 +114,7 @@ public class HsmsSsByteReader implements Callable<Object> {
 			}
 			
 			if ( r < 0 ) {
-				String errMsg = "protocol: " + parent.hsmsSsConfig().protocol() + ", address: " + parent.hsmsSsConfig().socketAddress();
-				throw new HsmsSsDetectTerminateException(errMsg);
+				throw new HsmsSsDetectTerminateException();
 			}
 			
 			return r;
@@ -133,8 +131,7 @@ public class HsmsSsByteReader implements Callable<Object> {
 				throw (RuntimeException)t;
 			}
 			
-			String errMsg = "protocol: " + parent.hsmsSsConfig().protocol() + ", address: " + parent.hsmsSsConfig().socketAddress();
-			throw new HsmsSsDetectTerminateException(errMsg, e);
+			throw new HsmsSsDetectTerminateException(e);
 		}
 		catch ( InterruptedException e ) {
 			f.cancel(true);

@@ -20,12 +20,34 @@ public class PairHsmsSs {
 	
 	private static final int testCycle = 100;
 	
+	private boolean equipComm;
+	private boolean hostComm;
 	public int equipCounter;
 	public int hostCounter;
 	
 	public PairHsmsSs() {
-		equipCounter = 0;
-		hostCounter = 0;
+		this.equipComm = false;
+		this.hostComm = false;
+		this.equipCounter = 0;
+		this.hostCounter = 0;
+	}
+	
+	public void equipCommunicateState(boolean f) {
+		synchronized ( this ) {
+			equipComm = f;
+		}
+	}
+	
+	public void hostCommunicateState(boolean f) {
+		synchronized ( this ) {
+			hostComm = f;
+		}
+	}
+	
+	public boolean bothCommunicatable() {
+		synchronized ( this ) {
+			return equipComm && hostComm;
+		}
 	}
 	
 	public static void main(String[] args) {
@@ -35,6 +57,7 @@ public class PairHsmsSs {
 		final HsmsSsCommunicatorConfig equipConfig = new HsmsSsCommunicatorConfig();
 		final HsmsSsCommunicatorConfig hostConfig  = new HsmsSsCommunicatorConfig();
 		
+		equipConfig.communicatorName("Equip");
 		equipConfig.protocol(HsmsSsProtocol.PASSIVE);
 		equipConfig.socketAddress(addr);
 		equipConfig.sessionId(10);
@@ -42,6 +65,7 @@ public class PairHsmsSs {
 		equipConfig.rebindIfPassive(5.0F);
 		equipConfig.linktest(30.0F);
 		
+		hostConfig.communicatorName("Host");
 		hostConfig.protocol(HsmsSsProtocol.ACTIVE);
 		hostConfig.socketAddress(addr);
 		hostConfig.sessionId(10);
@@ -58,7 +82,10 @@ public class PairHsmsSs {
 			equip.addSecsLogListener(PairHsmsSs::echo);
 			
 			equip.addSecsCommunicatableStateChangeListener(state -> {
-				echo("equip-communicate: " + state);
+				synchronized ( inst ) {
+					inst.equipCommunicateState(state);
+					inst.notifyAll();
+				}
 			});
 			
 			equip.addTrySendMessagePassThroughListener(msg -> {
@@ -119,17 +146,18 @@ public class PairHsmsSs {
 			});
 			
 			equip.open();
-			Thread.sleep(500L);
-			
 			
 			try (
 					SecsCommunicator host  = HsmsSsCommunicator.newInstance(hostConfig);
 					) {
-			
+				
 				host.addSecsLogListener(PairHsmsSs::echo);
 				
 				host.addSecsCommunicatableStateChangeListener(state -> {
-					echo("host-communicate: " + state);
+					synchronized ( inst ) {
+						inst.hostCommunicateState(state);
+						inst.notifyAll();
+					}
 				});
 				
 				host.addTrySendMessagePassThroughListener(msg -> {
@@ -191,7 +219,21 @@ public class PairHsmsSs {
 				
 				
 				host.open();
-				Thread.sleep(500L);
+				
+				synchronized ( inst ) {
+					
+					echo("wait-until-both-communicatable");
+					
+					for ( ;; ) {
+						if ( inst.bothCommunicatable() ) {
+							break;
+						}
+						inst.wait();
+					}
+					
+					echo("both-communicated");
+				}
+				
 				
 				final int m = testCycle;
 				
@@ -216,10 +258,7 @@ public class PairHsmsSs {
 							}
 							catch ( SecsException e ) {
 								
-								threads.forEach(th -> {
-									th.interrupt();
-								});
-								
+								threads.forEach(Thread::interrupt);
 								echo(e);
 								
 								throw new RuntimeException(e);
@@ -257,10 +296,7 @@ public class PairHsmsSs {
 							}
 							catch ( SecsException e ) {
 								
-								threads.forEach(th -> {
-									th.interrupt();
-								});
-								
+								threads.forEach(Thread::interrupt);
 								echo(e);
 								
 								throw new RuntimeException(e);
