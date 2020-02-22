@@ -52,7 +52,7 @@ public class SmlDataItemParser {
 	protected SeekValueResult parsing(String s, int fromIndex) throws SmlParseException {
 		
 		try {
-			SeekCharResult r = seekAngleBlankBegin(s, fromIndex);
+			SeekCharResult r = seekAngleBranketBegin(s, fromIndex);
 			SeekStringResult s2ir = this.seekSecs2ItemString(s, r.index + 1);
 			SeekStringResult s2sr = this.seekSizeString(s, s2ir.endIndex);
 			
@@ -167,7 +167,7 @@ public class SmlDataItemParser {
 	private SeekValueResult parseDefaults(String str, int fromIndex, Secs2Item secs2Item)
 			throws SmlParseException {
 		
-		SeekCharResult r = this.seekAngleBlankEnd(str, fromIndex);
+		SeekCharResult r = this.seekAngleBranketEnd(str, fromIndex);
 		
 		String ss = str.substring(fromIndex, r.index).trim();
 		
@@ -410,11 +410,11 @@ public class SmlDataItemParser {
 		}
 	}
 	
-	protected SeekCharResult seekAngleBlankBegin(String s, int fromIndex) {
+	protected SeekCharResult seekAngleBranketBegin(String s, int fromIndex) {
 		return seekNextChar(s, fromIndex, ABB);
 	}
 	
-	protected SeekCharResult seekAngleBlankEnd(String s, int fromIndex) {
+	protected SeekCharResult seekAngleBranketEnd(String s, int fromIndex) {
 		return seekNextChar(s, fromIndex, ABE);
 	}
 	
