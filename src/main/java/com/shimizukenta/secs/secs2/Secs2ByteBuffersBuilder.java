@@ -36,7 +36,7 @@ public class Secs2ByteBuffersBuilder {
 		}
 	}
 	
-	protected void put(int v) {
+	public void put(int v) {
 		byte b = (byte)v;
 		ByteBuffer buffer = buffers.getLast();
 		if ( buffer.hasRemaining() ) {
@@ -48,7 +48,7 @@ public class Secs2ByteBuffersBuilder {
 		}
 	}
 	
-	protected void put(byte[] bs) {
+	public void put(byte[] bs) {
 		for ( byte b : bs ) {
 			put(b);
 		}
