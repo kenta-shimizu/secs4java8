@@ -6,14 +6,13 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.Optional;
 
 public class SecsLog implements Serializable {
 	
 	private static final long serialVersionUID = 3912865343300189344L;
 
-	public static final String SUBJECT_OF_THROWABLE = "Throwable";
-	
 	private final String subject;
 	private final LocalDateTime timestamp;
 	private final Object value;
@@ -37,7 +36,11 @@ public class SecsLog implements Serializable {
 	}
 	
 	public SecsLog(Throwable t) {
-		this(SUBJECT_OF_THROWABLE, LocalDateTime.now(), t);
+		this(createThrowableSubject(t), LocalDateTime.now(), t);
+	}
+	
+	public static String createThrowableSubject(Throwable t) {
+		return Objects.requireNonNull(t).getClass().getName();
 	}
 	
 	public String subject() {

@@ -137,7 +137,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	}
 	
 	protected void notifyLog(Throwable t) {
-		notifyLog(SecsLog.SUBJECT_OF_THROWABLE, t);
+		notifyLog(SecsLog.createThrowableSubject(t), t);
 	}
 	
 	private String createLogSubject(CharSequence subject) {
