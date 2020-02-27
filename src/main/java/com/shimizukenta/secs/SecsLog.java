@@ -40,7 +40,7 @@ public class SecsLog implements Serializable {
 	}
 	
 	public static String createThrowableSubject(Throwable t) {
-		return Objects.requireNonNull(t).getClass().getName();
+		return Objects.requireNonNull(t).getClass().getSimpleName();
 	}
 	
 	public String subject() {
