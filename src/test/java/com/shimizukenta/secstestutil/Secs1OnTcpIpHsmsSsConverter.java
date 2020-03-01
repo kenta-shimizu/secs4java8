@@ -7,10 +7,8 @@ import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
-import com.shimizukenta.secs.hsmsss.HsmsSsMessage;
 import com.shimizukenta.secs.hsmsss.HsmsSsMessageType;
 import com.shimizukenta.secs.secs1.Secs1Communicator;
-import com.shimizukenta.secs.secs1.Secs1Message;
 import com.shimizukenta.secs.secs1.Secs1TooBigSendMessageException;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicator;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicatorConfig;
@@ -55,13 +53,12 @@ public class Secs1OnTcpIpHsmsSsConverter implements Closeable {
 			}
 		}
 		
-		secs1.addSecsMessageReceiveListener(msg -> {
+		secs1.addReceiveMessagePassThroughListener(msg -> {
 			
 			byte[] head = createToHsmsSsHead(msg);
 			
 			try {
-				hsmsSs.send(hsmsSs.createHsmsSsMessage(head, msg.secs2()))
-				.ifPresent(this::replyToSecs1);
+				hsmsSs.send(hsmsSs.createHsmsSsMessage(head, msg.secs2()));
 			}
 			catch ( InterruptedException ignore ) {
 			}
@@ -69,13 +66,11 @@ public class Secs1OnTcpIpHsmsSsConverter implements Closeable {
 			}
 		});
 		
-		hsmsSs.addSecsMessageReceiveListener(msg -> {
-			
+		hsmsSs.addReceiveMessagePassThroughListener(msg -> {
 			byte[] head = createToSecs1Head(msg);
 			
 			try {
-				secs1.send(secs1.createSecs1Message(head, msg.secs2()))
-				.ifPresent(this::replyToHsmsSs);
+				secs1.send(secs1.createSecs1Message(head, msg.secs2()));
 			}
 			catch ( InterruptedException ignore ) {
 			}
@@ -167,30 +162,6 @@ public class Secs1OnTcpIpHsmsSsConverter implements Closeable {
 		};
 		
 		return head;
-	}
-	
-	private void replyToSecs1(HsmsSsMessage msg) {
-		
-		try {
-			byte[] head = createToSecs1Head(msg);
-			secs1.send(secs1.createSecs1Message(head, msg.secs2()));
-		}
-		catch ( InterruptedException ignore ) {
-		}
-		catch ( SecsException giveup ) {
-		}
-	}
-	
-	private void replyToHsmsSs(Secs1Message msg) {
-		
-		try {
-			byte[] head = createToHsmsSsHead(msg);
-			hsmsSs.send(hsmsSs.createHsmsSsMessage(head, msg.secs2()));
-		}
-		catch ( InterruptedException ignore ) {
-		}
-		catch ( SecsException giveup ) {
-		}
 	}
 	
 	private void rejectToHsmsSs(SecsMessage primary, byte reason) {

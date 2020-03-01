@@ -30,6 +30,14 @@ public class TcpIpAdapter implements Closeable {
 		this.closed = false;
 	}
 	
+	public SocketAddress socketAddressA() throws IOException {
+		return this.a.server.getLocalAddress();
+	}
+	
+	public SocketAddress socketAddressB() throws IOException {
+		return this.b.server.getLocalAddress();
+	}
+	
 	public void open() throws IOException {
 		
 		synchronized (this) {

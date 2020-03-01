@@ -57,7 +57,7 @@ public class ProtocolConvert {
 	public static void main(String[] args) {
 		
 		int deviceId = 10;
-		SocketAddress innerAddr  = new InetSocketAddress("127.0.0.1", 23456);
+		SocketAddress innerAddr  = new InetSocketAddress("127.0.0.1", 0);
 		SocketAddress secs1Addr  = new InetSocketAddress("127.0.0.1", 23000);
 		SocketAddress hsmsSsAddr = new InetSocketAddress("127.0.0.1", 5000);
 		
@@ -74,7 +74,7 @@ public class ProtocolConvert {
 				) {
 			
 			Secs1OnTcpIpCommunicatorConfig secs1ConverterConfig = new Secs1OnTcpIpCommunicatorConfig();
-			secs1ConverterConfig.socketAddress(innerAddr);
+			secs1ConverterConfig.socketAddress(adapter.socketAddressB());
 			secs1ConverterConfig.deviceId(deviceId);
 			secs1ConverterConfig.isEquip(false);
 			secs1ConverterConfig.isMaster(false);
