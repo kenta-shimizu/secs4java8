@@ -67,6 +67,11 @@ public class Secs1OnTcpIpHsmsSsConverter implements Closeable {
 		});
 		
 		hsmsSs.addReceiveMessagePassThroughListener(msg -> {
+			
+			if ( msg.getStream() < 0 ) {
+				return;
+			}
+			
 			byte[] head = createToSecs1Head(msg);
 			
 			try {
