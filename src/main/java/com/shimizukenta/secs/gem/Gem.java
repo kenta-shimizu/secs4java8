@@ -33,7 +33,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s1f1()
+	public Optional<SecsMessage> s1f1()
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -54,7 +54,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s1f2(SecsMessage primaryMsg)
+	public Optional<SecsMessage> s1f2(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -87,7 +87,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s1f13()
+	public Optional<SecsMessage> s1f13()
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -122,7 +122,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s1f14(SecsMessage primaryMsg, COMMACK commack)
+	public Optional<SecsMessage> s1f14(SecsMessage primaryMsg, COMMACK commack)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -183,7 +183,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s1f16(SecsMessage primaryMsg)
+	public Optional<SecsMessage> s1f16(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -231,7 +231,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s1f18(SecsMessage primaryMsg, ONLACK onlack)
+	public Optional<SecsMessage> s1f18(SecsMessage primaryMsg, ONLACK onlack)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -279,7 +279,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s2f22(SecsMessage primaryMsg, CMDA cmda)
+	public Optional<SecsMessage> s2f22(SecsMessage primaryMsg, CMDA cmda)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -300,7 +300,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s2f28(SecsMessage primaryMsg, CMDA cmda)
+	public Optional<SecsMessage> s2f28(SecsMessage primaryMsg, CMDA cmda)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -321,7 +321,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s2f32(SecsMessage primaryMsg, TIACK tiack)
+	public Optional<SecsMessage> s2f32(SecsMessage primaryMsg, TIACK tiack)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -418,7 +418,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s2f34(SecsMessage primaryMsg, DRACK drack)
+	public Optional<SecsMessage> s2f34(SecsMessage primaryMsg, DRACK drack)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -493,7 +493,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s2f36(SecsMessage primaryMsg, LRACK lrack)
+	public Optional<SecsMessage> s2f36(SecsMessage primaryMsg, LRACK lrack)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -646,7 +646,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s2f38(SecsMessage primaryMsg, ERACK erack)
+	public Optional<SecsMessage> s2f38(SecsMessage primaryMsg, ERACK erack)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -667,7 +667,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s2f40(SecsMessage primaryMsg, GRANT grant)
+	public Optional<SecsMessage> s2f40(SecsMessage primaryMsg, GRANT grant)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -688,7 +688,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s3f16(SecsMessage primaryMsg, GRANT grant)
+	public Optional<SecsMessage> s3f16(SecsMessage primaryMsg, GRANT grant)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -708,7 +708,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s5f2(SecsMessage primaryMsg)
+	public Optional<SecsMessage> s5f2(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -728,7 +728,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s5f4(SecsMessage primaryMsg)
+	public Optional<SecsMessage> s5f4(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -748,7 +748,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s6f2(SecsMessage primaryMsg)
+	public Optional<SecsMessage> s6f2(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -768,7 +768,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s6f4(SecsMessage primaryMsg)
+	public Optional<SecsMessage> s6f4(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -789,7 +789,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s6f6(SecsMessage primaryMsg, GRANT6 grant6)
+	public Optional<SecsMessage> s6f6(SecsMessage primaryMsg, GRANT6 grant6)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -809,7 +809,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s6f10(SecsMessage primaryMsg)
+	public Optional<SecsMessage> s6f10(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -829,7 +829,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s6f12(SecsMessage primaryMsg)
+	public Optional<SecsMessage> s6f12(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -849,7 +849,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s6f14(SecsMessage primaryMsg)
+	public Optional<SecsMessage> s6f14(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -869,7 +869,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s6f26(SecsMessage primaryMsg)
+	public Optional<SecsMessage> s6f26(SecsMessage primaryMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -878,7 +878,7 @@ public class Gem {
 		return s6fxa(primaryMsg, 26);
 	}
 	
-	private Optional<? extends SecsMessage> s6fxa(SecsMessage primaryMsg, int func)
+	private Optional<SecsMessage> s6fxa(SecsMessage primaryMsg, int func)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -899,7 +899,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s7f4(SecsMessage primaryMsg, ACKC7 ackc7)
+	public Optional<SecsMessage> s7f4(SecsMessage primaryMsg, ACKC7 ackc7)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -920,7 +920,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s7f12(SecsMessage primaryMsg, ACKC7 ackc7)
+	public Optional<SecsMessage> s7f12(SecsMessage primaryMsg, ACKC7 ackc7)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -941,7 +941,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s7f14(SecsMessage primaryMsg, ACKC7 ackc7)
+	public Optional<SecsMessage> s7f14(SecsMessage primaryMsg, ACKC7 ackc7)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -962,7 +962,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s7f16(SecsMessage primaryMsg, ACKC7 ackc7)
+	public Optional<SecsMessage> s7f16(SecsMessage primaryMsg, ACKC7 ackc7)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -983,7 +983,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s7f18(SecsMessage primaryMsg, ACKC7 ackc7)
+	public Optional<SecsMessage> s7f18(SecsMessage primaryMsg, ACKC7 ackc7)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1004,7 +1004,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s7f24(SecsMessage primaryMsg, ACKC7 ackc7)
+	public Optional<SecsMessage> s7f24(SecsMessage primaryMsg, ACKC7 ackc7)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1025,7 +1025,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s7f32(SecsMessage primaryMsg, ACKC7 ackc7)
+	public Optional<SecsMessage> s7f32(SecsMessage primaryMsg, ACKC7 ackc7)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1046,7 +1046,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s7f38(SecsMessage primaryMsg, ACKC7 ackc7)
+	public Optional<SecsMessage> s7f38(SecsMessage primaryMsg, ACKC7 ackc7)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1067,7 +1067,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s7f40(SecsMessage primaryMsg, ACKC7 ackc7)
+	public Optional<SecsMessage> s7f40(SecsMessage primaryMsg, ACKC7 ackc7)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1088,7 +1088,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s7f42(SecsMessage primaryMsg, ACKC7 ackc7)
+	public Optional<SecsMessage> s7f42(SecsMessage primaryMsg, ACKC7 ackc7)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1109,7 +1109,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s7f44(SecsMessage primaryMsg, ACKC7 ackc7)
+	public Optional<SecsMessage> s7f44(SecsMessage primaryMsg, ACKC7 ackc7)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1118,7 +1118,7 @@ public class Gem {
 		return s7fx(primaryMsg, 44, ackc7);
 	}
 	
-	private Optional<? extends SecsMessage> s7fx(SecsMessage primaryMsg, int func, ACKC7 ackc7)
+	private Optional<SecsMessage> s7fx(SecsMessage primaryMsg, int func, ACKC7 ackc7)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1138,7 +1138,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s9f1(SecsMessage refMsg)
+	public Optional<SecsMessage> s9f1(SecsMessage refMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1158,7 +1158,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s9f3(SecsMessage refMsg)
+	public Optional<SecsMessage> s9f3(SecsMessage refMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1178,7 +1178,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s9f5(SecsMessage refMsg)
+	public Optional<SecsMessage> s9f5(SecsMessage refMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1198,7 +1198,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s9f7(SecsMessage refMsg)
+	public Optional<SecsMessage> s9f7(SecsMessage refMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1218,7 +1218,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s9f9(SecsMessage refMsg)
+	public Optional<SecsMessage> s9f9(SecsMessage refMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1238,7 +1238,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s9f11(SecsMessage refMsg)
+	public Optional<SecsMessage> s9f11(SecsMessage refMsg)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1247,7 +1247,7 @@ public class Gem {
 		return s9fx(refMsg, 11);
 	}
 	
-	private Optional<? extends SecsMessage> s9fx(SecsMessage refMsg, int func)
+	private Optional<SecsMessage> s9fx(SecsMessage refMsg, int func)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1271,7 +1271,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s10f2(SecsMessage primaryMsg, ACKC10 ackc10)
+	public Optional<SecsMessage> s10f2(SecsMessage primaryMsg, ACKC10 ackc10)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1292,7 +1292,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s10f4(SecsMessage primaryMsg, ACKC10 ackc10)
+	public Optional<SecsMessage> s10f4(SecsMessage primaryMsg, ACKC10 ackc10)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1313,7 +1313,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s10f6(SecsMessage primaryMsg, ACKC10 ackc10)
+	public Optional<SecsMessage> s10f6(SecsMessage primaryMsg, ACKC10 ackc10)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1334,7 +1334,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s10f10(SecsMessage primaryMsg, ACKC10 ackc10)
+	public Optional<SecsMessage> s10f10(SecsMessage primaryMsg, ACKC10 ackc10)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1343,7 +1343,7 @@ public class Gem {
 		return s10fx(primaryMsg, 10, ackc10);
 	}
 	
-	private Optional<? extends SecsMessage> s10fx(SecsMessage primaryMsg, int func, ACKC10 ackc10)
+	private Optional<SecsMessage> s10fx(SecsMessage primaryMsg, int func, ACKC10 ackc10)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -1364,7 +1364,7 @@ public class Gem {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> s13f12(SecsMessage primaryMsg, GRANT grant)
+	public Optional<SecsMessage> s13f12(SecsMessage primaryMsg, GRANT grant)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
