@@ -2,23 +2,27 @@ package com.shimizukenta.secs;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.shimizukenta.secs.gem.Gem;
+import com.shimizukenta.secs.gem.UsualGem;
+import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.sml.SmlMessage;
 
 public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 
 	private final AbstractSecsCommunicatorConfig config;
 	private final Gem gem;
 	
-	protected boolean opened;
-	protected boolean closed;
+	private boolean opened;
+	private boolean closed;
 	private boolean lastCommunicatable;
 	
 	public AbstractSecsCommunicator(AbstractSecsCommunicatorConfig config) {
 		
 		this.config = config;
-		this.gem = new Gem(this, config.gem());
+		this.gem = new UsualGem(this, config.gem());
 		
 		opened = false;
 		closed = false;
@@ -86,6 +90,38 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	
 	protected SecsTimeout timeout() {
 		return config.timeout();
+	}
+	
+	@Override
+	public Optional<SecsMessage> send(int strm, int func, boolean wbit)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+			, InterruptedException {
+		
+		return send(strm, func, wbit, Secs2.empty());
+	}
+	
+	@Override
+	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+			, InterruptedException {
+		
+		return send(primary, strm, func, wbit, Secs2.empty());
+	}
+	
+	@Override
+	public Optional<SecsMessage> send(SmlMessage sml)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+			, InterruptedException {
+		
+		return send(sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
+	}
+	
+	@Override
+	public Optional<SecsMessage> send(SecsMessage primary, SmlMessage sml)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+			, InterruptedException {
+		
+		return send(primary, sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
 	}
 	
 	

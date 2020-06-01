@@ -34,12 +34,11 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	default public Optional<SecsMessage> send(int strm, int func, boolean wbit)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
-			, InterruptedException {
-		
-		return send(strm, func, wbit, Secs2.empty());
-	}
+	public Optional<SecsMessage> send(int strm, int func, boolean wbit)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException;
 	
 	/**
 	 * Blocking-method<br />
@@ -57,7 +56,9 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws InterruptedException
 	 */
 	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
 			, InterruptedException;
 	
 	/**
@@ -73,12 +74,11 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	default public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
-			, InterruptedException {
-		
-		return send(primary, strm, func, wbit, Secs2.empty());
-	}
+	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException;
 	
 	/**
 	 * send reply-message
@@ -94,8 +94,10 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	abstract public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
 			, InterruptedException;
 	
 	/**
@@ -110,12 +112,11 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	default public Optional<SecsMessage> send(SmlMessage sml)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
-			, InterruptedException {
-		
-		return send(sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
-	}
+	public Optional<SecsMessage> send(SmlMessage sml)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException;
 	
 	/**
 	 * send reply-message
@@ -128,12 +129,11 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	default public Optional<SecsMessage> send(SecsMessage primary, SmlMessage sml)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
-			, InterruptedException {
-		
-		return send(primary, sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
-	}
+	public Optional<SecsMessage> send(SecsMessage primary, SmlMessage sml)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException;
 	
 	
 	/* Secs-Message Receive Listener */
@@ -144,7 +144,9 @@ public interface SecsCommunicator extends Closeable {
 	public boolean addSecsLogListener(SecsLogListener lstnr);
 	public boolean removeSecsLogListener(SecsLogListener lstnr);
 	
+	
 	/* Secs-Communicatable-State-Changed-Listener */
+	
 	/**
 	 * Blocking-Listener<br />
 	 * Pass through quickly.

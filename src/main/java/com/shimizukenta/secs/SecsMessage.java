@@ -28,9 +28,7 @@ public interface SecsMessage extends Serializable {
 	
 	public int deviceId();
 	
-	default public int sessionId() {
-		return deviceId();
-	}
+	public int sessionId();
 	
 	public byte[] header10Bytes();
 	

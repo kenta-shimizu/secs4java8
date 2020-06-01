@@ -35,6 +35,11 @@ public abstract class AbstractSecsMessage implements SecsMessage {
 	}
 	
 	@Override
+	public int sessionId() {
+		return deviceId();
+	}
+
+	@Override
 	public String toJson() {
 		return "{\"strm\":" + getStream()
 				+ ",\"func\":" + getFunction()

@@ -1,11 +1,8 @@
 package com.shimizukenta.secs.gem;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
@@ -13,16 +10,8 @@ import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
-public class Gem {
+public interface Gem {
 
-	private final SecsCommunicator comm;
-	private final GemConfig config;
-	
-	public Gem(SecsCommunicator communicator, GemConfig config) {
-		this.comm = communicator;
-		this.config = config;
-	}
-	
 	/**
 	 * Are You Online?<br />
 	 * blocking-method
@@ -37,10 +26,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(1, 1, true);
-	}
+			, InterruptedException;
 	
 	/**
 	 * On Line Data<br />
@@ -58,24 +44,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		Secs2 ss;
-		
-		if ( comm.isEquip() ) {
-			
-			ss = Secs2.list(
-					Secs2.ascii(config.mdln())
-					, Secs2.ascii(config.softrev())
-					);
-			
-		} else {
-			
-			ss = Secs2.list();
-		}
-		
-		return comm.send(primaryMsg, 1, 2, false, ss);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Establish Communications Request<br />
@@ -91,24 +60,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		Secs2 ss;
-		
-		if ( comm.isEquip() ) {
-			
-			ss = Secs2.list(
-					Secs2.ascii(config.mdln())
-					, Secs2.ascii(config.softrev())
-					);
-			
-		} else {
-			
-			ss = Secs2.list();
-		}
-		
-		return comm.send(1, 13, true, ss);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Establish Communications Request Acknowledge<br />
@@ -126,24 +78,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		Secs2 ss;
-		
-		if ( comm.isEquip() ) {
-			
-			ss = Secs2.list(
-					Secs2.ascii(config.mdln())
-					, Secs2.ascii(config.softrev())
-					);
-			
-		} else {
-			
-			ss = Secs2.list();
-		}
-		
-		return comm.send(primaryMsg, 1, 14, false, Secs2.list(commack.secs2(), ss));
-	}
+			, InterruptedException;
 	
 	/**
 	 * Request OFF-LINE<br />
@@ -161,16 +96,7 @@ public class Gem {
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
-			, InterruptedException {
-		
-		Secs2 ss = comm.send(1, 15, true)
-				.filter(msg -> msg.getStream() == 1)
-				.filter(msg -> msg.getFunction() == 16)
-				.map(msg -> msg.secs2())
-				.orElseThrow(() -> new Secs2Exception("S1F16 parse failed"));
-		
-		return OFLACK.get(ss);
-	}
+			, InterruptedException;
 	
 	/**
 	 * OFF-LINE Acknowledge<br />
@@ -187,10 +113,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 1, 16, false, OFLACK.OK.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Request ON-LINE<br />
@@ -208,16 +131,7 @@ public class Gem {
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
-			, InterruptedException {
-		
-		Secs2 ss = comm.send(1, 17, true)
-				.filter(msg -> msg.getStream() == 1)
-				.filter(msg -> msg.getFunction() == 18)
-				.map(msg -> msg.secs2())
-				.orElseThrow(() -> new Secs2Exception("S1F18 parse failed"));
-		
-		return ONLACK.get(ss);
-	}
+			, InterruptedException;
 	
 	/**
 	 * ON-LINE Acknowledge<br />
@@ -235,10 +149,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 1, 18, false, onlack.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Date and Time Request<br />
@@ -256,16 +167,7 @@ public class Gem {
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
-			, InterruptedException {
-		
-		Secs2 ss = comm.send(2, 17, true)
-				.filter(msg -> msg.getStream() == 2)
-				.filter(msg -> msg.getFunction() == 18)
-				.map(msg -> msg.secs2())
-				.orElseThrow(() -> new Secs2Exception("s2f18 parse failed"));
-		
-		return ss.getAscii();
-	}
+			, InterruptedException;
 	
 	/**
 	 * Remote Command Acknowledge<br />
@@ -283,10 +185,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 2, 22, false, cmda.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Initiate Processing Acknowledge<br />
@@ -304,10 +203,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 2, 28, false, cmda.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Date and Time Set Acknowledge<br />
@@ -325,10 +221,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 2, 32, false, tiack.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Define Report Delete All<br />
@@ -347,10 +240,7 @@ public class Gem {
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
-			, InterruptedException {
-		
-		return s2f33(dataId, Collections.emptyList());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Define Report<br />
@@ -370,10 +260,7 @@ public class Gem {
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
-			, InterruptedException {
-		
-		return s2f33(dataId, reports.stream().map(r -> r.secs2()).collect(Collectors.toList()));
-	}
+			, InterruptedException;
 	
 	/**
 	 * Define Report<br />
@@ -393,18 +280,7 @@ public class Gem {
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
-			, InterruptedException {
-		
-		Secs2 ss = Secs2.list(dataId, Secs2.list(reports));
-		
-		Secs2 r = comm.send(2, 33, true, ss)
-				.filter(msg -> msg.getStream() == 2)
-				.filter(msg -> msg.getFunction() == 34)
-				.map(msg -> msg.secs2())
-				.orElseThrow(() -> new Secs2Exception("s2f34 parse failed"));
-		
-		return DRACK.get(r);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Define Report Acknowledge<br />
@@ -422,10 +298,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 2, 34, false, drack.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Link Event Report<br />
@@ -445,10 +318,7 @@ public class Gem {
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
-			, InterruptedException {
-		
-		return s2f35(dataId, links.stream().map(lk -> lk.secs2()).collect(Collectors.toList()));
-	}
+			, InterruptedException;
 	
 	/**
 	 * Link Event Report<br />
@@ -468,18 +338,7 @@ public class Gem {
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
-			, InterruptedException {
-		
-		Secs2 ss = Secs2.list(dataId, Secs2.list(links));
-		
-		Secs2 r = comm.send(2, 35, true, ss)
-				.filter(msg -> msg.getStream() == 2)
-				.filter(msg -> msg.getFunction() == 36)
-				.map(msg -> msg.secs2())
-				.orElseThrow(() -> new Secs2Exception("s2f36 parse failed"));
-		
-		return LRACK.get(r);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Link Event Report Acknowledge<br />
@@ -497,10 +356,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 2, 36, false, lrack.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Eable Event Report<br />
@@ -519,10 +375,7 @@ public class Gem {
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
-			, InterruptedException {
-		
-		return s2f37p(CEED.ENABLE, events);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Disable Event Report<br />
@@ -541,10 +394,7 @@ public class Gem {
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
-			, InterruptedException {
-		
-		return s2f37p(CEED.DISABLE, events);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Enable All Event Report<br />
@@ -562,10 +412,7 @@ public class Gem {
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
-			, InterruptedException {
-	
-		return s2f37(CEED.ENABLE, Collections.emptyList());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Disable All Event Report<br />
@@ -583,23 +430,7 @@ public class Gem {
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
-			, InterruptedException {
-	
-		return s2f37(CEED.DISABLE, Collections.emptyList());
-	}
-	
-	private ERACK s2f37p(CEED ceed, List<GemCollectionEvent> ceids)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, Secs2Exception
-			, InterruptedException {
-		
-		return s2f37(ceed
-				, ceids.stream()
-				.map(v -> v.secs2())
-				.collect(Collectors.toList()));
-	}
+			, InterruptedException;
 	
 	/**
 	 * Enable/Disable Event Report<br />
@@ -619,20 +450,7 @@ public class Gem {
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
-			, InterruptedException {
-		
-		Secs2 ss = Secs2.list(
-				ceed.secs2()
-				, Secs2.list(ceids));
-		
-		Secs2 r = comm.send(2, 37, true, ss)
-				.filter(msg -> msg.getStream() == 2)
-				.filter(msg -> msg.getFunction() == 38)
-				.map(msg -> msg.secs2())
-				.orElseThrow(() -> new Secs2Exception("s2f38 parse failed"));
-		
-		return ERACK.get(r);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Enable/Disable Event Report Acknowledge<br />
@@ -650,10 +468,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 2, 38, false, erack.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Multi-block Grant<br />
@@ -671,10 +486,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 2, 40, false, grant.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Matls Multi-block Grant<br />
@@ -692,10 +504,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 3, 16, false, grant.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Alarm Report Ack<br />
@@ -712,10 +521,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 5, 2, false, ACKC5.OK.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Enable/Disable Alarm Ack<br />
@@ -732,10 +538,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 5, 4, false, ACKC5.OK.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Trace Data Ack<br />
@@ -752,10 +555,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s6fxa(primaryMsg, 2);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Discrete Variable Data Send Ack<br />
@@ -772,10 +572,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s6fxa(primaryMsg, 4);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Multi-block Grant<br />
@@ -793,10 +590,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 6, 6, false, grant6.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Formatted Variable Ack<br />
@@ -813,10 +607,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s6fxa(primaryMsg, 10);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Event Report Ack<br />
@@ -833,10 +624,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s6fxa(primaryMsg, 12);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Annotated Event Report Ack<br />
@@ -853,10 +641,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s6fxa(primaryMsg, 14);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Notification Report Send Ack<br />
@@ -873,19 +658,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s6fxa(primaryMsg, 26);
-	}
-	
-	private Optional<SecsMessage> s6fxa(SecsMessage primaryMsg, int func)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 6, func, false, ACKC6.OK.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Process Program Send Acknowledge<br />
@@ -903,10 +676,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s7fx(primaryMsg, 4, ackc7);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Matl/Process Matrix Update Ack<br />
@@ -924,10 +694,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s7fx(primaryMsg, 12, ackc7);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Delete Matl/Process Matrix Entry Acknowledge<br />
@@ -945,10 +712,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s7fx(primaryMsg, 14, ackc7);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Matrix Mode Select Ack<br />
@@ -966,10 +730,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s7fx(primaryMsg, 16, ackc7);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Delete Process Program Acknowledge<br />
@@ -987,10 +748,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s7fx(primaryMsg, 18, ackc7);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Formatted Process Program Acknowledge<br />
@@ -1008,10 +766,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s7fx(primaryMsg, 24, ackc7);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Verification Request Acknowledge<br />
@@ -1029,10 +784,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s7fx(primaryMsg, 32, ackc7);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Large PP Send Ack<br />
@@ -1050,10 +802,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s7fx(primaryMsg, 38, ackc7);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Large Formatted PP Ack<br />
@@ -1071,10 +820,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s7fx(primaryMsg, 40, ackc7);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Large PP Req Ack<br />
@@ -1092,10 +838,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s7fx(primaryMsg, 42, ackc7);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Large Formatted PP Req Ack<br />
@@ -1113,19 +856,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s7fx(primaryMsg, 44, ackc7);
-	}
-	
-	private Optional<SecsMessage> s7fx(SecsMessage primaryMsg, int func, ACKC7 ackc7)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 7, func, false, ackc7.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Unknown Device ID<br />
@@ -1142,10 +873,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s9fx(refMsg, 1);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Unknown Stream<br />
@@ -1162,10 +890,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s9fx(refMsg, 3);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Unknown Function<br />
@@ -1182,10 +907,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s9fx(refMsg, 5);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Illegal Data<br />
@@ -1202,10 +924,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s9fx(refMsg, 7);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Transaction Timeout<br />
@@ -1222,10 +941,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s9fx(refMsg, 9);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Data Too Long<br />
@@ -1242,19 +958,8 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s9fx(refMsg, 11);
-	}
+			, InterruptedException;
 	
-	private Optional<SecsMessage> s9fx(SecsMessage refMsg, int func)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, InterruptedException {
-		
-		return comm.send(9, func, false, Secs2.binary(refMsg.header10Bytes()));
-	}
 	
 	/* HOOK s9f13 */
 	
@@ -1275,10 +980,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s10fx(primaryMsg, 2, ackc10);
-	}
+			, InterruptedException;
 
 	/**
 	 * Terminal Display, Single Acknowledge<br />
@@ -1296,10 +998,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s10fx(primaryMsg, 4, ackc10);
-	}
+			, InterruptedException;
 
 	/**
 	 * Terminal Display, Multi-Block Acknowledge<br />
@@ -1317,10 +1016,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s10fx(primaryMsg, 6, ackc10);
-	}
+			, InterruptedException;
 	
 	/**
 	 * Broadcast Acknowledge<br />
@@ -1338,19 +1034,7 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return s10fx(primaryMsg, 10, ackc10);
-	}
-	
-	private Optional<SecsMessage> s10fx(SecsMessage primaryMsg, int func, ACKC10 ackc10)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, InterruptedException {
-		
-		return comm.send(9, func, false, ackc10.secs2());
-	}
+			, InterruptedException;
 	
 	/**
 	 * Data Set Obj Multi-Block Grant<br />
@@ -1368,9 +1052,6 @@ public class Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, InterruptedException {
-		
-		return comm.send(primaryMsg, 13, 12, false, grant.secs2());
-	}
-
+			, InterruptedException;
+	
 }
