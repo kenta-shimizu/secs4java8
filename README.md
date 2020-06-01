@@ -10,14 +10,14 @@ This library is SEMI-SECS-communicate implementation on Java8.
 - SECS-II (SEMI-E5)
 - GEM (SEMI-E30, partially)
 - HSMS-SS (SEMI-E37.1)
-- SML (PEER Group)
+- [SML (PEER Group)](https://www.peergroup.com/expertise/resources/secs-message-language/)
 
 ## Create Communicator instance and open
 
-- For use HSMS-SS Passive
+- For use HSMS-SS-Passive
 
 ```
-    /* HSMS-SS Passive open example */
+    /* HSMS-SS-Passive open example */
     HsmsSsCommunicatorConfig config = new HsmsSsCommunicatorConfig();
     config.protocol(HsmsSsProtocol.PASSIVE);
     config.socketAddress(new InetSocketAddress("127.0.0.1", 5000));
@@ -33,10 +33,10 @@ This library is SEMI-SECS-communicate implementation on Java8.
     SecsCommunicator passive = HsmsSsCommunicator.open(config);
 ```
 
-- For use HSMS-SS Active
+- For use HSMS-SS-Active
 
 ```
-    /* HSMS-SS Active open example */
+    /* HSMS-SS-Active open example */
     HsmsSsCommunicatorConfig config = new HsmsSsCommunicatorConfig();
     config.protocol(HsmsSsProtocol.ACTIVE);
     config.socketAddress(new InetSocketAddress("127.0.0.1", 5000));
@@ -68,7 +68,9 @@ This library is SEMI-SECS-communicate implementation on Java8.
     SecsCommunicator secs1 = Secs1OnTcpIpCommunicator.open(config);
 ```
 
-[How to TCP/IP <-> RS232C convert sample](/src/main/raspi-python/TcpIpSerialConverter)
+How to convert TCP/IP <-> RS232C
+- [Use XPort](https://www.lantronix.com/products/xport/)
+- [Use Raspberry Pi sample](/src/main/raspi-python/TcpIpSerialConverter)
 
 ## Send Primary-Message, and receive Reply-Message
 
@@ -77,9 +79,9 @@ This library is SEMI-SECS-communicate implementation on Java8.
 ```
     /* example */
     Secs2 secs2 = Secs2.list(               /* <L                       */
-        Secs2.binary((byte)0x81)            /*   <B  0x81>              */
-        , Secs2.int2(1001)                  /*   <I2 1001>              */
-        , Secs2.ascii("error message")      /*   <A  "error message">   */
+        Secs2.binary((byte)0x81),           /*   <B  0x81>              */
+        Secs2.int2(1001),                   /*   <I2 1001>              */
+        Secs2.ascii("error message")        /*   <A  "error message">   */
     );                                      /* >.                       */
 ```
 
@@ -88,10 +90,10 @@ This library is SEMI-SECS-communicate implementation on Java8.
 ```
     /* Send S5F1 W. example */
     Optional<SecsMessage> reply = passive.send(
-        5           /* Stream-Number   */
-        , 1         /* Function-Number */
-        , true      /* W-Bit           */
-        , secs2     /* SECS-II         */
+        5,          /* Stream-Number   */
+        1,          /* Function-Number */
+        true,       /* W-Bit           */
+        secs2       /* SECS-II         */
     );
 ```
 
@@ -126,7 +128,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
     <L [3]
         <B  [1] 0x81>           /* ALCD (0, 0) */
         <I2 [1] 1001>           /* ALID (1, 0) */
-        <A "error message">     /* ALTX (2)    */
+        <A  "error message">    /* ALTX (2)    */
     >. 
 
     byte   alcd = msg.secs2().getByte(0, 0);
@@ -154,11 +156,11 @@ This library is SEMI-SECS-communicate implementation on Java8.
     Secs2 reply = Secs2.binary((byte)0x0);  /* <B 0x0> */
 
     active.send(
-        primaryMsg  /* Primary-Message */
-        , 5         /* Stream-Number   */
-        , 2         /* Function-Number */
-        , false     /* W-Bit           */
-        , reply     /* Reply-SECS-II   */
+        primaryMsg, /* Primary-Message */
+        5,          /* Stream-Number   */
+        2,          /* Function-Number */
+        false,      /* W-Bit           */
+        reply       /* Reply-SECS-II   */
     );
 ```
 
