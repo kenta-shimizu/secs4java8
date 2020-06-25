@@ -60,13 +60,13 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	public void open() throws IOException {
 		super.open();
 		
-		execServ.execute(taskRecvMsg);
-		execServ.execute(taskNotifyLog);
-		execServ.execute(taskTrySendMsgPassThroughQueue);
-		execServ.execute(taskSendedMsgPassThroughQueue);
-		execServ.execute(taskRecvMsgPassThroughQueue);
+		execServ.execute(createRecvMsgTask());
+		execServ.execute(createNotifyLogTask());
+		execServ.execute(createTrySendMsgPassThroughQueueTask());
+		execServ.execute(createSendedMsgPassThroughQueueTask());
+		execServ.execute(createRecvMsgPassThroughQueueTask());
 		
-		execServ.execute(new Loop());
+		execServ.execute(new CircuitLoop());
 	}
 
 	@Override
@@ -117,20 +117,11 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		throw new UnsupportedOperationException("use #putReceiveDataMessage");
 	}
 	
-	private final Runnable taskRecvMsg = new Runnable() {
-
-		@Override
-		public void run() {
-			
-			try {
-				for ( ;; ) {
-					Secs1Communicator.super.notifyReceiveMessage(recvDataMsgQueue.take());
-				}
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		}
-	};
+	private final Runnable createRecvMsgTask() {
+		return createLoopTask(() -> {
+			super.notifyReceiveMessage(recvDataMsgQueue.take());
+		});
+	}
 	
 	
 	/* Log Queue */
@@ -141,19 +132,11 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		logQueue.offer(log);
 	}
 	
-	private final Runnable taskNotifyLog = new Runnable() {
-
-		@Override
-		public void run() {
-			try {
-				for ( ;; ) {
-					Secs1Communicator.super.notifyLog(logQueue.take());
-				}
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		}
-	};
+	private Runnable createNotifyLogTask() {
+		return createLoopTask(() -> {
+			super.notifyLog(logQueue.take());
+		});
+	}
 	
 	@Override
 	protected void notifyLog(CharSequence subject) {
@@ -183,20 +166,11 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		trySendMsgPassThroughQueue.put(msg);
 	}
 	
-	private final Runnable taskTrySendMsgPassThroughQueue = new Runnable() {
-
-		@Override
-		public void run() {
-			try {
-				for ( ;; ) {
-					Secs1Communicator.super.notifyTrySendMessagePassThrough(trySendMsgPassThroughQueue.take());
-				}
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		}
-	};
-	
+	private final Runnable createTrySendMsgPassThroughQueueTask() {
+		return createLoopTask(() -> {
+			super.notifyTrySendMessagePassThrough(trySendMsgPassThroughQueue.take());
+		});
+	}
 	
 	/* sendedPassThroughQueue */
 	private final BlockingQueue<Secs1Message> sendedMsgPassThroughQueue = new LinkedBlockingQueue<>();
@@ -210,20 +184,11 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		sendedMsgPassThroughQueue.put(msg);
 	}
 	
-	private final Runnable taskSendedMsgPassThroughQueue = new Runnable() {
-
-		@Override
-		public void run() {
-			try {
-				for ( ;; ) {
-					Secs1Communicator.super.notifySendedMessagePassThrough(sendedMsgPassThroughQueue.take());
-				}
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		}
-	};
-
+	private final Runnable createSendedMsgPassThroughQueueTask() {
+		return createLoopTask(() -> {
+			super.notifySendedMessagePassThrough(sendedMsgPassThroughQueue.take());
+		});
+	}
 	
 	/* sendedPassThroughQueue */
 	private final BlockingQueue<Secs1Message> recvMsgPassThroughQueue = new LinkedBlockingQueue<>();
@@ -237,23 +202,16 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		recvMsgPassThroughQueue.put(msg);
 	}
 	
-	private final Runnable taskRecvMsgPassThroughQueue = new Runnable() {
-
-		@Override
-		public void run() {
-			try {
-				for ( ;; ) {
-					Secs1Communicator.super.notifyReceiveMessagePassThrough(recvMsgPassThroughQueue.take());
-				}
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		}
-	};
+	private Runnable createRecvMsgPassThroughQueueTask() {
+		return createLoopTask(() -> {
+			super.notifyReceiveMessagePassThrough(recvMsgPassThroughQueue.take());
+		});
+	}
 	
 	
 	abstract protected Optional<Byte> pollByte();
 	abstract protected Optional<Byte> pollByte(long timeout, TimeUnit unit) throws InterruptedException;
+	abstract protected Optional<Byte> pollByte(byte[] request) throws InterruptedException;
 	abstract protected Optional<Byte> pollByte(byte[] request, long timeout, TimeUnit unit) throws InterruptedException;
 	
 	private Optional<Byte> pollByteTx(float timeout) throws InterruptedException {
@@ -387,11 +345,11 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		;
 	}
 	
-	private class Loop implements Runnable {
+	private class CircuitLoop implements Runnable {
 		
 		private Secs1MessageBlock presentBlock;
 		
-		public Loop() {
+		public CircuitLoop() {
 			presentBlock = null;
 		}
 		
@@ -450,13 +408,9 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			
 			Collection<Callable<PollCircuitControl>> tasks = Arrays.asList(
 					() -> {
-						
 						try {
-							long t = (long)(secs1Config().timeout().t2() * 2000.0F);
-							
 							for ( ;; ) {
-								
-								Optional<Byte> op = pollByte(request, t, TimeUnit.MILLISECONDS);
+								Optional<Byte> op = pollByte(request);
 								
 								if ( op.isPresent() ) {
 									
@@ -476,8 +430,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 						}
 						
 						return PollCircuitControl.RETRY;
-					}
-					);
+					});
 			
 			try {
 				long t = (long)(secs1Config().timeout().t2() * 1000.0F);

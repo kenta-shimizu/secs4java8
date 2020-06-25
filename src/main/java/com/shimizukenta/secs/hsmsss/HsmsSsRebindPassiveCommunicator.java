@@ -22,35 +22,24 @@ public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 		super.close();
 	}
 	
-	
 	@Override
 	protected void passiveOpen() {
 		
-		executorService().execute(() -> {
+		executorService().execute(createLoopTask(() -> {
 			
-			try {
-				for ( ;; ) {
-					
-					passiveBind();
-					
-					long t = this.hsmsSsConfig().rebindIfPassive()
-							.map(v -> (v * 1000.0F))
-							.map(v -> v.longValue())
-							.orElse(-1L);
-					
-					if ( t > 0 ) {
-						
-						TimeUnit.MILLISECONDS.sleep(t);
-						
-					} else {
-						
-						break;
-					}
-				}
+			passiveBind();
+			
+			long t = this.hsmsSsConfig().rebindIfPassive()
+					.map(v -> (v * 1000.0F))
+					.map(v -> v.longValue())
+					.orElse(-1L);
+			
+			if ( t > 0 ) {
+				TimeUnit.MILLISECONDS.sleep(t);
+			} else {
+				return;
 			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
+		}));
 	}
 	
 	private void passiveBind() throws InterruptedException {

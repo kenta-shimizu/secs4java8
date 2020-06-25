@@ -56,7 +56,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 			}
 		}
 		catch ( IOException e ) {
-			ioExcept = null;
+			ioExcept = e;
 		}
 		
 		synchronized ( this ) {

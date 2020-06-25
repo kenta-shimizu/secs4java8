@@ -32,21 +32,17 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 		
 		super.open();
 		
-		executorService().execute(() -> {
-			try {
-				for ( ;; ) {
-					activeLoop();
-					
-					sendReplyManager.clear();
-					
-					long t5 = (long)(hsmsSsConfig().timeout().t5() * 1000.0F);
-					TimeUnit.MILLISECONDS.sleep(t5);
-				}
+		executorService().execute(createLoopTask(() -> {
+			
+			activeCircuit();
+			
+			sendReplyManager.clear();
+			
+			long t5 = (long)(hsmsSsConfig().timeout().t5() * 1000.0F);
+			if ( t5 > 0 ) {
+				TimeUnit.MILLISECONDS.sleep(t5);
 			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
-		
+		}));
 	}
 	
 	@Override
@@ -54,7 +50,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 		super.close();
 	}
 	
-	protected void activeLoop() throws InterruptedException {
+	protected void activeCircuit() throws InterruptedException {
 		
 		try (
 				AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
@@ -227,15 +223,17 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 						}
 						finally {
 							
+							removeChannel(channel);
+							
 							try {
 								channel.shutdownOutput();
 							}
 							catch (IOException giveup) {
 							}
-						}
-						
-						synchronized ( channel ) {
-							channel.notifyAll();
+							
+							synchronized ( channel ) {
+								channel.notifyAll();
+							}
 						}
 					}
 					
@@ -255,16 +253,6 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 				}
 			}
 			finally {
-				
-				if ( removeChannel(channel) ) {
-					
-					try {
-						channel.shutdownOutput();
-					}
-					catch ( IOException giveup ) {
-					}
-				}
-				
 				notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
 			}
 		}

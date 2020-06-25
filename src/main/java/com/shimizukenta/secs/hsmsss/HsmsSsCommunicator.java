@@ -103,11 +103,11 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	public void open() throws IOException {
 		super.open();
 		
-		execServ.execute(taskRecvMsg);
-		execServ.execute(taskNotifyLog);
-		execServ.execute(taskTrySendMsgPassThroughQueue);
-		execServ.execute(taskSendedMsgPassThroughQueue);
-		execServ.execute(taskRecvMsgPassThroughQueue);
+		execServ.execute(createRecvMsgTask());
+		execServ.execute(createNotifyLogTask());
+		execServ.execute(createTrySendMsgPassThroughQueueTask());
+		execServ.execute(createSendedMsgPassThroughQueueTask());
+		execServ.execute(createRecvMsgPassThroughQueueTask());
 	}
 	
 	@Override
@@ -158,20 +158,11 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		throw new UnsupportedOperationException("use #putReceiveMessage");
 	}
 	
-	private final Runnable taskRecvMsg = new Runnable() {
-
-		@Override
-		public void run() {
-			
-			try {
-				for ( ;; ) {
-					HsmsSsCommunicator.super.notifyReceiveMessage(recvDataMsgQueue.take());
-				}
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		}
-	};
+	private Runnable createRecvMsgTask() {
+		return createLoopTask(() -> {
+			super.notifyReceiveMessage(recvDataMsgQueue.take());
+		});
+	}
 	
 	
 	/* Log Queue */
@@ -182,19 +173,11 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		logQueue.offer(log);
 	}
 	
-	private final Runnable taskNotifyLog = new Runnable() {
-
-		@Override
-		public void run() {
-			try {
-				for ( ;; ) {
-					HsmsSsCommunicator.super.notifyLog(logQueue.take());
-				}
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		}
-	};
+	private Runnable createNotifyLogTask() {
+		return createLoopTask(() -> {
+			super.notifyLog(logQueue.take());
+		});
+	}
 	
 	@Override
 	protected void notifyLog(CharSequence subject) {
@@ -224,19 +207,11 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		trySendMsgPassThroughQueue.put(msg);
 	}
 	
-	private final Runnable taskTrySendMsgPassThroughQueue = new Runnable() {
-
-		@Override
-		public void run() {
-			try {
-				for ( ;; ) {
-					HsmsSsCommunicator.super.notifyTrySendMessagePassThrough(trySendMsgPassThroughQueue.take());
-				}
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		}
-	};
+	private Runnable createTrySendMsgPassThroughQueueTask() {
+		return createLoopTask(() -> {
+			super.notifyTrySendMessagePassThrough(trySendMsgPassThroughQueue.take());
+		});
+	}
 	
 	
 	/* sendedPassThroughQueue */
@@ -251,20 +226,12 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		sendedMsgPassThroughQueue.put(msg);
 	}
 	
-	private final Runnable taskSendedMsgPassThroughQueue = new Runnable() {
-
-		@Override
-		public void run() {
-			try {
-				for ( ;; ) {
-					HsmsSsCommunicator.super.notifySendedMessagePassThrough(sendedMsgPassThroughQueue.take());
-				}
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		}
-	};
-
+	private Runnable createSendedMsgPassThroughQueueTask() {
+		return createLoopTask(() -> {
+			super.notifySendedMessagePassThrough(sendedMsgPassThroughQueue.take());
+		});
+	}
+	
 	
 	/* sendedPassThroughQueue */
 	private final BlockingQueue<HsmsSsMessage> recvMsgPassThroughQueue = new LinkedBlockingQueue<>();
@@ -278,19 +245,11 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		recvMsgPassThroughQueue.put(msg);
 	}
 	
-	private final Runnable taskRecvMsgPassThroughQueue = new Runnable() {
-
-		@Override
-		public void run() {
-			try {
-				for ( ;; ) {
-					HsmsSsCommunicator.super.notifyReceiveMessagePassThrough(recvMsgPassThroughQueue.take());
-				}
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		}
-	};
+	private Runnable createRecvMsgPassThroughQueueTask() {
+		return createLoopTask(() -> {
+			super.notifyReceiveMessagePassThrough(recvMsgPassThroughQueue.take());
+		});
+	}
 	
 	
 	/* channels */

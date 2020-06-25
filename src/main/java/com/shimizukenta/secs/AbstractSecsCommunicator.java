@@ -276,4 +276,25 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 		});
 	}
 	
+	protected static interface InterruptableRunnable {
+		public void run() throws InterruptedException;
+	}
+	
+	protected static Runnable createLoopTask(InterruptableRunnable task) {
+		
+		return new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					for ( ;; ) {
+						task.run();
+					}
+				}
+				catch ( InterruptedException ignore ) {
+				}
+			}
+		};
+	}
+	
 }

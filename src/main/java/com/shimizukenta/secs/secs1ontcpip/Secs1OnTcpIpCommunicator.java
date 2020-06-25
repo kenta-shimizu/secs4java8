@@ -8,7 +8,6 @@ import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -64,10 +63,8 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 	
 	@Override
 	public void open() throws IOException {
-		
 		super.open();
-		
-		executorService().execute(task);
+		executorService().execute(createTask());
 	}
 	
 	@Override
@@ -75,153 +72,131 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 		super.close();
 	}
 	
-	private final Runnable task = new Runnable() {
-
-		@Override
-		public void run() {
+	private Runnable createTask() {
+		
+		return createLoopTask(() -> {
 			
-			try {
-				for ( ;; ) {
-					
-					try (
-							AsynchronousSocketChannel ch = AsynchronousSocketChannel.open();
-							) {
-						
-						SocketAddress socketAddr = secs1OnTcpIpConfig.socketAddress();
-						
-						String socketAddrString = socketAddr.toString();
-						
-						notifyLog("Secs1OnTcpIpCommunicator#try-connect", socketAddrString);
+			try (
+					AsynchronousSocketChannel ch = AsynchronousSocketChannel.open();
+					) {
+				
+				SocketAddress socketAddr = secs1OnTcpIpConfig.socketAddress();
+				
+				String socketAddrString = socketAddr.toString();
+				
+				notifyLog("Secs1OnTcpIpCommunicator#try-connect", socketAddrString);
+				
+				ch.connect(socketAddr, null, new CompletionHandler<Void, Void>() {
+
+					@Override
+					public void completed(Void none, Void attachment) {
 						
 						try {
-							ch.connect(socketAddr, null, new CompletionHandler<Void, Void>() {
-	
-								@Override
-								public void completed(Void none, Void attachment) {
-									
-									try {
-										
-										synchronized ( Secs1OnTcpIpCommunicator.this ) {
-											Secs1OnTcpIpCommunicator.this.channel = ch;
-										}
-										
-										notifyCommunicatableStateChange(true);
-										
-										notifyLog("Secs1OnTcpIpCommunicator#connected", ch);
-										
-										final ByteBuffer buffer = ByteBuffer.allocate(1024);
-										
-										for ( ;; ) {
-											
-											((Buffer)buffer).clear();
-											
-											Future<Integer> f = ch.read(buffer);
-											
-											try {
-												int r = f.get().intValue();
-												
-												if ( r < 0 ) {
-													break;
-												}
-												
-												((Buffer)buffer).flip();
-												
-												putByte(buffer);
-											}
-											catch ( InterruptedException e ) {
-												f.cancel(true);
-												throw e;
-											}
-										}
-									}
-									catch ( InterruptedException ignore) {
-									}
-									catch ( ExecutionException e ) {
-										
-										Throwable t = e.getCause();
-										
-										if ( t instanceof RuntimeException ) {
-											throw (RuntimeException)t;
-										}
-										
-										if ( ! (t instanceof AsynchronousCloseException) ) {
-											notifyLog(e);
-										}
-									}
-									finally {
-										
-										notifyCommunicatableStateChange(false);
-										
-										synchronized ( Secs1OnTcpIpCommunicator.this ) {
-											Secs1OnTcpIpCommunicator.this.channel = null;
-										}
-										
-										try {
-											ch.shutdownOutput();
-										}
-										catch ( IOException giveup ) {
-										}
-										
-										notifyLog("Secs1OnTcpIpCommunicator#closed", socketAddrString);
-										
-										synchronized ( ch ) {
-											ch.notifyAll();
-										}
-									}
-								}
-	
-								@Override
-								public void failed(Throwable t, Void attachment) {
-									
-									try {
-										if ( t instanceof RuntimeException ) {
-											throw (RuntimeException)t;
-										}
-										
-										notifyLog(t);
-									}
-									finally {
-										
-										synchronized ( ch ) {
-											ch.notifyAll();
-										}
-									}
-								}
-							});
+							synchronized ( Secs1OnTcpIpCommunicator.this ) {
+								Secs1OnTcpIpCommunicator.this.channel = ch;
+							}
 							
-							synchronized ( ch ) {
-								ch.wait();
+							notifyCommunicatableStateChange(true);
+							
+							notifyLog("Secs1OnTcpIpCommunicator#connected", ch);
+							
+							final ByteBuffer buffer = ByteBuffer.allocate(1024);
+							
+							for ( ;; ) {
+								
+								((Buffer)buffer).clear();
+								
+								Future<Integer> f = ch.read(buffer);
+								
+								try {
+									int r = f.get().intValue();
+									
+									if ( r < 0 ) {
+										break;
+									}
+									
+									((Buffer)buffer).flip();
+									
+									putByte(buffer);
+								}
+								catch ( InterruptedException e ) {
+									f.cancel(true);
+									throw e;
+								}
+							}
+						}
+						catch ( InterruptedException ignore) {
+						}
+						catch ( ExecutionException e ) {
+							
+							Throwable t = e.getCause();
+							
+							if ( t instanceof RuntimeException ) {
+								throw (RuntimeException)t;
+							}
+							
+							if ( ! (t instanceof AsynchronousCloseException) ) {
+								notifyLog(e);
 							}
 						}
 						finally {
 							
+							notifyCommunicatableStateChange(false);
+							
 							synchronized ( Secs1OnTcpIpCommunicator.this ) {
-								
-								if ( Secs1OnTcpIpCommunicator.this.channel != null ) {
-									
-									try {
-										ch.shutdownOutput();
-									}
-									catch ( IOException giveup ) {
-									}
-								}
+								Secs1OnTcpIpCommunicator.this.channel = null;
+							}
+							
+							try {
+								ch.shutdownOutput();
+							}
+							catch ( IOException giveup ) {
+							}
+							
+							notifyLog("Secs1OnTcpIpCommunicator#closed", socketAddrString);
+							
+							synchronized ( ch ) {
+								ch.notifyAll();
 							}
 						}
 					}
-					catch ( IOException e ) {
-						notifyLog(e);
-					}
 					
-					{
-						long t = (long)(secs1OnTcpIpConfig.reconnectSeconds() * 1000.0F);
-						TimeUnit.MILLISECONDS.sleep(t);
+					@Override
+					public void failed(Throwable t, Void attachment) {
+						
+						try {
+							if ( t instanceof RuntimeException ) {
+								throw (RuntimeException)t;
+							}
+							
+							notifyLog(t);
+						}
+						finally {
+							
+							synchronized ( ch ) {
+								ch.notifyAll();
+							}
+						}
 					}
+				});
+				
+				synchronized ( ch ) {
+					ch.wait();
 				}
 			}
-			catch ( InterruptedException ignore ) {
+			catch ( IOException e ) {
+				notifyLog(e);
 			}
-		}
-	};
+			
+			{
+				long t = (long)(secs1OnTcpIpConfig.reconnectSeconds() * 1000.0F);
+				if ( t > 0 ) {
+					TimeUnit.MILLISECONDS.sleep(t);
+				}
+			}
+		});
+	}
+	
 	
 	private final BlockingQueue<Byte> byteQueue = new LinkedBlockingQueue<>();
 	
@@ -244,38 +219,17 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 	}
 	
 	@Override
-	protected Optional<Byte> pollByte(byte[] request, long timeout, TimeUnit unit) throws InterruptedException {
-		
-		Collection<Callable<Byte>> tasks = Arrays.asList(() -> {
-			
-			try {
-				
-				for ( ;; ) {
-					
-					byte b = byteQueue.take();
-					
-					for ( byte r : request ) {
-						if ( r == b ) {
-							return Byte.valueOf(b);
-						}
-					}
-				}
-			}
-			catch ( InterruptedException ignore ) {
-			}
-			
-			return null;
-		});
+	protected Optional<Byte> pollByte(byte[] request) throws InterruptedException {
 		
 		try {
 			
-			Byte b = executorService().invokeAny(tasks, timeout, unit);
+			Byte b = executorService().invokeAny(
+					Arrays.asList(createPollByteTask(request))
+					);
 			
 			if ( b != null ) {
 				return Optional.of(b);
 			}
-		}
-		catch ( TimeoutException giveup ) {
 		}
 		catch ( ExecutionException e ) {
 			
@@ -289,6 +243,62 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 		}
 		
 		return Optional.empty();
+	}
+	
+	@Override
+	protected Optional<Byte> pollByte(byte[] request, long timeout, TimeUnit unit) throws InterruptedException {
+		
+		try {
+			
+			Byte b = executorService().invokeAny(
+					Arrays.asList(createPollByteTask(request)),
+					timeout,unit);
+			
+			if ( b != null ) {
+				return Optional.of(b);
+			}
+		}
+		catch ( TimeoutException timeup ) {
+		}
+		catch ( ExecutionException e ) {
+			
+			Throwable t = e.getCause();
+			
+			if ( t instanceof RuntimeException ) {
+				throw (RuntimeException)t;
+			}
+			
+			notifyLog(e);
+		}
+		
+		return Optional.empty();
+	}
+	
+	private Callable<Byte> createPollByteTask(byte[] request) {
+		
+		return new Callable<Byte>() {
+			
+			@Override
+			public Byte call() {
+				try {
+					
+					for ( ;; ) {
+						
+						byte b = byteQueue.take();
+						
+						for ( byte r : request ) {
+							if ( r == b ) {
+								return Byte.valueOf(b);
+							}
+						}
+					}
+				}
+				catch ( InterruptedException ignore ) {
+				}
+				
+				return null;
+			}
+		};
 	}
 	
 	@Override
