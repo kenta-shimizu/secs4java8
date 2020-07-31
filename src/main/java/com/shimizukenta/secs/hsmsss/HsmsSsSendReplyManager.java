@@ -13,19 +13,21 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.shimizukenta.secs.AbstractSecsInnerManager;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2ByteBuffersBuilder;
 
-public class HsmsSsSendReplyManager {
+public class HsmsSsSendReplyManager extends AbstractSecsInnerManager {
 	
 	private final Collection<Pack> packs = new ArrayList<>();
 	
 	private final HsmsSsCommunicator parent;
 	
 	public HsmsSsSendReplyManager(HsmsSsCommunicator parent) {
+		super(parent);
 		this.parent = parent;
 	}
 	
@@ -109,7 +111,7 @@ public class HsmsSsSendReplyManager {
 					throw new HsmsSsTooBigSendMessageException(msg);
 				}
 				
-				parent.putTrySendMessagePassThrough(msg);
+				notifyTrySendMessagePassThrough(msg);
 				
 				{
 					ByteBuffer buffer = ByteBuffer.allocate(14);
@@ -129,8 +131,8 @@ public class HsmsSsSendReplyManager {
 					send(channel, buffer);
 				}
 				
-				parent.putSendedMessagePassThrough(msg);
-				parent.notifyLog("Sended HsmsSs-Message", msg);
+				notifySendedMessagePassThrough(msg);
+				notifyLog("Sended HsmsSs-Message", msg);
 			}
 			catch ( ExecutionException e ) {
 				
@@ -215,7 +217,7 @@ public class HsmsSsSendReplyManager {
 		
 		try {
 			long t = (long)(timeout * 1000.0F);
-			HsmsSsMessage msg = parent.executorService().invokeAny(tasks, t, TimeUnit.MILLISECONDS);
+			HsmsSsMessage msg = executorService().invokeAny(tasks, t, TimeUnit.MILLISECONDS);
 			
 			if ( msg == null ) {
 				throw new HsmsSsDetectTerminateException();

@@ -239,7 +239,11 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 				throw (RuntimeException)t;
 			}
 			
-			notifyLog(e);
+			if ( t instanceof Error ) {
+				throw (Error)t;
+			}
+			
+			notifyLog(t);
 		}
 		
 		return Optional.empty();
@@ -268,7 +272,11 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 				throw (RuntimeException)t;
 			}
 			
-			notifyLog(e);
+			if ( t instanceof Error ) {
+				throw (Error)t;
+			}
+			
+			notifyLog(t);
 		}
 		
 		return Optional.empty();
@@ -343,7 +351,11 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 					throw (RuntimeException)t;
 				}
 				
-				throw new Secs1SendMessageException(e);
+				if ( t instanceof Error ) {
+					throw (Error)t;
+				}
+				
+				throw new Secs1SendMessageException(t);
 			}
 			catch ( InterruptedException e ) {
 				f.cancel(true);

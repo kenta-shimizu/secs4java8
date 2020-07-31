@@ -4,12 +4,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -17,7 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.shimizukenta.secs.AbstractSecsCommunicator;
 import com.shimizukenta.secs.SecsException;
-import com.shimizukenta.secs.SecsLog;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
@@ -30,12 +25,6 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	protected static final byte ACK = (byte)0x06;
 	protected static final byte NAK = (byte)0x15;
 	
-	
-	private final ExecutorService execServ = Executors.newCachedThreadPool(r -> {
-		Thread th = new Thread(r);
-		th.setDaemon(true);
-		return th;
-	});
 	
 	private final Secs1CommunicatorConfig secs1Config;
 	private final Secs1SendReplyManager sendReplyManager;
@@ -52,160 +41,23 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		return secs1Config;
 	}
 	
-	protected ExecutorService executorService() {
-		return execServ;
-	}
-	
 	@Override
 	public void open() throws IOException {
 		super.open();
 		
-		execServ.execute(createRecvMsgTask());
-		execServ.execute(createNotifyLogTask());
-		execServ.execute(createTrySendMsgPassThroughQueueTask());
-		execServ.execute(createSendedMsgPassThroughQueueTask());
-		execServ.execute(createRecvMsgPassThroughQueueTask());
-		
-		execServ.execute(new CircuitLoop());
+		executorService().execute(new CircuitLoop());
 	}
 
 	@Override
 	public void close() throws IOException {
 		
-		IOException ioExcept = null;
-		
-		try {
-			synchronized ( this ) {
-				if ( isClosed() ) {
-					return;
-				}
-				
-				super.close();
+		synchronized ( this ) {
+			if ( isClosed() ) {
+				return;
 			}
+			
+			super.close();
 		}
-		catch ( IOException e ) {
-			ioExcept = e;
-		}
-		
-		try {
-			execServ.shutdown();
-			if ( ! execServ.awaitTermination(10L, TimeUnit.MILLISECONDS) ) {
-				execServ.shutdownNow();
-				if ( ! execServ.awaitTermination(5L, TimeUnit.SECONDS) ) {
-					ioExcept = new IOException("ExecutorService#shutdown failed");
-				}
-			}
-		}
-		catch ( InterruptedException giveup ) {
-		}
-		
-		if ( ioExcept != null ) {
-			throw ioExcept;
-		}
-	}
-	
-	
-	/* Receive Message Queue */
-	private final BlockingQueue<Secs1Message> recvDataMsgQueue = new LinkedBlockingQueue<>();
-	
-	protected void putReceiveDataMessage(Secs1Message msg) throws InterruptedException {
-		recvDataMsgQueue.put(msg);
-	}
-	
-	@Override
-	protected void notifyReceiveMessage(SecsMessage msg) {
-		throw new UnsupportedOperationException("use #putReceiveDataMessage");
-	}
-	
-	private final Runnable createRecvMsgTask() {
-		return createLoopTask(() -> {
-			super.notifyReceiveMessage(recvDataMsgQueue.take());
-		});
-	}
-	
-	
-	/* Log Queue */
-	private final BlockingQueue<SecsLog> logQueue = new LinkedBlockingQueue<>();
-	
-	@Override
-	protected void notifyLog(SecsLog log) {
-		logQueue.offer(log);
-	}
-	
-	private Runnable createNotifyLogTask() {
-		return createLoopTask(() -> {
-			super.notifyLog(logQueue.take());
-		});
-	}
-	
-	@Override
-	protected void notifyLog(CharSequence subject) {
-		super.notifyLog(subject);
-	}
-	
-	@Override
-	protected void notifyLog(CharSequence subject, Object value) {
-		super.notifyLog(subject, value);
-	}
-	
-	@Override
-	protected void notifyLog(Throwable t) {
-		super.notifyLog(t);
-	}
-	
-	
-	/* trySendMsgPassThroughQueue */
-	private final BlockingQueue<Secs1Message> trySendMsgPassThroughQueue = new LinkedBlockingQueue<>();
-	
-	@Override
-	protected void notifyTrySendMessagePassThrough(SecsMessage msg) {
-		throw new UnsupportedOperationException("use #putTrySendMessagePassThrough");
-	}
-	
-	protected void putTrySendMessagePassThrough(Secs1Message msg) throws InterruptedException {
-		trySendMsgPassThroughQueue.put(msg);
-	}
-	
-	private final Runnable createTrySendMsgPassThroughQueueTask() {
-		return createLoopTask(() -> {
-			super.notifyTrySendMessagePassThrough(trySendMsgPassThroughQueue.take());
-		});
-	}
-	
-	/* sendedPassThroughQueue */
-	private final BlockingQueue<Secs1Message> sendedMsgPassThroughQueue = new LinkedBlockingQueue<>();
-	
-	@Override
-	protected void notifySendedMessagePassThrough(SecsMessage msg) {
-		throw new UnsupportedOperationException("use #putSendedMessagePassThrough");
-	}
-	
-	protected void putSendedMessagePassThrough(Secs1Message msg) throws InterruptedException {
-		sendedMsgPassThroughQueue.put(msg);
-	}
-	
-	private final Runnable createSendedMsgPassThroughQueueTask() {
-		return createLoopTask(() -> {
-			super.notifySendedMessagePassThrough(sendedMsgPassThroughQueue.take());
-		});
-	}
-	
-	/* sendedPassThroughQueue */
-	private final BlockingQueue<Secs1Message> recvMsgPassThroughQueue = new LinkedBlockingQueue<>();
-	
-	@Override
-	protected void notifyReceiveMessagePassThrough(SecsMessage msg) {
-		throw new UnsupportedOperationException("use #putReceiveMessagePassThrough");
-	}
-	
-	protected void putReceiveMessagePassThrough(Secs1Message msg) throws InterruptedException {
-		recvMsgPassThroughQueue.put(msg);
-	}
-	
-	private Runnable createRecvMsgPassThroughQueueTask() {
-		return createLoopTask(() -> {
-			super.notifyReceiveMessagePassThrough(recvMsgPassThroughQueue.take());
-		});
 	}
 	
 	

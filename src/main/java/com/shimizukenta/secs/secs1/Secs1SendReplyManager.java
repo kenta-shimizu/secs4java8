@@ -13,12 +13,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.shimizukenta.secs.AbstractSecsInnerManager;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
-public class Secs1SendReplyManager {
+public class Secs1SendReplyManager extends AbstractSecsInnerManager {
 	
 	private final Collection<Pack> packs = new ArrayList<>();
 	private final BlockingQueue<Secs1MessageBlock> sendBlockQueue = new LinkedBlockingQueue<>();
@@ -30,6 +31,8 @@ public class Secs1SendReplyManager {
 	private final Secs1Communicator parent;
 	
 	protected Secs1SendReplyManager(Secs1Communicator parent) {
+		super(parent);
+		
 		this.parent = parent;
 		
 		this.resetTimerStatus = new ReplyStatus();
@@ -47,10 +50,10 @@ public class Secs1SendReplyManager {
 		
 		try {
 			
-			parent.notifyLog("Secs1-Message entry-send", msg);
-			parent.putTrySendMessagePassThrough(msg);
+			notifyLog("Secs1-Message entry-send", msg);
+			notifyTrySendMessagePassThrough(msg);
 			waitUntilSended(p);
-			parent.putSendedMessagePassThrough(msg);
+			notifySendedMessagePassThrough(msg);
 			
 			if ( msg.wbit() ) {
 				
@@ -120,7 +123,7 @@ public class Secs1SendReplyManager {
 				});
 		
 		try {
-			Pack pp = parent.executorService().invokeAny(tasks);
+			Pack pp = executorService().invokeAny(tasks);
 			
 			if ( pp == null ) {
 				throw new Secs1DetectTerminateException(p.primaryMsg());
@@ -202,7 +205,7 @@ public class Secs1SendReplyManager {
 			for ( ;; ) {
 				
 				long t = (long)(parent.secs1Config().timeout().t3() * 1000.0F);
-				ReplyStatus r = parent.executorService().invokeAny(tasks, t, TimeUnit.MILLISECONDS);
+				ReplyStatus r = executorService().invokeAny(tasks, t, TimeUnit.MILLISECONDS);
 				
 				if ( r.resetTimer() ) {
 					continue;
@@ -249,7 +252,7 @@ public class Secs1SendReplyManager {
 			}
 		}
 		
-		parent.putReceiveDataMessage(msg);
+		notifyReceiveMessage(msg);
 	}
 	
 	public void clear() {
@@ -283,7 +286,7 @@ public class Secs1SendReplyManager {
 	
 	public void sended(Secs1MessageBlock block) {
 		
-		parent.notifyLog("Secs1-Message-Block sended", block);
+		notifyLog("Secs1-Message-Block sended", block);
 		
 		if ( block.ebit() ) {
 			final Integer key = block.systemBytesKey();
@@ -320,7 +323,7 @@ public class Secs1SendReplyManager {
 	
 	public void received(Secs1MessageBlock block) throws InterruptedException {
 		
-		parent.notifyLog("Secs1-Message-Block received", block);
+		notifyLog("Secs1-Message-Block received", block);
 		
 		if ( recvBlocks.isEmpty() ) {
 			
@@ -366,12 +369,12 @@ public class Secs1SendReplyManager {
 			
 			try {
 				Secs1Message msg = Secs1MessageBlockConverter.toSecs1Message(recvBlocks);
-				parent.putReceiveMessagePassThrough(msg);
-				parent.notifyLog("Secs1-Message received", msg);
+				notifyReceiveMessagePassThrough(msg);
+				notifyLog("Secs1-Message received", msg);
 				put(msg);
 			}
 			catch ( Secs2Exception e ) {
-				parent.notifyLog(e);
+				notifyLog(e);
 			}
 			
 			recvBlocks.clear();

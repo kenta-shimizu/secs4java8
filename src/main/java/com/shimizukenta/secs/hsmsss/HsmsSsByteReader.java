@@ -14,15 +14,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import com.shimizukenta.secs.AbstractSecsInnerManager;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BytesParser;
 
-public class HsmsSsByteReader implements Callable<Object> {
+public class HsmsSsByteReader extends AbstractSecsInnerManager implements Callable<Object> {
 	
 	private final HsmsSsCommunicator parent;
 	private final AsynchronousSocketChannel channel;
 
 	public HsmsSsByteReader(HsmsSsCommunicator parent, AsynchronousSocketChannel channel) {
+		super(parent);
 		this.parent = parent;
 		this.channel = channel;
 	}
@@ -81,12 +83,12 @@ public class HsmsSsByteReader implements Callable<Object> {
 					lstnr.receive(msg);
 				});
 				
-				parent.putReceiveMessagePassThrough(msg);
-				parent.notifyLog("Received HsmsSs-Message", msg);
+				notifyReceiveMessagePassThrough(msg);
+				notifyLog("Received HsmsSs-Message", msg);
 			}
 		}
 		catch ( HsmsSsDetectTerminateException | HsmsSsTimeoutT8Exception e ) {
-			parent.notifyLog(e);
+			notifyLog(e);
 		}
 		catch ( InterruptedException ignore ) {
 		}
@@ -201,5 +203,5 @@ public class HsmsSsByteReader implements Callable<Object> {
 	public boolean addHsmsSsMessageReceiveListener(HsmsSsMessageReceiveListener lstnr) {
 		return listeners.add(lstnr);
 	}
-
+	
 }

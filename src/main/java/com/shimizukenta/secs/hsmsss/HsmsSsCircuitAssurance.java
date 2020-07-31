@@ -2,12 +2,15 @@ package com.shimizukenta.secs.hsmsss;
 
 import java.util.concurrent.Callable;
 
-public class HsmsSsCircuitAssurance implements Callable<Object> {
+import com.shimizukenta.secs.AbstractSecsInnerManager;
+
+public class HsmsSsCircuitAssurance extends AbstractSecsInnerManager implements Callable<Object> {
 	
 	private final HsmsSsCommunicator parent;
 	private boolean resetted;
 
 	public HsmsSsCircuitAssurance(HsmsSsCommunicator parent) {
+		super(parent);
 		this.parent = parent;
 		this.resetted = false;
 	}

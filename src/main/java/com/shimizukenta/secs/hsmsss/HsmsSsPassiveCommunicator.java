@@ -278,7 +278,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 											switch ( mt ) {
 											case DATA : {
 												
-												putReceiveDataMessage(msg);
+												notifyReceiveMessage(msg);
 												break;
 											}
 											case SELECT_REQ: {

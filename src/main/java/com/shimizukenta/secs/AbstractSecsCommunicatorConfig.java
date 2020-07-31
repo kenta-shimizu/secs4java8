@@ -16,13 +16,13 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	private boolean isEquip;
 	private GemConfig gem;
 	
-	private String communicatorName;
+	private String logSubjectHeader;
 	
 	public AbstractSecsCommunicatorConfig() {
 		deviceId = 10;
 		isEquip = false;
 		gem = new GemConfig();
-		communicatorName = "";
+		logSubjectHeader = "";
 	}
 	
 	public void deviceId(int id) {
@@ -58,19 +58,19 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	}
 	
 	/**
-	 * if setted, insert name to subject of SecsLog
+	 * if setted, insert header to subject of SecsLog
 	 * 
-	 * @param name of Communicator
+	 * @param header of SecsLog
 	 */
-	public void communicatorName(CharSequence name) {
+	public void logSubectHeader(CharSequence header) {
 		synchronized ( this ) {
-			this.communicatorName = Objects.requireNonNull(name).toString();
+			this.logSubjectHeader = Objects.requireNonNull(header).toString();
 		}
 	}
 	
-	public Optional<String> communicatorName() {
+	public Optional<String> logSubjectHeader() {
 		synchronized ( this ) {
-			return communicatorName.isEmpty() ? Optional.empty() : Optional.of(communicatorName);
+			return logSubjectHeader.isEmpty() ? Optional.empty() : Optional.of(logSubjectHeader);
 		}
 	}
 	
