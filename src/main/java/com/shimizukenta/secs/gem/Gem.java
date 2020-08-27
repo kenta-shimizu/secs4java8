@@ -301,7 +301,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Link Event Report<br />
+	 * Link CollectionEvent Report<br />
 	 * blocking-method
 	 * 
 	 * @param DATAID
@@ -321,7 +321,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Link Event Report<br />
+	 * Link CollectionEvent Report<br />
 	 * blocking-method
 	 * 
 	 * @param DATAID
@@ -341,7 +341,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Link Event Report Acknowledge<br />
+	 * Link CollectionEvent Report Acknowledge<br />
 	 * blocking-method
 	 * 
 	 * @param primary-message
@@ -359,7 +359,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Eable Event Report<br />
+	 * Eable CollectionEvent Report<br />
 	 * blocking-method
 	 * 
 	 * @param List of Events
@@ -378,7 +378,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Disable Event Report<br />
+	 * Disable CollectionEvent Report<br />
 	 * blocking-method
 	 * 
 	 * @param List of Events
@@ -397,7 +397,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Enable All Event Report<br />
+	 * Enable All CollectionEvent Report<br />
 	 * blocking-method
 	 * 
 	 * @return ERACK
@@ -415,7 +415,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Disable All Event Report<br />
+	 * Disable All CollectionEvent Report<br />
 	 * blocking-method
 	 * 
 	 * @return ERACK
@@ -433,7 +433,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Enable/Disable Event Report<br />
+	 * Enable/Disable CollectionEvent Report<br />
 	 * blocking-method
 	 * 
 	 * @param CEED
@@ -453,7 +453,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Enable/Disable Event Report Acknowledge<br />
+	 * Enable/Disable CollectionEvent Report Acknowledge<br />
 	 * blocking-method
 	 * 
 	 * @param primary-message
@@ -610,7 +610,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Event Report Ack<br />
+	 * CollectionEvent Report Ack<br />
 	 * blocking-method
 	 * 
 	 * @param primary-message
@@ -627,7 +627,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Annotated Event Report Ack<br />
+	 * Annotated CollectionEvent Report Ack<br />
 	 * blocking-method
 	 * 
 	 * @param primary-message

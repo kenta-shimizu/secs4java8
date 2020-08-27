@@ -29,6 +29,9 @@ public class HsmsSsByteReader extends AbstractSecsInnerManager implements Callab
 		this.channel = channel;
 	}
 	
+	
+	private static final byte[] emptyBytes = new byte[]{0, 0, 0, 0};
+	
 	/**
 	 * until detect-terminate or Timeout-T8
 	 */
@@ -39,7 +42,6 @@ public class HsmsSsByteReader extends AbstractSecsInnerManager implements Callab
 			
 			final ByteBuffer lenBf = ByteBuffer.allocate(8);
 			final ByteBuffer headBf = ByteBuffer.allocate(10);
-			final byte[] emptyBytes = new byte[]{0, 0, 0, 0};
 			
 			for ( ;; ) {
 				
@@ -48,14 +50,14 @@ public class HsmsSsByteReader extends AbstractSecsInnerManager implements Callab
 				
 				lenBf.put(emptyBytes);
 				
-				reading(lenBf, false);
+				readToByteBuffer(lenBf, false);
 				
 				while ( lenBf.hasRemaining() ) {
-					reading(lenBf, true);
+					readToByteBuffer(lenBf, true);
 				}
 				
 				while ( headBf.hasRemaining() ) {
-					reading(headBf, true);
+					readToByteBuffer(headBf, true);
 				}
 				
 				((Buffer)lenBf).flip();
@@ -97,7 +99,7 @@ public class HsmsSsByteReader extends AbstractSecsInnerManager implements Callab
 	}
 	
 	
-	private int reading(ByteBuffer buffer, boolean detectT8Timeout)
+	private int readToByteBuffer(ByteBuffer buffer, boolean detectT8Timeout)
 			throws HsmsSsDetectTerminateException, HsmsSsTimeoutT8Exception, InterruptedException {
 		
 		Future<Integer> f = channel.read(buffer);
@@ -131,6 +133,10 @@ public class HsmsSsByteReader extends AbstractSecsInnerManager implements Callab
 			
 			if ( t instanceof RuntimeException ) {
 				throw (RuntimeException)t;
+			}
+			
+			if ( t instanceof Error ) {
+				throw (Error)t;
 			}
 			
 			throw new HsmsSsDetectTerminateException(e);
@@ -172,7 +178,7 @@ public class HsmsSsByteReader extends AbstractSecsInnerManager implements Callab
 			
 			ByteBuffer bf = buffers.getLast();
 			
-			int r = parent.reading(bf, true);
+			int r = parent.readToByteBuffer(bf, true);
 			
 			this.present += r;
 			

@@ -62,7 +62,7 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	 * 
 	 * @param header of SecsLog
 	 */
-	public void logSubectHeader(CharSequence header) {
+	public void logSubjectHeader(CharSequence header) {
 		synchronized ( this ) {
 			this.logSubjectHeader = Objects.requireNonNull(header).toString();
 		}

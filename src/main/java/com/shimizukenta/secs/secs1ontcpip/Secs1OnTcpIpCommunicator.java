@@ -8,6 +8,7 @@ import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -100,30 +101,38 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 							
 							notifyLog("Secs1OnTcpIpCommunicator#connected", ch);
 							
-							final ByteBuffer buffer = ByteBuffer.allocate(1024);
+							final Collection<Callable<Void>> tasks = Arrays.asList(
+									() -> {
+										final ByteBuffer buffer = ByteBuffer.allocate(1024);
+										
+										for ( ;; ) {
+											
+											((Buffer)buffer).clear();
+											
+											Future<Integer> f = ch.read(buffer);
+											
+											try {
+												int r = f.get().intValue();
+												
+												if ( r < 0 ) {
+													break;
+												}
+												
+												((Buffer)buffer).flip();
+												
+												putByte(buffer);
+											}
+											catch ( InterruptedException e ) {
+												f.cancel(true);
+												throw e;
+											}
+										}
+										
+										return null;
+									});
 							
-							for ( ;; ) {
-								
-								((Buffer)buffer).clear();
-								
-								Future<Integer> f = ch.read(buffer);
-								
-								try {
-									int r = f.get().intValue();
-									
-									if ( r < 0 ) {
-										break;
-									}
-									
-									((Buffer)buffer).flip();
-									
-									putByte(buffer);
-								}
-								catch ( InterruptedException e ) {
-									f.cancel(true);
-									throw e;
-								}
-							}
+							executorService().invokeAny(tasks);
+							
 						}
 						catch ( InterruptedException ignore) {
 						}

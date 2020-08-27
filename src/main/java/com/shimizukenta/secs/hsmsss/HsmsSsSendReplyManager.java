@@ -96,6 +96,12 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerManager {
 		}
 	}
 	
+	private static final long MAX_BUFFER_SIZE = 256L * 256L;
+	
+	protected long prototypeMaxBufferSize() {
+		return MAX_BUFFER_SIZE;
+	}
+	
 	public void send(AsynchronousSocketChannel channel, HsmsSsMessage msg)
 			throws SecsSendMessageException, SecsException
 			, InterruptedException {
@@ -113,8 +119,31 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerManager {
 				
 				notifyTrySendMessagePassThrough(msg);
 				
-				{
-					ByteBuffer buffer = ByteBuffer.allocate(14);
+				long bufferSize = len + 4L;
+				
+				if ( bufferSize > prototypeMaxBufferSize() ) {
+					
+					{
+						ByteBuffer buffer = ByteBuffer.allocate(14);
+						
+						buffer.put((byte)(len >> 24));
+						buffer.put((byte)(len >> 16));
+						buffer.put((byte)(len >>  8));
+						buffer.put((byte)(len      ));
+						buffer.put(msg.header10Bytes());
+						
+						((Buffer)buffer).flip();
+						
+						send(channel, buffer);
+					}
+					
+					for ( ByteBuffer buffer : bb.getByteBuffers() ) {
+						send(channel, buffer);
+					}
+					
+				} else {
+					
+					ByteBuffer buffer = ByteBuffer.allocate((int)bufferSize);
 					
 					buffer.put((byte)(len >> 24));
 					buffer.put((byte)(len >> 16));
@@ -122,12 +151,12 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerManager {
 					buffer.put((byte)(len      ));
 					buffer.put(msg.header10Bytes());
 					
+					for ( ByteBuffer bf : bb.getByteBuffers() ) {
+						buffer.put(bf);
+					}
+					
 					((Buffer)buffer).flip();
 					
-					send(channel, buffer);
-				}
-				
-				for ( ByteBuffer buffer : bb.getByteBuffers() ) {
 					send(channel, buffer);
 				}
 				
