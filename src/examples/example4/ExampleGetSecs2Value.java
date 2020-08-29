@@ -6,7 +6,7 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
 public class ExampleGetSecs2Value {
 
 	public ExampleGetSecs2Value() {
-		/* Nothign */
+		/* Nothing */
 	}
 
 	public static void main(String[] args) {
