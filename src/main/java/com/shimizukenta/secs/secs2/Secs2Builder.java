@@ -11,6 +11,12 @@ public class Secs2Builder {
 	
 	private static class SingletonHolder {
 		private static Secs2Builder inst = new Secs2Builder();
+		private static Secs2RawBytes rawEmpty = new Secs2RawBytes();
+		private static Secs2List listEmpty = new Secs2List();
+		private static Secs2Int4 i4empty = new Secs2Int4();
+		private static Secs2Int8 i8empty = new Secs2Int8();
+		private static Secs2Uint4 u4empty = new Secs2Uint4();
+		private static Secs2Uint8 u8empty = new Secs2Uint8();
 	}
 	
 	public static Secs2Builder getInstance() {
@@ -18,7 +24,7 @@ public class Secs2Builder {
 	}
 	
 	public Secs2RawBytes empty() {
-		return new Secs2RawBytes();
+		return SingletonHolder.rawEmpty;
 	}
 	
 	public Secs2RawBytes raw(byte[] bs) {
@@ -26,7 +32,7 @@ public class Secs2Builder {
 	}
 	
 	public Secs2List list() {
-		return new Secs2List();
+		return SingletonHolder.listEmpty;
 	}
 	
 	public Secs2List list(Secs2... values) {
@@ -106,7 +112,7 @@ public class Secs2Builder {
 	}
 	
 	public Secs2Int4 int4() {
-		return new Secs2Int4();
+		return SingletonHolder.i4empty;
 	}
 	
 	public Secs2Int4 int4(int... values) {
@@ -126,7 +132,7 @@ public class Secs2Builder {
 	}
 	
 	public Secs2Int8 int8() {
-		return new Secs2Int8();
+		return SingletonHolder.i8empty;
 	}
 	
 	public Secs2Int8 int8(int... values) {
@@ -186,7 +192,7 @@ public class Secs2Builder {
 	}
 
 	public Secs2Uint4 uint4() {
-		return new Secs2Uint4();
+		return SingletonHolder.u4empty;
 	}
 	
 	public Secs2Uint4 uint4(int... values) {
@@ -206,7 +212,7 @@ public class Secs2Builder {
 	}
 
 	public Secs2Uint8 uint8() {
-		return new Secs2Uint8();
+		return SingletonHolder.u8empty;
 	}
 	
 	public Secs2Uint8 uint8(int... values) {
