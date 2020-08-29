@@ -156,6 +156,8 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 																	/* break; */
 																}
 																case SELECT_RSP:
+																case DESELECT_REQ:
+																case DESELECT_RSP:
 																case LINKTEST_RSP:
 																case REJECT_REQ:
 																default: {

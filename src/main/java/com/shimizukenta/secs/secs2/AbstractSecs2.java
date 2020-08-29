@@ -2,8 +2,11 @@ package com.shimizukenta.secs.secs2;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public abstract class AbstractSecs2 implements Secs2, Serializable {
 	
@@ -43,13 +46,27 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 		}
 	}
 	
-	
 	private static LinkedList<Integer> createLinkedList(int... indices) {
 		LinkedList<Integer> ll = new LinkedList<>();
 		IntStream.of(indices).boxed().forEach(ll::add);
 		return ll;
 	}
 	
+	@Override
+	public boolean isEmpty() {
+		return false;
+	}
+	
+	@Override
+	public Stream<Secs2> stream() {
+		return Stream.empty();
+	}
+
+	@Override
+	public Iterator<Secs2> iterator() {
+		return Collections.emptyIterator();
+	}
+
 	@Override
 	public Secs2 get() {
 		return this;

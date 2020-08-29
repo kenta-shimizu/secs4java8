@@ -58,7 +58,7 @@ public class BothSecs1 {
 		Secs1OnTcpIpCommunicatorConfig equipConfig = new Secs1OnTcpIpCommunicatorConfig();
 		Secs1OnTcpIpCommunicatorConfig hostConfig  = new Secs1OnTcpIpCommunicatorConfig();
 		
-		equipConfig.communicatorName("Equip");
+		equipConfig.logSubjectHeader("Equip: ");
 		equipConfig.deviceId(10);
 		equipConfig.isEquip(true);
 		equipConfig.isMaster(true);
@@ -66,8 +66,10 @@ public class BothSecs1 {
 		equipConfig.timeout().t2(15.0F);
 		equipConfig.timeout().t3(45.0F);
 		equipConfig.retry(3);
+		equipConfig.gem().mdln("MDLN-A");
+		equipConfig.gem().softrev("000001");
 		
-		hostConfig.communicatorName("Host");
+		hostConfig.logSubjectHeader("Host: ");
 		hostConfig.deviceId(10);
 		hostConfig.isEquip(false);
 		hostConfig.isMaster(false);

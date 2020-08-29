@@ -92,15 +92,17 @@ public class ProtocolConvert {
 					) {
 				
 				Secs1OnTcpIpCommunicatorConfig equipConfig = new Secs1OnTcpIpCommunicatorConfig();
-				equipConfig.communicatorName("Equip");
+				equipConfig.logSubjectHeader("Equip: ");
 				equipConfig.socketAddress(secs1Addr);
 				equipConfig.deviceId(deviceId);
 				equipConfig.isEquip(true);
 				equipConfig.isMaster(true);
 				equipConfig.retry(0);
+				equipConfig.gem().mdln("MDLN-A");
+				equipConfig.gem().softrev("000001");
 				
 				HsmsSsCommunicatorConfig hostConfig = new HsmsSsCommunicatorConfig();
-				hostConfig.communicatorName("Host");
+				hostConfig.logSubjectHeader("Host: ");
 				hostConfig.socketAddress(hsmsSsAddr);
 				hostConfig.protocol(HsmsSsProtocol.ACTIVE);
 				hostConfig.sessionId(deviceId);

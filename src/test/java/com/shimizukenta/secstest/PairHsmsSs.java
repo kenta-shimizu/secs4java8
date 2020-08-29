@@ -57,15 +57,17 @@ public class PairHsmsSs {
 		final HsmsSsCommunicatorConfig equipConfig = new HsmsSsCommunicatorConfig();
 		final HsmsSsCommunicatorConfig hostConfig  = new HsmsSsCommunicatorConfig();
 		
-		equipConfig.communicatorName("Equip");
+		equipConfig.logSubjectHeader("Equip: ");
 		equipConfig.protocol(HsmsSsProtocol.PASSIVE);
 		equipConfig.socketAddress(addr);
 		equipConfig.sessionId(10);
 		equipConfig.isEquip(true);
 		equipConfig.rebindIfPassive(5.0F);
 		equipConfig.linktest(30.0F);
+		equipConfig.gem().mdln("MDLN-A");
+		equipConfig.gem().softrev("000001");
 		
-		hostConfig.communicatorName("Host");
+		hostConfig.logSubjectHeader("Host: ");
 		hostConfig.protocol(HsmsSsProtocol.ACTIVE);
 		hostConfig.socketAddress(addr);
 		hostConfig.sessionId(10);
@@ -255,6 +257,8 @@ public class PairHsmsSs {
 									++ inst.equipCounter;
 									echo("equip-count: " + inst.equipCounter);
 								}
+								
+								equip.send(6, 3, true, createS6F3Secs2());
 							}
 							catch ( SecsException e ) {
 								

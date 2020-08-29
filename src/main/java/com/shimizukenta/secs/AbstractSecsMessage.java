@@ -1,6 +1,8 @@
 package com.shimizukenta.secs;
 
-public abstract class AbstractSecsMessage implements SecsMessage {
+import java.io.Serializable;
+
+public abstract class AbstractSecsMessage implements SecsMessage, Serializable {
 	
 	private static final long serialVersionUID = 6003913058174391972L;
 

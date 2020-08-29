@@ -85,6 +85,8 @@ How to convert TCP/IP <-> RS232C
     );                                      /* >.                       */
 ```
 
+See also ["/src/examples/example3/ExampleBuildSecs2.java"](/src/examples/example3/ExampleBuildSecs2.java)
+
 2. Send Primary-Message
 
 ```
@@ -149,6 +151,8 @@ How to convert TCP/IP <-> RS232C
 | getFloat      |   |   |   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | getDouble     |   |   |   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
+
+See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/example4/ExampleGetSecs2Value.java)
 
 3. Send Reply-Message
 

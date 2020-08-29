@@ -7,6 +7,8 @@ public enum HsmsSsMessageType {
 	DATA( (byte)0, (byte)0 ),
 	SELECT_REQ( (byte)0, (byte)1 ),
 	SELECT_RSP( (byte)0, (byte)2 ),
+	DESELECT_REQ( (byte)0, (byte)3 ),
+	DESELECT_RSP( (byte)0, (byte)4 ),
 	LINKTEST_REQ( (byte)0, (byte)5 ),
 	LINKTEST_RSP( (byte)0, (byte)6 ),
 	REJECT_REQ( (byte)0, (byte)7 ),

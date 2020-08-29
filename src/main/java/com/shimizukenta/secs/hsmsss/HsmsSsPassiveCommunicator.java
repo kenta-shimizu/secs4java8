@@ -188,12 +188,14 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 												/* break; */
 											}
 											case SELECT_RSP:
+											case DESELECT_RSP:
 											case LINKTEST_RSP:
 											case REJECT_REQ: {
 												
 												send(channel, createRejectRequest(msg, HsmsSsMessageRejectReason.TRANSACTION_NOT_OPEN));
 												break;
 											}
+											case DESELECT_REQ:
 											default: {
 												
 												if ( HsmsSsMessageType.supportSType(msg) ) {
@@ -297,12 +299,14 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 												/* break; */
 											}
 											case SELECT_RSP:
+											case DESELECT_RSP:
 											case LINKTEST_RSP:
 											case REJECT_REQ: {
 												
 												send(channel, createRejectRequest(msg, HsmsSsMessageRejectReason.TRANSACTION_NOT_OPEN));
 												break;
 											}
+											case DESELECT_REQ:
 											default: {
 												
 												if ( HsmsSsMessageType.supportSType(msg) ) {

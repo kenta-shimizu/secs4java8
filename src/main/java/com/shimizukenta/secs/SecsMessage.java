@@ -1,10 +1,8 @@
 package com.shimizukenta.secs;
 
-import java.io.Serializable;
-
 import com.shimizukenta.secs.secs2.Secs2;
 
-public interface SecsMessage extends Serializable {
+public interface SecsMessage {
 	
 	/**
 	 * 
