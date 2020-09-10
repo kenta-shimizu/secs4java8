@@ -2,51 +2,59 @@ package com.shimizukenta.secs;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.Optional;
 
 import com.shimizukenta.secs.gem.GemConfig;
 
 public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	
-	private static final long serialVersionUID = 5944298569476814051L;
+	private static final long serialVersionUID = -8456991094606676409L;
+
+	private class IntegerProperty extends AbstractProperty<Integer> {
+
+		public IntegerProperty(int initial) {
+			super(Integer.valueOf(initial));
+		}
+	}
+	
+	private class BooleanProperty extends AbstractProperty<Boolean> {
+
+		public BooleanProperty(Boolean initial) {
+			super(Boolean.valueOf(initial));
+		}
+	}
+	
+	private class StringProperty extends AbstractProperty<String> {
+
+		public StringProperty(String initial) {
+			super(initial);
+		}
+	}
+	
 	
 	private final SecsTimeout timeout = new SecsTimeout();
-	
-	private int deviceId;
-	private boolean isEquip;
+	private final Property<Integer> deviceId = new IntegerProperty(10);
+	private final Property<Boolean> isEquip = new BooleanProperty(false);
 	private GemConfig gem;
-	
-	private String logSubjectHeader;
+	private final Property<String> logSubjectHeader = new StringProperty("");
 	
 	public AbstractSecsCommunicatorConfig() {
-		deviceId = 10;
-		isEquip = false;
 		gem = new GemConfig();
-		logSubjectHeader = "";
 	}
 	
 	public void deviceId(int id) {
-		synchronized ( this ) {
-			this.deviceId = id;
-		}
+		this.deviceId.set(id);
 	}
 	
-	public int deviceId() {
-		synchronized ( this ) {
-			return deviceId;
-		}
+	public Property<Integer> deviceId() {
+		return deviceId;
 	}
 	
 	public void isEquip(boolean f) {
-		synchronized ( this ) {
-			this.isEquip = f;
-		}
+		this.isEquip.set(f);
 	}
 	
-	public boolean isEquip() {
-		synchronized ( this ) {
-			return isEquip;
-		}
+	public Property<Boolean> isEquip() {
+		return isEquip;
 	}
 	
 	public SecsTimeout timeout() {
@@ -63,15 +71,17 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	 * @param header of SecsLog
 	 */
 	public void logSubjectHeader(CharSequence header) {
-		synchronized ( this ) {
-			this.logSubjectHeader = Objects.requireNonNull(header).toString();
-		}
+		this.logSubjectHeader.set(Objects.requireNonNull(header).toString());
 	}
 	
-	public Optional<String> logSubjectHeader() {
-		synchronized ( this ) {
-			return logSubjectHeader.isEmpty() ? Optional.empty() : Optional.of(logSubjectHeader);
-		}
+//	public Optional<String> logSubjectHeader() {
+//		synchronized ( this ) {
+//			return logSubjectHeader.isEmpty() ? Optional.empty() : Optional.of(logSubjectHeader);
+//		}
+//	}
+	
+	public Property<String> logSubjectHeader() {
+		return logSubjectHeader;
 	}
 	
 }

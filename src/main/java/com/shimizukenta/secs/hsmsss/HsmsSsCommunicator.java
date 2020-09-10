@@ -7,7 +7,9 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.shimizukenta.secs.AbstractProperty;
 import com.shimizukenta.secs.AbstractSecsCommunicator;
+import com.shimizukenta.secs.Property;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
@@ -18,23 +20,21 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	
 	private final HsmsSsCommunicatorConfig hsmsSsConfig;
 	protected final HsmsSsSendReplyManager sendReplyManager;
-	private HsmsSsCommunicateState hsmsSsCommunicateState;
+	private final Property<HsmsSsCommunicateState> hsmsSsCommStateProperty = new HsmsSsCommunicateStateProperty(HsmsSsCommunicateState.NOT_CONNECTED);
 	
 	protected HsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);
 		
 		this.hsmsSsConfig = config;
 		this.sendReplyManager = new HsmsSsSendReplyManager(this);
-		
-		this.notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
 	}
 	
 	public static HsmsSsCommunicator newInstance(HsmsSsCommunicatorConfig config) {
 		
-		switch ( config.protocol() ) {
+		switch ( config.protocol().get() ) {
 		case PASSIVE: {
 			
-			if ( config.rebindIfPassive().isPresent() ) {
+			if ( config.rebindIfPassive().get() >= 0.0F ) {
 				
 				return new HsmsSsRebindPassiveCommunicator(config);
 				
@@ -85,6 +85,14 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	@Override
 	public void open() throws IOException {
 		super.open();
+		
+		this.hsmsSsCommStateProperty.addChangeListener(state -> {
+			notifyLog("HsmsSs-Connect-state-chenged: " + state.toString());
+		});
+		
+		this.hsmsSsCommStateProperty.addChangeListener(state -> {
+			notifyCommunicatableStateChange(state.communicatable());
+		});
 	}
 	
 	@Override
@@ -126,26 +134,20 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	
 	
 	/* HSMS Communicate State */
-	private final Object syncHsmsSsCommunicateState = new Object();
-	
-	protected HsmsSsCommunicateState hsmsSsCommunicateState() {
-		synchronized ( syncHsmsSsCommunicateState ) {
-			return hsmsSsCommunicateState;
+	private class HsmsSsCommunicateStateProperty extends AbstractProperty<HsmsSsCommunicateState> {
+
+		public HsmsSsCommunicateStateProperty(HsmsSsCommunicateState initial) {
+			super(initial);
 		}
 	}
 	
+	
+	protected HsmsSsCommunicateState hsmsSsCommunicateState() {
+		return hsmsSsCommStateProperty.get();
+	}
+	
 	protected void notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState state) {
-		
-		synchronized ( syncHsmsSsCommunicateState ) {
-			
-			if ( this.hsmsSsCommunicateState != state ) {
-				
-				this.hsmsSsCommunicateState = state;
-				
-				notifyLog("HsmsSs-Connect-state-chenged: " + state.toString());
-				notifyCommunicatableStateChange(state.communicatable());
-			}
-		}
+		hsmsSsCommStateProperty.set(state);
 	}
 	
 	
@@ -176,9 +178,9 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		
 		byte[] bs = new byte[4];
 		
-		if ( hsmsSsConfig().isEquip() ) {
+		if ( hsmsSsConfig().isEquip().get() ) {
 			
-			int sessionid = hsmsSsConfig().sessionId();
+			int sessionid = hsmsSsConfig().sessionId().get();
 			
 			bs[0] = (byte)(sessionid >> 8);
 			bs[1] = (byte)sessionid;
@@ -223,7 +225,7 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 			, InterruptedException {
 		
 		HsmsSsMessageType mt = HsmsSsMessageType.DATA;
-		int sessionid = hsmsSsConfig().sessionId();
+		int sessionid = hsmsSsConfig().sessionId().get();
 		byte[] sysbytes = systemBytes();
 		
 		byte[] head = new byte[] {
@@ -254,7 +256,7 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		byte[] pri = primary.header10Bytes();
 		
 		HsmsSsMessageType mt = HsmsSsMessageType.DATA;
-		int sessionid = hsmsSsConfig().sessionId();
+		int sessionid = hsmsSsConfig().sessionId().get();
 		
 		byte[] head = new byte[] {
 				(byte)(sessionid >> 8)

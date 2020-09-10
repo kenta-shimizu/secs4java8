@@ -71,15 +71,15 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	}
 	
 	private Optional<Byte> pollByteT1() throws InterruptedException {
-		return pollByteTx(secs1Config.timeout().t1());
+		return pollByteTx(secs1Config.timeout().t1().get());
 	}
 	
 	private Optional<Byte> pollByteT2() throws InterruptedException {
-		return pollByteTx(secs1Config.timeout().t2());
+		return pollByteTx(secs1Config.timeout().t2().get());
 	}
 	
 	private Optional<Byte> pollByteT4() throws InterruptedException {
-		return pollByteTx(secs1Config.timeout().t4());
+		return pollByteTx(secs1Config.timeout().t4().get());
 	}
 	
 	protected void pollByteUntilEmpty() {
@@ -124,8 +124,8 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
-		int devid = secs1Config().deviceId();
-		boolean rbit = secs1Config().isEquip();
+		int devid = secs1Config().deviceId().get();
+		boolean rbit = secs1Config().isEquip().get();
 		int num = autoNumber.incrementAndGet();
 		
 		byte[] head = new byte[] {
@@ -161,8 +161,8 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		
 		byte[] priHead = primary.header10Bytes();
 		
-		int devid = this.secs1Config().deviceId();
-		boolean rbit = this.secs1Config().isEquip();
+		int devid = this.secs1Config().deviceId().get();
+		boolean rbit = this.secs1Config().isEquip().get();
 		
 		byte[] head = new byte[] {
 				(byte)(devid >> 8)
@@ -268,7 +268,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 									
 									byte b = op.get();
 									
-									if ( ! secs1Config().isMaster() && b == ENQ ) {
+									if ( ! secs1Config().isMaster().get() && b == ENQ ) {
 										return PollCircuitControl.RX;
 									}
 									
@@ -285,7 +285,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 					});
 			
 			try {
-				long t = (long)(secs1Config().timeout().t2() * 1000.0F);
+				long t = (long)(secs1Config().timeout().t2().get() * 1000.0F);
 				return executorService().invokeAny(tasks, t, TimeUnit.MILLISECONDS);
 			}
 			catch ( TimeoutException giveup ) {
@@ -306,7 +306,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		
 		private void circuitControl() throws SecsException, InterruptedException {
 			
-			for ( int counter = 0 ; counter <= secs1Config.retry() ; ) {
+			for ( int counter = 0 ; counter <= secs1Config.retry().get() ; ) {
 				
 				sendByte(ENQ);
 				

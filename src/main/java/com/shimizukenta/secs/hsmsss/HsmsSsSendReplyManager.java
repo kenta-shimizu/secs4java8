@@ -50,7 +50,7 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerManager {
 				send(channel, msg);
 				
 				try {
-					return Optional.of(reply(p, parent.hsmsSsConfig().timeout().t6()));
+					return Optional.of(reply(p, parent.hsmsSsConfig().timeout().t6().get()));
 				}
 				catch ( TimeoutException e ) {
 					throw new HsmsSsTimeoutT6Exception(msg, e);
@@ -71,7 +71,7 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerManager {
 					send(channel, msg);
 					
 					try {
-						return Optional.of(reply(p, parent.hsmsSsConfig().timeout().t3()));
+						return Optional.of(reply(p, parent.hsmsSsConfig().timeout().t3().get()));
 					}
 					catch ( TimeoutException e ) {
 						throw new HsmsSsTimeoutT3Exception(msg, e);

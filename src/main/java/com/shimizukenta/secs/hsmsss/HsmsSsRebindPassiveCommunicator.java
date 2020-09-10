@@ -29,10 +29,7 @@ public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 			
 			passiveBind();
 			
-			long t = this.hsmsSsConfig().rebindIfPassive()
-					.map(v -> (v * 1000.0F))
-					.map(v -> v.longValue())
-					.orElse(-1L);
+			long t = (long)(this.hsmsSsConfig().rebindIfPassive().get() * 1000.0F);
 			
 			if ( t > 0 ) {
 				TimeUnit.MILLISECONDS.sleep(t);
@@ -48,7 +45,11 @@ public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 				AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
 				) {
 			
-			SocketAddress socketAddr = hsmsSsConfig().socketAddress();
+			final SocketAddress socketAddr = hsmsSsConfig().socketAddress().get();
+			
+			if ( socketAddr == null ) {
+				throw new IllegalStateException("SocketAddress not setted");
+			}
 			
 			String socketAddrInfo = socketAddr.toString();
 			

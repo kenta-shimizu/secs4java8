@@ -26,7 +26,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 	@Override
 	public void open() throws IOException {
 		
-		if ( hsmsSsConfig().protocol() != HsmsSsProtocol.ACTIVE ) {
+		if ( hsmsSsConfig().protocol().get() != HsmsSsProtocol.ACTIVE ) {
 			throw new IOException("HsmsSsCommunicatorConfig#protocol is not ACTIVE");
 		}
 		
@@ -38,7 +38,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 			
 			sendReplyManager.clear();
 			
-			long t5 = (long)(hsmsSsConfig().timeout().t5() * 1000.0F);
+			long t5 = (long)(hsmsSsConfig().timeout().t5().get() * 1000.0F);
 			if ( t5 > 0 ) {
 				TimeUnit.MILLISECONDS.sleep(t5);
 			}
@@ -56,7 +56,11 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 				AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
 				) {
 			
-			SocketAddress socketAddr = hsmsSsConfig().socketAddress();
+			final SocketAddress socketAddr = hsmsSsConfig().socketAddress().get();
+			
+			if ( socketAddr == null ) {
+				throw new IllegalStateException("SocketAddress not setted");
+			}
 			
 			String socketAddrInfo = socketAddr.toString();
 			

@@ -109,7 +109,7 @@ public class HsmsSsByteReader extends AbstractSecsInnerManager implements Callab
 			
 			if ( detectT8Timeout ) {
 				
-				long t8 = (long)(parent.hsmsSsConfig().timeout().t8() * 1000.0F);
+				long t8 = (long)(parent.hsmsSsConfig().timeout().t8().get() * 1000.0F);
 				r = f.get(t8, TimeUnit.MILLISECONDS);
 				
 			} else {

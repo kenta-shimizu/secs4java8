@@ -32,7 +32,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 	@Override
 	public void open() throws IOException {
 		
-		if ( hsmsSsConfig().protocol() != HsmsSsProtocol.PASSIVE ) {
+		if ( hsmsSsConfig().protocol().get() != HsmsSsProtocol.PASSIVE ) {
 			throw new IOException("HsmsSsCommunicatorConfig#protocol is not PASSIVE");
 		}
 		
@@ -84,7 +84,11 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 				this.server = AsynchronousServerSocketChannel.open();
 			}
 			
-			SocketAddress socketAddr = hsmsSsConfig().socketAddress();
+			final SocketAddress socketAddr = hsmsSsConfig().socketAddress().get();
+			
+			if ( socketAddr == null ) {
+				throw new IllegalStateException("SocketAddress not setted");
+			}
 			
 			String socketAddrInfo = socketAddr.toString();
 			
@@ -225,7 +229,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 					
 					try {
 						
-						long t7 = (long)(hsmsSsConfig().timeout().t7() * 1000.0F);
+						long t7 = (long)(hsmsSsConfig().timeout().t7().get() * 1000.0F);
 						boolean f = executorService().invokeAny(connectTasks, t7, TimeUnit.MILLISECONDS);
 						
 						if ( f ) {

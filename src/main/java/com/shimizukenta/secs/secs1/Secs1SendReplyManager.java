@@ -204,7 +204,7 @@ public class Secs1SendReplyManager extends AbstractSecsInnerManager {
 			
 			for ( ;; ) {
 				
-				long t = (long)(parent.secs1Config().timeout().t3() * 1000.0F);
+				long t = (long)(parent.secs1Config().timeout().t3().get() * 1000.0F);
 				ReplyStatus r = executorService().invokeAny(tasks, t, TimeUnit.MILLISECONDS);
 				
 				if ( r.resetTimer() ) {

@@ -26,9 +26,7 @@ public class HsmsSsCircuitAssurance extends AbstractSecsInnerManager implements 
 			
 			for ( ;; ) {
 				
-				long t = parent.hsmsSsConfig().linktest()
-						.map(v -> (long)(v * 1000.0F))
-						.orElse(-1L);
+				long t = (long)(parent.hsmsSsConfig().linktest().get() * 1000.0F);
 				
 				synchronized ( this ) {
 					

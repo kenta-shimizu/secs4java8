@@ -1,19 +1,32 @@
 package com.shimizukenta.secs.secs1;
 
+import com.shimizukenta.secs.AbstractProperty;
 import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
+import com.shimizukenta.secs.Property;
 
 public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
-	private static final long serialVersionUID = -4179240764890047723L;
+	private static final long serialVersionUID = -4562702342609110048L;
 	
-	private boolean isMaster;
-	private int retry;
+	private class BooleanProperty extends AbstractProperty<Boolean> {
+
+		public BooleanProperty(boolean initial) {
+			super(Boolean.valueOf(initial));
+		}
+	}
+	
+	private class IntegerProperty extends AbstractProperty<Integer> {
+
+		public IntegerProperty(int initial) {
+			super(Integer.valueOf(initial));
+		}
+	}
+	
+	private final Property<Boolean> isMaster = new BooleanProperty(true);
+	private final Property<Integer> retry = new IntegerProperty(3);
 	
 	public Secs1CommunicatorConfig() {
 		super();
-		
-		isMaster = true;
-		retry = 3;
 	}
 	
 	/**
@@ -21,19 +34,15 @@ public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * @param isMasterMode
 	 */
 	public void isMaster(boolean isMaster) {
-		synchronized ( this ) {
-			this.isMaster = isMaster;
-		}
+		this.isMaster.set(isMaster);
 	}
 	
 	/**
 	 * 
 	 * @return isMasterMode
 	 */
-	public boolean isMaster() {
-		synchronized ( this ) {
-			return isMaster;
-		}
+	public Property<Boolean> isMaster() {
+		return isMaster;
 	}
 	
 	/**
@@ -41,24 +50,18 @@ public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * @param retry-count-value is >= 0
 	 */
 	public void retry(int retryCount) {
-		
-		synchronized ( this ) {
-			if ( retryCount < 0 ) {
-				throw new IllegalArgumentException("retry is >= 0");
-			}
-			
-			this.retry = retryCount;
+		if ( retryCount < 0 ) {
+			throw new IllegalArgumentException("retry is >= 0");
 		}
+		this.retry.set(retryCount);
 	}
 	
 	/**
 	 * 
 	 * @return retry-count
 	 */
-	public int retry() {
-		synchronized ( this ) {
-			return retry;
-		}
+	public Property<Integer> retry() {
+		return retry;
 	}
 	
 }
