@@ -10,15 +10,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import com.shimizukenta.secs.AbstractSecsInnerManager;
+import com.shimizukenta.secs.AbstractSecsInnerEngine;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BytesParser;
 
-public class HsmsSsByteReader extends AbstractSecsInnerManager implements Callable<Object> {
+public class HsmsSsByteReader extends AbstractSecsInnerEngine implements Callable<Void> {
 	
 	private final HsmsSsCommunicator parent;
 	private final AsynchronousSocketChannel channel;
@@ -36,7 +35,7 @@ public class HsmsSsByteReader extends AbstractSecsInnerManager implements Callab
 	 * until detect-terminate or Timeout-T8
 	 */
 	@Override
-	public Object call() throws Exception {
+	public Void call() throws Exception {
 		
 		try {
 			
@@ -109,8 +108,7 @@ public class HsmsSsByteReader extends AbstractSecsInnerManager implements Callab
 			
 			if ( detectT8Timeout ) {
 				
-				long t8 = (long)(parent.hsmsSsConfig().timeout().t8().get() * 1000.0F);
-				r = f.get(t8, TimeUnit.MILLISECONDS);
+				r = parent.hsmsSsConfig().timeout().t8().future(f);
 				
 			} else {
 				

@@ -2,9 +2,9 @@ package com.shimizukenta.secs.hsmsss;
 
 import java.util.concurrent.Callable;
 
-import com.shimizukenta.secs.AbstractSecsInnerManager;
+import com.shimizukenta.secs.AbstractSecsInnerEngine;
 
-public class HsmsSsCircuitAssurance extends AbstractSecsInnerManager implements Callable<Object> {
+public class HsmsSsCircuitAssurance extends AbstractSecsInnerEngine implements Callable<Void> {
 	
 	private final HsmsSsCommunicator parent;
 	private boolean resetted;
@@ -20,34 +20,24 @@ public class HsmsSsCircuitAssurance extends AbstractSecsInnerManager implements 
 	 * 
 	 */
 	@Override
-	public Object call() throws Exception {
+	public Void call() throws Exception {
 		
 		try {
 			
-			for ( ;; ) {
+			synchronized ( this ) {
 				
-				long t = (long)(parent.hsmsSsConfig().linktest().get() * 1000.0F);
-				
-				synchronized ( this ) {
+				for ( ;; ) {
 					
-					if ( resetted ) {
-						resetted = false;
-					}
+					resetted = false;
 					
-					if ( t > 0 ) {
-						this.wait(t);
-					} else {
-						this.wait();
-					}
+					parent.hsmsSsConfig().linktest().wait(this);
 					
-					if ( resetted ) {
-						resetted = false;
-						continue;
+					if ( ! resetted ) {
+						
+						if ( ! parent.linktest() ) {
+							break;
+						}
 					}
-				}
-				
-				if ( ! parent.linktest() ) {
-					break;
 				}
 			}
 		}

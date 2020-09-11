@@ -7,6 +7,8 @@ public class BooleanProperty extends AbstractProperty<Boolean> {
 	}
 	
 	public boolean booleanValue() {
-		return get().booleanValue();
+		synchronized ( this ) {
+			return get().booleanValue();
+		}
 	}
 }

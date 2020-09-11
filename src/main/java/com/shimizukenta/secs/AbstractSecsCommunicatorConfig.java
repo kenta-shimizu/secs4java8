@@ -9,20 +9,6 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	
 	private static final long serialVersionUID = -8456991094606676409L;
 
-	private class IntegerProperty extends AbstractProperty<Integer> {
-
-		public IntegerProperty(int initial) {
-			super(Integer.valueOf(initial));
-		}
-	}
-	
-	private class BooleanProperty extends AbstractProperty<Boolean> {
-
-		public BooleanProperty(Boolean initial) {
-			super(Boolean.valueOf(initial));
-		}
-	}
-	
 	private class StringProperty extends AbstractProperty<String> {
 
 		public StringProperty(String initial) {
@@ -32,8 +18,8 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	
 	
 	private final SecsTimeout timeout = new SecsTimeout();
-	private final Property<Integer> deviceId = new IntegerProperty(10);
-	private final Property<Boolean> isEquip = new BooleanProperty(false);
+	private final IntegerProperty deviceId = new IntegerProperty(10);
+	private final BooleanProperty isEquip = new BooleanProperty(false);
 	private GemConfig gem;
 	private final Property<String> logSubjectHeader = new StringProperty("");
 	
@@ -45,7 +31,7 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 		this.deviceId.set(id);
 	}
 	
-	public Property<Integer> deviceId() {
+	public IntegerProperty deviceId() {
 		return deviceId;
 	}
 	
@@ -53,7 +39,7 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 		this.isEquip.set(f);
 	}
 	
-	public Property<Boolean> isEquip() {
+	public BooleanProperty isEquip() {
 		return isEquip;
 	}
 	

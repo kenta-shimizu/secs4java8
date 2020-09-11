@@ -6,21 +6,14 @@ public class SecsTimeout implements Serializable {
 	
 	private static final long serialVersionUID = -3240180901934372535L;
 	
-	private class FloatProperty extends AbstractProperty<Float> {
-
-		public FloatProperty(float initial) {
-			super(Float.valueOf(initial));
-		}
-	}
-	
-	private final Property<Float> t1 = new FloatProperty( 1.0F);
-	private final Property<Float> t2 = new FloatProperty(15.0F);
-	private final Property<Float> t3 = new FloatProperty(45.0F);
-	private final Property<Float> t4 = new FloatProperty(45.0F);
-	private final Property<Float> t5 = new FloatProperty(10.0F);
-	private final Property<Float> t6 = new FloatProperty( 5.0F);
-	private final Property<Float> t7 = new FloatProperty(10.0F);
-	private final Property<Float> t8 = new FloatProperty( 6.0F);
+	private final TimeProperty t1 = new TimeProperty( 1.0F);
+	private final TimeProperty t2 = new TimeProperty(15.0F);
+	private final TimeProperty t3 = new TimeProperty(45.0F);
+	private final TimeProperty t4 = new TimeProperty(45.0F);
+	private final TimeProperty t5 = new TimeProperty(10.0F);
+	private final TimeProperty t6 = new TimeProperty( 5.0F);
+	private final TimeProperty t7 = new TimeProperty(10.0F);
+	private final TimeProperty t8 = new TimeProperty( 6.0F);
 	
 	protected SecsTimeout() {
 		/* Nothing */
@@ -41,7 +34,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public Property<Float> t1() {
+	public TimeProperty t1() {
 		return t1;
 	}
 	
@@ -60,7 +53,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public Property<Float> t2() {
+	public TimeProperty t2() {
 		return t2;
 	}
 	
@@ -79,7 +72,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public Property<Float> t3() {
+	public TimeProperty t3() {
 		return t3;
 	}
 	
@@ -98,7 +91,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public Property<Float> t4() {
+	public TimeProperty t4() {
 		return t4;
 	}
 	
@@ -117,7 +110,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public Property<Float> t5() {
+	public TimeProperty t5() {
 		return t5;
 	}
 	
@@ -136,7 +129,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public Property<Float> t6() {
+	public TimeProperty t6() {
 		return t6;
 	}
 	
@@ -155,7 +148,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public Property<Float> t7() {
+	public TimeProperty t7() {
 		return t7;
 	}
 	
@@ -174,7 +167,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public Property<Float> t8() {
+	public TimeProperty t8() {
 		return t8;
 	}
 	

@@ -22,11 +22,30 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	protected final HsmsSsSendReplyManager sendReplyManager;
 	private final Property<HsmsSsCommunicateState> hsmsSsCommStateProperty = new HsmsSsCommunicateStateProperty(HsmsSsCommunicateState.NOT_CONNECTED);
 	
+	private class BytesProperty extends AbstractProperty<byte[]> {
+		
+		public BytesProperty(byte[] initial) {
+			super(initial);
+		}
+	}
+	
+	private final BytesProperty sessionIdBytes = new BytesProperty(new byte[] {0, 0});
+	
+	
 	protected HsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);
 		
 		this.hsmsSsConfig = config;
 		this.sendReplyManager = new HsmsSsSendReplyManager(this);
+		
+		this.hsmsSsConfig.sessionId().addChangeListener(i -> {
+			int v = i.intValue();
+			byte[] bs = new byte[] {
+					(byte)(v >> 8),
+					(byte)v
+			};
+			sessionIdBytes.set(bs);
+		});
 	}
 	
 	public static HsmsSsCommunicator newInstance(HsmsSsCommunicatorConfig config) {
@@ -34,7 +53,7 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		switch ( config.protocol().get() ) {
 		case PASSIVE: {
 			
-			if ( config.rebindIfPassive().get() >= 0.0F ) {
+			if ( config.rebindIfPassive().getMilliSeconds() >= 0L ) {
 				
 				return new HsmsSsRebindPassiveCommunicator(config);
 				
@@ -141,7 +160,6 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		}
 	}
 	
-	
 	protected HsmsSsCommunicateState hsmsSsCommunicateState() {
 		return hsmsSsCommStateProperty.get();
 	}
@@ -178,12 +196,11 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		
 		byte[] bs = new byte[4];
 		
-		if ( hsmsSsConfig().isEquip().get() ) {
+		if ( hsmsSsConfig().isEquip().booleanValue() ) {
 			
-			int sessionid = hsmsSsConfig().sessionId().get();
-			
-			bs[0] = (byte)(sessionid >> 8);
-			bs[1] = (byte)sessionid;
+			byte[] xs = sessionIdBytes.get();
+			bs[0] = xs[0];
+			bs[1] = xs[1];
 			
 		} else {
 			
@@ -200,15 +217,15 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	}
 	
 	protected void send(AsynchronousSocketChannel channel, HsmsSsMessage msg)
-			throws SecsSendMessageException, SecsException
-			, InterruptedException {
+			throws SecsSendMessageException, SecsException,
+			InterruptedException {
 		
 		sendReplyManager.send(channel, msg);
 	}
 	
 	public Optional<HsmsSsMessage> send(HsmsSsMessage msg)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
-			, InterruptedException {
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException,
+			InterruptedException {
 		
 		try {
 			return sendReplyManager.send(msg);
@@ -225,20 +242,20 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 			, InterruptedException {
 		
 		HsmsSsMessageType mt = HsmsSsMessageType.DATA;
-		int sessionid = hsmsSsConfig().sessionId().get();
+		byte[] xs = sessionIdBytes.get();
 		byte[] sysbytes = systemBytes();
 		
 		byte[] head = new byte[] {
-				(byte)(sessionid >> 8)
-				, (byte)(sessionid)
-				, (byte)strm
-				, (byte)func
-				, mt.pType()
-				, mt.sType()
-				, sysbytes[0]
-				, sysbytes[1]
-				, sysbytes[2]
-				, sysbytes[3]
+				xs[0],
+				xs[1],
+				(byte)strm,
+				(byte)func,
+				mt.pType(),
+				mt.sType(),
+				sysbytes[0],
+				sysbytes[1],
+				sysbytes[2],
+				sysbytes[3]
 		};
 		
 		if ( wbit ) {
@@ -256,19 +273,19 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		byte[] pri = primary.header10Bytes();
 		
 		HsmsSsMessageType mt = HsmsSsMessageType.DATA;
-		int sessionid = hsmsSsConfig().sessionId().get();
+		byte[] xs = sessionIdBytes.get();
 		
 		byte[] head = new byte[] {
-				(byte)(sessionid >> 8)
-				, (byte)(sessionid)
-				, (byte)strm
-				, (byte)func
-				, mt.pType()
-				, mt.sType()
-				, pri[6]
-				, pri[7]
-				, pri[8]
-				, pri[9]
+				xs[0],
+				xs[1],
+				(byte)strm,
+				(byte)func,
+				mt.pType(),
+				mt.sType(),
+				pri[6],
+				pri[7],
+				pri[8],
+				pri[9]
 		};
 		
 		if ( wbit ) {
@@ -296,16 +313,16 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		byte[] pri = primary.header10Bytes();
 		
 		return createHsmsSsMessage(new byte[] {
-				pri[0]
-				, pri[1]
-				, (byte)0
-				, status.statusCode()
-				, mt.pType()
-				, mt.sType()
-				, pri[6]
-				, pri[7]
-				, pri[8]
-				, pri[9]
+				pri[0],
+				pri[1],
+				(byte)0,
+				status.statusCode(),
+				mt.pType(),
+				mt.sType(),
+				pri[6],
+				pri[7],
+				pri[8],
+				pri[9]
 		});
 	}
 	
@@ -319,16 +336,16 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		byte[] pri = primary.header10Bytes();
 		
 		return createHsmsSsMessage(new byte[] {
-				pri[0]
-				, pri[1]
-				, (byte)0
-				, (byte)0
-				, mt.pType()
-				, mt.sType()
-				, pri[6]
-				, pri[7]
-				, pri[8]
-				, pri[9]
+				pri[0],
+				pri[1],
+				(byte)0,
+				(byte)0,
+				mt.pType(),
+				mt.sType(),
+				pri[6],
+				pri[7],
+				pri[8],
+				pri[9]
 		});
 	}
 	
@@ -342,16 +359,16 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		byte[] pri = primary.header10Bytes();
 		
 		return createHsmsSsMessage(new byte[] {
-				pri[0]
-				, pri[1]
-				, (byte)0
-				, (byte)0
-				, mt.pType()
-				, mt.sType()
-				, pri[6]
-				, pri[7]
-				, pri[8]
-				, pri[9]
+				pri[0],
+				pri[1],
+				(byte)0,
+				(byte)0,
+				mt.pType(),
+				mt.sType(),
+				pri[6],
+				pri[7],
+				pri[8],
+				pri[9]
 		});
 	}
 	
@@ -362,16 +379,16 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		byte b = reason == HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P ? bs[4] : bs[5];
 		
 		return createHsmsSsMessage(new byte[] {
-				bs[0]
-				, bs[1]
-				, b
-				, reason.reasonCode()
-				, mt.pType()
-				, mt.sType()
-				, bs[6]
-				, bs[7]
-				, bs[8]
-				, bs[9]
+				bs[0],
+				bs[1],
+				b,
+				reason.reasonCode(),
+				mt.pType(),
+				mt.sType(),
+				bs[6],
+				bs[7],
+				bs[8],
+				bs[9]
 		});
 	}
 	
@@ -384,16 +401,16 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		byte[] sysbytes = systemBytes();
 		
 		return createHsmsSsMessage(new byte[] {
-				(byte)0xFF
-				, (byte)0xFF
-				, (byte)0
-				, (byte)0
-				, mt.pType()
-				, mt.sType()
-				, sysbytes[0]
-				, sysbytes[1]
-				, sysbytes[2]
-				, sysbytes[3]
+				(byte)0xFF,
+				(byte)0xFF,
+				(byte)0,
+				(byte)0,
+				mt.pType(),
+				mt.sType(),
+				sysbytes[0],
+				sysbytes[1],
+				sysbytes[2],
+				sysbytes[3]
 		});
 	}
 	

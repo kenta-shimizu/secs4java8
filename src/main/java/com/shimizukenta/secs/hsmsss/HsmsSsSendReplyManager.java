@@ -4,23 +4,22 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.shimizukenta.secs.AbstractSecsInnerManager;
+import com.shimizukenta.secs.AbstractSecsInnerEngine;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
+import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2ByteBuffersBuilder;
 
-public class HsmsSsSendReplyManager extends AbstractSecsInnerManager {
+public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 	
 	private final Collection<Pack> packs = new ArrayList<>();
 	
@@ -50,7 +49,7 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerManager {
 				send(channel, msg);
 				
 				try {
-					return Optional.of(reply(p, parent.hsmsSsConfig().timeout().t6().get()));
+					return Optional.of(reply(p, parent.hsmsSsConfig().timeout().t6()));
 				}
 				catch ( TimeoutException e ) {
 					throw new HsmsSsTimeoutT6Exception(msg, e);
@@ -71,7 +70,7 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerManager {
 					send(channel, msg);
 					
 					try {
-						return Optional.of(reply(p, parent.hsmsSsConfig().timeout().t3().get()));
+						return Optional.of(reply(p, parent.hsmsSsConfig().timeout().t3()));
 					}
 					catch ( TimeoutException e ) {
 						throw new HsmsSsTimeoutT3Exception(msg, e);
@@ -184,7 +183,7 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerManager {
 		
 		while ( buffer.hasRemaining() ) {
 			
-			Future<Integer> f = channel.write(buffer);
+			final Future<Integer> f = channel.write(buffer);
 			
 			try {
 				int w = f.get().intValue();
@@ -200,53 +199,52 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerManager {
 		}
 	}
 	
-	private HsmsSsMessage reply(Pack p, float timeout)
+	private HsmsSsMessage reply(Pack p, TimeProperty timeout)
 			throws SecsWaitReplyMessageException, SecsException
 			, TimeoutException, InterruptedException {
 		
-		Collection<Callable<HsmsSsMessage>> tasks = Arrays.asList(
-				() -> {
-					
-					try {
-						synchronized ( packs ) {
-							for ( ;; ) {
-								HsmsSsMessage m = p.replyMsg();
-								if ( m != null ) {
-									return m;
-								}
-								packs.wait();
-							}
+		final Callable<HsmsSsMessage> getMsgTask = () -> {
+			
+			try {
+				synchronized ( packs ) {
+					for ( ;; ) {
+						HsmsSsMessage m = p.replyMsg();
+						if ( m != null ) {
+							return m;
 						}
+						packs.wait();
 					}
-					catch ( InterruptedException ignroe ) {
-					}
+				}
+			}
+			catch ( InterruptedException ignroe ) {
+			}
+			
+			return null;
+		};
+		
+		final Callable<HsmsSsMessage> checkTerminateTask = () -> {
+			
+			try {
+				synchronized ( packs ) {
 					
-					return null;
-				},
-				() -> {
-					
-					try {
-						synchronized ( packs ) {
-							
-							for ( ;; ) {
-								
-								if ( packs.isEmpty() ) {
-									return null;
-								}
-								
-								packs.wait();
-							}
+					for ( ;; ) {
+						
+						if ( packs.isEmpty() ) {
+							return null;
 						}
+						
+						packs.wait();
 					}
-					catch ( InterruptedException ignore ) {
-					}
-					
-					return null;
-				});
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+			
+			return null;
+		};
 		
 		try {
-			long t = (long)(timeout * 1000.0F);
-			HsmsSsMessage msg = executorService().invokeAny(tasks, t, TimeUnit.MILLISECONDS);
+			HsmsSsMessage msg = executeInvokeAny(getMsgTask, checkTerminateTask, timeout);
 			
 			if ( msg == null ) {
 				throw new HsmsSsDetectTerminateException();

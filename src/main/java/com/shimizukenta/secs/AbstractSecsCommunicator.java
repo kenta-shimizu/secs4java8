@@ -1,15 +1,20 @@
 package com.shimizukenta.secs;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.gem.Gem;
 import com.shimizukenta.secs.gem.UsualGem;
@@ -23,6 +28,10 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 		th.setDaemon(true);
 		return th;
 	});
+	
+	protected ExecutorService executorService() {
+		return execServ;
+	}
 	
 	protected static Runnable createLoopTask(InterruptableRunnable task) {
 		return new Runnable() {
@@ -42,6 +51,56 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	protected void executeLoopTask(InterruptableRunnable r) {
 		execServ.execute(createLoopTask(r));
 	}
+	
+	protected <T> T executeInvokeAny(Collection<? extends Callable<T>> tasks)
+			throws InterruptedException, ExecutionException{
+		return execServ.invokeAny(tasks);
+	}
+	
+	protected <T> T executeInvokeAny(Callable<T> task)
+			throws InterruptedException, ExecutionException{
+		return execServ.invokeAny(Collections.singleton(task));
+	}
+	
+	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2)
+			throws InterruptedException, ExecutionException{
+		return execServ.invokeAny(Arrays.asList(task1, task2));
+	}
+	
+	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, Callable<T> task3)
+			throws InterruptedException, ExecutionException{
+		return execServ.invokeAny(Arrays.asList(task1, task2, task3));
+	}
+	
+	protected <T> T executeInvokeAny(Collection<? extends Callable<T>> tasks, TimeProperty timeout)
+			throws InterruptedException, ExecutionException, TimeoutException {
+		return execServ.invokeAny(tasks, timeout.getMilliSeconds(), TimeUnit.MILLISECONDS);
+	}
+	
+	protected <T> T executeInvokeAny(Callable<T> task, TimeProperty timeout)
+			throws InterruptedException, ExecutionException, TimeoutException {
+		return execServ.invokeAny(
+				Collections.singleton(task),
+				timeout.getMilliSeconds(),
+				TimeUnit.MILLISECONDS);
+	}
+	
+	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, TimeProperty timeout)
+			throws InterruptedException, ExecutionException, TimeoutException {
+		return execServ.invokeAny(
+				Arrays.asList(task1, task2),
+				timeout.getMilliSeconds(),
+				TimeUnit.MILLISECONDS);
+	}
+	
+	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, Callable<T> task3, TimeProperty timeout)
+			throws InterruptedException, ExecutionException, TimeoutException {
+		return execServ.invokeAny(
+				Arrays.asList(task1, task2, task3),
+				timeout.getMilliSeconds(),
+				TimeUnit.MILLISECONDS);
+	}
+	
 	
 	private final AbstractSecsCommunicatorConfig config;
 	private final Gem gem;
@@ -120,10 +179,6 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 		}
 	}
 	
-	protected ExecutorService executorService() {
-		return execServ;
-	}
-	
 	@Override
 	public final Gem gem() {
 		return gem;
@@ -131,12 +186,12 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	
 	@Override
 	public final int deviceId() {
-		return config.deviceId().get();
+		return config.deviceId().intValue();
 	}
 	
 	@Override
 	public final boolean isEquip() {
-		return config.isEquip().get();
+		return config.isEquip().booleanValue();
 	}
 	
 	protected SecsTimeout timeout() {
@@ -266,13 +321,6 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	
 	
 	/* Secs-Communicatable-State-Changed-Listener */
-	private class BooleanProperty extends AbstractProperty<Boolean> {
-
-		public BooleanProperty(boolean initial) {
-			super(Boolean.valueOf(initial));
-		}
-	}
-	
 	private final Property<Boolean> communicatable = new BooleanProperty(false);
 	
 	@Override

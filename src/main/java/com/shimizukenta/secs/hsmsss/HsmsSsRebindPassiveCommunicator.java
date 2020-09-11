@@ -6,7 +6,8 @@ import java.net.StandardSocketOptions;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
-import java.util.concurrent.TimeUnit;
+
+import com.shimizukenta.secs.TimeProperty;
 
 public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 	
@@ -25,18 +26,17 @@ public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 	@Override
 	protected void passiveOpen() {
 		
-		executorService().execute(createLoopTask(() -> {
+		executeLoopTask(() -> {
 			
 			passiveBind();
 			
-			long t = (long)(this.hsmsSsConfig().rebindIfPassive().get() * 1000.0F);
-			
-			if ( t > 0 ) {
-				TimeUnit.MILLISECONDS.sleep(t);
+			TimeProperty tp = this.hsmsSsConfig().rebindIfPassive();
+			if ( tp.gtZero() ) {
+				tp.sleep();
 			} else {
 				return;
 			}
-		}));
+		});
 	}
 	
 	private void passiveBind() throws InterruptedException {
@@ -45,11 +45,7 @@ public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 				AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
 				) {
 			
-			final SocketAddress socketAddr = hsmsSsConfig().socketAddress().get();
-			
-			if ( socketAddr == null ) {
-				throw new IllegalStateException("SocketAddress not setted");
-			}
+			final SocketAddress socketAddr = hsmsSsConfig().socketAddress().getSocketAddress();
 			
 			String socketAddrInfo = socketAddr.toString();
 			
@@ -62,7 +58,8 @@ public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 
 				@Override
 				public void completed(AsynchronousSocketChannel channel, Void attachment) {
-					completedAction(server, this, channel, attachment);
+					server.accept(attachment, this);
+					completedAction(channel);
 				}
 
 				@Override

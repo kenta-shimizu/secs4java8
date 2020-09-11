@@ -5,7 +5,10 @@ import java.util.Objects;
 
 import com.shimizukenta.secs.AbstractProperty;
 import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
+import com.shimizukenta.secs.IntegerProperty;
 import com.shimizukenta.secs.Property;
+import com.shimizukenta.secs.SocketAddressProperty;
+import com.shimizukenta.secs.TimeProperty;
 
 public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
@@ -18,24 +21,11 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 		}
 	}
 	
-	private class SocketAddressProperty extends AbstractProperty<SocketAddress> {
-
-		public SocketAddressProperty(SocketAddress initial) {
-			super(initial);
-		}
-	}
-	
-	private class FloatProperty extends AbstractProperty<Float> {
-
-		public FloatProperty(float initial) {
-			super(Float.valueOf(initial));
-		}
-	}
 	
 	private final Property<HsmsSsProtocol> protocol = new ProtocolProperty(HsmsSsProtocol.PASSIVE);
-	private final Property<SocketAddress> sockAddr = new SocketAddressProperty(null);
-	private final Property<Float> linktest = new FloatProperty(-1.0F);
-	private final Property<Float> rebindIfPassive = new FloatProperty(-1.0F);
+	private final SocketAddressProperty sockAddr = new SocketAddressProperty(null);
+	private final TimeProperty linktest = new TimeProperty(-1.0F);
+	private final TimeProperty rebindIfPassive = new TimeProperty(-1.0F);
 	
 	public HsmsSsCommunicatorConfig() {
 		super();
@@ -61,7 +51,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * 
 	 * @return socketAddress of PASSIVE/ACTIVE
 	 */
-	public Property<SocketAddress> socketAddress() {
+	public SocketAddressProperty socketAddress() {
 		return sockAddr;
 	}
 	
@@ -79,7 +69,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * 
 	 * @return session-id
 	 */
-	public Property<Integer> sessionId() {
+	public IntegerProperty sessionId() {
 		return deviceId();
 	}
 	
@@ -106,7 +96,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * 
 	 * @return seconds
 	 */
-	public Property<Float> linktest() {
+	public TimeProperty linktest() {
 		return linktest;
 	}
 	
@@ -134,7 +124,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * 
 	 * @return seconds
 	 */
-	public Property<Float> rebindIfPassive() {
+	public TimeProperty rebindIfPassive() {
 		return rebindIfPassive;
 	}
 	

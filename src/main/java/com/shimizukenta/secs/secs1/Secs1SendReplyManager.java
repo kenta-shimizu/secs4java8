@@ -1,7 +1,6 @@
 package com.shimizukenta.secs.secs1;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,16 +9,15 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.shimizukenta.secs.AbstractSecsInnerManager;
+import com.shimizukenta.secs.AbstractSecsInnerEngine;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
-public class Secs1SendReplyManager extends AbstractSecsInnerManager {
+public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 	
 	private final Collection<Pack> packs = new ArrayList<>();
 	private final BlockingQueue<Secs1MessageBlock> sendBlockQueue = new LinkedBlockingQueue<>();
@@ -48,6 +46,8 @@ public class Secs1SendReplyManager extends AbstractSecsInnerManager {
 		
 		Pack p = entry(msg);
 		
+		parent.circuitNotifyAll();
+		
 		try {
 			
 			notifyLog("Secs1-Message entry-send", msg);
@@ -72,58 +72,59 @@ public class Secs1SendReplyManager extends AbstractSecsInnerManager {
 	private void waitUntilSended(Pack p)
 			throws SecsSendMessageException, SecsException, InterruptedException {
 		
-		Collection<Callable<Pack>> tasks = Arrays.asList(
-				() -> {
-					try {
-						synchronized ( packs ) {
-							for ( ;; ) {
-								if ( p.isSended() ) {
-									break;
-								}
-								packs.wait();
-							}
+		final Callable<Pack> sendedTask = () -> {
+			try {
+				synchronized ( packs ) {
+					for ( ;; ) {
+						if ( p.isSended() ) {
+							break;
 						}
+						packs.wait();
 					}
-					catch ( InterruptedException ignore ) {
-					}
-					
-					return p;
-				},
-				() -> {
-					try {
-						synchronized ( packs ) {
-							for ( ;; ) {
-								if ( p.failedCause() != null ) {
-									break;
-								}
-								packs.wait();
-							}
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+			
+			return p;
+		};
+		
+		final Callable<Pack> failedTask = () -> {
+			try {
+				synchronized ( packs ) {
+					for ( ;; ) {
+						if ( p.failedCause() != null ) {
+							break;
 						}
+						packs.wait();
 					}
-					catch ( InterruptedException ignore ) {
-					}
-					
-					return p;
-				},
-				() -> {
-					try {
-						synchronized ( packs ) {
-							for ( ;; ) {
-								if ( packs.isEmpty() ) {
-									break;
-								}
-								packs.wait();
-							}
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+			
+			return p;
+		};
+		
+		final Callable<Pack> terminateTask = () -> {
+			try {
+				synchronized ( packs ) {
+					for ( ;; ) {
+						if ( packs.isEmpty() ) {
+							break;
 						}
+						packs.wait();
 					}
-					catch ( InterruptedException ignore ) {
-					}
-					
-					return null;
-				});
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+			
+			return null;
+		};
 		
 		try {
-			Pack pp = executorService().invokeAny(tasks);
+			Pack pp = executeInvokeAny(sendedTask, failedTask, terminateTask);
 			
 			if ( pp == null ) {
 				throw new Secs1DetectTerminateException(p.primaryMsg());
@@ -146,66 +147,64 @@ public class Secs1SendReplyManager extends AbstractSecsInnerManager {
 		
 	}
 	
-	
 	private Secs1Message reply(Pack p)
 			throws SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
-		Collection<Callable<ReplyStatus>> tasks = Arrays.asList(
-				() -> {
-					
-					try {
-						synchronized ( packs ) {
-							for ( ;; ) {
-								Secs1Message reply = p.replyMsg();
-								if ( reply != null ) {
-									return new ReplyStatus(reply);
-								}
-								packs.wait();
-							}
+		final Callable<ReplyStatus> replyTask = () -> {
+			try {
+				synchronized ( packs ) {
+					for ( ;; ) {
+						Secs1Message reply = p.replyMsg();
+						if ( reply != null ) {
+							return new ReplyStatus(reply);
 						}
+						packs.wait();
 					}
-					catch ( InterruptedException ignore ) {
-					}
-					
-					return terminateStatus;
-				},
-				() -> {
-					
-					try {
-						synchronized (resetTimerStatus) {
-							resetTimerStatus.wait();
-							return resetTimerStatus;
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+			
+			return terminateStatus;
+		};
+		
+		final Callable<ReplyStatus> resetTimerTask = () -> {
+			try {
+				synchronized (resetTimerStatus) {
+					resetTimerStatus.wait();
+					return resetTimerStatus;
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+			
+			return terminateStatus;
+		};
+		
+		final Callable<ReplyStatus> terminateTask = () -> {
+			try {
+				synchronized ( packs ) {
+					for ( ;; ) {
+						if ( packs.isEmpty() ) {
+							break;
 						}
+						packs.wait();
 					}
-					catch ( InterruptedException ignore ) {
-					}
-					
-					return terminateStatus;
-				},
-				() -> {
-					
-					try {
-						synchronized ( packs ) {
-							for ( ;; ) {
-								if ( packs.isEmpty() ) {
-									break;
-								}
-								packs.wait();
-							}
-						}
-					}
-					catch ( InterruptedException ignore ) {
-					}
-					
-					return terminateStatus;
-				});
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+			
+			return terminateStatus;
+		};
 		
 		try {
 			
 			for ( ;; ) {
 				
-				long t = (long)(parent.secs1Config().timeout().t3().get() * 1000.0F);
-				ReplyStatus r = executorService().invokeAny(tasks, t, TimeUnit.MILLISECONDS);
+				ReplyStatus r = executeInvokeAny(
+						replyTask, resetTimerTask, terminateTask,
+						parent.secs1Config().timeout().t3());
 				
 				if ( r.resetTimer() ) {
 					continue;
