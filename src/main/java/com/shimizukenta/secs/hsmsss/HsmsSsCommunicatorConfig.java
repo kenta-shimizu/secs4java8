@@ -14,15 +14,10 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
 	private static final long serialVersionUID = -5737187045438763249L;
 	
-	private class ProtocolProperty extends AbstractProperty<HsmsSsProtocol> {
-
-		public ProtocolProperty(HsmsSsProtocol initial) {
-			super(initial);
-		}
-	}
+	private final Property<HsmsSsProtocol> protocol = new AbstractProperty<HsmsSsProtocol>(HsmsSsProtocol.PASSIVE) {
+		private static final long serialVersionUID = 3265234560589662064L;
+	};
 	
-	
-	private final Property<HsmsSsProtocol> protocol = new ProtocolProperty(HsmsSsProtocol.PASSIVE);
 	private final SocketAddressProperty sockAddr = new SocketAddressProperty(null);
 	private final TimeProperty linktest = new TimeProperty(-1.0F);
 	private final TimeProperty rebindIfPassive = new TimeProperty(-1.0F);

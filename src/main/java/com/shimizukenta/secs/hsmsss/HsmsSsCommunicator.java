@@ -20,17 +20,14 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	
 	private final HsmsSsCommunicatorConfig hsmsSsConfig;
 	protected final HsmsSsSendReplyManager sendReplyManager;
-	private final Property<HsmsSsCommunicateState> hsmsSsCommStateProperty = new HsmsSsCommunicateStateProperty(HsmsSsCommunicateState.NOT_CONNECTED);
 	
-	private class BytesProperty extends AbstractProperty<byte[]> {
-		
-		public BytesProperty(byte[] initial) {
-			super(initial);
-		}
-	}
+	private final Property<HsmsSsCommunicateState> hsmsSsCommStateProperty = new AbstractProperty<HsmsSsCommunicateState>(HsmsSsCommunicateState.NOT_CONNECTED) {
+		private static final long serialVersionUID = 2735232737920848138L;
+	};
 	
-	private final BytesProperty sessionIdBytes = new BytesProperty(new byte[] {0, 0});
-	
+	private final Property<byte[]> sessionIdBytes = new AbstractProperty<byte[]>(new byte[] {0, 0}) {
+		private static final long serialVersionUID = 5573599576527849842L;
+	};
 	
 	protected HsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);
@@ -153,13 +150,6 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	
 	
 	/* HSMS Communicate State */
-	private class HsmsSsCommunicateStateProperty extends AbstractProperty<HsmsSsCommunicateState> {
-
-		public HsmsSsCommunicateStateProperty(HsmsSsCommunicateState initial) {
-			super(initial);
-		}
-	}
-	
 	protected HsmsSsCommunicateState hsmsSsCommunicateState() {
 		return hsmsSsCommStateProperty.get();
 	}

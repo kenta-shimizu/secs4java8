@@ -8,20 +8,15 @@ import com.shimizukenta.secs.gem.GemConfig;
 public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	
 	private static final long serialVersionUID = -8456991094606676409L;
-
-	private class StringProperty extends AbstractProperty<String> {
-
-		public StringProperty(String initial) {
-			super(initial);
-		}
-	}
-	
 	
 	private final SecsTimeout timeout = new SecsTimeout();
 	private final IntegerProperty deviceId = new IntegerProperty(10);
 	private final BooleanProperty isEquip = new BooleanProperty(false);
 	private GemConfig gem;
-	private final Property<String> logSubjectHeader = new StringProperty("");
+	
+	private final Property<String> logSubjectHeader = new AbstractProperty<String>("") {
+		private static final long serialVersionUID = -1042714715990834253L;
+	};
 	
 	public AbstractSecsCommunicatorConfig() {
 		gem = new GemConfig();

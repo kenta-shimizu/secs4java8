@@ -8,6 +8,8 @@ import java.util.concurrent.TimeoutException;
 
 public class TimeProperty extends AbstractProperty<Float> {
 	
+	private static final long serialVersionUID = -2905213245311975065L;
+	
 	private long milliSec;
 	
 	public TimeProperty(float initial) {

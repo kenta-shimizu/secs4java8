@@ -3,7 +3,9 @@ package com.shimizukenta.secs;
 import java.net.SocketAddress;
 
 public class SocketAddressProperty extends AbstractProperty<SocketAddress> {
-
+	
+	private static final long serialVersionUID = -7242589411485478427L;
+	
 	public SocketAddressProperty(SocketAddress initial) {
 		super(initial);
 	}
