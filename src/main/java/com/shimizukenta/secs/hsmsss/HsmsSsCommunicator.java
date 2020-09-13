@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.shimizukenta.secs.AbstractProperty;
 import com.shimizukenta.secs.AbstractSecsCommunicator;
+import com.shimizukenta.secs.ByteArrayProperty;
 import com.shimizukenta.secs.Property;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
@@ -21,13 +22,12 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	private final HsmsSsCommunicatorConfig hsmsSsConfig;
 	protected final HsmsSsSendReplyManager sendReplyManager;
 	
+	private final ByteArrayProperty sessionIdBytes = new ByteArrayProperty(new byte[] {0, 0});
+	
 	private final Property<HsmsSsCommunicateState> hsmsSsCommStateProperty = new AbstractProperty<HsmsSsCommunicateState>(HsmsSsCommunicateState.NOT_CONNECTED) {
 		private static final long serialVersionUID = 2735232737920848138L;
 	};
 	
-	private final Property<byte[]> sessionIdBytes = new AbstractProperty<byte[]>(new byte[] {0, 0}) {
-		private static final long serialVersionUID = 5573599576527849842L;
-	};
 	
 	protected HsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);

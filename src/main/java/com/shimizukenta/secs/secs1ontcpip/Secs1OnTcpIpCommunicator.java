@@ -100,10 +100,11 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 							
 							notifyLog("Secs1OnTcpIpCommunicator#connected", ch);
 							
+							final ByteBuffer buffer = ByteBuffer.allocate(1024);
+							
 							final Callable<Void> task = () -> {
 								
 								try {
-									final ByteBuffer buffer = ByteBuffer.allocate(1024);
 									
 									for ( ;; ) {
 										
@@ -128,6 +129,18 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 											f.cancel(true);
 											throw e;
 										}
+									}
+								}
+								catch ( ExecutionException e ) {
+									
+									Throwable t = e.getCause();
+									
+									if ( t instanceof RuntimeException ) {
+										throw (RuntimeException)t;
+									}
+									
+									if ( ! (t instanceof AsynchronousCloseException) ) {
+										notifyLog(e);
 									}
 								}
 								catch ( InterruptedException ignore ) {

@@ -7,10 +7,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.shimizukenta.secs.AbstractProperty;
 import com.shimizukenta.secs.AbstractSecsCommunicator;
+import com.shimizukenta.secs.ByteArrayProperty;
 import com.shimizukenta.secs.InterruptableRunnable;
-import com.shimizukenta.secs.Property;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
@@ -28,11 +27,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	
 	private final Secs1CommunicatorConfig secs1Config;
 	private final Secs1SendReplyManager sendReplyManager;
-	
-	private final Property<byte[]> deviceIdBytes = new AbstractProperty<byte[]>(new byte[] {0, 0}) {
-		private static final long serialVersionUID = 5775009965595283928L;
-	};
-	
+	private final ByteArrayProperty deviceIdBytes = new ByteArrayProperty(new byte[] {0, 0});
 	private final CircuitLoop circuit = new CircuitLoop();
 	
 	protected void circuitNotifyAll() {

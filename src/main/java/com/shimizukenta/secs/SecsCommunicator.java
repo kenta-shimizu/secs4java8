@@ -12,13 +12,22 @@ public interface SecsCommunicator extends Closeable {
 	
 	public void open() throws IOException;
 	
-	public boolean isOpened();
+	public boolean isOpen();
 	public boolean isClosed();
 	
 	public Gem gem();
 	public int deviceId();
 	public boolean isEquip();
 	
+	
+	/**
+	 * Blocking-method.<br />
+	 * open() and wait until communicating.
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public void openAndWaitUntilCommunicating() throws IOException, InterruptedException;
 	
 	/**
 	 * Blocking-method.<br />

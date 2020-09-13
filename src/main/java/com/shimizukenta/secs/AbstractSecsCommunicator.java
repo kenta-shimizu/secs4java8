@@ -118,7 +118,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	}
 	
 	@Override
-	public boolean isOpened() {
+	public boolean isOpen() {
 		synchronized ( this ) {
 			return this.opened && ! this.closed;
 		}
@@ -194,8 +194,16 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 		return config.isEquip().booleanValue();
 	}
 	
-	protected SecsTimeout timeout() {
-		return config.timeout();
+	@Override
+	public void openAndWaitUntilCommunicating() throws IOException, InterruptedException {
+		
+		synchronized ( this ) {
+			if ( ! isOpen() ) {
+				open();
+			}
+		}
+		
+		communicatable.waitUntilTrue();
 	}
 	
 	@Override
@@ -321,7 +329,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	
 	
 	/* Secs-Communicatable-State-Changed-Listener */
-	private final Property<Boolean> communicatable = new BooleanProperty(false);
+	private final BooleanProperty communicatable = new BooleanProperty(false);
 	
 	@Override
 	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener l) {
