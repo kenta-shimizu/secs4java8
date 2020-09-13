@@ -80,8 +80,8 @@ How to convert TCP/IP <-> RS232C
     /* example */
     Secs2 secs2 = Secs2.list(               /* <L                       */
         Secs2.binary((byte)0x81),           /*   <B  0x81>              */
-        Secs2.int2(1001),                   /*   <I2 1001>              */
-        Secs2.ascii("error message")        /*   <A  "error message">   */
+        Secs2.uint2(1001),                  /*   <U2 1001>              */
+        Secs2.ascii("ON FIRE")              /*   <A  "ON FIRE">         */
     );                                      /* >.                       */
 ```
 
@@ -129,8 +129,8 @@ See also ["/src/examples/example3/ExampleBuildSecs2.java"](/src/examples/example
     S5F1 W
     <L [3]
         <B  [1] 0x81>           /* ALCD (0, 0) */
-        <I2 [1] 1001>           /* ALID (1, 0) */
-        <A  "error message">    /* ALTX (2)    */
+        <U2 [1] 1001>           /* ALID (1, 0) */
+        <A  "ON FIRE">          /* ALTX (2)    */
     >. 
 
     byte   alcd = msg.secs2().getByte(0, 0);
