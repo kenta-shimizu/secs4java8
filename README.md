@@ -206,6 +206,36 @@ See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/exam
 
 Access by SecsCommunicator#gem
 
+### Clock
+
+```
+    /* Send S2F17, parse to LocalDateTime example */
+    Clock clock = passive.gem().s2f17();
+    LocalDateTime ldt = clock.toLocalDateTime();
+
+    /* Reply S2F18 Now example */
+    active.gem().s2f18(Clock.from(LocalDateTime.now()));
+    or
+    active.gem().s2f18(Clock.now());
+    or
+    active.gem().s2f18Now();
+
+    /* Send S2F31 Now example */
+    TIACK tiack = active.gem().s2f31(Clock.from(LocalDateTime.now()));
+    or
+    TIACK tiack = active.gem().s2f31(Clock.now());
+    or
+    TIACK tiack = active.gem().s2f31Now();
+
+    /* Receive S2F31, parse to LocalDateTime example */
+    Clock clock = Clock.from(recvS2F31Msg.secs2());
+    LocalDateTime ldt = clock.toLocalDateTime();
+```
+
+    TimeFormat (A[12] or A[16]) can be set from `AbstractConfig#gem#clockSize`.
+
+### Others
+
 ```
     /* example */
     COMMACK commack = active.gem().s1f13();
@@ -216,7 +246,14 @@ Access by SecsCommunicator#gem
     passive.gem().s1f16(primaryMsg);
     passive.gem().s1f18(primaryMsg, ONLACK.OK);
 
-    passive.gem().s5f2(primaryMsg);
-    passive.gem().s6f4(primaryMsg);
+    passive.gem().s5f2(primaryMsg, ACKC5.OK);
+    passive.gem().s6f12(primaryMsg, ACKC6.OK);
     passive.gem().s9f1(referenceMsg);
+    passive.gem().s9f3(referenceMsg);
+    passive.gem().s9f5(referenceMsg);
+    passive.gem().s9f7(referenceMsg);
+    passive.gem().s9f9(referenceMsg);
+    passive.gem().s9f11(referenceMsg);
+
+    Secs2 dataId = passive.gem().autoDataId();
 ```

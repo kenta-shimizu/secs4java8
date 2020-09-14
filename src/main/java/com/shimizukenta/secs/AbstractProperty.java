@@ -78,5 +78,10 @@ public abstract class AbstractProperty<T> implements Property<T>, Serializable {
 			}
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return Objects.toString(get());
+	}
 
 }

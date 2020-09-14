@@ -14,9 +14,7 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	private final BooleanProperty isEquip = new BooleanProperty(false);
 	private GemConfig gem;
 	
-	private final Property<String> logSubjectHeader = new AbstractProperty<String>("") {
-		private static final long serialVersionUID = -1042714715990834253L;
-	};
+	private final StringProperty logSubjectHeader = new StringProperty("");
 	
 	public AbstractSecsCommunicatorConfig() {
 		gem = new GemConfig();
@@ -55,13 +53,7 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 		this.logSubjectHeader.set(Objects.requireNonNull(header).toString());
 	}
 	
-//	public Optional<String> logSubjectHeader() {
-//		synchronized ( this ) {
-//			return logSubjectHeader.isEmpty() ? Optional.empty() : Optional.of(logSubjectHeader);
-//		}
-//	}
-	
-	public Property<String> logSubjectHeader() {
+	public StringProperty logSubjectHeader() {
 		return logSubjectHeader;
 	}
 	

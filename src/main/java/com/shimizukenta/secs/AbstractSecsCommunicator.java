@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.gem.Gem;
-import com.shimizukenta.secs.gem.UsualGem;
+import com.shimizukenta.secs.gem.SimpleGem;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.sml.SmlMessage;
 
@@ -111,7 +111,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	public AbstractSecsCommunicator(AbstractSecsCommunicatorConfig config) {
 		
 		this.config = config;
-		this.gem = new UsualGem(this, config.gem());
+		this.gem = new SimpleGem(this, config.gem());
 		
 		opened = false;
 		closed = false;

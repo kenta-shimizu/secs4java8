@@ -8,6 +8,7 @@ import java.util.Collection;
 
 import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
+import com.shimizukenta.secs.gem.ACKC6;
 import com.shimizukenta.secs.gem.COMMACK;
 import com.shimizukenta.secs.gem.ONLACK;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicator;
@@ -204,7 +205,7 @@ public class BothSecs1 {
 								switch ( func ) {
 								case 3: {
 									
-									host.gem().s6f4(msg);
+									host.gem().s6f4(msg, ACKC6.OK);
 									break;
 								}
 								}
