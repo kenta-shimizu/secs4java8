@@ -3,7 +3,6 @@ package com.shimizukenta.secs.gem;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.secs2.Secs2;
 
@@ -12,21 +11,17 @@ public class DynamicLink implements Serializable {
 	private static final long serialVersionUID = 2780263993430315803L;
 	
 	private final DynamicCollectionEvent collectionEvent;
-	private final List<DynamicReport> reports;
+	private final List<Secs2> reports;
 	
-	public DynamicLink(DynamicCollectionEvent collectionEvent, List<DynamicReport> reports) {
+	public DynamicLink(DynamicCollectionEvent collectionEvent, List<? extends Secs2> reports) {
 		this.collectionEvent = collectionEvent;
 		this.reports = new ArrayList<>(reports);
 	}
 	
-	public Secs2 secs2() {
-		List<Secs2> rr = reports.stream()
-				.map(r -> r.reportId())
-				.collect(Collectors.toList());
-		
+	public Secs2 s2f35() {
 		return Secs2.list(
 				collectionEvent.collectionEventId(),
-				Secs2.list(rr));
+				Secs2.list(reports));
 	}
 	
 	@Override

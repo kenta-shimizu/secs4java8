@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import com.shimizukenta.secs.AbstractProperty;
-import com.shimizukenta.secs.IntegerProperty;
 import com.shimizukenta.secs.Property;
 import com.shimizukenta.secs.StringProperty;
 import com.shimizukenta.secs.secs2.Secs2Item;
@@ -42,9 +41,24 @@ public class GemConfig implements Serializable {
 		}
 	}
 	
+	private class ClockTypeProperty extends AbstractProperty<ClockType> {
+		
+		private static final long serialVersionUID = 7149295926237765793L;
+		
+		public ClockTypeProperty(ClockType initial) {
+			super(initial);
+		}
+		
+		@Override
+		public void set(ClockType v) {
+			super.set(Objects.requireNonNull(v));
+		}
+	}
+	
+	
 	private final StringProperty mdln = new StringProperty("      ");
 	private final StringProperty softrev = new StringProperty("      ");
-	private final IntegerProperty clockSize = new IntegerProperty(16);
+	private final ClockTypeProperty clockType = new ClockTypeProperty(ClockType.A16);
 	private final Secs2NumberItemProperty dataIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
 	private final Secs2NumberItemProperty vIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
 	private final Secs2NumberItemProperty reportIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
@@ -57,7 +71,7 @@ public class GemConfig implements Serializable {
 	/**
 	 * use S1F2, S1F13, S1F14
 	 * 
-	 * @param cs
+	 * @param MODEL-NUMBER
 	 */
 	public void mdln(CharSequence cs) {
 		this.mdln.set(Objects.requireNonNull(cs));
@@ -70,7 +84,7 @@ public class GemConfig implements Serializable {
 	/**
 	 * use S1F2, S1F13, S1F14
 	 * 
-	 * @param cs
+	 * @param SOFTWARE-RESION
 	 */
 	public void softrev(CharSequence cs) {
 		this.softrev.set(Objects.requireNonNull(cs));
@@ -83,18 +97,18 @@ public class GemConfig implements Serializable {
 	/**
 	 * use S2F18, S2F31
 	 * 
-	 * @param size is 16 or 12.
+	 * @param A16 or A12
 	 */
-	public void clockSize(int size) {
-		this.clockSize.set(size);
+	public void clockType(ClockType type) {
+		this.clockType.set(type);
 	}
 	
-	public IntegerProperty clockSize() {
-		return this.clockSize;
+	public Property<ClockType> clockType() {
+		return this.clockType;
 	}
 	
 	/**
-	 * Data-ID Secs2Item type
+	 * DATA-ID Secs2Item type
 	 * 
 	 * @param INT1, INT2, INT4, INT8, UINT1, UINT2, UINT4, UINT8
 	 */
@@ -106,6 +120,11 @@ public class GemConfig implements Serializable {
 		return this.dataIdSecs2Item;
 	}
 	
+	/**
+	 * V-ID Secs2Item type
+	 * 
+	 * @param INT1, INT2, INT4, INT8, UINT1, UINT2, UINT4, UINT8
+	 */
 	public void vIdSecs2Item(Secs2Item item) {
 		this.vIdSecs2Item.set(item);
 	}
@@ -114,6 +133,11 @@ public class GemConfig implements Serializable {
 		return this.vIdSecs2Item;
 	}
 	
+	/**
+	 * REPORT-ID Secs2Item type
+	 * 
+	 * @param INT1, INT2, INT4, INT8, UINT1, UINT2, UINT4, UINT8
+	 */
 	public void reportIdSecs2Item(Secs2Item item) {
 		this.reportIdSecs2Item.set(item);
 	}
@@ -122,6 +146,11 @@ public class GemConfig implements Serializable {
 		return this.reportIdSecs2Item;
 	}
 
+	/**
+	 * COLLECTION-EVENT-ID Secs2Item type
+	 * 
+	 * @param INT1, INT2, INT4, INT8, UINT1, UINT2, UINT4, UINT8
+	 */
 	public void collectionEventIdSecs2Item(Secs2Item item) {
 		this.collectionEventIdSecs2Item.set(item);
 	}

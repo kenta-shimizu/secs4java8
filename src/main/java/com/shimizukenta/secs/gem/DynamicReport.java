@@ -16,13 +16,13 @@ public class DynamicReport implements Serializable {
 	private final String alias;
 	private final List<Secs2> vids;
 	
-	protected DynamicReport(Secs2 reportId, CharSequence alias, List<Secs2> vids) {
+	protected DynamicReport(Secs2 reportId, CharSequence alias, List<? extends Secs2> vids) {
 		this.reportId = reportId;
 		this.alias = (alias == null ? null : alias.toString());
 		this.vids = new ArrayList<>(vids);
 	}
 	
-	public Secs2 secs2() {
+	public Secs2 s2f33Define() {
 		return Secs2.list(
 				reportId,
 				Secs2.list(vids));

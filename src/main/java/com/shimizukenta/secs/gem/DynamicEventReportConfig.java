@@ -1,108 +1,249 @@
 package com.shimizukenta.secs.gem;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.stream.Collectors;
 
-import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.SecsException;
+import com.shimizukenta.secs.SecsMessage;
+import com.shimizukenta.secs.SecsSendMessageException;
+import com.shimizukenta.secs.SecsWaitReplyMessageException;
+import com.shimizukenta.secs.secs2.Secs2Exception;
 
-public class DynamicEventReportConfig {
+public interface DynamicEventReportConfig {
 	
-	private final AbstractGem gem;
+	/**
+	 * Add Define-Report.<br />
+	 * Use for S2F33
+	 * 
+	 * @param reportId
+	 * @param alias
+	 * @param VIDs
+	 * @return DynamicReport
+	 */
+	public DynamicReport addDefineReport(long reportId, CharSequence alias, List<? extends Number> vids);
 	
-	public DynamicEventReportConfig(AbstractGem gem) {
-		this.gem = gem;
-	}
+	/**
+	 * Add Define-Report.<br />
+	 * Use for S2F33
+	 * 
+	 * @param reportId
+	 * @param VIDs
+	 * @return DynamicReport
+	 */
+	public DynamicReport addDefineReport(long reportId, List<? extends Number> vids);
 	
-	/* Report */
-	private final Set<DynamicReport> reports = new CopyOnWriteArraySet<>();
+	/**
+	 * Add Define-Report.<br />
+	 * Use for S2F33<br />
+	 * Report-ID is AutoNumber.
+	 * 
+	 * @param alias
+	 * @param VIDs
+	 * @return DynamicReport
+	 */
+	public DynamicReport addDefineReport(CharSequence alias, List<? extends Number> vids);
 	
-	public DynamicReport addReport(long reportId, CharSequence alias, List<? extends Number> vids) {
-		return addReport(gem.reportId(reportId), alias, vids);
-	}
+	/**
+	 * Add Define-Report.<br />
+	 * Use for S2F33<br />
+	 * Report-ID is AutoNumber.
+	 * 
+	 * @param VIDs
+	 * @return
+	 */
+	public DynamicReport addDefineReport(List<Number> vids);
 	
-	public DynamicReport addReport(long reportId, List<? extends Number> vids) {
-		return addReport(gem.reportId(reportId), null, vids);
-	}
+	/**
+	 * 
+	 * @param DynamicReport
+	 * @return true if success
+	 */
+	public boolean removeReport(DynamicReport report);
 	
-	public DynamicReport addReport(CharSequence alias, List<? extends Number> vids) {
-		return addReport(gem.autoReportId(), alias, vids);
-	}
+	/**
+	 * Seek in Define-Reports by alias.
+	 * 
+	 * @param alias
+	 * @return DynamicReport if exist
+	 */
+	public Optional<DynamicReport> getReport(CharSequence alias);
 	
-	public DynamicReport addReport(List<Number> vids) {
-		return addReport(gem.autoReportId(), null, vids);
-	}
+	/**
+	 * Add Event-Report-Link.<br />
+	 * Use for S2F35
+	 * 
+	 * @param Collection-Event-ID
+	 * @param Report-IDs
+	 * @return DynamicLink
+	 */
+	public DynamicLink addLinkById(long ceid, List<? extends Number> reportIds);
 	
-	private DynamicReport addReport(Secs2 reportId, CharSequence alias, List<? extends Number> vids) {
-		List<Secs2> vv = vids.stream()
-				.map(Number::longValue)
-				.map(gem::vId)
-				.collect(Collectors.toList());
-		DynamicReport r = new DynamicReport(reportId, alias, vv);
-		reports.add(r);
-		return r;
-	}
+	/**
+	 * Add Event-Report-Link.<br />
+	 * Use for S2F35
+	 * 
+	 * @param DynamicCollectionEvent
+	 * @param Report-IDs
+	 * @return DynamicLink
+	 */
+	public DynamicLink addLinkById(DynamicCollectionEvent ce, List<? extends Number> reportIds);
 	
-	public boolean removeReport(DynamicReport report) {
-		return reports.remove(report);
-	}
+	/**
+	 * Add Event-Report-Link.<br />
+	 * Use for S2F35
+	 * 
+	 * @param Collection-Event-ID
+	 * @param DynamicReports
+	 * @return DynamicLink
+	 */
+	public DynamicLink addLinkByReport(long ceid, List<? extends DynamicReport> reports);
 	
-	public Optional<DynamicReport> getReport(CharSequence alias) {
-		
-		if ( alias == null ) {
-			return Optional.empty();
-		}
-		
-		String s = alias.toString();
-		
-		return reports.stream()
-				.filter(r -> Objects.equals(r.alias(), s))
-				.findFirst();
-	}
+	/**
+	 * Add Event-Report-Link.<br />
+	 * Use for S2F35
+	 * 
+	 * @param DynamicCollectionEvent
+	 * @param DynamicReports
+	 * @return DynamicLink
+	 */
+	public DynamicLink addLinkByReport(DynamicCollectionEvent ce, List<? extends DynamicReport> reports);
+	
+	/**
+	 * 
+	 * @param DynamicLink
+	 * @return true if success
+	 */
+	public boolean removeLink(DynamicLink link);
+	
+	/**
+	 * Add Enable-Collection-Event.<br />
+	 * Use for S2F37
+	 * 
+	 * @param Collection-Event-ID
+	 * @return DynamicCollectionEvent
+	 */
+	public DynamicCollectionEvent addEnableCollectionEvent(long ceid);
+	
+	/**
+	 * Add Enable-Collection-Event.<br />
+	 * Use for S2F37
+	 * 
+	 * @param alias
+	 * @param Collection-Event-ID
+	 * @return DynamicCollectionEvent
+	 */
+	public DynamicCollectionEvent addEnableCollectionEvent(CharSequence alias, long ceid);
+	
+	/**
+	 * 
+	 * @param DynamicCollectionEvent
+	 * @return true if success
+	 */
+	public boolean removeEnableCollectionEvent(DynamicCollectionEvent ce);
+	
+	/**
+	 * Seek in Enable-Collection-Events by alias.
+	 * 
+	 * @param alias
+	 * @return DynamicCollectionEvent if exist
+	 */
+	public Optional<DynamicCollectionEvent> getCollectionEvent(CharSequence alias);
 	
 	
-	/* Collection-Event */
-	private final Set<DynamicCollectionEvent> events = new CopyOnWriteArraySet<>();
 	
-	//TODO
-	//add
+	public DRACK s2f33DeleteAll()
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, Secs2Exception
+			, InterruptedException;
 	
-	public boolean removeCollectionEvent(DynamicCollectionEvent ce) {
-		return events.remove(ce);
-	}
+	public DRACK s2f33Define()
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, Secs2Exception
+			, InterruptedException;
 	
-	public Optional<DynamicCollectionEvent> getCollectionEvent(CharSequence alias) {
-		
-		if ( alias == null ) {
-			return Optional.empty();
-		}
-		
-		String s = alias.toString();
-		
-		return events.stream()
-				.filter(ce -> Objects.equals(ce.alias(), s))
-				.findFirst();
-	}
+	public LRACK s2f35()
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, Secs2Exception
+			, InterruptedException;
+	
+	public ERACK s2f37DisableAll()
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, Secs2Exception
+			, InterruptedException;
+	
+	public ERACK s2f37EnableAll()
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, Secs2Exception
+			, InterruptedException;
+	
+	public ERACK s2f37Enable()
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, Secs2Exception
+			, InterruptedException;
 	
 	
-	/* Link */
-	private final Set<DynamicLink> links = new CopyOnWriteArraySet<>();
+	public Optional<SecsMessage> s6f15(DynamicCollectionEvent ce)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException;
 	
-	//TODO
-	//link
-	//add
+	public Optional<SecsMessage> s6f15(CharSequence alias)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, DynamicEventReportException
+			, InterruptedException;
 	
-	public boolean removeLink(DynamicLink link) {
-		return links.remove(link);
-	}
+	public Optional<SecsMessage> s6f17(DynamicCollectionEvent ce)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException;
 	
+	public Optional<SecsMessage> s6f17(CharSequence alias)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, DynamicEventReportException
+			, InterruptedException;
 	
-	//TODO
-	//s2f33
-	//s2f35
-	//s2f37enables
+	public Optional<SecsMessage> s6f19(DynamicReport report)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException;
 	
+	public Optional<SecsMessage> s6f19(CharSequence alias)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, DynamicEventReportException
+			, InterruptedException;
+
+	public Optional<SecsMessage> s6f21(DynamicReport report)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException;
+	
+	public Optional<SecsMessage> s6f21(CharSequence alias)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, DynamicEventReportException
+			, InterruptedException;
+
 }

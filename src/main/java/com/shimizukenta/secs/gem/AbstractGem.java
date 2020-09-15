@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.AbstractSecsCommunicator;
 import com.shimizukenta.secs.AbstractSecsInnerEngine;
@@ -100,7 +99,7 @@ public abstract class AbstractGem extends AbstractSecsInnerEngine implements Gem
 	
 	@Override
 	public DynamicEventReportConfig newDynamicEventReportConfig() {
-		return new DynamicEventReportConfig(this);
+		return new SimpleDynamicEventReportConfig(this);
 	}
 	
 	@Override
@@ -257,19 +256,18 @@ public abstract class AbstractGem extends AbstractSecsInnerEngine implements Gem
 	
 	private Secs2 getClockSecs2(Clock c) {
 		
-		int len = config.clockSize().intValue();
-		
-		if ( len == 12 ) {
-			
+		switch ( config.clockType().get() ) {
+		case A12: {
 			return c.toAscii12();
-			
-		} else if ( len == 16 ) {
-			
+			/* break; */
+		}
+		case A16: {
 			return c.toAscii16();
-			
-		} else {
-			
+			/* break; */
+		}
+		default: {
 			return Secs2.empty();
+		}
 		}
 	}
 	
@@ -312,7 +310,7 @@ public abstract class AbstractGem extends AbstractSecsInnerEngine implements Gem
 		return s2f18(primaryMsg, Clock.now());
 	}
 	
-	public Optional<SecsMessage> s2f18(SecsMessage primaryMsg, Secs2 ss)
+	private Optional<SecsMessage> s2f18(SecsMessage primaryMsg, Secs2 ss)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -397,36 +395,37 @@ public abstract class AbstractGem extends AbstractSecsInnerEngine implements Gem
 	}
 	
 	@Override
-	public DRACK s2f33DeleteAll(Secs2 dataId)
+	public DRACK s2f33DeleteAll()
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
 			, InterruptedException {
 		
-		return s2f33(dataId, Collections.emptyList());
+		return s2f33Inner(Collections.emptyList());
 	}
 	
 	@Override
-	public DRACK s2f33Define(Secs2 dataId, List<GemReport> reports)
+	public DRACK s2f33Define(DynamicEventReportConfig config)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
 			, InterruptedException {
 		
-		return s2f33(dataId, reports.stream().map(r -> r.secs2()).collect(Collectors.toList()));
+		return config.s2f33Define();
 	}
 	
-	@Override
-	public DRACK s2f33(Secs2 dataId, List<Secs2> reports)
+	protected DRACK s2f33Inner(List<? extends Secs2> reports)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
 			, InterruptedException {
 		
-		Secs2 ss = Secs2.list(dataId, Secs2.list(reports));
+		Secs2 ss = Secs2.list(
+				autoDataId(),
+				Secs2.list(reports));
 		
 		Secs2 r = comm.send(2, 33, true, ss)
 				.filter(msg -> msg.getStream() == 2)
@@ -436,6 +435,7 @@ public abstract class AbstractGem extends AbstractSecsInnerEngine implements Gem
 		
 		return DRACK.get(r);
 	}
+
 	
 	@Override
 	public Optional<SecsMessage> s2f34(SecsMessage primaryMsg, DRACK drack)
@@ -452,25 +452,26 @@ public abstract class AbstractGem extends AbstractSecsInnerEngine implements Gem
 	}
 	
 	@Override
-	public LRACK s2f35Link(Secs2 dataId, List<GemCollectionEventReportLink> links)
+	public LRACK s2f35(DynamicEventReportConfig config)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
 			, InterruptedException {
 		
-		return s2f35(dataId, links.stream().map(lk -> lk.secs2()).collect(Collectors.toList()));
+		return config.s2f35();
 	}
 	
-	@Override
-	public LRACK s2f35(Secs2 dataId, List<Secs2> links)
+	protected LRACK s2f35Inner(List<? extends Secs2> links)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
 			, InterruptedException {
 		
-		Secs2 ss = Secs2.list(dataId, Secs2.list(links));
+		Secs2 ss = Secs2.list(
+				autoDataId(),
+				Secs2.list(links));
 		
 		Secs2 r = comm.send(2, 35, true, ss)
 				.filter(msg -> msg.getStream() == 2)
@@ -496,64 +497,37 @@ public abstract class AbstractGem extends AbstractSecsInnerEngine implements Gem
 	}
 	
 	@Override
-	public ERACK s2f37Enable(List<GemCollectionEvent> events)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, Secs2Exception
-			, InterruptedException {
-		
-		return s2f37p(CEED.ENABLE, events);
-	}
-	
-	@Override
-	public ERACK s2f37Disable(List<GemCollectionEvent> events)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, Secs2Exception
-			, InterruptedException {
-		
-		return s2f37p(CEED.DISABLE, events);
-	}
-	
-	@Override
-	public ERACK s2f37EnableAll()
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, Secs2Exception
-			, InterruptedException {
-	
-		return s2f37(CEED.ENABLE, Collections.emptyList());
-	}
-	
-	@Override
 	public ERACK s2f37DisableAll()
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
 			, InterruptedException {
-	
-		return s2f37(CEED.DISABLE, Collections.emptyList());
+		
+		return s2f37Inner(CEED.DISABLE, Collections.emptyList());
 	}
 	
-	private ERACK s2f37p(CEED ceed, List<GemCollectionEvent> ceids)
+	public ERACK s2f37EnableAll()
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
 			, InterruptedException {
 		
-		return s2f37(ceed
-				, ceids.stream()
-				.map(v -> v.secs2())
-				.collect(Collectors.toList()));
+		return s2f37Inner(CEED.ENABLE, Collections.emptyList());
 	}
 	
-	@Override
-	public ERACK s2f37(CEED ceed, List<Secs2> ceids)
+	public ERACK s2f37Enable(DynamicEventReportConfig config)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, Secs2Exception
+			, InterruptedException {
+		
+		return config.s2f37Enable();
+	}
+	
+	protected ERACK s2f37Inner(CEED ceed, List<? extends Secs2> ces)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -561,8 +535,8 @@ public abstract class AbstractGem extends AbstractSecsInnerEngine implements Gem
 			, InterruptedException {
 		
 		Secs2 ss = Secs2.list(
-				ceed.secs2()
-				, Secs2.list(ceids));
+				ceed.secs2(),
+				Secs2.list(ces));
 		
 		Secs2 r = comm.send(2, 37, true, ss)
 				.filter(msg -> msg.getStream() == 2)
@@ -705,6 +679,46 @@ public abstract class AbstractGem extends AbstractSecsInnerEngine implements Gem
 			, InterruptedException {
 		
 		return s6fx(primaryMsg, 14, ackc6);
+	}
+	
+	@Override
+	public Optional<SecsMessage> s6f15(DynamicCollectionEvent ce)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return comm.send(6, 15, true, ce.collectionEventId());
+	}
+	
+	@Override
+	public Optional<SecsMessage> s6f17(DynamicCollectionEvent ce)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return comm.send(6, 17, true, ce.collectionEventId());
+	}
+	
+	@Override
+	public Optional<SecsMessage> s6f19(DynamicReport report)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return comm.send(6, 19, true, report.reportId());
+	}
+	
+	@Override
+	public Optional<SecsMessage> s6f21(DynamicReport report)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException {
+		
+		return comm.send(6, 21, true, report.reportId());
 	}
 	
 	@Override

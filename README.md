@@ -206,6 +206,35 @@ See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/exam
 
 Access by SecsCommunicator#gem
 
+### Dynamic Event Report Configuration
+
+1. NewInstance Configuration
+
+```
+    DynamicEventReportConfig config = active.gem().newDynamicEventReportConfig();
+```
+
+2. config
+
+```
+```
+
+3. flow
+
+```
+```
+
+If set Collection-Event-Alias, call S6F15, S6F17 by Alias.
+
+```
+```
+
+If set Report-Alias, call S6F19, S6F21 by Alias.
+
+```
+```
+
+
 ### Clock
 
 ```
@@ -232,7 +261,7 @@ Access by SecsCommunicator#gem
     LocalDateTime ldt = clock.toLocalDateTime();
 ```
 
-    TimeFormat (A[12] or A[16]) can be set from `AbstractConfig#gem#clockSize`.
+    TimeFormat (A[12] or A[16]) can be set from `AbstractConfig#gem#clockType`.
 
 ### Others
 

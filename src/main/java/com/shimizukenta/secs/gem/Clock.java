@@ -25,7 +25,7 @@ public class Clock implements Serializable {
 	private Secs2 a12;
 	private Secs2 a16;
 	
-	private Clock(LocalDateTime ldt) {
+	protected Clock(LocalDateTime ldt) {
 		this.dt = ldt;
 		this.a12 = null;
 		this.a16 = null;
@@ -39,6 +39,13 @@ public class Clock implements Serializable {
 		return from(LocalDateTime.now());
 	}
 	
+	/**
+	 * use for Secs2 of S2F18, S2F31
+	 * 
+	 * @param secs2
+	 * @return Clock
+	 * @throws Secs2Exception
+	 */
 	public static Clock from(Secs2 secs2) throws Secs2Exception {
 		
 		String a = secs2.getAscii();
@@ -108,6 +115,10 @@ public class Clock implements Serializable {
 	
 	private static DateTimeFormatter A14 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 	
+	/**
+	 * 
+	 * @return Secs2.ascii(yyMMddhhmmss)
+	 */
 	public Secs2 toAscii12() {
 		
 		synchronized ( this ) {
@@ -121,6 +132,10 @@ public class Clock implements Serializable {
 		}
 	}
 	
+	/**
+	 * 
+	 * @return Secs2.ascii(yyyyMMddhhmmssSS)
+	 */
 	public Secs2 toAscii16() {
 		
 		synchronized ( this ) {

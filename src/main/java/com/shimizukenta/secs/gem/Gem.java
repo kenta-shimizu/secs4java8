@@ -1,6 +1,5 @@
 package com.shimizukenta.secs.gem;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.shimizukenta.secs.SecsException;
@@ -319,9 +318,9 @@ public interface Gem {
 	
 	/**
 	 * Define Report Delete All<br />
+	 * DATA-ID is AutoNumber.<br />
 	 * blocking-method
 	 * 
-	 * @param DATAID
 	 * @return DRACK
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -329,19 +328,19 @@ public interface Gem {
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
-	public DRACK s2f33DeleteAll(Secs2 dataId)
+	public DRACK s2f33DeleteAll()
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
 			, Secs2Exception
 			, InterruptedException;
-	
+
 	/**
 	 * Define Report<br />
+	 * DATA-ID is AutoNumber.<br />
 	 * blocking-method
 	 * 
-	 * @param DATAID
-	 * @param GemReport-list
+	 * @param DynamicEventReportConfig
 	 * @return DRACK
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -349,27 +348,7 @@ public interface Gem {
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
-	public DRACK s2f33Define(Secs2 dataId, List<GemReport> reports)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, Secs2Exception
-			, InterruptedException;
-	
-	/**
-	 * Define Report<br />
-	 * blocking-method
-	 * 
-	 * @param DATAID
-	 * @param Report-list
-	 * @return DRACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws Secs2Exception
-	 * @throws InterruptedException
-	 */
-	public DRACK s2f33(Secs2 dataId, List<Secs2> reports)
+	public DRACK s2f33Define(DynamicEventReportConfig config)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -396,10 +375,10 @@ public interface Gem {
 	
 	/**
 	 * Link CollectionEvent Report<br />
+	 * DATA-ID is AutoNumber.<br />
 	 * blocking-method
 	 * 
-	 * @param DATAID
-	 * @param CollectionEvent-ReportID-Link list
+	 * @param DynamicEventReportConfig
 	 * @return LRACK
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -407,27 +386,7 @@ public interface Gem {
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
-	public LRACK s2f35Link(Secs2 dataId, List<GemCollectionEventReportLink> links)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, Secs2Exception
-			, InterruptedException;
-	
-	/**
-	 * Link CollectionEvent Report<br />
-	 * blocking-method
-	 * 
-	 * @param DATAID
-	 * @param CollectionEvent-ReportID-Link list
-	 * @return LRACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws Secs2Exception
-	 * @throws InterruptedException
-	 */
-	public LRACK s2f35(Secs2 dataId, List<Secs2> links)
+	public LRACK s2f35(DynamicEventReportConfig config)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -453,10 +412,9 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Eable CollectionEvent Report<br />
+	 * Disable All CollectionEvent Report<br />
 	 * blocking-method
 	 * 
-	 * @param List of Events
 	 * @return ERACK
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -464,26 +422,7 @@ public interface Gem {
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
-	public ERACK s2f37Enable(List<GemCollectionEvent> events)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, Secs2Exception
-			, InterruptedException;
-	
-	/**
-	 * Disable CollectionEvent Report<br />
-	 * blocking-method
-	 * 
-	 * @param List of Events
-	 * @return ERACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws Secs2Exception
-	 * @throws InterruptedException
-	 */
-	public ERACK s2f37Disable(List<GemCollectionEvent> events)
+	public ERACK s2f37DisableAll()
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -509,9 +448,10 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Disable All CollectionEvent Report<br />
+	 * Eable CollectionEvent Report<br />
 	 * blocking-method
 	 * 
+	 * @param DynamicEventReportConfig
 	 * @return ERACK
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -519,27 +459,7 @@ public interface Gem {
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
-	public ERACK s2f37DisableAll()
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, Secs2Exception
-			, InterruptedException;
-	
-	/**
-	 * Enable/Disable CollectionEvent Report<br />
-	 * blocking-method
-	 * 
-	 * @param CEED
-	 * @param CEIDs
-	 * @return ERACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws Secs2Exception
-	 * @throws InterruptedException
-	 */
-	public ERACK s2f37(CEED ceed, List<Secs2> ceids)
+	public ERACK s2f37Enable(DynamicEventReportConfig config)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -739,6 +659,74 @@ public interface Gem {
 	 * @throws InterruptedException
 	 */
 	public Optional<SecsMessage> s6f14(SecsMessage primaryMsg, ACKC6 ackc6)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException;
+	
+	/**
+	 * Event Report Request<br />
+	 * blocking-method
+	 * 
+	 * @param DynamicCollectionEvent
+	 * @return reply-message
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s6f15(DynamicCollectionEvent ce)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException;
+	
+	/**
+	 * Annotated Event Report Request<br />
+	 * blocking-method
+	 * 
+	 * @param DynamicCollectionEvent
+	 * @return reply-message
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s6f17(DynamicCollectionEvent ce)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException;
+	
+	/**
+	 * Individual Report Request<br />
+	 * blocking-method
+	 * 
+	 * @param DynamicReport
+	 * @return reply-message
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s6f19(DynamicReport report)
+			throws SecsSendMessageException
+			, SecsWaitReplyMessageException
+			, SecsException
+			, InterruptedException;
+	
+	/**
+	 * Annotated Individual Report Request<br />
+	 * blocking-method
+	 * 
+	 * @param DynamicReport
+	 * @return reply-message
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
+	public Optional<SecsMessage> s6f21(DynamicReport report)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
