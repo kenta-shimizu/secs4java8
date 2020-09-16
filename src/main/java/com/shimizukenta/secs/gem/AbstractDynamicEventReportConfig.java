@@ -86,6 +86,17 @@ public abstract class AbstractDynamicEventReportConfig implements DynamicEventRe
 				.findFirst();
 	}
 	
+	@Override
+	public Optional<DynamicReport> getReport(Secs2 reportId) {
+		
+		if ( reportId == null ) {
+			return Optional.empty();
+		}
+		
+		return reports.stream()
+				.filter(r -> Objects.equals(r.reportId(), reportId))
+				.findFirst();
+	}
 	
 	/* Link */
 	private final Set<DynamicLink> links = new CopyOnWriteArraySet<>();
@@ -164,6 +175,18 @@ public abstract class AbstractDynamicEventReportConfig implements DynamicEventRe
 	}
 	
 	@Override
+	public Optional<DynamicCollectionEvent> getCollectionEvent(Secs2 ceid) {
+		
+		if ( ceid == null ) {
+			return Optional.empty();
+		}
+		
+		return events.stream()
+				.filter(ev -> Objects.equals(ev.collectionEventId(), ceid))
+				.findFirst();
+	}
+
+	@Override
 	public DRACK s2f33DeleteAll()
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
@@ -183,7 +206,7 @@ public abstract class AbstractDynamicEventReportConfig implements DynamicEventRe
 			, InterruptedException {
 		
 		List<Secs2> rr = reports.stream()
-				.map(r -> r.s2f33Define())
+				.map(r -> r.toS2F33Report())
 				.collect(Collectors.toList());
 		
 		return gem.s2f33Inner(rr);
@@ -198,7 +221,7 @@ public abstract class AbstractDynamicEventReportConfig implements DynamicEventRe
 			, InterruptedException {
 		
 		List<Secs2> ll = links.stream()
-				.map(l -> l.s2f35())
+				.map(l -> l.toS2F35Link())
 				.collect(Collectors.toList());
 		
 		return gem.s2f35Inner(ll);

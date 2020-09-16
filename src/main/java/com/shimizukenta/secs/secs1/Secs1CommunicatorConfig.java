@@ -4,6 +4,14 @@ import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 import com.shimizukenta.secs.BooleanProperty;
 import com.shimizukenta.secs.IntegerProperty;
 
+/**
+ * This class is SECS-I config<br />
+ * To set Master-Mode, {@link #isMaster(boolean)}<br />
+ * To set Retry, {@link #retry(int)}
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
 	private static final long serialVersionUID = -4562702342609110048L;
@@ -16,6 +24,7 @@ public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	}
 	
 	/**
+	 * Set true if Master Mode.
 	 * 
 	 * @param isMasterMode
 	 */
@@ -24,14 +33,16 @@ public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	}
 	
 	/**
+	 * Master Mode getter.
 	 * 
-	 * @return isMasterMode
+	 * @return true if Master Mode
 	 */
 	public BooleanProperty isMaster() {
 		return isMaster;
 	}
 	
 	/**
+	 * Rety setter.
 	 * 
 	 * @param retry-count-value is >= 0
 	 */
@@ -43,6 +54,7 @@ public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	}
 	
 	/**
+	 * Retry getter.
 	 * 
 	 * @return retry-count
 	 */

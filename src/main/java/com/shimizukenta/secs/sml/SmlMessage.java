@@ -4,6 +4,13 @@ import java.io.Serializable;
 
 import com.shimizukenta.secs.secs2.Secs2;
 
+/**
+ * This class is implementation of SML (Peer-Group)<br />
+ * Instances of this class are immutable.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class SmlMessage implements Serializable {
 	
 	private static final long serialVersionUID = 630517337022434278L;

@@ -19,23 +19,31 @@ public class Secs2List extends AbstractSecs2 {
 	
 
 	private final List<Secs2> values;
+	private String proxyToString;
+	private String proxyToJson;
 	
 	public Secs2List() {
 		super();
 		
 		this.values = Collections.emptyList();
+		this.proxyToString = null;
+		this.proxyToJson = null;
 	}
 
 	public Secs2List(Secs2... values){
 		super();
 		
 		this.values = Stream.of(values).collect(Collectors.toList());
+		this.proxyToString = null;
+		this.proxyToJson = null;
 	}
 
 	public Secs2List(List<? extends Secs2> values) {
 		super();
 		
 		this.values = new ArrayList<>(values);
+		this.proxyToString = null;
+		this.proxyToJson = null;
 	}
 
 	@Override
@@ -106,7 +114,12 @@ public class Secs2List extends AbstractSecs2 {
 	
 	@Override
 	public String toString() {
-		return lineStrings("").stream().collect(Collectors.joining(BR));
+		synchronized ( this ) {
+			if ( this.proxyToString == null ) {
+				this.proxyToString = lineStrings("").stream().collect(Collectors.joining(BR));
+			}
+			return this.proxyToString;
+		}
 	}
 	
 	private List<String> lineStrings(String space) {
@@ -135,6 +148,16 @@ public class Secs2List extends AbstractSecs2 {
 		lines.add(space + ">");
 		
 		return lines;
+	}
+	
+	@Override
+	public String toJson() {
+		synchronized ( this ) {
+			if ( this.proxyToJson == null ) {
+				this.proxyToJson = super.toJson();
+			}
+			return this.proxyToJson;
+		}
 	}
 	
 	@Override

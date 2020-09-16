@@ -17,6 +17,14 @@ import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
 
+/**
+ * This class is implementation of HSMS-SS (SEMI-E37.1)<br />
+ * To create new instance, {@link #newInstance(HsmsSsCommunicatorConfig)}<br />
+ * To craete new instance and open, {@link #open(HsmsSsCommunicatorConfig)}
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	
 	private final HsmsSsCommunicatorConfig hsmsSsConfig;
@@ -27,7 +35,6 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	private final Property<HsmsSsCommunicateState> hsmsSsCommStateProperty = new AbstractProperty<HsmsSsCommunicateState>(HsmsSsCommunicateState.NOT_CONNECTED) {
 		private static final long serialVersionUID = 2735232737920848138L;
 	};
-	
 	
 	protected HsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);
@@ -45,6 +52,12 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		});
 	}
 	
+	/**
+	 * create new HSMS-SS-Communicator instance.
+	 * 
+	 * @param config
+	 * @return new HSMS-SS-Communicator instance
+	 */
 	public static HsmsSsCommunicator newInstance(HsmsSsCommunicatorConfig config) {
 		
 		switch ( config.protocol().get() ) {
@@ -72,6 +85,13 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		}
 	}
 	
+	/**
+	 * create new HSMS-SS-Communicator instance and {@link #open()}
+	 * 
+	 * @param config
+	 * @return new HSMS-SS-Communicator instance
+	 * @throws IOException
+	 */
 	public static HsmsSsCommunicator open(HsmsSsCommunicatorConfig config) throws IOException {
 		
 		final HsmsSsCommunicator inst = newInstance(config);

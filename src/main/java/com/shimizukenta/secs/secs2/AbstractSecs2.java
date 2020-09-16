@@ -199,5 +199,17 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	
 	abstract protected String toJsonValue();
 	
+	@Override
+	public int hashCode() {
+		return toJson().hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o != null && (o instanceof AbstractSecs2)) {
+			return ((AbstractSecs2)o).toJson().equals(toJson());
+		}
+		return false;
+	}
 	
 }

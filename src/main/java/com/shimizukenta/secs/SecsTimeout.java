@@ -2,6 +2,13 @@ package com.shimizukenta.secs;
 
 import java.io.Serializable;
 
+/**
+ * Secs Timeout config.<br />
+ * T1-T8 setter and getter.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class SecsTimeout implements Serializable {
 	
 	private static final long serialVersionUID = -3240180901934372535L;
@@ -20,6 +27,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T1-Timeout setter.
 	 * 
 	 * @param T1-timeout seconds
 	 */
@@ -31,6 +39,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T1-Timeout getter
 	 * 
 	 * @return seconds
 	 */
@@ -39,6 +48,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T2-Timeout setter
 	 * 
 	 * @param T2-timeout seconds
 	 */
@@ -50,6 +60,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T2-Timeout getter
 	 * 
 	 * @return seconds
 	 */
@@ -58,6 +69,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T3-Timeout setter
 	 * 
 	 * @param T3-timeout seconds
 	 */
@@ -69,6 +81,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T3-Timeout getter
 	 * 
 	 * @return seconds
 	 */
@@ -77,6 +90,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T4-Timeout setter
 	 * 
 	 * @param T4-timeout seconds
 	 */
@@ -88,6 +102,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T4-Timeout getter
 	 * 
 	 * @return seconds
 	 */
@@ -96,6 +111,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T5-Timeout setter
 	 * 
 	 * @param T5-timeout seconds
 	 */
@@ -107,6 +123,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T5-Timeout getter
 	 * 
 	 * @return seconds
 	 */
@@ -115,6 +132,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T6-Timeout setter
 	 * 
 	 * @param T6-timeout seconds
 	 */
@@ -126,6 +144,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T6-Timeout getter
 	 * 
 	 * @return seconds
 	 */
@@ -134,6 +153,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T7-Timeout setter
 	 * 
 	 * @param T7-timeout seconds
 	 */
@@ -145,6 +165,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T7-Timeout getter
 	 * 
 	 * @return seconds
 	 */
@@ -153,6 +174,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T8-Timeout setter
 	 * 
 	 * @param T8-timeout seconds
 	 */
@@ -164,6 +186,7 @@ public class SecsTimeout implements Serializable {
 	}
 	
 	/**
+	 * T8-Timeout getter
 	 * 
 	 * @return seconds
 	 */

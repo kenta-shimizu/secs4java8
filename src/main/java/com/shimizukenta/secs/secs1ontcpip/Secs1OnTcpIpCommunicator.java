@@ -23,6 +23,14 @@ import com.shimizukenta.secs.secs1.Secs1Communicator;
 import com.shimizukenta.secs.secs1.Secs1DetectTerminateException;
 import com.shimizukenta.secs.secs1.Secs1SendMessageException;
 
+/**
+ * This class is implementation of SECS-I (SEMI-E4) on TCP/IP<br />
+ * To create new instance, {@link #newInstance(Secs1OnTcpIpCommunicatorConfig)}<br />
+ * To create new instance and open, {@link #open(Secs1OnTcpIpCommunicatorConfig)}
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 	
 	private final Secs1OnTcpIpCommunicatorConfig secs1OnTcpIpConfig;
@@ -35,10 +43,23 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 		this.channel = null;
 	}
 	
+	/**
+	 * Create SECS-I-on-TCP/IP instance.
+	 * 
+	 * @param config
+	 * @return new Secs1OnTcpIp instance
+	 */
 	public static Secs1OnTcpIpCommunicator newInstance(Secs1OnTcpIpCommunicatorConfig config) {
 		return new Secs1OnTcpIpCommunicator(config);
 	}
 	
+	/**
+	 * Create SECS-I-on-Tcp/IP instance and {@link #open()}
+	 * 
+	 * @param config
+	 * @return new Secs1OnTcpIp instance
+	 * @throws IOException
+	 */
 	public static Secs1OnTcpIpCommunicator open(Secs1OnTcpIpCommunicatorConfig config) throws IOException {
 		
 		final Secs1OnTcpIpCommunicator inst = newInstance(config);

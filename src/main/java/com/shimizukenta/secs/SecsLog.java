@@ -9,6 +9,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * SecsLog contains<br />
+ * <ul>
+ * <li>Log-subject</li>
+ * <li>Log-timestamp</li>
+ * <li>Log-value (detail-information)</li>
+ * </ul>
+ * Instances of this class are immutable.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class SecsLog implements Serializable {
 	
 	private static final long serialVersionUID = 3912865343300189344L;

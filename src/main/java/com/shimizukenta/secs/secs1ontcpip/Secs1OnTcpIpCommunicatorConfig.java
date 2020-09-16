@@ -7,6 +7,13 @@ import com.shimizukenta.secs.SocketAddressProperty;
 import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.secs1.Secs1CommunicatorConfig;
 
+/**
+ * This class is SECS-I-on-TCP/IP config.<br />
+ * To set Connect SocketAddress, {@link #socketAddress(SocketAddress)}<br />
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 	
 	private static final long serialVersionUID = -7468433384957790240L;
@@ -18,10 +25,20 @@ public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 		super();
 	}
 	
-	public void socketAddress(SocketAddress socketAddr) {
-		this.socketAddr.set(Objects.requireNonNull(socketAddr));
+	/**
+	 * Connect SocketAddress setter
+	 * 
+	 * @param socketAddress
+	 */
+	public void socketAddress(SocketAddress socketAddress) {
+		this.socketAddr.set(Objects.requireNonNull(socketAddress));
 	}
 	
+	/**
+	 * Conenct SocketAddress getter
+	 * 
+	 * @return Connect SocketAddress
+	 */
 	public SocketAddressProperty socketAddress() {
 		return this.socketAddr;
 	}

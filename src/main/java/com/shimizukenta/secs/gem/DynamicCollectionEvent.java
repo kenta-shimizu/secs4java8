@@ -1,10 +1,8 @@
 package com.shimizukenta.secs.gem;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 import com.shimizukenta.secs.secs2.Secs2;
-import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class DynamicCollectionEvent implements Serializable {
 	
@@ -22,33 +20,37 @@ public class DynamicCollectionEvent implements Serializable {
 		return alias;
 	}
 	
+	/**
+	 * newInstance from S2F37 Secs2 Single-Collection-Event.<br />
+	 * Single-Collection-Event-Format:<br />
+	 * &lt;U4 ceid&gt;
+	 * 
+	 * @param S2F37 Secs2 Single-Collection-Event
+	 * @return DynamicCollectionEvent
+	 */
+	public static DynamicCollectionEvent fromS2F37CollectionEvent(Secs2 secs2) {
+		return new DynamicCollectionEvent(null, secs2);
+	}
+	
+	public Secs2 toS2F37CollectionEvent() {
+		return collectionEventId;
+	}
+	
 	public Secs2 collectionEventId() {
 		return collectionEventId;
 	}
 	
-	private BigInteger bigInteger() throws Secs2Exception {
-		return collectionEventId.getBigInteger(0);
-	}
-	
 	@Override
 	public int hashCode() {
-		try {
-			return bigInteger().hashCode();
-		}
-		catch ( Secs2Exception giveup ) {
-			return collectionEventId.hashCode();
-		}
+		return collectionEventId.hashCode();
 	}
 	
 	@Override
 	public boolean equals(Object o) {
 		if ( o != null && (o instanceof DynamicCollectionEvent) ) {
-			try {
-				return ((DynamicCollectionEvent)o).bigInteger().equals(bigInteger());
-			}
-			catch ( Secs2Exception giveup ) {
-			}
+			return ((DynamicCollectionEvent)o).collectionEventId.equals(collectionEventId);
 		}
 		return false;
 	}
+	
 }

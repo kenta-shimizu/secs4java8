@@ -4,6 +4,14 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This class is implementation of SML-Parse<br />
+ * To get parser instance, {@link #getInstance()}<br />
+ * To parse SML, {@link #parse(CharSequence)}
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class SmlMessageParser {
 
 	protected SmlMessageParser() {

@@ -17,6 +17,13 @@ import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.secs2.Secs2;
 
+/**
+ * This class is implementation of SECS-I (SEMI-E4)<br />
+ * To get instance, Secs1OnTcpIpCommunicator#newInstance
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	
 	protected static final byte ENQ = (byte)0x05;

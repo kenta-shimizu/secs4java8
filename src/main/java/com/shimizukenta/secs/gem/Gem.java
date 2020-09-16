@@ -9,6 +9,13 @@ import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
+/**
+ * This interface is implementation of GEM (SEMI-E30, partially)<br />
+ * Call from SecsCommunicator#gem
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public interface Gem {
 	
 	/**
@@ -191,7 +198,7 @@ public interface Gem {
 	 * Date and Time Response />
 	 * blocking-method
 	 * 
-	 * @param Clock
+	 * @param SimpleClock
 	 * @return Optional.empty()
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -210,7 +217,7 @@ public interface Gem {
 	 * Now Date and Time Response />
 	 * blocking-method
 	 * 
-	 * @param Clock
+	 * @param SimpleClock
 	 * @return Optional.empty()
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -317,7 +324,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Define Report Delete All<br />
+	 * Delete All Define-Report<br />
 	 * DATA-ID is AutoNumber.<br />
 	 * blocking-method
 	 * 
@@ -374,7 +381,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Link CollectionEvent Report<br />
+	 * Link Collection Event Report<br />
 	 * DATA-ID is AutoNumber.<br />
 	 * blocking-method
 	 * 
@@ -394,7 +401,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Link CollectionEvent Report Acknowledge<br />
+	 * Link Collection Event Report Acknowledge<br />
 	 * blocking-method
 	 * 
 	 * @param primary-message
@@ -412,7 +419,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Disable All CollectionEvent Report<br />
+	 * Disable All Collection-Event-Report<br />
 	 * blocking-method
 	 * 
 	 * @return ERACK
@@ -430,7 +437,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Enable All CollectionEvent Report<br />
+	 * Enable All Collection-Event-Report<br />
 	 * blocking-method
 	 * 
 	 * @return ERACK
@@ -448,7 +455,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Eable CollectionEvent Report<br />
+	 * Enable Collection-Event-Report<br />
 	 * blocking-method
 	 * 
 	 * @param DynamicEventReportConfig

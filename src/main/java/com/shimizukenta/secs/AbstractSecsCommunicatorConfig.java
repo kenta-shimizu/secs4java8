@@ -20,26 +20,56 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 		gem = new GemConfig();
 	}
 	
+	/**
+	 * Device-ID setter.
+	 * 
+	 * @param id
+	 */
 	public void deviceId(int id) {
 		this.deviceId.set(id);
 	}
 	
+	/**
+	 * Device-ID getter
+	 * 
+	 * @return device-id
+	 */
 	public IntegerProperty deviceId() {
 		return deviceId;
 	}
 	
+	/**
+	 * Set true if equipment.
+	 * 
+	 * @param is-equip
+	 */
 	public void isEquip(boolean f) {
 		this.isEquip.set(f);
 	}
 	
+	/**
+	 * getter
+	 * 
+	 * @return true if equipment
+	 */
 	public BooleanProperty isEquip() {
 		return isEquip;
 	}
 	
+	/**
+	 * SecsTimeout getter
+	 * 
+	 * @return SecsTimeout
+	 */
 	public SecsTimeout timeout() {
 		return timeout;
 	}
 	
+	/**
+	 * GemConfig getter.
+	 * 
+	 * @return GemConfig
+	 */
 	public GemConfig gem() {
 		return gem;
 	}
@@ -53,6 +83,11 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 		this.logSubjectHeader.set(Objects.requireNonNull(header).toString());
 	}
 	
+	/**
+	 * Log-Subject-Header getter
+	 * 
+	 * @return log-subject-header
+	 */
 	public StringProperty logSubjectHeader() {
 		return logSubjectHeader;
 	}

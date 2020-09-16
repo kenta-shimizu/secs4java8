@@ -8,15 +8,53 @@ import com.shimizukenta.secs.gem.Gem;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.sml.SmlMessage;
 
+/**
+ * This interface is implementation of SECS-Communicating.<br />
+ * To get instance, HsmsSsCommunicator#newInstance or Secs1OnTcpIp#newInstance<br />
+ * To start communicating, {@link #open()}<br />
+ * To send Message, #send methods.<br />
+ * To receive Message, {@link #addSecsMessageReceiveListener(SecsMessageReceiveListener)}<br />
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public interface SecsCommunicator extends Closeable {
 	
+	/**
+	 * start communicating.
+	 * 
+	 * @throws IOException
+	 */
 	public void open() throws IOException;
 	
+	/**
+	 * 
+	 * @return true if open.
+	 */
 	public boolean isOpen();
+	
+	/**
+	 * 
+	 * @return true if closed.
+	 */
 	public boolean isClosed();
 	
+	/**
+	 * 
+	 * @return get GEM instance.
+	 */
 	public Gem gem();
+	
+	/**
+	 * 
+	 * @return communicator device-id.
+	 */
 	public int deviceId();
+	
+	/**
+	 * 
+	 * @return true if Equipment.
+	 */
 	public boolean isEquip();
 	
 	
