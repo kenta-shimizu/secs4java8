@@ -134,7 +134,7 @@ public class ExampleBuildSecs2 {
 			try {
 				SmlDataItemParser parser = SmlDataItemParser.getInstance();
 				
-				Secs2 ss = parser.parse("<L <B 0x01><I4 100><A \"ERROR-MSG\">>");
+				Secs2 ss = parser.parse("<L <B 0x81><I4 1001><A \"ON FIRE\">>");
 				
 				System.out.println("build by SML");
 				System.out.println(ss);

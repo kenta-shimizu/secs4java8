@@ -323,7 +323,7 @@ From RPTID in received S6F11 or S6F13, Get Report-Alias if aliased.
 ```
     Secs2 rptid = recvS6F11Msg.secs2().get(2, ...);   /* Get RPTID SECS-II */
 
-    Optional<DynamicReport> op = evRptConf.getReport(Secs2 rptid);
+    Optional<DynamicReport> op = evRptConf.getReport(rptid);
     Optional<String> alias     = op.flatMap(rpt -> rpt.alias());    /* Get Report-Alias */
 ```
 

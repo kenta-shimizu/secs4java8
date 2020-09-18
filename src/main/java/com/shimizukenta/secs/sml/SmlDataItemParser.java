@@ -1,6 +1,7 @@
 package com.shimizukenta.secs.sml;
 
 import java.math.BigInteger;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,12 @@ import java.util.regex.Pattern;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Item;
 
+/**
+ * This class is implementation of SML-SECS-II-Data-Parse<br />
+ * To get parser instance, {@link #getInstance()}<br />
+ * To parse SML, {@link #parse(CharSequence)}
+ * 
+ */
 public class SmlDataItemParser {
 
 	protected SmlDataItemParser() {
@@ -21,6 +28,11 @@ public class SmlDataItemParser {
 		private static final SmlDataItemParser inst = new SmlDataItemParser();
 	}
 	
+	/**
+	 * parser getter
+	 * 
+	 * @return
+	 */
 	public static SmlDataItemParser getInstance() {
 		return SingletonHolder.inst;
 	}
