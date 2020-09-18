@@ -76,7 +76,7 @@ public class DynamicReport implements Serializable {
 	/**
 	 * Alias getter
 	 * 
-	 * @return has value if setted alias.
+	 * @return has value if aliased.
 	 */
 	public Optional<String> alias() {
 		return alias == null ? Optional.empty() : Optional.of(alias);

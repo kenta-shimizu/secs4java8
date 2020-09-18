@@ -20,7 +20,7 @@ public class DynamicCollectionEvent implements Serializable {
 	/**
 	 * Alias getter
 	 * 
-	 * @return has valus if setted alias
+	 * @return has valus if aliased.
 	 */
 	public Optional<String> alias() {
 		return alias == null ? Optional.empty() : Optional.of(alias);

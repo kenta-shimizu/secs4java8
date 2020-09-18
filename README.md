@@ -126,7 +126,7 @@ See also ["/src/examples/example3/ExampleBuildSecs2.java"](/src/examples/example
     });
 ```
 
-2. SECS-II parse
+2. Parse SECS-II
 
 ```
     /* example Receive Message */
@@ -210,7 +210,7 @@ See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/exam
 
 Access from SecsCommunicator#gem
 
-### Dynamic Event Report Configuration
+### Dynamic Event Report Configuration (User Side)
 
 1. Create Configuration instance
 
@@ -251,13 +251,13 @@ Access from SecsCommunicator#gem
 ```
     /* no Alias */
     DynamicCollectionEvent evSimple = evRptConf.addEnableCollectionEvent(
-        101             /* CEID         */
+        101L            /* CEID         */
     );
 
     /* set Alias */
     DynamicCollectionEvent evAlias = evRptConf.addEnableCollectionEvent(
         "event-alias",  /* Event-Alias  */
-        201             /* CEID         */
+        201L            /* CEID         */
     );
 ```
 
@@ -277,13 +277,13 @@ Access from SecsCommunicator#gem
     evRpt.addLinkById(
         evAlias,                /* DynamicCollectionEvent   */
         Arrays.asList(
-            Long.valueOf(1),    /* RPTID-1                  */
+            Long.valueOf(1L),   /* RPTID-1                  */
             ...
         )
     );
 ```
 
-3. Scenario
+3. Execute Scenario
 
 ```
     ERACK erack = evRptConf.s2f37DisableAll();
@@ -295,20 +295,37 @@ Access from SecsCommunicator#gem
 
     DATAID is auto number.
 
-If has Report-Alias, S6F19 and S6F21 call by Alias.
+If has Report-Alias, S6F19 and S6F21 called by Alias.
 
 ```
     Optional<SecsMessage> s6f20 = evRptConf.s6f19("report-alias");
     Optional<SecsMessage> s6f22 = evRptConf.s6f21("report-alias");
 ```
 
-If has Event-Alias, S6F15 and S6F17 call by Alias.
+If has Event-Alias, S6F15 and S6F17 called by Alias.
 
 ```
     Optional<SecsMessage> s6f16 = evRptConf.s6f15("event-alias");
     Optional<SecsMessage> s6f18 = evRptConf.s6f17("event-alias");
 ```
 
+From CEID in received S6F11 or S6F13, Get Event-Alias if aliased.
+
+```
+    Secs2 ceid = recvS6F11Msg.secs2().get(1);   /* Get CEID SECS-II */
+
+    Optional<DynamicCollectionEvent> op = evRptConf.getCollectionEvent(ceid);
+    Optional<String> alias              = op.flatMap(ev -> ev.alias()); /* Get Event-ALias */
+```
+
+From RPTID in received S6F11 or S6F13, Get Report-Alias if aliased.
+
+```
+    Secs2 rptid = recvS6F11Msg.secs2().get(2, ...);   /* Get RPTID SECS-II */
+
+    Optional<DynamicReport> op = evRptConf.getReport(Secs2 rptid);
+    Optional<String> alias     = op.flatMap(rpt -> rpt.alias());    /* Get Report-Alias */
+```
 
 ### Clock
 
