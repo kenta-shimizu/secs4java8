@@ -1,6 +1,11 @@
 package com.shimizukenta.secs.gem;
 
+import java.util.Objects;
+
 import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.Secs2Exception;
+import com.shimizukenta.secs.secs2.Secs2IrregalDataFormatException;
+import com.shimizukenta.secs.secs2.Secs2Item;
 
 public enum CEED {
 	
@@ -16,5 +21,21 @@ public enum CEED {
 	
 	public Secs2 secs2() {
 		return v;
+	}
+	
+	public static CEED get(Secs2 value) throws Secs2Exception {
+		
+		if ( value.secs2Item() == Secs2Item.BOOLEAN ) {
+			
+			if ( Objects.equals(value, CEED.DISABLE.secs2()) ) {
+				return CEED.DISABLE;
+			} else {
+				return CEED.ENABLE;
+			}
+			
+		} else {
+			
+			throw new Secs2IrregalDataFormatException("CEED require BOOLEAN");
+		}
 	}
 }

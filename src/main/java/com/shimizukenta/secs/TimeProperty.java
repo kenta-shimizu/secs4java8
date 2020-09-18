@@ -1,39 +1,56 @@
 package com.shimizukenta.secs;
 
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class TimeProperty extends AbstractProperty<Float> {
+public class TimeProperty extends NumberProperty {
 	
 	private static final long serialVersionUID = -2905213245311975065L;
 	
 	private long milliSec;
 	
-	public TimeProperty(float initial) {
-		super(Float.valueOf(initial));
+	public TimeProperty(Number initial) {
+		super(initial);
 		setMilliSeconds(initial);
 	}
 	
+	public TimeProperty(int initial) {
+		this(Integer.valueOf(initial));
+	}
+	
+	public TimeProperty(long initial) {
+		this(Long.valueOf(initial));
+	}
+	
+	public TimeProperty(float initial) {
+		this(Float.valueOf(initial));
+	}
+	
+	public TimeProperty(double initial) {
+		this(Double.valueOf(initial));
+	}
+	
 	@Override
-	public void set(Float v) {
+	public void set(Number v) {
 		synchronized ( this ) {
-			setMilliSeconds(v.floatValue());
+			setMilliSeconds(v);
 			super.set(v);
 		}
 	}
 	
-	private void setMilliSeconds(float v) {
+	private void setMilliSeconds(Number v) {
 		synchronized ( this ) {
-			this.milliSec = (long)(v * 1000.0F);
+			this.milliSec = (long)(Objects.requireNonNull(v).floatValue() * 1000.0F);
 		}
 	}
 	
 	public float getSeconds() {
 		synchronized ( this ) {
-			return get().floatValue();
+			return floatValue();
 		}
 	}
 	

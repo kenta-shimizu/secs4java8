@@ -57,7 +57,7 @@ public abstract class AbstractDynamicEventReportConfig implements DynamicEventRe
 	}
 	
 	@Override
-	public DynamicReport addDefineReport(List<Number> vids) {
+	public DynamicReport addDefineReport(List<? extends Number> vids) {
 		return addDefineReport(gem.autoReportId(), null, vids);
 	}
 	
@@ -82,7 +82,8 @@ public abstract class AbstractDynamicEventReportConfig implements DynamicEventRe
 		String s = alias.toString();
 		
 		return reports.stream()
-				.filter(r -> Objects.equals(r.alias(), s))
+				.filter(r -> r.alias().isPresent())
+				.filter(r -> Objects.equals(r.alias().get(), s))
 				.findFirst();
 	}
 	
@@ -170,7 +171,8 @@ public abstract class AbstractDynamicEventReportConfig implements DynamicEventRe
 		String s = alias.toString();
 		
 		return events.stream()
-				.filter(ce -> Objects.equals(ce.alias(), s))
+				.filter(r -> r.alias().isPresent())
+				.filter(ce -> Objects.equals(ce.alias().get(), s))
 				.findFirst();
 	}
 	

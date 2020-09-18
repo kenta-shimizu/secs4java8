@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import com.shimizukenta.secs.AbstractProperty;
 import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
-import com.shimizukenta.secs.IntegerProperty;
+import com.shimizukenta.secs.NumberProperty;
 import com.shimizukenta.secs.Property;
 import com.shimizukenta.secs.SocketAddressProperty;
 import com.shimizukenta.secs.TimeProperty;
@@ -29,7 +29,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
 	private final SocketAddressProperty sockAddr = new SocketAddressProperty(null);
 	private final TimeProperty linktest = new TimeProperty(-1.0F);
-	private final TimeProperty rebindIfPassive = new TimeProperty(-1.0F);
+	private final TimeProperty rebindIfPassive = new TimeProperty(10.0F);
 	
 	public HsmsSsCommunicatorConfig() {
 		super();
@@ -85,7 +85,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * 
 	 * @return session-id
 	 */
-	public IntegerProperty sessionId() {
+	public NumberProperty sessionId() {
 		return deviceId();
 	}
 	

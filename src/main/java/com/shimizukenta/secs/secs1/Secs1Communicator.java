@@ -49,8 +49,8 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		this.secs1Config = config;
 		this.sendReplyManager = new Secs1SendReplyManager(this);
 		
-		this.secs1Config.deviceId().addChangeListener(i -> {
-			int v = i.intValue();
+		this.secs1Config.deviceId().addChangeListener(n -> {
+			int v = n.intValue();
 			byte[] bs = new byte[] {
 					(byte)(v >> 8),
 					(byte)v
@@ -219,7 +219,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	
 	private class CircuitLoop implements InterruptableRunnable {
 		
-		private final TimeProperty wdt = new TimeProperty(0.100F);
+		private final TimeProperty wdt = new TimeProperty(0.250F);
 		private Secs1MessageBlock presentBlock;
 		
 		public CircuitLoop() {
@@ -239,13 +239,15 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 					
 					Byte b = pollByte().orElse(null);
 					
-					if ( b != null && b.byteValue() == ENQ ) {
+					if ( b == null ) {
 						
-						receiveBlock();
+						wdt.wait(this);
 						
 					} else {
 						
-						wdt.wait(this);
+						if ( b.byteValue() == ENQ ) {
+							receiveBlock();
+						}
 					}
 					
 				} else {

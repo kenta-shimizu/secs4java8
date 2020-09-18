@@ -49,7 +49,7 @@ public class ExampleHsmsSsPassive {
 				
 				try {
 					
-					if ( msg.sessionId() != config.sessionId().get() ) {
+					if ( msg.sessionId() != config.sessionId().intValue() ) {
 						comm.gem().s9f1(msg);
 						return;
 					}

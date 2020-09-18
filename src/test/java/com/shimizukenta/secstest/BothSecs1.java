@@ -250,7 +250,13 @@ public class BothSecs1 {
 								
 								for ( ; inst.equipCounter < m; ) {
 									
-									equip.gem().s1f13();
+									try {
+										equip.gem().s1f13();
+									}
+									catch ( Secs2Exception e ) {
+										echo(e);
+									}
+									
 									Thread.sleep(1L);
 									
 									equip.gem().s1f1();
@@ -274,7 +280,13 @@ public class BothSecs1 {
 							try {
 								for (; inst.hostCounter < m; ) {
 									
-									host.gem().s1f13();
+									try {
+										host.gem().s1f13();
+									}
+									catch ( Secs2Exception e ) {
+										echo(e);
+									}
+									
 									Thread.sleep(1L);
 									
 									try {

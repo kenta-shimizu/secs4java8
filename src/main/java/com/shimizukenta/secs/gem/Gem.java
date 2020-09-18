@@ -75,16 +75,18 @@ public interface Gem {
 	 * Establish Communications Request<br />
 	 * blocking-method
 	 * 
-	 * @return Reply-Message
+	 * @return COMMACK
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
 	 * @throws SecsException
+	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> s1f13()
+	public COMMACK s1f13()
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
+			, Secs2Exception
 			, InterruptedException;
 	
 	/**

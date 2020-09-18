@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.secs2.Secs2;
@@ -63,14 +64,29 @@ public class DynamicReport implements Serializable {
 				Secs2.list(vids));
 	}
 	
+	/**
+	 * RPTID getter
+	 * 
+	 * @return SECS-II RPTID
+	 */
 	public Secs2 reportId() {
 		return reportId;
 	}
 	
-	public String alias() {
-		return alias;
+	/**
+	 * Alias getter
+	 * 
+	 * @return has value if setted alias.
+	 */
+	public Optional<String> alias() {
+		return alias == null ? Optional.empty() : Optional.of(alias);
 	}
 	
+	/**
+	 * VIDs getter
+	 * 
+	 * @return List of SECS-II VID
+	 */
 	public List<Secs2> vids() {
 		return Collections.unmodifiableList(vids);
 	}

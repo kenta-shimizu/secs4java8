@@ -42,8 +42,8 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 		this.hsmsSsConfig = config;
 		this.sendReplyManager = new HsmsSsSendReplyManager(this);
 		
-		this.hsmsSsConfig.sessionId().addChangeListener(i -> {
-			int v = i.intValue();
+		this.hsmsSsConfig.sessionId().addChangeListener(n -> {
+			int v = n.intValue();
 			byte[] bs = new byte[] {
 					(byte)(v >> 8),
 					(byte)v

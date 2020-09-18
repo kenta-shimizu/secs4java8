@@ -2,7 +2,7 @@ package com.shimizukenta.secs.secs1;
 
 import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 import com.shimizukenta.secs.BooleanProperty;
-import com.shimizukenta.secs.IntegerProperty;
+import com.shimizukenta.secs.NumberProperty;
 
 /**
  * This class is SECS-I config<br />
@@ -17,7 +17,7 @@ public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	private static final long serialVersionUID = -4562702342609110048L;
 	
 	private final BooleanProperty isMaster = new BooleanProperty(true);
-	private final IntegerProperty retry = new IntegerProperty(3);
+	private final NumberProperty retry = new NumberProperty(3);
 	
 	public Secs1CommunicatorConfig() {
 		super();
@@ -58,7 +58,7 @@ public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * 
 	 * @return retry-count
 	 */
-	public IntegerProperty retry() {
+	public NumberProperty retry() {
 		return retry;
 	}
 	

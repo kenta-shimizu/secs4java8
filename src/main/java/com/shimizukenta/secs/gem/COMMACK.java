@@ -40,8 +40,8 @@ public enum COMMACK {
 		return UNDEFINED;
 	}
 	
-	public static COMMACK get(Secs2 s1f14secs2) throws Secs2Exception {
-		byte b = s1f14secs2.getByte(0, 0);
+	public static COMMACK get(Secs2 value) throws Secs2Exception {
+		byte b = value.getByte(0);
 		return get(b);
 	}
 }

@@ -58,9 +58,9 @@ public interface DynamicEventReportConfig {
 	 * Report-ID is AutoNumber.
 	 * 
 	 * @param VIDs
-	 * @return
+	 * @return DynamicReport
 	 */
-	public DynamicReport addDefineReport(List<Number> vids);
+	public DynamicReport addDefineReport(List<? extends Number> vids);
 	
 	/**
 	 * 

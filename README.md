@@ -14,7 +14,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
 
 ## Create Communicator instance and open
 
-- For use HSMS-SS-Passive
+- For use HSMS-SS-Passive example
 
 ```
     /* HSMS-SS-Passive open example */
@@ -29,11 +29,12 @@ This library is SEMI-SECS-communicate implementation on Java8.
     config.timeout().t8( 6.0F);
     config.gem().mdln("MDLN-A");
     config.gem().softrev("000001");
+    config.gem().clockType(ClockType.A16);
 
     SecsCommunicator passive = HsmsSsCommunicator.open(config);
 ```
 
-- For use HSMS-SS-Active
+- For use HSMS-SS-Active example
 
 ```
     /* HSMS-SS-Active open example */
@@ -46,11 +47,13 @@ This library is SEMI-SECS-communicate implementation on Java8.
     config.timeout().t5(10.0F);
     config.timeout().t6( 5.0F);
     config.timeout().t8( 6.0F);
+    config.linktest(120.0F);
+    config.gem().clockType(ClockType.A16);
 
     SecsCommunicator active = HsmsSsCommunicator.open(config);
 ```
 
-- For use SECS-I (onTcpIp)
+- For use SECS-I (onTcpIp) example
 
 ```
     /* SECS-I (onTcpIp) open example */
@@ -64,6 +67,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
     config.timeout().t3(45.0F);
     config.timeout().t4(45.0F);
     config.retry(3);
+    config.gem().clockType(ClockType.A16);
 
     SecsCommunicator secs1 = Secs1OnTcpIpCommunicator.open(config);
 ```
@@ -72,7 +76,7 @@ How to convert TCP/IP <-> RS232C
 - [Use XPort](https://www.lantronix.com/products/xport/)
 - [Use Raspberry Pi sample](/src/main/raspi-python/TcpIpSerialConverter)
 
-## Send Primary-Message, and receive Reply-Message
+## Send Primary-Message and receive Reply-Message
 
 1. Create SECS-II
 
@@ -170,7 +174,7 @@ See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/exam
 
 ## SML
 
-1. GetInstance SML-Parser
+1. Get SML-Parser instance
 
 ```
     SmlMessageParser parser = SmlMessageParser.getInstance();
@@ -204,69 +208,146 @@ See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/exam
 
 ## GEM
 
-Access by SecsCommunicator#gem
+Access from SecsCommunicator#gem
 
 ### Dynamic Event Report Configuration
 
-1. NewInstance Configuration
+1. Create Configuration instance
 
 ```
-    DynamicEventReportConfig config = active.gem().newDynamicEventReportConfig();
+    DynamicEventReportConfig evRptConf = active.gem().newDynamicEventReportConfig();
 ```
 
-2. config
+2. Add Configs
+
+- Add Define Reports
+
+    Can be aliased.  
+    RPTID is auto number.
 
 ```
+    /* no ALias */
+    DynamicReport rptSimple = evRptConf.addDefineReport(
+        Arrays.asList(
+            Long.valueOf(1001L),    /* VID-1        */
+            ...
+        )
+    );
+
+    /* set Alias */
+    DynamicReport rptAlias = evRptConf.addDefineReport(
+        "report-alias",             /* Report-ALias */
+        Arrays.asList(
+            Long.valueOf(2001L),    /* VID-1        */
+            ...
+        )
+    );
 ```
 
-3. flow
+- Add Enable Collection Events
+
+    Can be aliased.
 
 ```
+    /* no Alias */
+    DynamicCollectionEvent evSimple = evRptConf.addEnableCollectionEvent(
+        101             /* CEID         */
+    );
+
+    /* set Alias */
+    DynamicCollectionEvent evAlias = evRptConf.addEnableCollectionEvent(
+        "event-alias",  /* Event-Alias  */
+        201             /* CEID         */
+    );
 ```
 
-If set Collection-Event-Alias, call S6F15, S6F17 by Alias.
+- Add Links
 
 ```
+    /* by DynamicReport */
+    evRpt.addLinkByReport(
+        evAlias,                /* DynamicCollectionEvent   */
+        Arrays.asList(
+            rptAlias,           /* DynamicReport-1          */
+            ...
+        )
+    );
+
+    /* by Report-ID */
+    evRpt.addLinkById(
+        evAlias,                /* DynamicCollectionEvent   */
+        Arrays.asList(
+            Long.valueOf(1),    /* RPTID-1                  */
+            ...
+        )
+    );
 ```
 
-If set Report-Alias, call S6F19, S6F21 by Alias.
+3. Scenario
 
 ```
+    ERACK erack = evRptConf.s2f37DisableAll();
+    DRACK drack = evRptConf.s2f33DeleteAll();
+    DRACK drack = evRptConf.s2f33Define();
+    LRACK lrack = evRptConf.s2f35();
+    ERACK erack = evRptConf.s2f37Enable();
+```
+
+    DATAID is auto number.
+
+If has Report-Alias, S6F19 and S6F21 call by Alias.
+
+```
+    Optional<SecsMessage> s6f20 = evRptConf.s6f19("report-alias");
+    Optional<SecsMessage> s6f22 = evRptConf.s6f21("report-alias");
+```
+
+If has Event-Alias, S6F15 and S6F17 call by Alias.
+
+```
+    Optional<SecsMessage> s6f16 = evRptConf.s6f15("event-alias");
+    Optional<SecsMessage> s6f18 = evRptConf.s6f17("event-alias");
 ```
 
 
 ### Clock
 
+- Send S2F17 and receive reply, parse to LocalDateTime
+
 ```
-    /* Send S2F17, parse to LocalDateTime example */
     Clock clock = passive.gem().s2f17();
     LocalDateTime ldt = clock.toLocalDateTime();
+```
 
-    /* Reply S2F18 Now example */
+- Reply S2F18 Now examples
+
+```
     active.gem().s2f18(Clock.from(LocalDateTime.now()));
-    or
     active.gem().s2f18(Clock.now());
-    or
     active.gem().s2f18Now();
+```
 
-    /* Send S2F31 Now example */
+- Send S2F31 Now examples
+
+```
     TIACK tiack = active.gem().s2f31(Clock.from(LocalDateTime.now()));
-    or
     TIACK tiack = active.gem().s2f31(Clock.now());
-    or
     TIACK tiack = active.gem().s2f31Now();
+```
 
-    /* Receive S2F31, parse to LocalDateTime example */
+- Receive S2F31, parse to LocalDateTime
+
+```
     Clock clock = Clock.from(recvS2F31Msg.secs2());
     LocalDateTime ldt = clock.toLocalDateTime();
 ```
 
-    TimeFormat (A[12] or A[16]) can be set from `AbstractConfig#gem#clockType`.
+TimeFormat (A[12] or A[16]) can be set from `AbstractConfig#gem#clockType`.
 
 ### Others
 
 ```
-    /* example */
+    /* examples */
     COMMACK commack = active.gem().s1f13();
     OFLACK  oflack  = active.gem().s1f15();
     ONLACK  onlack  = acitve.gem().s1f17();
@@ -275,8 +356,9 @@ If set Report-Alias, call S6F19, S6F21 by Alias.
     passive.gem().s1f16(primaryMsg);
     passive.gem().s1f18(primaryMsg, ONLACK.OK);
 
-    passive.gem().s5f2(primaryMsg, ACKC5.OK);
-    passive.gem().s6f12(primaryMsg, ACKC6.OK);
+    active.gem().s5f2(primaryMsg, ACKC5.OK);
+    active.gem().s6f12(primaryMsg, ACKC6.OK);
+
     passive.gem().s9f1(referenceMsg);
     passive.gem().s9f3(referenceMsg);
     passive.gem().s9f5(referenceMsg);
@@ -286,3 +368,5 @@ If set Report-Alias, call S6F19, S6F21 by Alias.
 
     Secs2 dataId = passive.gem().autoDataId();
 ```
+
+See also ["/src/examples/example5/ExampleGem.java"](/src/examples/example5/ExampleGem.java)  

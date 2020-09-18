@@ -141,10 +141,11 @@ public abstract class AbstractGem extends AbstractSecsInnerEngine implements Gem
 	}
 	
 	@Override
-	public Optional<SecsMessage> s1f13()
+	public COMMACK s1f13()
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
+			, Secs2Exception
 			, InterruptedException {
 		
 		Secs2 ss;
@@ -161,7 +162,13 @@ public abstract class AbstractGem extends AbstractSecsInnerEngine implements Gem
 			ss = Secs2.list();
 		}
 		
-		return comm.send(1, 13, true, ss);
+		Secs2 r = comm.send(1, 13, true, ss)
+				.filter(msg -> msg.getStream() == 1)
+				.filter(msg -> msg.getFunction() == 14)
+				.map(msg -> msg.secs2())
+				.orElseThrow(() -> new Secs2Exception("S1F14 parse failed"));
+		
+		return COMMACK.get(r.get(0));
 	}
 	
 	@Override

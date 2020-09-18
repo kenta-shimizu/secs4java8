@@ -1,6 +1,7 @@
 package com.shimizukenta.secs.gem;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import com.shimizukenta.secs.secs2.Secs2;
 
@@ -16,8 +17,13 @@ public class DynamicCollectionEvent implements Serializable {
 		this.collectionEventId = collectionEventId;
 	}
 	
-	public String alias() {
-		return alias;
+	/**
+	 * Alias getter
+	 * 
+	 * @return has valus if setted alias
+	 */
+	public Optional<String> alias() {
+		return alias == null ? Optional.empty() : Optional.of(alias);
 	}
 	
 	/**
@@ -36,6 +42,11 @@ public class DynamicCollectionEvent implements Serializable {
 		return collectionEventId;
 	}
 	
+	/**
+	 * CEID getter
+	 * 
+	 * @return SECS-II CEID
+	 */
 	public Secs2 collectionEventId() {
 		return collectionEventId;
 	}
