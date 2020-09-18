@@ -48,6 +48,7 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
+	 * Create DynamicEventReportConfig
 	 * 
 	 * @return DynamicEventReportConfig new-Instance
 	 */

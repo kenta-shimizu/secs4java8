@@ -7,6 +7,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Time value Getter, Setter, Value-Change-Observer<br />
+ * Not accept null.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class TimeProperty extends NumberProperty {
 	
 	private static final long serialVersionUID = -2905213245311975065L;
@@ -48,12 +55,22 @@ public class TimeProperty extends NumberProperty {
 		}
 	}
 	
+	/**
+	 * Seconds float getter
+	 * 
+	 * @return Seconds from get().floatValue()
+	 */
 	public float getSeconds() {
 		synchronized ( this ) {
 			return floatValue();
 		}
 	}
 	
+	/**
+	 * MilliSeconds long getter.
+	 * 
+	 * @return MilliSeconds.
+	 */
 	public long getMilliSeconds() {
 		synchronized ( this ) {
 			return milliSec;
@@ -80,6 +97,11 @@ public class TimeProperty extends NumberProperty {
 		}
 	}
 	
+	/**
+	 * Thread#sleep
+	 * 
+	 * @throws InterruptedException
+	 */
 	public void sleep() throws InterruptedException {
 		long t = getMilliSeconds();
 		if ( t > 0 ) {
@@ -87,6 +109,12 @@ public class TimeProperty extends NumberProperty {
 		}
 	}
 	
+	/**
+	 * Synchronized wait
+	 * 
+	 * @param sync-object
+	 * @throws InterruptedException
+	 */
 	public void wait(Object sync) throws InterruptedException {
 		synchronized ( sync ) {
 			long t = getMilliSeconds();
@@ -98,11 +126,29 @@ public class TimeProperty extends NumberProperty {
 		}
 	}
 	
+	/**
+	 * Future#get
+	 * 
+	 * @param <T>
+	 * @param f
+	 * @return future#get result
+	 * @throws InterruptedException
+	 * @throws TimeoutException
+	 * @throws ExecutionException
+	 */
 	public <T> T future(Future<T> f)
 			throws InterruptedException, TimeoutException, ExecutionException {
 		return f.get(getMilliSeconds(), TimeUnit.MILLISECONDS);
 	}
 	
+	/**
+	 * BlockingQueue#poll
+	 * 
+	 * @param <T>
+	 * @param queue
+	 * @return BlockingQueue#poll result
+	 * @throws InterruptedException
+	 */
 	public <T> T poll(BlockingQueue<T> queue) throws InterruptedException {
 		return queue.poll(getMilliSeconds(), TimeUnit.MILLISECONDS);
 	}

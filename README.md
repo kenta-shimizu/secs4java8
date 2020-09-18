@@ -109,7 +109,7 @@ See also ["/src/examples/example3/ExampleBuildSecs2.java"](/src/examples/example
     Blocking until reply-message received.  
     Optional has value if W-Bit is true.  
     Optional is empty if W-Bit is false.  
-    If Timeout-T3, throw SecsWaitReplyMessageException.  
+    If T3-Timeout, throw SecsWaitReplyMessageException.  
 
 ## Received Primary-Message, parse, and send Reply-Message
 

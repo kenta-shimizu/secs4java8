@@ -3,7 +3,8 @@ package com.shimizukenta.secs;
 import java.util.Objects;
 
 /**
- * Boolean value Getter, Setter, Value-Change-Observer
+ * Boolean value Getter, Setter, Value-Change-Observer<br />
+ * Not accept null.
  * 
  * @author kenta-shimizu
  *
@@ -16,6 +17,10 @@ public class BooleanProperty extends AbstractProperty<Boolean> {
 		super(Boolean.valueOf(initial));
 	}
 	
+	/**
+	 * setter<br />
+	 * Not Accept null.
+	 */
 	@Override
 	public void set(Boolean v) {
 		super.set(Objects.requireNonNull(v));

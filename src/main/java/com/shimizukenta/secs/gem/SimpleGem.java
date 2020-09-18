@@ -8,4 +8,8 @@ public class SimpleGem extends AbstractGem {
 		super(communicator, config);
 	}
 
+	@Override
+	public DynamicEventReportConfig newDynamicEventReportConfig() {
+		return new SimpleDynamicEventReportConfig(this);
+	}
 }

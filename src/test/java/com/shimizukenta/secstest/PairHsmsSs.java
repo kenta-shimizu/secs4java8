@@ -150,6 +150,8 @@ public class PairHsmsSs {
 			
 			equip.open();
 			
+			Thread.sleep(500L);
+			
 			try (
 					SecsCommunicator host  = HsmsSsCommunicator.newInstance(hostConfig);
 					) {

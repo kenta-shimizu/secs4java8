@@ -26,11 +26,14 @@ public class GemConfig implements Serializable {
 		private static final long serialVersionUID = 3803548762155640142L;
 		
 		public Secs2NumberItemProperty(Secs2Item initial) {
-			super(initial);
+			super(Objects.requireNonNull(initial));
 		}
 		
 		@Override
 		public void set(Secs2Item v) {
+			
+			Objects.requireNonNull(v);
+			
 			switch ( v ) {
 			case INT1:
 			case INT2:
@@ -50,12 +53,12 @@ public class GemConfig implements Serializable {
 		}
 	}
 	
-	private class ClockTypeProperty extends AbstractProperty<ClockType> {
+	protected class ClockTypeProperty extends AbstractProperty<ClockType> {
 		
 		private static final long serialVersionUID = 7149295926237765793L;
 		
 		public ClockTypeProperty(ClockType initial) {
-			super(initial);
+			super(Objects.requireNonNull(initial));
 		}
 		
 		@Override
