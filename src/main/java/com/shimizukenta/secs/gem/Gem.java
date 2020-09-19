@@ -19,17 +19,26 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
 public interface Gem {
 	
 	/**
+	 * Create auto number DATAID
 	 * 
 	 * @return Auto-Data-ID from AtomicLong#incrementAndGet
 	 */
 	public Secs2 autoDataId();
 	
 	/**
+	 * Create DATAID
 	 * 
 	 * @param id
 	 * @return Data-ID
 	 */
 	public Secs2 dataId(long id);
+	
+	/**
+	 * Create DynamicEventReportConfig instance
+	 * 
+	 * @return DynamicEventReportConfig new-Instance
+	 */
+	public DynamicEventReportConfig newDynamicEventReportConfig();
 	
 	/**
 	 * Are You Online?<br />
@@ -48,15 +57,8 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Create DynamicEventReportConfig
-	 * 
-	 * @return DynamicEventReportConfig new-Instance
-	 */
-	public DynamicEventReportConfig newDynamicEventReportConfig();
-	
-	/**
 	 * On Line Data<br />
-	 * MDLN, SOFTREV is reference GemConfig value<br />
+	 * MDLN, SOFTREV is reference AbstractGemConfig value<br />
 	 * blocking-method
 	 * 
 	 * @param primary-message

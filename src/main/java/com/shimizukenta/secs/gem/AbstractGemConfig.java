@@ -17,7 +17,7 @@ import com.shimizukenta.secs.secs2.Secs2Item;
  * @author kenta-shimizu
  *
  */
-public class GemConfig implements Serializable {
+public abstract class AbstractGemConfig implements Serializable {
 	
 	private static final long serialVersionUID = 1130854092113358850L;
 	
@@ -76,7 +76,7 @@ public class GemConfig implements Serializable {
 	private final Secs2NumberItemProperty reportIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
 	private final Secs2NumberItemProperty collectionEventIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
 	
-	public GemConfig() {
+	public AbstractGemConfig() {
 		/* Nothing */
 	}
 	

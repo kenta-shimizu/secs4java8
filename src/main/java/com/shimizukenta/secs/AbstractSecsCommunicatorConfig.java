@@ -3,7 +3,8 @@ package com.shimizukenta.secs;
 import java.io.Serializable;
 import java.util.Objects;
 
-import com.shimizukenta.secs.gem.GemConfig;
+import com.shimizukenta.secs.gem.AbstractGemConfig;
+import com.shimizukenta.secs.gem.SimpleGemConfig;
 
 public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	
@@ -12,12 +13,13 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	private final SecsTimeout timeout = new SecsTimeout();
 	private final NumberProperty deviceId = new NumberProperty(10);
 	private final BooleanProperty isEquip = new BooleanProperty(false);
-	private GemConfig gem;
+	
+	private final AbstractGemConfig gem = new SimpleGemConfig();
 	
 	private final StringProperty logSubjectHeader = new StringProperty("");
 	
 	public AbstractSecsCommunicatorConfig() {
-		gem = new GemConfig();
+		/* Nothing */
 	}
 	
 	/**
@@ -66,11 +68,11 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	}
 	
 	/**
-	 * GemConfig getter.
+	 * AbstractGemConfig getter.
 	 * 
-	 * @return GemConfig
+	 * @return AbstractGemConfig
 	 */
-	public GemConfig gem() {
+	public AbstractGemConfig gem() {
 		return gem;
 	}
 	

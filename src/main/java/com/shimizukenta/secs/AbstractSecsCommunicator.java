@@ -180,17 +180,17 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	}
 	
 	@Override
-	public final Gem gem() {
+	public Gem gem() {
 		return gem;
 	}
 	
 	@Override
-	public final int deviceId() {
+	public int deviceId() {
 		return config.deviceId().intValue();
 	}
 	
 	@Override
-	public final boolean isEquip() {
+	public boolean isEquip() {
 		return config.isEquip().booleanValue();
 	}
 	

@@ -19,9 +19,9 @@ import com.shimizukenta.secs.secs2.Secs2Item;
 public abstract class AbstractGem extends AbstractSecsInnerEngine implements Gem {
 
 	private final SecsCommunicator comm;
-	private final GemConfig config;
+	private final AbstractGemConfig config;
 	
-	public AbstractGem(AbstractSecsCommunicator communicator, GemConfig config) {
+	public AbstractGem(AbstractSecsCommunicator communicator, AbstractGemConfig config) {
 		super(communicator);
 		this.comm = communicator;
 		this.config = config;
