@@ -17,6 +17,11 @@ public class Secs2RawBytes extends AbstractSecs2 {
 	}
 	
 	@Override
+	public boolean isEmpty() {
+		return bs.length == 0;
+	}
+	
+	@Override
 	public int size() {
 		return -1;
 	}
