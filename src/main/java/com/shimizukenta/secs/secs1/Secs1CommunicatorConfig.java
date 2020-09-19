@@ -1,8 +1,12 @@
 package com.shimizukenta.secs.secs1;
 
+import com.shimizukenta.secs.AbstractBooleanProperty;
+import com.shimizukenta.secs.AbstractNumberProperty;
 import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
-import com.shimizukenta.secs.BooleanProperty;
-import com.shimizukenta.secs.NumberProperty;
+import com.shimizukenta.secs.ReadOnlyBooleanProperty;
+import com.shimizukenta.secs.ReadOnlyNumberProperty;
+import com.shimizukenta.secs.SimpleBooleanProperty;
+import com.shimizukenta.secs.SimpleNumberProperty;
 
 /**
  * This class is SECS-I config<br />
@@ -14,10 +18,10 @@ import com.shimizukenta.secs.NumberProperty;
  */
 public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
-	private static final long serialVersionUID = -4562702342609110048L;
+	private static final long serialVersionUID = 4897063498275749609L;
 	
-	private final BooleanProperty isMaster = new BooleanProperty(true);
-	private final NumberProperty retry = new NumberProperty(3);
+	private final AbstractBooleanProperty isMaster = new SimpleBooleanProperty(true);
+	private final AbstractNumberProperty retry = new SimpleNumberProperty(3);
 	
 	public Secs1CommunicatorConfig() {
 		super();
@@ -37,7 +41,7 @@ public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * 
 	 * @return true if Master Mode
 	 */
-	public BooleanProperty isMaster() {
+	public ReadOnlyBooleanProperty isMaster() {
 		return isMaster;
 	}
 	
@@ -58,7 +62,7 @@ public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * 
 	 * @return retry-count
 	 */
-	public NumberProperty retry() {
+	public ReadOnlyNumberProperty retry() {
 		return retry;
 	}
 	

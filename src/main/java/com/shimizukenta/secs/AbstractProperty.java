@@ -5,16 +5,28 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * Value Getter, Setter, Value-Change-Observer<br />
+ * 
+ * @author kenta-shimizu
+ *
+ * @param <T>
+ */
 public abstract class AbstractProperty<T> implements Property<T>, Serializable {
 	
-	private static final long serialVersionUID = -7278621632734549087L;
+	private static final long serialVersionUID = -7897962203686565003L;
 	
 	private T present;
 	
 	public AbstractProperty(T initial) {
 		this.present = initial;
 	}
-
+	
+	@Override
+	public T get() {
+		return this.present;
+	}
+	
 	@Override
 	public void set(T v) {
 		synchronized ( this ) {
@@ -25,13 +37,6 @@ public abstract class AbstractProperty<T> implements Property<T>, Serializable {
 				});
 				this.notifyAll();
 			}
-		}
-	}
-
-	@Override
-	public T get() {
-		synchronized ( this ) {
-			return this.present;
 		}
 	}
 	
@@ -83,5 +88,6 @@ public abstract class AbstractProperty<T> implements Property<T>, Serializable {
 	public String toString() {
 		return Objects.toString(get());
 	}
-
+	
+	
 }

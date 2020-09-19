@@ -5,10 +5,14 @@ import java.util.Objects;
 
 import com.shimizukenta.secs.AbstractProperty;
 import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
-import com.shimizukenta.secs.NumberProperty;
-import com.shimizukenta.secs.Property;
-import com.shimizukenta.secs.SocketAddressProperty;
-import com.shimizukenta.secs.TimeProperty;
+import com.shimizukenta.secs.AbstractSocketAddressProperty;
+import com.shimizukenta.secs.AbstractTimeProperty;
+import com.shimizukenta.secs.ReadOnlyNumberProperty;
+import com.shimizukenta.secs.ReadOnlyProperty;
+import com.shimizukenta.secs.ReadOnlySocketAddressProperty;
+import com.shimizukenta.secs.ReadOnlyTimeProperty;
+import com.shimizukenta.secs.SimpleSocketAddressProperty;
+import com.shimizukenta.secs.SimpleTimeProperty;
 
 /**
  * This class is config of HSMS-SS-Communicator.<br />
@@ -23,13 +27,13 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
 	private static final long serialVersionUID = -5737187045438763249L;
 	
-	private final Property<HsmsSsProtocol> protocol = new AbstractProperty<HsmsSsProtocol>(HsmsSsProtocol.PASSIVE) {
+	private final AbstractProperty<HsmsSsProtocol> protocol = new AbstractProperty<HsmsSsProtocol>(HsmsSsProtocol.PASSIVE) {
 		private static final long serialVersionUID = 3265234560589662064L;
 	};
 	
-	private final SocketAddressProperty sockAddr = new SocketAddressProperty(null);
-	private final TimeProperty linktest = new TimeProperty(-1.0F);
-	private final TimeProperty rebindIfPassive = new TimeProperty(10.0F);
+	private final AbstractSocketAddressProperty sockAddr = new SimpleSocketAddressProperty(null);
+	private final AbstractTimeProperty linktest = new SimpleTimeProperty(-1.0F);
+	private final AbstractTimeProperty rebindIfPassive = new SimpleTimeProperty(10.0F);
 	
 	public HsmsSsCommunicatorConfig() {
 		super();
@@ -49,7 +53,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * 
 	 * @return protocol
 	 */
-	public Property<HsmsSsProtocol> protocol() {
+	public ReadOnlyProperty<HsmsSsProtocol> protocol() {
 		return protocol;
 	}
 	
@@ -67,7 +71,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * 
 	 * @return socketAddress of PASSIVE/ACTIVE
 	 */
-	public SocketAddressProperty socketAddress() {
+	public ReadOnlySocketAddressProperty socketAddress() {
 		return sockAddr;
 	}
 	
@@ -85,7 +89,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * 
 	 * @return session-id
 	 */
-	public NumberProperty sessionId() {
+	public ReadOnlyNumberProperty sessionId() {
 		return deviceId();
 	}
 	
@@ -114,7 +118,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * 
 	 * @return seconds. Not-linktest if < 0.
 	 */
-	public TimeProperty linktest() {
+	public ReadOnlyTimeProperty linktest() {
 		return linktest;
 	}
 	
@@ -144,7 +148,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * 
 	 * @return seconds. Not rebind if < 0.
 	 */
-	public TimeProperty rebindIfPassive() {
+	public ReadOnlyTimeProperty rebindIfPassive() {
 		return rebindIfPassive;
 	}
 	

@@ -9,58 +9,38 @@ import java.util.Objects;
  * @author kenta-shimizu
  *
  */
-public class BooleanProperty extends AbstractProperty<Boolean> {
+public abstract class AbstractBooleanProperty extends AbstractProperty<Boolean>
+		implements ReadOnlyBooleanProperty, WritableBooleanValue {
 	
-	private static final long serialVersionUID = 3179529862036582480L;
-	
-	public BooleanProperty(boolean initial) {
+	private static final long serialVersionUID = -1707441122073604603L;
+
+	public AbstractBooleanProperty(boolean initial) {
 		super(Boolean.valueOf(initial));
 	}
-	
-	/**
-	 * setter<br />
-	 * Not Accept null.
-	 */
+
 	@Override
 	public void set(Boolean v) {
 		super.set(Objects.requireNonNull(v));
 	}
-	
-	/**
-	 * setter
-	 * 
-	 * @param v
-	 */
+
+	@Override
 	public void set(boolean v) {
 		super.set(Boolean.valueOf(v));
 	}
-	
-	/**
-	 * getter
-	 * 
-	 * @return get().booleanValue()
-	 */
+
+	@Override
 	public boolean booleanValue() {
 		return get().booleanValue();
 	}
-	
-	/**
-	 * Blocking-method.<br />
-	 * Waiting until get().booleanValue() == true.
-	 * 
-	 * @throws InterruptedException
-	 */
+
+	@Override
 	public void waitUntilTrue() throws InterruptedException {
 		waitUntil(Boolean.TRUE);
 	}
-	
-	/**
-	 * Blocking-method.<br />
-	 * Waiting until get().booleanValue() == false.
-	 * 
-	 * @throws InterruptedException
-	 */
+
+	@Override
 	public void waitUntilFalse() throws InterruptedException {
 		waitUntil(Boolean.FALSE);
 	}
+
 }

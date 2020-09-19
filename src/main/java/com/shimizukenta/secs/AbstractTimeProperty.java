@@ -14,30 +14,31 @@ import java.util.concurrent.TimeoutException;
  * @author kenta-shimizu
  *
  */
-public class TimeProperty extends NumberProperty {
+public abstract class AbstractTimeProperty extends AbstractNumberProperty
+		implements ReadOnlyTimeProperty {
 	
-	private static final long serialVersionUID = -2905213245311975065L;
+	private static final long serialVersionUID = 4647118881525451997L;
 	
 	private long milliSec;
 	
-	public TimeProperty(Number initial) {
+	public AbstractTimeProperty(Number initial) {
 		super(initial);
 		setMilliSeconds(initial);
 	}
 	
-	public TimeProperty(int initial) {
+	public AbstractTimeProperty(int initial) {
 		this(Integer.valueOf(initial));
 	}
 	
-	public TimeProperty(long initial) {
+	public AbstractTimeProperty(long initial) {
 		this(Long.valueOf(initial));
 	}
 	
-	public TimeProperty(float initial) {
+	public AbstractTimeProperty(float initial) {
 		this(Float.valueOf(initial));
 	}
 	
-	public TimeProperty(double initial) {
+	public AbstractTimeProperty(double initial) {
 		this(Double.valueOf(initial));
 	}
 	
@@ -55,53 +56,34 @@ public class TimeProperty extends NumberProperty {
 		}
 	}
 	
-	/**
-	 * Seconds float getter
-	 * 
-	 * @return Seconds from get().floatValue()
-	 */
 	public float getSeconds() {
 		synchronized ( this ) {
 			return floatValue();
 		}
 	}
 	
-	/**
-	 * MilliSeconds long getter.
-	 * 
-	 * @return MilliSeconds.
-	 */
+	@Override
 	public long getMilliSeconds() {
 		synchronized ( this ) {
 			return milliSec;
 		}
 	}
 	
-	/**
-	 * 
-	 * @return true if > 0
-	 */
+	@Override
 	public boolean gtZero() {
 		synchronized ( this ) {
 			return milliSec > 0;
 		}
 	}
 	
-	/**
-	 * 
-	 * @return true if >= 0
-	 */
+	@Override
 	public boolean geZero() {
 		synchronized ( this ) {
 			return milliSec >= 0;
 		}
 	}
 	
-	/**
-	 * Thread#sleep
-	 * 
-	 * @throws InterruptedException
-	 */
+	@Override
 	public void sleep() throws InterruptedException {
 		long t = getMilliSeconds();
 		if ( t > 0 ) {
@@ -109,12 +91,7 @@ public class TimeProperty extends NumberProperty {
 		}
 	}
 	
-	/**
-	 * Synchronized wait
-	 * 
-	 * @param sync-object
-	 * @throws InterruptedException
-	 */
+	@Override
 	public void wait(Object sync) throws InterruptedException {
 		synchronized ( sync ) {
 			long t = getMilliSeconds();
@@ -126,29 +103,13 @@ public class TimeProperty extends NumberProperty {
 		}
 	}
 	
-	/**
-	 * Future#get
-	 * 
-	 * @param <T>
-	 * @param f
-	 * @return future#get result
-	 * @throws InterruptedException
-	 * @throws TimeoutException
-	 * @throws ExecutionException
-	 */
+	@Override
 	public <T> T future(Future<T> f)
 			throws InterruptedException, TimeoutException, ExecutionException {
 		return f.get(getMilliSeconds(), TimeUnit.MILLISECONDS);
 	}
 	
-	/**
-	 * BlockingQueue#poll
-	 * 
-	 * @param <T>
-	 * @param queue
-	 * @return BlockingQueue#poll result
-	 * @throws InterruptedException
-	 */
+	@Override
 	public <T> T poll(BlockingQueue<T> queue) throws InterruptedException {
 		return queue.poll(getMilliSeconds(), TimeUnit.MILLISECONDS);
 	}

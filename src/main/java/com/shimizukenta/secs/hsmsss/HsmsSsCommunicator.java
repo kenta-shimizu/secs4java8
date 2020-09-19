@@ -7,14 +7,14 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.shimizukenta.secs.AbstractByteArrayProperty;
 import com.shimizukenta.secs.AbstractProperty;
 import com.shimizukenta.secs.AbstractSecsCommunicator;
-import com.shimizukenta.secs.ByteArrayProperty;
-import com.shimizukenta.secs.Property;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
+import com.shimizukenta.secs.SimpleByteArrayProperty;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
@@ -30,9 +30,9 @@ public abstract class HsmsSsCommunicator extends AbstractSecsCommunicator {
 	private final HsmsSsCommunicatorConfig hsmsSsConfig;
 	protected final HsmsSsSendReplyManager sendReplyManager;
 	
-	private final ByteArrayProperty sessionIdBytes = new ByteArrayProperty(new byte[] {0, 0});
+	private final AbstractByteArrayProperty sessionIdBytes = new SimpleByteArrayProperty(new byte[] {0, 0});
 	
-	private final Property<HsmsSsCommunicateState> hsmsSsCommStateProperty = new AbstractProperty<HsmsSsCommunicateState>(HsmsSsCommunicateState.NOT_CONNECTED) {
+	private final AbstractProperty<HsmsSsCommunicateState> hsmsSsCommStateProperty = new AbstractProperty<HsmsSsCommunicateState>(HsmsSsCommunicateState.NOT_CONNECTED) {
 		private static final long serialVersionUID = 2735232737920848138L;
 	};
 	

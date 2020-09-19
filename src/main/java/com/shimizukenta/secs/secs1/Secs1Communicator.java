@@ -7,14 +7,17 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.shimizukenta.secs.AbstractByteArrayProperty;
 import com.shimizukenta.secs.AbstractSecsCommunicator;
-import com.shimizukenta.secs.ByteArrayProperty;
+import com.shimizukenta.secs.AbstractTimeProperty;
 import com.shimizukenta.secs.InterruptableRunnable;
+import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
-import com.shimizukenta.secs.TimeProperty;
+import com.shimizukenta.secs.SimpleByteArrayProperty;
+import com.shimizukenta.secs.SimpleTimeProperty;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
@@ -34,7 +37,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	
 	private final Secs1CommunicatorConfig secs1Config;
 	private final Secs1SendReplyManager sendReplyManager;
-	private final ByteArrayProperty deviceIdBytes = new ByteArrayProperty(new byte[] {0, 0});
+	private final AbstractByteArrayProperty deviceIdBytes = new SimpleByteArrayProperty(new byte[] {0, 0});
 	private final CircuitLoop circuit = new CircuitLoop();
 	
 	protected void circuitNotifyAll() {
@@ -85,8 +88,8 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	
 	abstract protected Optional<Byte> pollByte();
 	abstract protected Optional<Byte> pollByte(byte[] request) throws InterruptedException;
-	abstract protected Optional<Byte> pollByte(TimeProperty timeout) throws InterruptedException;
-	abstract protected Optional<Byte> pollByte(byte[] request, TimeProperty timeout) throws InterruptedException;
+	abstract protected Optional<Byte> pollByte(ReadOnlyTimeProperty timeout) throws InterruptedException;
+	abstract protected Optional<Byte> pollByte(byte[] request, ReadOnlyTimeProperty timeout) throws InterruptedException;
 	
 	private Optional<Byte> pollByteT1() throws InterruptedException {
 		return pollByte(secs1Config.timeout().t1());
@@ -219,7 +222,7 @@ public abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	
 	private class CircuitLoop implements InterruptableRunnable {
 		
-		private final TimeProperty wdt = new TimeProperty(0.250F);
+		private final AbstractTimeProperty wdt = new SimpleTimeProperty(0.250F);
 		private Secs1MessageBlock presentBlock;
 		
 		public CircuitLoop() {

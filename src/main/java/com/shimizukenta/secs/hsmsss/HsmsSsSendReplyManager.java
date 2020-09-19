@@ -12,10 +12,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.AbstractSecsInnerEngine;
+import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
-import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2ByteBuffersBuilder;
 
@@ -199,7 +199,7 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 		}
 	}
 	
-	private HsmsSsMessage reply(Pack p, TimeProperty timeout)
+	private HsmsSsMessage reply(Pack p, ReadOnlyTimeProperty timeout)
 			throws SecsWaitReplyMessageException, SecsException
 			, TimeoutException, InterruptedException {
 		

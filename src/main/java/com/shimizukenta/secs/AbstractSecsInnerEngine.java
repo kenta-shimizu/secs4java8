@@ -46,22 +46,22 @@ public abstract class AbstractSecsInnerEngine {
 		return engine.executeInvokeAny(task1, task2, task3);
 	}
 	
-	protected <T> T executeInvokeAny(Collection<? extends Callable<T>> tasks, TimeProperty timeout)
+	protected <T> T executeInvokeAny(Collection<? extends Callable<T>> tasks, ReadOnlyTimeProperty timeout)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		return engine.executeInvokeAny(tasks, timeout);
 	}
 	
-	protected <T> T executeInvokeAny(Callable<T> task, TimeProperty timeout)
+	protected <T> T executeInvokeAny(Callable<T> task, ReadOnlyTimeProperty timeout)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		return engine.executeInvokeAny(task, timeout);
 	}
 	
-	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, TimeProperty timeout)
+	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, ReadOnlyTimeProperty timeout)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		return engine.executeInvokeAny(task1, task2, timeout);
 	}
 	
-	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, Callable<T> task3, TimeProperty timeout)
+	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, Callable<T> task3, ReadOnlyTimeProperty timeout)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		return engine.executeInvokeAny(task1, task2, task3, timeout);
 	}

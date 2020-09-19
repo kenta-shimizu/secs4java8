@@ -11,12 +11,12 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	private static final long serialVersionUID = -8456991094606676409L;
 	
 	private final SecsTimeout timeout = new SecsTimeout();
-	private final NumberProperty deviceId = new NumberProperty(10);
-	private final BooleanProperty isEquip = new BooleanProperty(false);
+	private final AbstractNumberProperty deviceId = new SimpleNumberProperty(10);
+	private final AbstractBooleanProperty isEquip = new SimpleBooleanProperty(false);
 	
 	private final AbstractGemConfig gem = new SimpleGemConfig();
 	
-	private final StringProperty logSubjectHeader = new StringProperty("");
+	private final AbstractStringProperty logSubjectHeader = new SimpleStringProperty("");
 	
 	public AbstractSecsCommunicatorConfig() {
 		/* Nothing */
@@ -36,7 +36,7 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	 * 
 	 * @return device-id
 	 */
-	public NumberProperty deviceId() {
+	public ReadOnlyNumberProperty deviceId() {
 		return deviceId;
 	}
 	
@@ -54,7 +54,7 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	 * 
 	 * @return true if equipment
 	 */
-	public BooleanProperty isEquip() {
+	public ReadOnlyBooleanProperty isEquip() {
 		return isEquip;
 	}
 	
@@ -90,7 +90,7 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	 * 
 	 * @return log-subject-header
 	 */
-	public StringProperty logSubjectHeader() {
+	public ReadOnlyProperty<String> logSubjectHeader() {
 		return logSubjectHeader;
 	}
 	

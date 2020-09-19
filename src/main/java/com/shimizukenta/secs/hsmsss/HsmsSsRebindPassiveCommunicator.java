@@ -7,7 +7,7 @@ import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 
-import com.shimizukenta.secs.TimeProperty;
+import com.shimizukenta.secs.ReadOnlyTimeProperty;
 
 public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 	
@@ -30,7 +30,7 @@ public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 			
 			passiveBind();
 			
-			TimeProperty tp = this.hsmsSsConfig().rebindIfPassive();
+			ReadOnlyTimeProperty tp = this.hsmsSsConfig().rebindIfPassive();
 			if ( tp.gtZero() ) {
 				tp.sleep();
 			} else {

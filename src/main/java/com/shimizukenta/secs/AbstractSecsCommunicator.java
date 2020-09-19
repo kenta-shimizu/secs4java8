@@ -72,12 +72,12 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 		return execServ.invokeAny(Arrays.asList(task1, task2, task3));
 	}
 	
-	protected <T> T executeInvokeAny(Collection<? extends Callable<T>> tasks, TimeProperty timeout)
+	protected <T> T executeInvokeAny(Collection<? extends Callable<T>> tasks, ReadOnlyTimeProperty timeout)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		return execServ.invokeAny(tasks, timeout.getMilliSeconds(), TimeUnit.MILLISECONDS);
 	}
 	
-	protected <T> T executeInvokeAny(Callable<T> task, TimeProperty timeout)
+	protected <T> T executeInvokeAny(Callable<T> task, ReadOnlyTimeProperty timeout)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		return execServ.invokeAny(
 				Collections.singleton(task),
@@ -85,7 +85,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 				TimeUnit.MILLISECONDS);
 	}
 	
-	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, TimeProperty timeout)
+	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, ReadOnlyTimeProperty timeout)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		return execServ.invokeAny(
 				Arrays.asList(task1, task2),
@@ -93,7 +93,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 				TimeUnit.MILLISECONDS);
 	}
 	
-	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, Callable<T> task3, TimeProperty timeout)
+	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, Callable<T> task3, ReadOnlyTimeProperty timeout)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		return execServ.invokeAny(
 				Arrays.asList(task1, task2, task3),
@@ -329,7 +329,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	
 	
 	/* Secs-Communicatable-State-Changed-Listener */
-	private final BooleanProperty communicatable = new BooleanProperty(false);
+	private final AbstractBooleanProperty communicatable = new SimpleBooleanProperty(false);
 	
 	@Override
 	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener l) {

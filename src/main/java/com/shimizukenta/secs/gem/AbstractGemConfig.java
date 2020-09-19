@@ -4,8 +4,9 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import com.shimizukenta.secs.AbstractProperty;
-import com.shimizukenta.secs.Property;
-import com.shimizukenta.secs.StringProperty;
+import com.shimizukenta.secs.AbstractStringProperty;
+import com.shimizukenta.secs.ReadOnlyProperty;
+import com.shimizukenta.secs.SimpleStringProperty;
 import com.shimizukenta.secs.secs2.Secs2Item;
 
 /**
@@ -68,8 +69,8 @@ public abstract class AbstractGemConfig implements Serializable {
 	}
 	
 	
-	private final StringProperty mdln = new StringProperty("      ");
-	private final StringProperty softrev = new StringProperty("      ");
+	private final AbstractStringProperty mdln = new SimpleStringProperty("      ");
+	private final AbstractStringProperty softrev = new SimpleStringProperty("      ");
 	private final ClockTypeProperty clockType = new ClockTypeProperty(ClockType.A16);
 	private final Secs2NumberItemProperty dataIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
 	private final Secs2NumberItemProperty vIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
@@ -95,7 +96,7 @@ public abstract class AbstractGemConfig implements Serializable {
 	 * 
 	 * @return Model-Number
 	 */
-	public StringProperty mdln() {
+	public ReadOnlyProperty<String> mdln() {
 		return mdln;
 	}
 	
@@ -114,7 +115,7 @@ public abstract class AbstractGemConfig implements Serializable {
 	 * 
 	 * @return Software-Revision
 	 */
-	public StringProperty softrev() {
+	public ReadOnlyProperty<String> softrev() {
 		return softrev;
 	}
 	
@@ -133,7 +134,7 @@ public abstract class AbstractGemConfig implements Serializable {
 	 * 
 	 * @return Clock-type
 	 */
-	public Property<ClockType> clockType() {
+	public ReadOnlyProperty<ClockType> clockType() {
 		return this.clockType;
 	}
 	
@@ -152,7 +153,7 @@ public abstract class AbstractGemConfig implements Serializable {
 	 * 
 	 * @return Secs2Item
 	 */
-	public Property<Secs2Item> dataIdSecs2Item() {
+	public ReadOnlyProperty<Secs2Item> dataIdSecs2Item() {
 		return this.dataIdSecs2Item;
 	}
 	
@@ -171,7 +172,7 @@ public abstract class AbstractGemConfig implements Serializable {
 	 * 
 	 * @return Secs2Item
 	 */
-	public Property<Secs2Item> vIdSecs2Item() {
+	public ReadOnlyProperty<Secs2Item> vIdSecs2Item() {
 		return this.vIdSecs2Item;
 	}
 	
@@ -190,7 +191,7 @@ public abstract class AbstractGemConfig implements Serializable {
 	 * 
 	 * @return Secs2Item
 	 */
-	public Property<Secs2Item> reportIdSecs2Item() {
+	public ReadOnlyProperty<Secs2Item> reportIdSecs2Item() {
 		return this.reportIdSecs2Item;
 	}
 
@@ -209,7 +210,7 @@ public abstract class AbstractGemConfig implements Serializable {
 	 * 
 	 * @return Secs2Item
 	 */
-	public Property<Secs2Item> collectionEventIdSecs2Item() {
+	public ReadOnlyProperty<Secs2Item> collectionEventIdSecs2Item() {
 		return this.collectionEventIdSecs2Item;
 	}
 	

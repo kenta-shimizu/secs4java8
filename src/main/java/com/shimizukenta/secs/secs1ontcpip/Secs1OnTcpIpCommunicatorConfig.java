@@ -3,8 +3,12 @@ package com.shimizukenta.secs.secs1ontcpip;
 import java.net.SocketAddress;
 import java.util.Objects;
 
-import com.shimizukenta.secs.SocketAddressProperty;
-import com.shimizukenta.secs.TimeProperty;
+import com.shimizukenta.secs.AbstractSocketAddressProperty;
+import com.shimizukenta.secs.AbstractTimeProperty;
+import com.shimizukenta.secs.ReadOnlySocketAddressProperty;
+import com.shimizukenta.secs.ReadOnlyTimeProperty;
+import com.shimizukenta.secs.SimpleSocketAddressProperty;
+import com.shimizukenta.secs.SimpleTimeProperty;
 import com.shimizukenta.secs.secs1.Secs1CommunicatorConfig;
 
 /**
@@ -18,8 +22,8 @@ public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 	
 	private static final long serialVersionUID = -7468433384957790240L;
 	
-	private SocketAddressProperty socketAddr = new SocketAddressProperty(null);
-	private TimeProperty reconnectSeconds = new TimeProperty(5.0F);
+	private AbstractSocketAddressProperty socketAddr = new SimpleSocketAddressProperty(null);
+	private AbstractTimeProperty reconnectSeconds = new SimpleTimeProperty(5.0F);
 	
 	public Secs1OnTcpIpCommunicatorConfig() {
 		super();
@@ -39,7 +43,7 @@ public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 	 * 
 	 * @return Connect SocketAddress
 	 */
-	public SocketAddressProperty socketAddress() {
+	public ReadOnlySocketAddressProperty socketAddress() {
 		return this.socketAddr;
 	}
 	
@@ -47,7 +51,7 @@ public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 		this.reconnectSeconds.set(seconds);
 	}
 	
-	public TimeProperty reconnectSeconds() {
+	public ReadOnlyTimeProperty reconnectSeconds() {
 		return this.reconnectSeconds;
 	}
 }

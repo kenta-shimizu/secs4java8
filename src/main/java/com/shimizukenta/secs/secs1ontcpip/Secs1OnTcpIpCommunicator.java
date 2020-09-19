@@ -16,9 +16,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeoutException;
 
+import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsSendMessageException;
-import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.secs1.Secs1Communicator;
 import com.shimizukenta.secs.secs1.Secs1DetectTerminateException;
 import com.shimizukenta.secs.secs1.Secs1SendMessageException;
@@ -255,7 +255,7 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 	}
 	
 	@Override
-	protected Optional<Byte> pollByte(TimeProperty timeout) throws InterruptedException {
+	protected Optional<Byte> pollByte(ReadOnlyTimeProperty timeout) throws InterruptedException {
 		Byte b = timeout.poll(byteQueue);
 		return b == null ? Optional.empty() : Optional.of(b);
 	}
@@ -288,7 +288,7 @@ public class Secs1OnTcpIpCommunicator extends Secs1Communicator {
 	}
 	
 	@Override
-	protected Optional<Byte> pollByte(byte[] request, TimeProperty timeout) throws InterruptedException {
+	protected Optional<Byte> pollByte(byte[] request, ReadOnlyTimeProperty timeout) throws InterruptedException {
 		
 		try {
 			Byte b = executeInvokeAny(createPollByteTask(request), timeout);

@@ -13,14 +13,14 @@ public class SecsTimeout implements Serializable {
 	
 	private static final long serialVersionUID = -3240180901934372535L;
 	
-	private final TimeProperty t1 = new TimeProperty( 1.0F);
-	private final TimeProperty t2 = new TimeProperty(15.0F);
-	private final TimeProperty t3 = new TimeProperty(45.0F);
-	private final TimeProperty t4 = new TimeProperty(45.0F);
-	private final TimeProperty t5 = new TimeProperty(10.0F);
-	private final TimeProperty t6 = new TimeProperty( 5.0F);
-	private final TimeProperty t7 = new TimeProperty(10.0F);
-	private final TimeProperty t8 = new TimeProperty( 6.0F);
+	private final AbstractTimeProperty t1 = new SimpleTimeProperty( 1.0F);
+	private final AbstractTimeProperty t2 = new SimpleTimeProperty(15.0F);
+	private final AbstractTimeProperty t3 = new SimpleTimeProperty(45.0F);
+	private final AbstractTimeProperty t4 = new SimpleTimeProperty(45.0F);
+	private final AbstractTimeProperty t5 = new SimpleTimeProperty(10.0F);
+	private final AbstractTimeProperty t6 = new SimpleTimeProperty( 5.0F);
+	private final AbstractTimeProperty t7 = new SimpleTimeProperty(10.0F);
+	private final AbstractTimeProperty t8 = new SimpleTimeProperty( 6.0F);
 	
 	protected SecsTimeout() {
 		/* Nothing */
@@ -43,7 +43,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public TimeProperty t1() {
+	public ReadOnlyTimeProperty t1() {
 		return t1;
 	}
 	
@@ -64,7 +64,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public TimeProperty t2() {
+	public ReadOnlyTimeProperty t2() {
 		return t2;
 	}
 	
@@ -85,7 +85,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public TimeProperty t3() {
+	public ReadOnlyTimeProperty t3() {
 		return t3;
 	}
 	
@@ -106,7 +106,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public TimeProperty t4() {
+	public ReadOnlyTimeProperty t4() {
 		return t4;
 	}
 	
@@ -127,7 +127,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public TimeProperty t5() {
+	public ReadOnlyTimeProperty t5() {
 		return t5;
 	}
 	
@@ -148,7 +148,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public TimeProperty t6() {
+	public ReadOnlyTimeProperty t6() {
 		return t6;
 	}
 	
@@ -169,7 +169,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public TimeProperty t7() {
+	public ReadOnlyTimeProperty t7() {
 		return t7;
 	}
 	
@@ -190,7 +190,7 @@ public class SecsTimeout implements Serializable {
 	 * 
 	 * @return seconds
 	 */
-	public TimeProperty t8() {
+	public ReadOnlyTimeProperty t8() {
 		return t8;
 	}
 	
