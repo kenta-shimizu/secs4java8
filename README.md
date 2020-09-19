@@ -265,7 +265,7 @@ Access from SecsCommunicator#gem
 
 ```
     /* by DynamicReport */
-    evRpt.addLinkByReport(
+    evRptConf.addLinkByReport(
         evAlias,                /* DynamicCollectionEvent   */
         Arrays.asList(
             rptAlias,           /* DynamicReport-1          */
@@ -274,7 +274,7 @@ Access from SecsCommunicator#gem
     );
 
     /* by Report-ID */
-    evRpt.addLinkById(
+    evRptConf.addLinkById(
         evAlias,                /* DynamicCollectionEvent   */
         Arrays.asList(
             Long.valueOf(1L),   /* RPTID-1                  */
