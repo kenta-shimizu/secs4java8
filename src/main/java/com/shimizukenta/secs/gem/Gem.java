@@ -2,6 +2,7 @@ package com.shimizukenta.secs.gem;
 
 import java.util.Optional;
 
+import com.shimizukenta.secs.AbstractSecsCommunicator;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
@@ -17,6 +18,17 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
  *
  */
 public interface Gem {
+	
+	/**
+	 * Crate new instance.
+	 * 
+	 * @param communicator
+	 * @param config
+	 * @return newInstance
+	 */
+	public static Gem newInstance(AbstractSecsCommunicator communicator, AbstractGemConfig config) {
+		return new AbstractGem(communicator, config) {};
+	}
 	
 	/**
 	 * Create auto number DATAID
@@ -203,7 +215,7 @@ public interface Gem {
 	 * Date and Time Response />
 	 * blocking-method
 	 * 
-	 * @param SimpleClock
+	 * @param AbstractClock
 	 * @return Optional.empty()
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -222,7 +234,7 @@ public interface Gem {
 	 * Now Date and Time Response />
 	 * blocking-method
 	 * 
-	 * @param SimpleClock
+	 * @param AbstractClock
 	 * @return Optional.empty()
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException

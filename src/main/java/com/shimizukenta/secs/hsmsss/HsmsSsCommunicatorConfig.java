@@ -3,16 +3,14 @@ package com.shimizukenta.secs.hsmsss;
 import java.net.SocketAddress;
 import java.util.Objects;
 
-import com.shimizukenta.secs.AbstractProperty;
 import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
-import com.shimizukenta.secs.AbstractSocketAddressProperty;
-import com.shimizukenta.secs.AbstractTimeProperty;
+import com.shimizukenta.secs.Property;
 import com.shimizukenta.secs.ReadOnlyNumberProperty;
 import com.shimizukenta.secs.ReadOnlyProperty;
 import com.shimizukenta.secs.ReadOnlySocketAddressProperty;
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
-import com.shimizukenta.secs.SimpleSocketAddressProperty;
-import com.shimizukenta.secs.SimpleTimeProperty;
+import com.shimizukenta.secs.SocketAddressProperty;
+import com.shimizukenta.secs.TimeProperty;
 
 /**
  * This class is config of HSMS-SS-Communicator.<br />
@@ -27,13 +25,10 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
 	private static final long serialVersionUID = -5737187045438763249L;
 	
-	private final AbstractProperty<HsmsSsProtocol> protocol = new AbstractProperty<HsmsSsProtocol>(HsmsSsProtocol.PASSIVE) {
-		private static final long serialVersionUID = 3265234560589662064L;
-	};
-	
-	private final AbstractSocketAddressProperty sockAddr = new SimpleSocketAddressProperty(null);
-	private final AbstractTimeProperty linktest = new SimpleTimeProperty(-1.0F);
-	private final AbstractTimeProperty rebindIfPassive = new SimpleTimeProperty(10.0F);
+	private final Property<HsmsSsProtocol> protocol = Property.newInstance(HsmsSsProtocol.PASSIVE);
+	private final SocketAddressProperty sockAddr = SocketAddressProperty.newInstance(null);
+	private final TimeProperty linktest = TimeProperty.newInstance(-1.0F);
+	private final TimeProperty rebindIfPassive = TimeProperty.newInstance(10.0F);
 	
 	public HsmsSsCommunicatorConfig() {
 		super();

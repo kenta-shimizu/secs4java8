@@ -14,9 +14,15 @@ import java.util.concurrent.RejectedExecutionException;
 
 import com.shimizukenta.secs.SecsException;
 
-public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
+/**
+ * This abstract class is implementation of HSMS-SS-Active (SEMI-E37.1)<br />
+ * 
+ * @author kenta-shimizu
+ *
+ */
+public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCommunicator {
 
-	public HsmsSsActiveCommunicator(HsmsSsCommunicatorConfig config) {
+	public AbstractHsmsSsActiveCommunicator(HsmsSsCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
 	}
 	
@@ -56,7 +62,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 			
 			try {
 				
-				notifyLog("HsmsSsActiveCommunicator try-connect", socketAddrInfo);
+				notifyLog("AbstractHsmsSsActiveCommunicator try-connect", socketAddrInfo);
 
 				channel.connect(socketAddr, null, new CompletionHandler<Void, Void>(){
 					
@@ -73,8 +79,8 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 							
 							final BlockingQueue<HsmsSsMessage> queue = new LinkedBlockingQueue<>();
 							
-							final HsmsSsByteReader reader = new HsmsSsByteReader(HsmsSsActiveCommunicator.this, channel);
-							final HsmsSsCircuitAssurance linktest = new HsmsSsCircuitAssurance(HsmsSsActiveCommunicator.this);
+							final HsmsSsByteReader reader = new HsmsSsByteReader(AbstractHsmsSsActiveCommunicator.this, channel);
+							final HsmsSsCircuitAssurance linktest = new HsmsSsCircuitAssurance(AbstractHsmsSsActiveCommunicator.this);
 							
 							reader.addHsmsSsMessageReceiveListener(msg -> {
 								sendReplyManager.put(msg).ifPresent(queue::offer);
@@ -233,7 +239,7 @@ public class HsmsSsActiveCommunicator extends HsmsSsCommunicator {
 							channel.notifyAll();
 						}
 						
-						notifyLog("HsmsSsActiveCommunicator#open-AsynchronousSocketChannel#connect failed", t);
+						notifyLog("AbstractHsmsSsActiveCommunicator#open-AsynchronousSocketChannel#connect failed", t);
 					}
 				});
 				

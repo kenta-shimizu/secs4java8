@@ -9,4 +9,10 @@ package com.shimizukenta.secs;
  */
 public interface Property<T> extends ReadOnlyProperty<T>, WritableValue<T> {
 	
+	public static <T> Property<T> newInstance(T v) {
+		
+		return new AbstractProperty<T>(v) {
+			private static final long serialVersionUID = 1L;
+		};
+	}
 }

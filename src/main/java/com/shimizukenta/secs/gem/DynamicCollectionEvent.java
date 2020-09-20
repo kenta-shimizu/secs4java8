@@ -17,6 +17,20 @@ import com.shimizukenta.secs.secs2.Secs2;
 public interface DynamicCollectionEvent {
 	
 	/**
+	 * Create new instance.
+	 * 
+	 * @param alias
+	 * @param collectionEventId
+	 * @return newInstance
+	 */
+	public static DynamicCollectionEvent newInstance(CharSequence alias, Secs2 collectionEventId) {
+		
+		return new AbstractDynamicCollectionEvent(alias, collectionEventId) {
+			private static final long serialVersionUID = 3280261182801909513L;
+		};
+	}
+	
+	/**
 	 * Alias getter
 	 * 
 	 * @return has valus if aliased.
@@ -47,7 +61,7 @@ public interface DynamicCollectionEvent {
 	 * @return DynamicCollectionEvent
 	 */
 	public static DynamicCollectionEvent fromS2F37CollectionEvent(Secs2 secs2) {
-		return new SimpleDynamicCollectionEvent(null, secs2);
+		return newInstance(null, secs2);
 	}
 	
 }

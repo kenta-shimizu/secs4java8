@@ -13,14 +13,14 @@ public class SecsTimeout implements Serializable {
 	
 	private static final long serialVersionUID = -3240180901934372535L;
 	
-	private final AbstractTimeProperty t1 = new SimpleTimeProperty( 1.0F);
-	private final AbstractTimeProperty t2 = new SimpleTimeProperty(15.0F);
-	private final AbstractTimeProperty t3 = new SimpleTimeProperty(45.0F);
-	private final AbstractTimeProperty t4 = new SimpleTimeProperty(45.0F);
-	private final AbstractTimeProperty t5 = new SimpleTimeProperty(10.0F);
-	private final AbstractTimeProperty t6 = new SimpleTimeProperty( 5.0F);
-	private final AbstractTimeProperty t7 = new SimpleTimeProperty(10.0F);
-	private final AbstractTimeProperty t8 = new SimpleTimeProperty( 6.0F);
+	private final TimeProperty t1 = TimeProperty.newInstance( 1.0F);
+	private final TimeProperty t2 = TimeProperty.newInstance(15.0F);
+	private final TimeProperty t3 = TimeProperty.newInstance(45.0F);
+	private final TimeProperty t4 = TimeProperty.newInstance(45.0F);
+	private final TimeProperty t5 = TimeProperty.newInstance(10.0F);
+	private final TimeProperty t6 = TimeProperty.newInstance( 5.0F);
+	private final TimeProperty t7 = TimeProperty.newInstance(10.0F);
+	private final TimeProperty t8 = TimeProperty.newInstance( 6.0F);
 	
 	protected SecsTimeout() {
 		/* Nothing */

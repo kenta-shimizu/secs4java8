@@ -98,6 +98,11 @@ public abstract class AbstractGem extends AbstractSecsInnerEngine implements Gem
 	}
 	
 	@Override
+	public DynamicEventReportConfig newDynamicEventReportConfig() {
+		return DynamicEventReportConfig.newInstance(this);
+	}
+	
+	@Override
 	public Optional<SecsMessage> s1f1()
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException

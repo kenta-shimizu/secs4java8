@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import com.shimizukenta.secs.AbstractProperty;
-import com.shimizukenta.secs.AbstractStringProperty;
+import com.shimizukenta.secs.Property;
 import com.shimizukenta.secs.ReadOnlyProperty;
-import com.shimizukenta.secs.SimpleStringProperty;
+import com.shimizukenta.secs.StringProperty;
 import com.shimizukenta.secs.secs2.Secs2Item;
 
 /**
@@ -54,24 +54,10 @@ public abstract class AbstractGemConfig implements Serializable {
 		}
 	}
 	
-	protected class ClockTypeProperty extends AbstractProperty<ClockType> {
-		
-		private static final long serialVersionUID = 7149295926237765793L;
-		
-		public ClockTypeProperty(ClockType initial) {
-			super(Objects.requireNonNull(initial));
-		}
-		
-		@Override
-		public void set(ClockType v) {
-			super.set(Objects.requireNonNull(v));
-		}
-	}
 	
-	
-	private final AbstractStringProperty mdln = new SimpleStringProperty("      ");
-	private final AbstractStringProperty softrev = new SimpleStringProperty("      ");
-	private final ClockTypeProperty clockType = new ClockTypeProperty(ClockType.A16);
+	private final StringProperty mdln = StringProperty.newInstance("      ");
+	private final StringProperty softrev = StringProperty.newInstance("      ");
+	private final Property<ClockType> clockType = Property.newInstance(ClockType.A16);
 	private final Secs2NumberItemProperty dataIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
 	private final Secs2NumberItemProperty vIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
 	private final Secs2NumberItemProperty reportIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
@@ -126,7 +112,7 @@ public abstract class AbstractGemConfig implements Serializable {
 	 * @param A16 or A12
 	 */
 	public void clockType(ClockType type) {
-		this.clockType.set(type);
+		this.clockType.set(Objects.requireNonNull(type));
 	}
 	
 	/**

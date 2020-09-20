@@ -64,6 +64,7 @@ public class ExampleHsmsSsActiveUseGem {
 						ONLACK onlack = comm.gem().s1f17();
 							
 						System.out.println("ONLACK: " + onlack);
+						
 					}
 				}
 				catch ( InterruptedException ignore ) {

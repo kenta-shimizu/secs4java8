@@ -19,10 +19,10 @@ import com.shimizukenta.secs.secs2.Secs2BytesParser;
 
 public class HsmsSsByteReader extends AbstractSecsInnerEngine implements Callable<Void> {
 	
-	private final HsmsSsCommunicator parent;
+	private final AbstractHsmsSsCommunicator parent;
 	private final AsynchronousSocketChannel channel;
 
-	public HsmsSsByteReader(HsmsSsCommunicator parent, AsynchronousSocketChannel channel) {
+	public HsmsSsByteReader(AbstractHsmsSsCommunicator parent, AsynchronousSocketChannel channel) {
 		super(parent);
 		this.parent = parent;
 		this.channel = channel;

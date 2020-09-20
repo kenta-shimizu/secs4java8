@@ -15,7 +15,7 @@ import java.util.concurrent.TimeoutException;
  *
  */
 public abstract class AbstractTimeProperty extends AbstractNumberProperty
-		implements ReadOnlyTimeProperty {
+		implements TimeProperty {
 	
 	private static final long serialVersionUID = 4647118881525451997L;
 	

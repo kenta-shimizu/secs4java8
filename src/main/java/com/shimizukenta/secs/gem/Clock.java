@@ -22,7 +22,7 @@ public interface Clock {
 	 * @return Clock-of-LocalDateTime
 	 */
 	public static Clock from(LocalDateTime ldt) {
-		return SimpleClock.from(ldt);
+		return AbstractClock.from(ldt);
 	}
 	
 	/**
@@ -31,7 +31,7 @@ public interface Clock {
 	 * @return Clock-of-Now
 	 */
 	public static Clock now() {
-		return SimpleClock.now();
+		return AbstractClock.now();
 	}
 	
 	/**
@@ -43,7 +43,7 @@ public interface Clock {
 	 * @throws Secs2Exception
 	 */
 	public static Clock from(Secs2 secs2) throws Secs2Exception {
-		return SimpleClock.from(secs2);
+		return AbstractClock.from(secs2);
 	}
 	
 	/**

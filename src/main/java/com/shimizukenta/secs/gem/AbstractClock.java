@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
-public class SimpleClock implements Clock, Serializable {
+public abstract class AbstractClock implements Clock, Serializable {
 	
 	private static final long serialVersionUID = 7004605301054564451L;
 	
@@ -25,17 +25,20 @@ public class SimpleClock implements Clock, Serializable {
 	private Secs2 a12;
 	private Secs2 a16;
 	
-	protected SimpleClock(LocalDateTime ldt) {
+	public AbstractClock(LocalDateTime ldt) {
 		this.dt = ldt;
 		this.a12 = null;
 		this.a16 = null;
 	}
 	
-	public static SimpleClock from(LocalDateTime ldt) {
-		return new SimpleClock(ldt);
+	public static AbstractClock from(LocalDateTime ldt) {
+		return new AbstractClock(ldt) {
+			private static final long serialVersionUID = 5391862507203354279L;
+			
+		};
 	}
 	
-	public static SimpleClock now() {
+	public static AbstractClock now() {
 		return from(LocalDateTime.now());
 	}
 	
@@ -46,7 +49,7 @@ public class SimpleClock implements Clock, Serializable {
 	 * @return Clock
 	 * @throws Secs2Exception
 	 */
-	public static SimpleClock from(Secs2 secs2) throws Secs2Exception {
+	public static AbstractClock from(Secs2 secs2) throws Secs2Exception {
 		
 		String a = secs2.getAscii();
 		int len = a.length();
@@ -61,7 +64,7 @@ public class SimpleClock implements Clock, Serializable {
 				int ii = Integer.valueOf(a.substring(8, 10));
 				int ss = Integer.valueOf(a.substring(10, 12));
 				
-				SimpleClock c =  new SimpleClock(LocalDateTime.of(yyyy, mm, dd, hh, ii, ss));
+				AbstractClock c = from(LocalDateTime.of(yyyy, mm, dd, hh, ii, ss));
 				c.a12 = secs2;
 				return c;
 				
@@ -75,7 +78,7 @@ public class SimpleClock implements Clock, Serializable {
 				int ss = Integer.valueOf(a.substring(12, 14));
 				int sss = Integer.valueOf(a.substring(14, 16)) * 10000000;
 				
-				SimpleClock c = new SimpleClock(LocalDateTime.of(yyyy, mm, dd, hh, ii, ss, sss));
+				AbstractClock c = from(LocalDateTime.of(yyyy, mm, dd, hh, ii, ss, sss));
 				c.a16 = secs2;
 				return c;
 				

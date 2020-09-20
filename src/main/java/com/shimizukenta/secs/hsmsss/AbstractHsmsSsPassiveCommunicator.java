@@ -16,11 +16,17 @@ import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.SecsException;
 
-public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
+/**
+ * This abstract class is implementation of HSMS-SS-Passive (SEMI-E37.1)<br />
+ * 
+ * @author kenta-shimizu
+ *
+ */
+public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCommunicator {
 
 	private AsynchronousServerSocketChannel server;
 	
-	public HsmsSsPassiveCommunicator(HsmsSsCommunicatorConfig config) {
+	public AbstractHsmsSsPassiveCommunicator(HsmsSsCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
 		
 		server = null;
@@ -88,7 +94,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 			server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 			server.bind(socketAddr);
 			
-			notifyLog("HsmsSsPassiveCommunicator#binded", socketAddrInfo);
+			notifyLog("AbstractHsmsSsPassiveCommunicator#binded", socketAddrInfo);
 			
 			server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
 				
@@ -100,7 +106,7 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 				
 				@Override
 				public void failed(Throwable t, Void attachment) {
-					notifyLog("HsmsSsPassiveCommunicator AsynchronousSeverSocketChannel#accept failed", t);
+					notifyLog("AbstractHsmsSsPassiveCommunicator AsynchronousSeverSocketChannel#accept failed", t);
 				}
 			});
 		}
@@ -114,12 +120,12 @@ public class HsmsSsPassiveCommunicator extends HsmsSsCommunicator {
 		
 		String channelString = channel.toString();
 		
-		notifyLog("HsmsSsPassiveCommunicator channel#accept", channelString);
+		notifyLog("AbstractHsmsSsPassiveCommunicator channel#accept", channelString);
 		
 		final BlockingQueue<HsmsSsMessage> queue = new LinkedBlockingQueue<>();
 		
-		final HsmsSsByteReader reader = new HsmsSsByteReader(HsmsSsPassiveCommunicator.this, channel);
-		final HsmsSsCircuitAssurance linktest = new HsmsSsCircuitAssurance(HsmsSsPassiveCommunicator.this);
+		final HsmsSsByteReader reader = new HsmsSsByteReader(AbstractHsmsSsPassiveCommunicator.this, channel);
+		final HsmsSsCircuitAssurance linktest = new HsmsSsCircuitAssurance(AbstractHsmsSsPassiveCommunicator.this);
 		
 		reader.addHsmsSsMessageReceiveListener(msg -> {
 			sendReplyManager.put(msg).ifPresent(queue::offer);

@@ -6,10 +6,10 @@ import com.shimizukenta.secs.AbstractSecsInnerEngine;
 
 public class HsmsSsCircuitAssurance extends AbstractSecsInnerEngine implements Callable<Void> {
 	
-	private final HsmsSsCommunicator parent;
+	private final AbstractHsmsSsCommunicator parent;
 	private boolean resetted;
 
-	public HsmsSsCircuitAssurance(HsmsSsCommunicator parent) {
+	public HsmsSsCircuitAssurance(AbstractHsmsSsCommunicator parent) {
 		super(parent);
 		this.parent = parent;
 		this.resetted = false;

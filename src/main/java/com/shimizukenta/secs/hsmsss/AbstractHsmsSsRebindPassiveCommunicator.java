@@ -9,9 +9,15 @@ import java.nio.channels.CompletionHandler;
 
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
 
-public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
+/**
+ * This abstract class is implementation of HSMS-SS-Passive-rebind (SEMI-E37.1)<br />
+ * 
+ * @author kenta-shimizu
+ *
+ */
+public abstract class AbstractHsmsSsRebindPassiveCommunicator extends AbstractHsmsSsPassiveCommunicator {
 	
-	public HsmsSsRebindPassiveCommunicator(HsmsSsCommunicatorConfig config) {
+	public AbstractHsmsSsRebindPassiveCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);
 	}
 	
@@ -52,7 +58,7 @@ public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 			server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 			server.bind(socketAddr);
 			
-			notifyLog("HsmsSsRebindPassiveCommunicator#binded", socketAddrInfo);
+			notifyLog("AbstractHsmsSsRebindPassiveCommunicator#binded", socketAddrInfo);
 			
 			server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
 
@@ -65,7 +71,7 @@ public class HsmsSsRebindPassiveCommunicator extends HsmsSsPassiveCommunicator {
 				@Override
 				public void failed(Throwable t, Void attachment) {
 					
-					notifyLog("HsmsSsRebindPassiveCommunicator AsynchronousSeverSocketChannel#accept failed", t);
+					notifyLog("AbstractHsmsSsRebindPassiveCommunicator AsynchronousSeverSocketChannel#accept failed", t);
 					
 					synchronized ( server ) {
 						server.notifyAll();

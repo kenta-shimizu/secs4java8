@@ -9,7 +9,8 @@ import java.util.Objects;
  * @author kenta-shimizu
  *
  */
-public abstract class AbstractByteArrayProperty extends AbstractProperty<byte[]> {
+public abstract class AbstractByteArrayProperty extends AbstractProperty<byte[]>
+		implements ByteArrayProperty {
 	
 	private static final long serialVersionUID = -3387589927771782849L;
 

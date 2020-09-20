@@ -12,13 +12,26 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
 
 /**
  * This interface is implementation of Dynamic-Event-Report-Configuration in GEM (SEMI-E30)<br />
- * To create instance, call from Gem#newDynamicEventReportConfig<br />
+ * To create new instance, {@link #newInstance(AbstractGem)}<br />
  * Relates: S2F33, S2F35, S2F37, S6F11, S6F13, S6F15, S6F17, S6F19, S6F21
  * 
  * @author kenta-shimizu
  *
  */
 public interface DynamicEventReportConfig {
+	
+	/**
+	 * Create new instance.
+	 * 
+	 * @param gem
+	 * @return newInstance
+	 */
+	public static DynamicEventReportConfig newInstance(AbstractGem gem) {
+		
+		return new AbstractDynamicEventReportConfig(gem) {
+			private static final long serialVersionUID = -5375563226536904308L;
+		};
+	}
 	
 	/**
 	 * Add Define-Report.<br />

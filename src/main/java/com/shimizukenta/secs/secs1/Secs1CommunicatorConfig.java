@@ -1,12 +1,10 @@
 package com.shimizukenta.secs.secs1;
 
-import com.shimizukenta.secs.AbstractBooleanProperty;
-import com.shimizukenta.secs.AbstractNumberProperty;
 import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
+import com.shimizukenta.secs.BooleanProperty;
+import com.shimizukenta.secs.NumberProperty;
 import com.shimizukenta.secs.ReadOnlyBooleanProperty;
 import com.shimizukenta.secs.ReadOnlyNumberProperty;
-import com.shimizukenta.secs.SimpleBooleanProperty;
-import com.shimizukenta.secs.SimpleNumberProperty;
 
 /**
  * This class is SECS-I config<br />
@@ -20,8 +18,8 @@ public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
 	private static final long serialVersionUID = 4897063498275749609L;
 	
-	private final AbstractBooleanProperty isMaster = new SimpleBooleanProperty(true);
-	private final AbstractNumberProperty retry = new SimpleNumberProperty(3);
+	private final BooleanProperty isMaster = BooleanProperty.newInstance(true);
+	private final NumberProperty retry = NumberProperty.newInstance(3);
 	
 	public Secs1CommunicatorConfig() {
 		super();

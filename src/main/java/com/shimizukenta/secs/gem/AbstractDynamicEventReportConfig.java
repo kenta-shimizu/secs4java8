@@ -32,28 +32,37 @@ public abstract class AbstractDynamicEventReportConfig implements DynamicEventRe
 	 * @param reportId
 	 * @param alias
 	 * @param vids
-	 * @return AbstractDynamicReport instance
+	 * @return DynamicReport instance
 	 */
-	abstract protected AbstractDynamicReport createReport(Secs2 reportId, CharSequence alias, List<? extends Number> vids);
+	protected DynamicReport createReport(Secs2 reportId, CharSequence alias, List<? extends Number> vids) {
+		List<Secs2> vv = vids.stream()
+				.map(Number::longValue)
+				.map(gem::vId)
+				.collect(Collectors.toList());
+		return DynamicReport.newInstance(reportId, alias, vv);
+	}
 	
 	/**
 	 * prototype-pattern
 	 * 
 	 * @param alias
 	 * @param ceid
-	 * @return AbstractDynamicCollectionEvent instance
+	 * @return DynamicCollectionEvent instance
 	 */
-	abstract protected AbstractDynamicCollectionEvent createCollectionEvent(CharSequence alias, long ceid);
+	protected DynamicCollectionEvent createCollectionEvent(CharSequence alias, long ceid) {
+		return DynamicCollectionEvent.newInstance(alias, gem.collectionEventId(ceid));
+	}
 	
 	/**
 	 * prototype-pattern
 	 * 
 	 * @param ce
 	 * @param reports
-	 * @return AbstractDynamicLink
+	 * @return DynamicLink
 	 */
-	abstract protected AbstractDynamicLink createLink(DynamicCollectionEvent ce, List<? extends Secs2> reports);
-	
+	protected DynamicLink createLink(DynamicCollectionEvent ce, List<? extends Secs2> reports) {
+		return DynamicLink.newInstance(ce, reports);
+	}
 	
 	/* Report */
 	private final Set<DynamicReport> reports = new CopyOnWriteArraySet<>();
@@ -78,8 +87,8 @@ public abstract class AbstractDynamicEventReportConfig implements DynamicEventRe
 		return addDefineReport(gem.autoReportId(), null, vids);
 	}
 	
-	private AbstractDynamicReport addDefineReport(Secs2 reportId, CharSequence alias, List<? extends Number> vids) {
-		AbstractDynamicReport r = createReport(reportId, alias, vids);
+	private DynamicReport addDefineReport(Secs2 reportId, CharSequence alias, List<? extends Number> vids) {
+		DynamicReport r = createReport(reportId, alias, vids);
 		reports.add(r);
 		return r;
 	}
@@ -147,7 +156,7 @@ public abstract class AbstractDynamicEventReportConfig implements DynamicEventRe
 	}
 	
 	private DynamicLink addLinkBySecs2(DynamicCollectionEvent ce, List<? extends Secs2> reports) {
-		AbstractDynamicLink link = createLink(ce, reports);
+		DynamicLink link = createLink(ce, reports);
 		links.add(link);
 		return link;
 	}
@@ -168,7 +177,7 @@ public abstract class AbstractDynamicEventReportConfig implements DynamicEventRe
 	
 	@Override
 	public DynamicCollectionEvent addEnableCollectionEvent(CharSequence alias, long ceid) {
-		AbstractDynamicCollectionEvent ce = createCollectionEvent(alias, ceid);
+		DynamicCollectionEvent ce = createCollectionEvent(alias, ceid);
 		events.add(ce);
 		return ce;
 	}

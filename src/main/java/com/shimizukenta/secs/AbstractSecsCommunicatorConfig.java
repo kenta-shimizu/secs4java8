@@ -4,19 +4,31 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import com.shimizukenta.secs.gem.AbstractGemConfig;
-import com.shimizukenta.secs.gem.SimpleGemConfig;
 
+/**
+ * This abstract class is implementation of communicate config.<br />
+ * To set device-id, {@link #deviceId(int)}<br />
+ * To set is-equip, {@link #isEquip(boolean)}<br />
+ * To set timeouts, {@link #timeout()}<br />
+ * To set gem, {@link #gem()}<br />
+ * To set log-subject-header, {@link #logSubjectHeader(CharSequence)}
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	
 	private static final long serialVersionUID = -8456991094606676409L;
 	
 	private final SecsTimeout timeout = new SecsTimeout();
-	private final AbstractNumberProperty deviceId = new SimpleNumberProperty(10);
-	private final AbstractBooleanProperty isEquip = new SimpleBooleanProperty(false);
+	private final NumberProperty deviceId = NumberProperty.newInstance(10);
+	private final BooleanProperty isEquip = BooleanProperty.newInstance(false);
 	
-	private final AbstractGemConfig gem = new SimpleGemConfig();
+	private final AbstractGemConfig gem = new AbstractGemConfig() {
+		private static final long serialVersionUID = -3386783271396322749L;
+	};
 	
-	private final AbstractStringProperty logSubjectHeader = new SimpleStringProperty("");
+	private final StringProperty logSubjectHeader = StringProperty.newInstance("");
 	
 	public AbstractSecsCommunicatorConfig() {
 		/* Nothing */

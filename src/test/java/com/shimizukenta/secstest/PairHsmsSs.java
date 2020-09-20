@@ -153,7 +153,7 @@ public class PairHsmsSs {
 			Thread.sleep(500L);
 			
 			try (
-					SecsCommunicator host  = HsmsSsCommunicator.newInstance(hostConfig);
+					SecsCommunicator host = HsmsSsCommunicator.newInstance(hostConfig);
 					) {
 				
 				host.addSecsLogListener(PairHsmsSs::echo);

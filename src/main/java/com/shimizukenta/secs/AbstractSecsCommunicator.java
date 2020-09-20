@@ -17,10 +17,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.gem.Gem;
-import com.shimizukenta.secs.gem.SimpleGem;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.sml.SmlMessage;
 
+/**
+ * This abstract class is implementation of SECS-communicate.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	
 	private final ExecutorService execServ = Executors.newCachedThreadPool(r -> {
@@ -111,7 +116,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	public AbstractSecsCommunicator(AbstractSecsCommunicatorConfig config) {
 		
 		this.config = config;
-		this.gem = new SimpleGem(this, config.gem());
+		this.gem = Gem.newInstance(this, config.gem());
 		
 		opened = false;
 		closed = false;
@@ -329,7 +334,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	
 	
 	/* Secs-Communicatable-State-Changed-Listener */
-	private final AbstractBooleanProperty communicatable = new SimpleBooleanProperty(false);
+	private final BooleanProperty communicatable = BooleanProperty.newInstance(false);
 	
 	@Override
 	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener l) {

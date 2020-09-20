@@ -23,9 +23,9 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 	
 	private final Collection<Pack> packs = new ArrayList<>();
 	
-	private final HsmsSsCommunicator parent;
+	private final AbstractHsmsSsCommunicator parent;
 	
-	public HsmsSsSendReplyManager(HsmsSsCommunicator parent) {
+	public HsmsSsSendReplyManager(AbstractHsmsSsCommunicator parent) {
 		super(parent);
 		this.parent = parent;
 	}

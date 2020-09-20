@@ -10,7 +10,7 @@ import java.util.Objects;
  *
  */
 public abstract class AbstractBooleanProperty extends AbstractProperty<Boolean>
-		implements ReadOnlyBooleanProperty, WritableBooleanValue {
+		implements BooleanProperty {
 	
 	private static final long serialVersionUID = -1707441122073604603L;
 

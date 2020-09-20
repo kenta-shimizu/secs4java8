@@ -10,7 +10,6 @@ import com.shimizukenta.secs.sml.SmlMessage;
 
 /**
  * This interface is implementation of SECS-Communicating.<br />
- * To get instance, HsmsSsCommunicator#newInstance or Secs1OnTcpIp#newInstance<br />
  * To start communicating, {@link #open()}<br />
  * To send Message, #send methods.<br />
  * To receive Message, {@link #addSecsMessageReceiveListener(SecsMessageReceiveListener)}<br />
@@ -28,30 +27,35 @@ public interface SecsCommunicator extends Closeable {
 	public void open() throws IOException;
 	
 	/**
+	 * is open.
 	 * 
 	 * @return true if open.
 	 */
 	public boolean isOpen();
 	
 	/**
+	 * is closed.
 	 * 
 	 * @return true if closed.
 	 */
 	public boolean isClosed();
 	
 	/**
+	 * Gem getter
 	 * 
 	 * @return get GEM instance.
 	 */
 	public Gem gem();
 	
 	/**
+	 * device-id getter
 	 * 
 	 * @return communicator device-id.
 	 */
 	public int deviceId();
 	
 	/**
+	 * is equip.
 	 * 
 	 * @return true if Equipment.
 	 */
@@ -60,7 +64,7 @@ public interface SecsCommunicator extends Closeable {
 	
 	/**
 	 * Blocking-method.<br />
-	 * open() and wait until communicating.
+	 * {@link #open()} and wait until communicating.
 	 * 
 	 * @throws IOException
 	 * @throws InterruptedException
@@ -69,8 +73,8 @@ public interface SecsCommunicator extends Closeable {
 	
 	/**
 	 * Blocking-method.<br />
-	 * send Primary-Message,<br />
-	 * wait until Reply-Message if exist.
+	 * Send Primary-Message,<br />
+	 * Wait until Reply-Message if exist.
 	 * 
 	 * @param strm
 	 * @param func
@@ -89,8 +93,8 @@ public interface SecsCommunicator extends Closeable {
 	
 	/**
 	 * Blocking-method.<br />
-	 * send Primary-Message,<br />
-	 * wait until Reply-Message if exist.
+	 * Send Primary-Message,<br />
+	 * Wait until Reply-Message if exist.
 	 * 
 	 * @param strm
 	 * @param func
@@ -109,7 +113,7 @@ public interface SecsCommunicator extends Closeable {
 			, InterruptedException;
 	
 	/**
-	 * send Reply-Message.
+	 * Send Reply-Message.
 	 * 
 	 * @param primary (primary-message)
 	 * @param strm
@@ -128,7 +132,7 @@ public interface SecsCommunicator extends Closeable {
 			, InterruptedException;
 	
 	/**
-	 * send Reply-Message.
+	 * Send Reply-Message.
 	 * 
 	 * @param primary (primary-message)
 	 * @param strm
@@ -149,8 +153,8 @@ public interface SecsCommunicator extends Closeable {
 	
 	/**
 	 * Blocking-method.<br />
-	 * send Primary-Message,<br />
-	 * wait until Reply-Message if exist.
+	 * Send Primary-Message,<br />
+	 * Wait until Reply-Message if exist.
 	 * 
 	 * @param sml
 	 * @return reply-message if exist.
@@ -166,7 +170,7 @@ public interface SecsCommunicator extends Closeable {
 			, InterruptedException;
 	
 	/**
-	 * send Reply-Message.
+	 * Send Reply-Message.
 	 * 
 	 * @param primary-message
 	 * @param sml
@@ -195,6 +199,7 @@ public interface SecsCommunicator extends Closeable {
 	public boolean addSecsMessageReceiveListener(SecsMessageReceiveListener lstnr);
 	
 	/**
+	 * Remove Listener
 	 * 
 	 * @param lstnr
 	 * @return true if remove success.
@@ -213,6 +218,7 @@ public interface SecsCommunicator extends Closeable {
 	public boolean addSecsLogListener(SecsLogListener lstnr);
 	
 	/**
+	 * Remove Listener
 	 * 
 	 * @param lstnr
 	 * @return true if remove success.
@@ -232,6 +238,7 @@ public interface SecsCommunicator extends Closeable {
 	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener lstnr);
 	
 	/**
+	 * Remove Listener
 	 * 
 	 * @param lstnr
 	 * @return true if remove success.
@@ -250,6 +257,7 @@ public interface SecsCommunicator extends Closeable {
 	public boolean addTrySendMessagePassThroughListener(SecsMessagePassThroughListener lstnr);
 	
 	/**
+	 * Remove Listener
 	 * 
 	 * @param lstnr
 	 * @return true if remove success.
@@ -268,6 +276,7 @@ public interface SecsCommunicator extends Closeable {
 	public boolean addSendedMessagePassThroughListener(SecsMessagePassThroughListener lstnr);
 	
 	/**
+	 * Remove Listener
 	 * 
 	 * @param lstnr
 	 * @return true if remove success.
@@ -286,6 +295,7 @@ public interface SecsCommunicator extends Closeable {
 	public boolean addReceiveMessagePassThroughListener(SecsMessagePassThroughListener lstnr);
 	
 	/**
+	 * Remove Listener
 	 * 
 	 * @param lstnr
 	 * @return true if remove success.

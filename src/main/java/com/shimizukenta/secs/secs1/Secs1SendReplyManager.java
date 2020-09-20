@@ -26,9 +26,9 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 	private final ReplyStatus resetTimerStatus;
 	private final ReplyStatus terminateStatus;
 	
-	private final Secs1Communicator parent;
+	private final AbstractSecs1Communicator parent;
 	
-	protected Secs1SendReplyManager(Secs1Communicator parent) {
+	protected Secs1SendReplyManager(AbstractSecs1Communicator parent) {
 		super(parent);
 		
 		this.parent = parent;

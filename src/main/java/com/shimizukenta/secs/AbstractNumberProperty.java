@@ -10,7 +10,7 @@ import java.util.Objects;
  *
  */
 public abstract class AbstractNumberProperty extends AbstractProperty<Number>
-		implements ReadOnlyNumberProperty, WritableNumberValue {
+		implements NumberProperty {
 	
 	private static final long serialVersionUID = 7735781891914639639L;
 	

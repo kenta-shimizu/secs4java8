@@ -3,12 +3,10 @@ package com.shimizukenta.secs.secs1ontcpip;
 import java.net.SocketAddress;
 import java.util.Objects;
 
-import com.shimizukenta.secs.AbstractSocketAddressProperty;
-import com.shimizukenta.secs.AbstractTimeProperty;
 import com.shimizukenta.secs.ReadOnlySocketAddressProperty;
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
-import com.shimizukenta.secs.SimpleSocketAddressProperty;
-import com.shimizukenta.secs.SimpleTimeProperty;
+import com.shimizukenta.secs.SocketAddressProperty;
+import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.secs1.Secs1CommunicatorConfig;
 
 /**
@@ -22,15 +20,16 @@ public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 	
 	private static final long serialVersionUID = -7468433384957790240L;
 	
-	private AbstractSocketAddressProperty socketAddr = new SimpleSocketAddressProperty(null);
-	private AbstractTimeProperty reconnectSeconds = new SimpleTimeProperty(5.0F);
+	private SocketAddressProperty socketAddr = SocketAddressProperty.newInstance(null);
+	private TimeProperty reconnectSeconds = TimeProperty.newInstance(5.0F);
 	
 	public Secs1OnTcpIpCommunicatorConfig() {
 		super();
 	}
 	
 	/**
-	 * Connect SocketAddress setter
+	 * Connect SocketAddress setter<br />
+	 * Not accept null.
 	 * 
 	 * @param socketAddress
 	 */
