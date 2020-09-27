@@ -41,57 +41,39 @@ public abstract class AbstractNumberProperty extends AbstractProperty<Number>
 	 */
 	@Override
 	public void set(Number v) {
-		synchronized ( this ) {
-			super.set(Objects.requireNonNull(v));
-		}
+		super.set(Objects.requireNonNull(v));
 	}
 	
 	public void set(int v) {
-		synchronized ( this ) {
-			set(Integer.valueOf(v));
-		}
+		set(Integer.valueOf(v));
 	}
 	
 	public void set(long v) {
-		synchronized ( this ) {
-			set(Long.valueOf(v));
-		}
+		set(Long.valueOf(v));
 	}
 	
 	public void set(float v) {
-		synchronized ( this ) {
-			set(Float.valueOf(v));
-		}
+		set(Float.valueOf(v));
 	}
 	
 	public void set(double v) {
-		synchronized ( this ) {
-			set(Double.valueOf(v));
-		}
+		set(Double.valueOf(v));
 	}
 	
 	public int intValue() {
-		synchronized ( this ) {
-			return get().intValue();
-		}
+		return get().intValue();
 	}
 	
 	public long longValue() {
-		synchronized ( this ) {
-			return get().longValue();
-		}
+		return get().longValue();
 	}
 	
 	public float floatValue() {
-		synchronized ( this ) {
-			return get().floatValue();
-		}
+		return get().floatValue();
 	}
 	
 	public double doubleValue() {
-		synchronized ( this ) {
-			return get().doubleValue();
-		}
+		return get().doubleValue();
 	}
 	
 }

@@ -30,13 +30,11 @@ public abstract class AbstractSocketAddressProperty extends AbstractProperty<Soc
 	
 	@Override
 	public SocketAddress getSocketAddress() {
-		synchronized ( this ) {
-			SocketAddress a = get();
-			if ( a == null ) {
-				throw new IllegalStateException("SocketAddress not setted");
-			}
-			return a;
+		SocketAddress a = get();
+		if ( a == null ) {
+			throw new IllegalStateException("SocketAddress not setted");
 		}
+		return a;
 	}
 
 }

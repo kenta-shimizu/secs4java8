@@ -16,6 +16,8 @@ public abstract class AbstractProperty<T> implements Property<T>, Serializable {
 	
 	private static final long serialVersionUID = -7897962203686565003L;
 	
+	private final Object sync = new Object();
+	
 	private T present;
 	
 	public AbstractProperty(T initial) {
@@ -24,18 +26,17 @@ public abstract class AbstractProperty<T> implements Property<T>, Serializable {
 	
 	@Override
 	public T get() {
-		return this.present;
+		synchronized ( sync ) {
+			return this.present;
+		}
 	}
 	
 	@Override
 	public void set(T v) {
-		synchronized ( this ) {
+		synchronized ( sync ) {
 			if ( ! Objects.equals(v, this.present) ) {
 				this.present = v;
-				listeners.forEach(l -> {
-					l.changed(v);
-				});
-				this.notifyAll();
+				notifyChanged();
 			}
 		}
 	}
@@ -44,7 +45,7 @@ public abstract class AbstractProperty<T> implements Property<T>, Serializable {
 	
 	@Override
 	public boolean addChangeListener(PropertyChangeListener<? super T> l) {
-		synchronized ( this ) {
+		synchronized ( sync ) {
 			boolean f = listeners.add(l);
 			if ( f ) {
 				l.changed(get());
@@ -52,34 +53,43 @@ public abstract class AbstractProperty<T> implements Property<T>, Serializable {
 			return f;
 		}
 	}
-
+	
 	@Override
 	public boolean removeChangeListener(PropertyChangeListener<? super T> l) {
-		synchronized ( this ) {
+		synchronized ( sync ) {
 			return listeners.remove(l);
+		}
+	}
+	
+	protected void notifyChanged() {
+		synchronized ( sync ) {
+			listeners.forEach(l -> {
+				l.changed(get());
+			});
+			sync.notifyAll();
 		}
 	}
 	
 	@Override
 	public void waitUntil(T v) throws InterruptedException {
-		synchronized ( this ) {
+		synchronized ( sync ) {
 			for ( ;; ) {
-				if ( Objects.equals(get(), v)) {
+				if ( Objects.equals(get(), v) ) {
 					return;
 				}
-				this.wait();
+				sync.wait();
 			}
 		}
 	}
 	
 	@Override
 	public void waitUntilNot(T v) throws InterruptedException {
-		synchronized ( this ) {
+		synchronized ( sync ) {
 			for ( ;; ) {
 				if ( ! Objects.equals(get(), v)) {
 					return;
 				}
-				this.wait();
+				sync.wait();
 			}
 		}
 	}

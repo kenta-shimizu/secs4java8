@@ -19,6 +19,8 @@ public abstract class AbstractTimeProperty extends AbstractNumberProperty
 	
 	private static final long serialVersionUID = 4647118881525451997L;
 	
+	private final Object sync = new Object();
+	
 	private long milliSec;
 	
 	public AbstractTimeProperty(Number initial) {
@@ -44,41 +46,41 @@ public abstract class AbstractTimeProperty extends AbstractNumberProperty
 	
 	@Override
 	public void set(Number v) {
-		synchronized ( this ) {
+		synchronized ( sync ) {
 			setMilliSeconds(v);
 			super.set(v);
 		}
 	}
 	
 	private void setMilliSeconds(Number v) {
-		synchronized ( this ) {
+		synchronized ( sync ) {
 			this.milliSec = (long)(Objects.requireNonNull(v).floatValue() * 1000.0F);
 		}
 	}
 	
 	public float getSeconds() {
-		synchronized ( this ) {
+		synchronized ( sync ) {
 			return floatValue();
 		}
 	}
 	
 	@Override
 	public long getMilliSeconds() {
-		synchronized ( this ) {
+		synchronized ( sync ) {
 			return milliSec;
 		}
 	}
 	
 	@Override
 	public boolean gtZero() {
-		synchronized ( this ) {
+		synchronized ( sync ) {
 			return milliSec > 0;
 		}
 	}
 	
 	@Override
 	public boolean geZero() {
-		synchronized ( this ) {
+		synchronized ( sync ) {
 			return milliSec >= 0;
 		}
 	}
@@ -92,13 +94,13 @@ public abstract class AbstractTimeProperty extends AbstractNumberProperty
 	}
 	
 	@Override
-	public void wait(Object sync) throws InterruptedException {
-		synchronized ( sync ) {
+	public void wait(Object syncObj) throws InterruptedException {
+		synchronized ( syncObj ) {
 			long t = getMilliSeconds();
 			if ( t >= 0 ) {
-				sync.wait(t);
+				syncObj.wait(t);
 			} else {
-				sync.wait();
+				syncObj.wait();
 			}
 		}
 	}

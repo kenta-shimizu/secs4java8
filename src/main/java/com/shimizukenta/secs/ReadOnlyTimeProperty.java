@@ -52,7 +52,7 @@ public interface ReadOnlyTimeProperty extends ReadOnlyNumberProperty {
 	 * @param sync-object
 	 * @throws InterruptedException
 	 */
-	public void wait(Object sync) throws InterruptedException;
+	public void wait(Object syncObj) throws InterruptedException;
 	
 	/**
 	 * Future#get
