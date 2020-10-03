@@ -10,7 +10,11 @@ import java.nio.channels.CompletionHandler;
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
 
 /**
- * This abstract class is implementation of HSMS-SS-Passive-rebind (SEMI-E37.1)<br />
+ * This abstract class is implementation of HSMS-SS-Passive-rebind Communicator(SEMI-E37.1).
+ * 
+ * <p>
+ * This class is called from {@link HsmsSsCommunicator#newInstance(HsmsSsCommunicatorConfig)<br />
+ * </p>
  * 
  * @author kenta-shimizu
  *

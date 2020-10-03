@@ -19,7 +19,7 @@ public interface Secs1Communicator extends SecsCommunicator {
 	/**
 	 * Create header-only Sesc1Message.
 	 * 
-	 * @param header
+	 * @param header header-10-bytes
 	 * @return Secs1Message
 	 */
 	public Secs1Message createSecs1Message(byte[] header);
@@ -27,16 +27,20 @@ public interface Secs1Communicator extends SecsCommunicator {
 	/**
 	 * Create Secs1Message.
 	 * 
-	 * @param header
-	 * @param body
+	 * @param header header-10-bytes
+	 * @param body SECS-II data
 	 * @return Secs1Message
 	 */
 	public Secs1Message createSecs1Message(byte[] header, Secs2 body);
 	
 	/**
+	 * Send SECS-I-Message.
+	 * 
+	 * <p>
+	 * Send Primary-Secs1Message,<br />
 	 * Blocking-method.<br />
-	 * send Primary-Secs1Message,<br />
-	 * wait until Reply-Secs1Message if exist.
+	 * Wait until sended Primay-Message and Reply-Secs1Message received if exist.
+	 * </p>
 	 * 
 	 * @param msg
 	 * @return reply-Secs1Message if exist

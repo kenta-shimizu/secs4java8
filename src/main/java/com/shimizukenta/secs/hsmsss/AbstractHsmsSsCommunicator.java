@@ -17,7 +17,7 @@ import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
- * This abstract class is implementation of HSMS-SS (SEMI-E37.1)<br />
+ * This abstract class is implementation of HSMS-SS (SEMI-E37.1).
  * 
  * @author kenta-shimizu
  *
@@ -31,7 +31,7 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 	private final ByteArrayProperty sessionIdBytes = ByteArrayProperty.newInstance(new byte[] {0, 0});
 	private final Property<HsmsSsCommunicateState> hsmsSsCommStateProperty = Property.newInstance(HsmsSsCommunicateState.NOT_CONNECTED);
 	
-	protected AbstractHsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
+	public AbstractHsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);
 		
 		this.hsmsSsConfig = config;

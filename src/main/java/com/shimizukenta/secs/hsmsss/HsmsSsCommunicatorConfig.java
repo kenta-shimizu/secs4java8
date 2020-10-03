@@ -13,10 +13,13 @@ import com.shimizukenta.secs.SocketAddressProperty;
 import com.shimizukenta.secs.TimeProperty;
 
 /**
- * This class is config of HSMS-SS-Communicator.<br />
+ * This class is config of HSMS-SS-Communicator.
+ * 
+ * <p>
  * To set Active or Passive protocol, {@link #protocol(HsmsSsProtocol)}<br />
  * To set Connect or Bind SocketAddress, {@link #socketAddress(SocketAddress)}<br />
  * To set Session-ID, {@link #sessionId(int)}<br />
+ * </p>
  * 
  * @author kenta-shimizu
  *
@@ -99,7 +102,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	/**
 	 * Linktest cycle time setter
 	 * 
-	 * @param linktest-cycle-seconds. value >= 0
+	 * @param v linktest-cycle-seconds. value is {@code >= 0}
 	 */
 	public void linktest(float v) {
 		if ( v < 0.0F ) {
@@ -111,7 +114,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	/**
 	 * Linktest cycle getter
 	 * 
-	 * @return seconds. Not-linktest if < 0.
+	 * @return seconds. Not-linktest if {@code <0}
 	 */
 	public ReadOnlyTimeProperty linktest() {
 		return linktest;
@@ -126,10 +129,9 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	}
 	
 	/**
-	 * Rebind if Passive-Protocol.<br />
-	 * If bind failed, then rebind after this time.
+	 * Rebind if Passive-Protocol, if bind failed, then rebind after this time.
 	 * 
-	 * @param rebind after this time if Passive-protocol. value >= 0
+	 * @param v rebind after this time if Passive-protocol. value {@code >=0}
 	 */
 	public void rebindIfPassive(float v) {
 		if ( v < 0.0F ) {
@@ -141,7 +143,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	/**
 	 * rebind time getter.
 	 * 
-	 * @return seconds. Not rebind if < 0.
+	 * @return seconds. Not rebind if {@code <0}
 	 */
 	public ReadOnlyTimeProperty rebindIfPassive() {
 		return rebindIfPassive;

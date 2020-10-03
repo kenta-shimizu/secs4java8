@@ -2,6 +2,16 @@ package com.shimizukenta.secs;
 
 import java.util.Optional;
 
+/**
+ * This Exception is super class of SECS-Communicating Exception.
+ * 
+ * <p>
+ * To get Reference-Message if exist, {@link #secsMessage()}<br />
+ * </p>
+ * 
+ * @author kenta-shimzu
+ *
+ */
 public class SecsException extends Exception {
 	
 	private static final long serialVersionUID = -3938886949828082098L;

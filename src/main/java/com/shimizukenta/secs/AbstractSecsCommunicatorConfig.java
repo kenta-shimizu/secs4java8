@@ -6,12 +6,15 @@ import java.util.Objects;
 import com.shimizukenta.secs.gem.AbstractGemConfig;
 
 /**
- * This abstract class is implementation of communicate config.<br />
+ * This abstract class is implementation of communicate config.
+ * 
+ * <p>
  * To set device-id, {@link #deviceId(int)}<br />
  * To set is-equip, {@link #isEquip(boolean)}<br />
  * To set timeouts, {@link #timeout()}<br />
- * To set gem, {@link #gem()}<br />
+ * To set gem config, {@link #gem()}<br />
  * To set log-subject-header, {@link #logSubjectHeader(CharSequence)}
+ * </p>
  * 
  * @author kenta-shimizu
  *
@@ -37,7 +40,7 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	/**
 	 * Device-ID setter.
 	 * 
-	 * @param id
+	 * @param id Device-ID
 	 */
 	public void deviceId(int id) {
 		this.deviceId.set(id);
@@ -55,7 +58,7 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	/**
 	 * Set true if equipment.
 	 * 
-	 * @param is-equip
+	 * @param f set {@code true} if equipment
 	 */
 	public void isEquip(boolean f) {
 		this.isEquip.set(f);
@@ -64,7 +67,7 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	/**
 	 * getter
 	 * 
-	 * @return true if equipment
+	 * @return {@code true} if equipment
 	 */
 	public ReadOnlyBooleanProperty isEquip() {
 		return isEquip;
@@ -91,7 +94,7 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	/**
 	 * if setted, insert header to subject of SecsLog
 	 * 
-	 * @param header of SecsLog
+	 * @param header insert header of SecsLog
 	 */
 	public void logSubjectHeader(CharSequence header) {
 		this.logSubjectHeader.set(Objects.requireNonNull(header).toString());

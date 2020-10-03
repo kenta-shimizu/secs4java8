@@ -5,11 +5,16 @@ import java.util.Optional;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
- * This interface is implementation of Enable-CEID in GEM (SEMI-E30)<br />
+ * This interface is implementation of Enable-CEID in GEM (SEMI-E30).
+ * 
+ * <p>
  * To get alias, {@link #alias()}<br />
  * To get CEID, {@link #collectionEventId()}<br />
  * To S2F37 Single CEID, {@link #toS2F37CollectionEvent()}<br />
+ * </p>
+ * <p>
  * Instances of this class are immutable.
+ * </p>
  * 
  * @author kenta-shimizu
  *
@@ -38,7 +43,7 @@ public interface DynamicCollectionEvent {
 	public Optional<String> alias();
 	
 	/**
-	 * CEID getter to S2F37
+	 * CEID getter to S2F37.
 	 * 
 	 * @return SECS-II CEID
 	 */
@@ -53,11 +58,14 @@ public interface DynamicCollectionEvent {
 	
 	
 	/**
-	 * newInstance from S2F37 Secs2 Single-Collection-Event.<br />
+	 * newInstance from S2F37 Secs2 Single-Collection-Event.
+	 * 
+	 * <p>
 	 * Single-Collection-Event-Format:<br />
 	 * &lt;U4 ceid&gt;
+	 * </p>
 	 * 
-	 * @param S2F37 Secs2 Single-Collection-Event
+	 * @param secs2 S2F37 Secs2 Single-Collection-Event
 	 * @return DynamicCollectionEvent
 	 */
 	public static DynamicCollectionEvent fromS2F37CollectionEvent(Secs2 secs2) {

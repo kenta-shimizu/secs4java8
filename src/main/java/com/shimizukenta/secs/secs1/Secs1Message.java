@@ -7,6 +7,21 @@ import java.util.Objects;
 import com.shimizukenta.secs.AbstractSecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 
+
+/**
+ * This class is implementation of SECS-I-Message.
+ * 
+ * <p>
+ * This instance is created from {@link Secs1Communicator#createSecs1Message(byte[])
+ * or {@link Secs1Communicator#createSecs1Message(byte[], Secs2)}
+ * </p>
+ * <p>
+ * Instances of this class are immutable.<br />
+ * </p>
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class Secs1Message extends AbstractSecsMessage {
 	
 	private static final long serialVersionUID = -5892491853890818330L;

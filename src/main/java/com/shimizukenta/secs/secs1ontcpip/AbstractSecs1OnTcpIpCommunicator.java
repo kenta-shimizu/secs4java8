@@ -24,7 +24,7 @@ import com.shimizukenta.secs.secs1.Secs1DetectTerminateException;
 import com.shimizukenta.secs.secs1.Secs1SendMessageException;
 
 /**
- * This abstract class is implementation of SECS-I (SEMI-E4) on TCP/IP<br />
+ * This abstract class is implementation of SECS-I (SEMI-E4) on TCP/IP
  * 
  * @author kenta-shimizu
  *

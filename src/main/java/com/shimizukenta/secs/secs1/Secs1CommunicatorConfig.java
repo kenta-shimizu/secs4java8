@@ -7,9 +7,12 @@ import com.shimizukenta.secs.ReadOnlyBooleanProperty;
 import com.shimizukenta.secs.ReadOnlyNumberProperty;
 
 /**
- * This class is SECS-I config<br />
+ * This class is SECS-I-Communicator config.
+ * 
+ * <p>
  * To set Master-Mode, {@link #isMaster(boolean)}<br />
  * To set Retry, {@link #retry(int)}
+ * </p>
  * 
  * @author kenta-shimizu
  *
@@ -26,9 +29,9 @@ public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	}
 	
 	/**
-	 * Set true if Master Mode.
+	 * Set {@code true} if Master Mode.
 	 * 
-	 * @param isMasterMode
+	 * @param isMaster
 	 */
 	public void isMaster(boolean isMaster) {
 		this.isMaster.set(isMaster);
@@ -37,7 +40,7 @@ public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	/**
 	 * Master Mode getter.
 	 * 
-	 * @return true if Master Mode
+	 * @return {@code true} if Master Mode
 	 */
 	public ReadOnlyBooleanProperty isMaster() {
 		return isMaster;
@@ -46,7 +49,7 @@ public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	/**
 	 * Rety setter.
 	 * 
-	 * @param retry-count-value is >= 0
+	 * @param retryCount retry-count-value is {@code >= 0}
 	 */
 	public void retry(int retryCount) {
 		if ( retryCount < 0 ) {

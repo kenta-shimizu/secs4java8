@@ -6,6 +6,20 @@ import java.util.Objects;
 import com.shimizukenta.secs.AbstractSecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 
+/**
+ * This class is implementation of HSMS-SS-Message.
+ * 
+ * <p>
+ * This instance is created from {@link HsmsSsCommunicator#createHsmsSsMessage(byte[])
+ * or {@link HsmsSsCommunicator#createHsmsSsMessage(byte[], Secs2)}<br />
+ * </p>
+ * <p>
+ * Instances of this class are immutable.<br />
+ * </p>
+ * 
+ * @author shimizukenta
+ *
+ */
 public class HsmsSsMessage extends AbstractSecsMessage {
 	
 	private static final long serialVersionUID = 7062413563321894477L;

@@ -1,5 +1,15 @@
 package com.shimizukenta.secs;
 
+/**
+ * This Exception is super class of SECS-Communicator receive-message failed Exception.
+ * 
+ * <p>
+ * e.g. Timeout-T3
+ * </p>
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class SecsWaitReplyMessageException extends SecsException {
 	
 	private static final long serialVersionUID = -443398822888562392L;

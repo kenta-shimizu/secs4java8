@@ -1,7 +1,7 @@
 package com.shimizukenta.secs;
 
 /**
- * Setter
+ * Setter, super interface of WritableValue.
  * 
  * @author kenta-shimizu
  *

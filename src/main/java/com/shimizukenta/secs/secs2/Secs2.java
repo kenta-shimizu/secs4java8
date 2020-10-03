@@ -5,10 +5,13 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * This interface is implementation of SECS-II (SEMI-E5)<br />
+ * This interface is implementation of SECS-II (SEMI-E5).
+ * 
+ * <p>
  * Used for build and parse SECS-II data.<br />
  * Support item-type: L, B, BOOLEAN, A, I1, I2, I4, I8, U1, U2, U4, U8, F4, F8<br />
  * Instances of this class are immutable.
+ * </p>
  * 
  * @author kenta-shimizu
  *

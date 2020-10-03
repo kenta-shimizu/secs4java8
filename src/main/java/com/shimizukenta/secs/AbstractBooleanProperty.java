@@ -3,8 +3,11 @@ package com.shimizukenta.secs;
 import java.util.Objects;
 
 /**
- * Boolean value Getter, Setter, Value-Change-Observer<br />
- * Not accept null.
+ * Boolean value Getter, Setter, Value-Change-Observer.
+ * 
+ * <p>
+ * Not accept {@code null}
+ * </p>
  * 
  * @author kenta-shimizu
  *

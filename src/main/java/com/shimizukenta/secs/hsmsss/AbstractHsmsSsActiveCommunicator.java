@@ -15,7 +15,11 @@ import java.util.concurrent.RejectedExecutionException;
 import com.shimizukenta.secs.SecsException;
 
 /**
- * This abstract class is implementation of HSMS-SS-Active (SEMI-E37.1)<br />
+ * This abstract class is implementation of HSMS-SS-Active-Communicator(SEMI-E37.1).
+ * 
+ * <p>
+ * This class is called from {@link HsmsSsCommunicator#newInstance(HsmsSsCommunicatorConfig)<br />
+ * </p>
  * 
  * @author kenta-shimizu
  *

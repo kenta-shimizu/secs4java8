@@ -10,10 +10,13 @@ import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
- * This interface is implementation of HSMS-SS (SEMI-E37.1)<br />
+ * This interface is implementation of HSMS-SS (SEMI-E37.1).
+ * 
+ * <p>
  * To create newInstance, {@link #newInstance(HsmsSsCommunicatorConfig)}<br />
  * To create newInstance and open, {@link #open(HsmsSsCommunicatorConfig)}<br />
  * To linktest, {@link #linktest()}
+ * </p>
  * 
  * @author kenta-shimizu
  *
@@ -54,7 +57,7 @@ public interface HsmsSsCommunicator extends SecsCommunicator {
 	}
 	
 	/**
-	 * create new HSMS-SS-Communicator instance and {@link #open()}
+	 * Create new HSMS-SS-Communicator instance and {@link #open()}.
 	 * 
 	 * @param config
 	 * @return new HSMS-SS-Communicator instance
@@ -82,18 +85,26 @@ public interface HsmsSsCommunicator extends SecsCommunicator {
 	}
 	
 	/**
-	 * Blocking-method<br />
+	 * HSMS-SS linktest.
 	 * 
-	 * @return true if success
+	 * <p>
+	 * Blocking-method.
+	 * </p>
+	 * 
+	 * @return {@code true} if success
 	 * @throws InterruptedException
 	 * @throws SecsException
 	 */
 	public boolean linktest() throws InterruptedException;
 	
 	/**
+	 * Send HSMS-SS-Message and receive Reply-Message if exist.
+	 * 
+	 * <p>
 	 * Blocking-method.<br />
-	 * send Primary-HsmsSsMessage,<br />
-	 * wait until Reply-HsmsSsMessage if exist.
+	 * Send Primary-HsmsSsMessage and 
+	 * wait until received Reply-HsmsSsMessage if exist.
+	 * </p>
 	 * 
 	 * @param msg
 	 * @return reply-HsmsSsMessage if exist

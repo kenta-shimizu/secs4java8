@@ -1,5 +1,11 @@
 package com.shimizukenta.secs.gem;
 
+/**
+ * This Exception is super class of DynamicEventReportConfig method failed.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class DynamicEventReportException extends Exception {
 	
 	private static final long serialVersionUID = -8074400313735676602L;

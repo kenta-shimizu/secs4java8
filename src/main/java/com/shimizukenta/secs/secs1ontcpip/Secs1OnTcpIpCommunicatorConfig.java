@@ -10,8 +10,11 @@ import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.secs1.Secs1CommunicatorConfig;
 
 /**
- * This class is SECS-I-on-TCP/IP config.<br />
+ * This class is SECS-I-on-TCP/IP-Communicator config.
+ * 
+ * <p>
  * To set Connect SocketAddress, {@link #socketAddress(SocketAddress)}<br />
+ * </p>
  * 
  * @author kenta-shimizu
  *
@@ -28,8 +31,11 @@ public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 	}
 	
 	/**
-	 * Connect SocketAddress setter<br />
-	 * Not accept null.
+	 * Connect SocketAddress setter.
+	 * 
+	 * <p>
+	 * Not accept {@code null}
+	 * </p>
 	 * 
 	 * @param socketAddress
 	 */
@@ -38,7 +44,7 @@ public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 	}
 	
 	/**
-	 * Conenct SocketAddress getter
+	 * Conenct SocketAddress getter.
 	 * 
 	 * @return Connect SocketAddress
 	 */
@@ -46,10 +52,20 @@ public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 		return this.socketAddr;
 	}
 	
+	/**
+	 * Reconnect seconds setter.
+	 * 
+	 * @param seconds
+	 */
 	public void reconnectSeconds(float seconds) {
 		this.reconnectSeconds.set(seconds);
 	}
 	
+	/**
+	 * Reconnect seconds getter.
+	 * 
+	 * @return Reconnect-Seconds
+	 */
 	public ReadOnlyTimeProperty reconnectSeconds() {
 		return this.reconnectSeconds;
 	}

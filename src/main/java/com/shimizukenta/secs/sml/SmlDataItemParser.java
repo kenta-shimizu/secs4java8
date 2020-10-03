@@ -13,9 +13,12 @@ import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Item;
 
 /**
- * This class is implementation of SML-SECS-II-Data-Parse<br />
+ * This class is implementation of SML-SECS-II-Data-Parse.
+ * 
+ * <p>
  * To get parser instance, {@link #getInstance()}<br />
  * To parse SML, {@link #parse(CharSequence)}
+ * </p>
  * 
  */
 public class SmlDataItemParser {
@@ -31,7 +34,7 @@ public class SmlDataItemParser {
 	/**
 	 * parser getter
 	 * 
-	 * @return
+	 * @return parser instance
 	 */
 	public static SmlDataItemParser getInstance() {
 		return SingletonHolder.inst;
@@ -40,7 +43,7 @@ public class SmlDataItemParser {
 	/**
 	 * parse to Secs2
 	 * 
-	 * @param SML-Format-Secs2-part-Character (<A "ascii">)
+	 * @param cs SML-Format-Secs2-part-Character (<A "ascii">)
 	 * @return Secs2
 	 * @throws SmlParseException
 	 */

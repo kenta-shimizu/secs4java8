@@ -10,7 +10,7 @@ public abstract class AbstractSecsInnerEngine {
 	
 	private final AbstractSecsCommunicator engine;
 	
-	public AbstractSecsInnerEngine(AbstractSecsCommunicator engine) {
+	protected AbstractSecsInnerEngine(AbstractSecsCommunicator engine) {
 		this.engine = engine;
 	}
 	

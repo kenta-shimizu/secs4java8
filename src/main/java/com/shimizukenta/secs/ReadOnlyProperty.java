@@ -8,9 +8,10 @@ package com.shimizukenta.secs;
  * @param <T>
  */
 public interface ReadOnlyProperty<T> {
-
+	
 	/**
 	 * value getter
+	 * 
 	 * @return value
 	 */
 	public T get();

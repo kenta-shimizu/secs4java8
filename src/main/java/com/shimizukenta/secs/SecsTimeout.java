@@ -3,8 +3,7 @@ package com.shimizukenta.secs;
 import java.io.Serializable;
 
 /**
- * Secs Timeout config.<br />
- * T1-T8 setter and getter.
+ * Secs Timeout config, T1-T8 setter and getter.
  * 
  * @author kenta-shimizu
  *
@@ -29,7 +28,7 @@ public class SecsTimeout implements Serializable {
 	/**
 	 * T1-Timeout setter.
 	 * 
-	 * @param T1-timeout seconds
+	 * @param v T1-timeout seconds, set value of >0
 	 */
 	public void t1(float v) {
 		if ( v <= 0 ) {
@@ -50,7 +49,7 @@ public class SecsTimeout implements Serializable {
 	/**
 	 * T2-Timeout setter
 	 * 
-	 * @param T2-timeout seconds
+	 * @param v T2-timeout seconds, set value of >0
 	 */
 	public void t2(float v) {
 		if ( v <= 0 ) {
@@ -71,7 +70,7 @@ public class SecsTimeout implements Serializable {
 	/**
 	 * T3-Timeout setter
 	 * 
-	 * @param T3-timeout seconds
+	 * @param v T3-timeout seconds, set value of >0
 	 */
 	public void t3(float v) {
 		if ( v <= 0 ) {
@@ -92,7 +91,7 @@ public class SecsTimeout implements Serializable {
 	/**
 	 * T4-Timeout setter
 	 * 
-	 * @param T4-timeout seconds
+	 * @param v T4-timeout seconds, set value of >0
 	 */
 	public void t4(float v) {
 		if ( v <= 0 ) {
@@ -113,7 +112,7 @@ public class SecsTimeout implements Serializable {
 	/**
 	 * T5-Timeout setter
 	 * 
-	 * @param T5-timeout seconds
+	 * @param v T5-timeout seconds, set value of >0
 	 */
 	public void t5(float v) {
 		if ( v <= 0 ) {
@@ -134,7 +133,7 @@ public class SecsTimeout implements Serializable {
 	/**
 	 * T6-Timeout setter
 	 * 
-	 * @param T6-timeout seconds
+	 * @param v T6-timeout seconds, set value of >0
 	 */
 	public void t6(float v) {
 		if ( v <= 0 ) {
@@ -155,7 +154,7 @@ public class SecsTimeout implements Serializable {
 	/**
 	 * T7-Timeout setter
 	 * 
-	 * @param T7-timeout seconds
+	 * @param v T7-timeout seconds, set value of >0
 	 */
 	public void t7(float v) {
 		if ( v <= 0 ) {
@@ -176,7 +175,7 @@ public class SecsTimeout implements Serializable {
 	/**
 	 * T8-Timeout setter
 	 * 
-	 * @param T8-timeout seconds
+	 * @param v T8-timeout seconds, set value of >0
 	 */
 	public void t8(float v) {
 		if ( v <= 0 ) {

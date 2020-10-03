@@ -10,10 +10,13 @@ import com.shimizukenta.secs.StringProperty;
 import com.shimizukenta.secs.secs2.Secs2Item;
 
 /**
- * This class is GEM config.<br />
+ * This abstract class is GEM config.
+ * 
+ * <p>
  * To set Model-Number, {@link #mdln(CharSequence)}<br />
  * To set Software-Revision, {@link #softrev(CharSequence)}<br />
- * To set Clock-type, {@link #clockType(ClockType)}
+ * To set Clock-type, {@link #clockType(ClockType)}<br />
+ * </p>
  * 
  * @author kenta-shimizu
  *
@@ -68,10 +71,13 @@ public abstract class AbstractGemConfig implements Serializable {
 	}
 	
 	/**
-	 * Model-Number setter.<br />
-	 * use S1F2, S1F13, S1F14
+	 * Model-Number setter.
 	 * 
-	 * @param MODEL-NUMBER
+	 * <p>
+	 * use S1F2, S1F13, S1F14
+	 * </p>
+	 * 
+	 * @param cs MODEL-NUMBER
 	 */
 	public void mdln(CharSequence cs) {
 		this.mdln.set(Objects.requireNonNull(cs));
@@ -87,10 +93,13 @@ public abstract class AbstractGemConfig implements Serializable {
 	}
 	
 	/**
-	 * Software-Revision setter.<br />
-	 * use S1F2, S1F13, S1F14
+	 * Software-Revision setter.
 	 * 
-	 * @param SOFTWARE-RESION
+	 * <p>
+	 * use S1F2, S1F13, S1F14
+	 * </p>
+	 * 
+	 * @param cs SOFTWARE-RESION
 	 */
 	public void softrev(CharSequence cs) {
 		this.softrev.set(Objects.requireNonNull(cs));
@@ -106,10 +115,13 @@ public abstract class AbstractGemConfig implements Serializable {
 	}
 	
 	/**
-	 * Clock-type setter.<br />
-	 * use S2F18, S2F31
+	 * Clock-type setter.
 	 * 
-	 * @param A16 or A12
+	 * <p>
+	 * use S2F18, S2F31
+	 * </p>
+	 * 
+	 * @param type A16 or A12
 	 */
 	public void clockType(ClockType type) {
 		this.clockType.set(Objects.requireNonNull(type));
@@ -125,10 +137,13 @@ public abstract class AbstractGemConfig implements Serializable {
 	}
 	
 	/**
-	 * DATA-ID Secs2Item type setter.<br />
-	 * type: INT1, INT2, INT4, INT8, UINT1, UINT2, UINT4, UINT8
+	 * DATA-ID Secs2Item type setter.
 	 * 
-	 * @param item-type
+	 * <p>
+	 * type: INT1, INT2, INT4, INT8, UINT1, UINT2, UINT4, UINT8
+	 * </p>
+	 * 
+	 * @param item item-type
 	 */
 	public void dataIdSecs2Item(Secs2Item item) {
 		this.dataIdSecs2Item.set(item);
@@ -144,17 +159,20 @@ public abstract class AbstractGemConfig implements Serializable {
 	}
 	
 	/**
-	 * V-ID Secs2Item type setter.<br />
-	 * type: INT1, INT2, INT4, INT8, UINT1, UINT2, UINT4, UINT8
+	 * V-ID Secs2Item type setter.
 	 * 
-	 * @param item-type
+	 * <p>
+	 * type: INT1, INT2, INT4, INT8, UINT1, UINT2, UINT4, UINT8
+	 * </p>
+	 * 
+	 * @param item item-type
 	 */
 	public void vIdSecs2Item(Secs2Item item) {
 		this.vIdSecs2Item.set(item);
 	}
 	
 	/**
-	 * V-ID Secs2Item type getter.<br />
+	 * V-ID Secs2Item type getter.
 	 * 
 	 * @return Secs2Item
 	 */
@@ -163,10 +181,13 @@ public abstract class AbstractGemConfig implements Serializable {
 	}
 	
 	/**
-	 * REPORT-ID Secs2Item type setter.<br />
-	 * type: INT1, INT2, INT4, INT8, UINT1, UINT2, UINT4, UINT8
+	 * REPORT-ID Secs2Item type setter.
 	 * 
-	 * @param item-type
+	 * <p>
+	 * type: INT1, INT2, INT4, INT8, UINT1, UINT2, UINT4, UINT8
+	 * </p>
+	 * 
+	 * @param item item-type
 	 */
 	public void reportIdSecs2Item(Secs2Item item) {
 		this.reportIdSecs2Item.set(item);
@@ -182,10 +203,13 @@ public abstract class AbstractGemConfig implements Serializable {
 	}
 
 	/**
-	 * COLLECTION-EVENT-ID Secs2Item type setter.<br />
-	 * type: INT1, INT2, INT4, INT8, UINT1, UINT2, UINT4, UINT8
+	 * COLLECTION-EVENT-ID Secs2Item type setter.
 	 * 
-	 * @param item-type
+	 * <p>
+	 * type: INT1, INT2, INT4, INT8, UINT1, UINT2, UINT4, UINT8
+	 * </p>
+	 * 
+	 * @param item item-type
 	 */
 	public void collectionEventIdSecs2Item(Secs2Item item) {
 		this.collectionEventIdSecs2Item.set(item);

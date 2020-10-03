@@ -6,10 +6,15 @@ public abstract class AbstractSecsMessage implements SecsMessage, Serializable {
 	
 	private static final long serialVersionUID = 6003913058174391972L;
 
-	public AbstractSecsMessage() {
+	protected AbstractSecsMessage() {
 		/* Nothing */
 	}
 	
+	/**
+	 * System-Bytes-getter, using Map's key.
+	 * 
+	 * @return {@code Integer} of Message System-Bytes
+	 */
 	public Integer systemBytesKey() {
 		byte[] bs = this.header10Bytes();
 		int i = ((int)(bs[6]) << 24) & 0xFF000000;

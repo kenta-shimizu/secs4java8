@@ -7,12 +7,17 @@ import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 /**
- * This interface is implementation of Event-Report-Link in GEM (SEMI-E30)<br />
+ * This interface is implementation of Event-Report-Link in GEM (SEMI-E30).
+ * 
+ * <p>
  * To create new instance, {@link #newInstance(DynamicCollectionEvent, List)}<br />
  * To get CEID, {@link #collectionEventId()}<br />
  * To get RPTIDs, {@link #reportIds()}<br />
  * To S2F35 Single Link, {@link #toS2F35Link()}
+ * </p>
+ * <p>
  * Instances of this class are immutable.
+ * </p>
  * 
  * @author kenta-shimizu
  *
@@ -35,7 +40,9 @@ public interface DynamicLink {
 	}
 	
 	/**
-	 * to S2F35-Secs2-Single-Link.<br />
+	 * to S2F35-Secs2-Single-Link.
+	 * 
+	 * <p>
 	 * Single-Link-Format:<br />
 	 * &lt;L [2]<br />
 	 * &nbsp;&nbsp;&lt;U4 collection-event-id&gt;<br />
@@ -44,6 +51,7 @@ public interface DynamicLink {
 	 * &nbsp;&nbsp;&nbsp;&nbsp;...<br />
 	 * &nbsp;&nbsp;&lt;<br />
 	 * &gt;.
+	 * </p>
 	 * 
 	 * @return S2F35-single-link
 	 */
@@ -72,7 +80,9 @@ public interface DynamicLink {
 	
 	
 	/**
-	 * newInstance from S2F35-Secs2-Single-Link.<br />
+	 * newInstance from S2F35-Secs2-Single-Link.
+	 * 
+	 * <p>
 	 * Single-Link-Format:<br />
 	 * &lt;L [2]<br />
 	 * &nbsp;&nbsp;&lt;U4 collection-event-id&gt;<br />
@@ -81,8 +91,9 @@ public interface DynamicLink {
 	 * &nbsp;&nbsp;&nbsp;&nbsp;...<br />
 	 * &nbsp;&nbsp;&lt;<br />
 	 * &gt;.
+	 * </p>
 	 * 
-	 * @param S2F35 Secs2 Single-Link
+	 * @param secs2 S2F35 Secs2 Single-Link
 	 * @return DynamicLink
 	 * @throws Secs2Exception
 	 */

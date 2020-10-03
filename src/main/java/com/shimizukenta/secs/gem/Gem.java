@@ -2,6 +2,7 @@ package com.shimizukenta.secs.gem;
 
 import java.util.Optional;
 
+import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.AbstractSecsCommunicator;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
@@ -11,8 +12,11 @@ import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 /**
- * This interface is implementation of GEM (SEMI-E30, partially)<br />
- * Call from SecsCommunicator#gem
+ * This interface is implementation of GEM (SEMI-E30, partially).
+ * 
+ * <p>
+ * To get this interface, call from {@link SecsCommunicator#gem()}<br />
+ * </p>
  * 
  * @author kenta-shimizu
  *
@@ -33,15 +37,15 @@ public interface Gem {
 	/**
 	 * Create auto number DATAID
 	 * 
-	 * @return Auto-Data-ID from AtomicLong#incrementAndGet
+	 * @return Auto-DATAID
 	 */
 	public Secs2 autoDataId();
 	
 	/**
 	 * Create DATAID
 	 * 
-	 * @param id
-	 * @return Data-ID
+	 * @param id DATA-ID-Nubmer
+	 * @return SECS-II DATAID
 	 */
 	public Secs2 dataId(long id);
 	
@@ -53,8 +57,11 @@ public interface Gem {
 	public DynamicEventReportConfig newDynamicEventReportConfig();
 	
 	/**
-	 * Are You Online?<br />
+	 * S1F1, Are You Online?
+	 * 
+	 * <p>
 	 * blocking-method
+	 * </p>
 	 * 
 	 * @return Reply-Message
 	 * @throws SecsSendMessageException
@@ -69,11 +76,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * On Line Data<br />
-	 * MDLN, SOFTREV is reference AbstractGemConfig value<br />
-	 * blocking-method
+	 * S1F2, On Line Data.
 	 * 
-	 * @param primary-message
+	 * <p>
+	 * MDLN, SOFTREV is reference AbstractGemConfig value<br />
+	 * Blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -87,8 +97,11 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Establish Communications Request<br />
+	 * S1F13, Establish Communications Request.
+	 * 
+	 * <p>
 	 * blocking-method
+	 * </p>
 	 * 
 	 * @return COMMACK
 	 * @throws SecsSendMessageException
@@ -105,11 +118,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Establish Communications Request Acknowledge<br />
-	 * blocking-mothod
+	 * S1F14, Establish Communications Request Acknowledge.
 	 * 
-	 * @param primary-message
-	 * @param COMMACK
+	 * <p>
+	 * blocking-mothod
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param commack
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -123,8 +139,11 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Request OFF-LINE<br />
+	 * S1F15, Request OFF-LINE
+	 * 
+	 * <p>
 	 * blocking-method
+	 * </p>
 	 * 
 	 * @return OFLACK
 	 * @throws SecsSendMessageException
@@ -141,10 +160,13 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * OFF-LINE Acknowledge<br />
-	 * blocking-method
+	 * S1F16, OFF-LINE Acknowledge.
 	 * 
-	 * @param primary-message
+	 * <p>
+	 * blocking-method
+	 * </p>
+	 * 
+	 * @param primaryMsg
 	 * @return Optional.empty()
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -158,8 +180,11 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Request ON-LINE<br />
-	 * blocking-method
+	 * S1F17, Request ON-LINE.
+	 * 
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
 	 * 
 	 * @return ONLACK
 	 * @throws SecsSendMessageException
@@ -176,10 +201,13 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * ON-LINE Acknowledge<br />
-	 * blocking-mehod
+	 * S1F18, ON-LINE Acknowledge.
 	 * 
-	 * @param primary-message
+	 * <p>
+	 * blocking-mehod
+	 * </p>
+	 * 
+	 * @param primaryMsg
 	 * @param onlack
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
@@ -194,8 +222,11 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Date and Time Request<br />
+	 * S2F17, Date and Time Request.
+	 * 
+	 * <p>
 	 * blocking-method
+	 * </p>
 	 * 
 	 * @return Clock
 	 * @throws SecsSendMessageException
@@ -212,10 +243,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Date and Time Response />
-	 * blocking-method
+	 * S2F18, Date and Time Response.
 	 * 
-	 * @param AbstractClock
+	 * <p>
+	 * blocking-method
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param clock
 	 * @return Optional.empty()
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -223,7 +258,7 @@ public interface Gem {
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> s2f18(SecsMessage primaryMsg, Clock c)
+	public Optional<SecsMessage> s2f18(SecsMessage primaryMsg, Clock clock)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -231,10 +266,13 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Now Date and Time Response />
-	 * blocking-method
+	 * S2F18, Now Date and Time Response.
 	 * 
-	 * @param AbstractClock
+	 * <p>
+	 * blocking-method
+	 * </p>
+	 * 
+	 * @param primaryMsg
 	 * @return Optional.empty()
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -250,11 +288,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Remote Command Acknowledge<br />
-	 * blocking-method
+	 * S2F22, Remote Command Acknowledge.
 	 * 
-	 * @param primary-message
-	 * @param CMDA
+	 * <p>
+	 * blocking-method
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param cmda
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -268,11 +309,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Initiate Processing Acknowledge<br />
-	 * blocking-method
+	 * S2F28, Initiate Processing Acknowledge.
 	 * 
-	 * @param primary-message
-	 * @param CMDA
+	 * <p>
+	 * blocking-method
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param cmda
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -286,10 +330,13 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Date and Time Set Request<br />
-	 * blocking-method
+	 * S2F31, Date and Time Set Request.
 	 * 
-	 * @param CLOCK
+	 * <p>
+	 * blocking-method
+	 * </p>
+	 * 
+	 * @param clock
 	 * @return TIACK
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -297,7 +344,7 @@ public interface Gem {
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
 	 */
-	public TIACK s2f31(Clock c)
+	public TIACK s2f31(Clock clock)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -305,8 +352,11 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Now Date and Time Set Request<br />
-	 * blocking-method
+	 * S2F31, Now Date and Time Set Request.
+	 * 
+	 * <p>
+	 * blocking-method.
+	 * </p>
 	 * 
 	 * @return TIACK
 	 * @throws SecsSendMessageException
@@ -323,11 +373,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Date and Time Set Acknowledge<br />
-	 * blocking-method
+	 * S2F32, Date and Time Set Acknowledge.
 	 * 
-	 * @param primary-message
-	 * @param TIACK
+	 * <p>
+	 * blocking-method.
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param tiack
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -341,9 +394,12 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Delete All Define-Report<br />
+	 * S2F33, Delete All Define-Report.
+	 * 
+	 * <p>
 	 * DATA-ID is AutoNumber.<br />
-	 * blocking-method
+	 * blocking-method<br />
+	 * </p>
 	 * 
 	 * @return DRACK
 	 * @throws SecsSendMessageException
@@ -360,11 +416,14 @@ public interface Gem {
 			, InterruptedException;
 
 	/**
-	 * Define Report<br />
-	 * DATA-ID is AutoNumber.<br />
-	 * blocking-method
+	 * S2F33, Define Report.
 	 * 
-	 * @param DynamicEventReportConfig
+	 * <p>
+	 * DATA-ID is AutoNumber.<br />
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param config DynamicEventReportConfig
 	 * @return DRACK
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -380,11 +439,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Define Report Acknowledge<br />
-	 * blocking-method
+	 * S2F34, Define Report Acknowledge.
 	 * 
-	 * @param primary-message
-	 * @param DRACK
+	 * <p>
+	 * blocking-method
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param drack
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -398,11 +460,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Link Collection Event Report<br />
-	 * DATA-ID is AutoNumber.<br />
-	 * blocking-method
+	 * S2F35, Link Collection Event Report.
 	 * 
-	 * @param DynamicEventReportConfig
+	 * <p>
+	 * DATA-ID is AutoNumber.<br />
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param config DynamicEventReportConfig
 	 * @return LRACK
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -418,11 +483,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Link Collection Event Report Acknowledge<br />
-	 * blocking-method
+	 * S2F36, Link Collection Event Report Acknowledge.
 	 * 
-	 * @param primary-message
-	 * @param LRACK
+	 * <p>
+	 * blocking-method
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param lrack
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -436,8 +504,11 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Disable All Collection-Event-Report<br />
-	 * blocking-method
+	 * S2F37, Disable All Collection-Event-Report.
+	 * 
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
 	 * 
 	 * @return ERACK
 	 * @throws SecsSendMessageException
@@ -454,8 +525,11 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Enable All Collection-Event-Report<br />
-	 * blocking-method
+	 * S2F37, Enable All Collection-Event-Report.
+	 * 
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
 	 * 
 	 * @return ERACK
 	 * @throws SecsSendMessageException
@@ -472,8 +546,11 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Enable Collection-Event-Report<br />
-	 * blocking-method
+	 * S2F37, Enable Collection-Event-Report.
+	 * 
+	 * <p>
+	 * blocking-method.<br />
+	 * </p>
 	 * 
 	 * @param DynamicEventReportConfig
 	 * @return ERACK
@@ -491,11 +568,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Enable/Disable CollectionEvent Report Acknowledge<br />
-	 * blocking-method
+	 * S2F38, Enable/Disable CollectionEvent Report Acknowledge.
 	 * 
-	 * @param primary-message
-	 * @param ERACK
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param erack
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -509,11 +589,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Multi-block Grant<br />
-	 * blocking-method
+	 * S2F40, Multi-block Grant.
 	 * 
-	 * @param primary-message
-	 * @param GRANT
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param grant
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -527,11 +610,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Matls Multi-block Grant<br />
-	 * blocking-method
+	 * S3F16, Matls Multi-block Grant.
 	 * 
-	 * @param primary-message
-	 * @param GRANT
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param grant
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -545,11 +631,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Alarm Report Ack<br />
-	 * blocking-method
+	 * S5F2, Alarm Report Ack.
 	 * 
-	 * @param primary-message
-	 * @param ACKC5
+	 * <p>
+	 * blocking-method.
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc5
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -563,11 +652,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Enable/Disable Alarm Ack<br />
-	 * blocking-method
+	 * S5F4, Enable/Disable Alarm Ack.
 	 * 
-	 * @param primary-message
-	 * @param ACKC5
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc5
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -581,11 +673,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Trace Data Ack<br />
-	 * blocking-method
+	 * S6F2, Trace Data Ack.
 	 * 
-	 * @param primary-message
-	 * @param ACKC6
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc6
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -599,11 +694,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Discrete Variable Data Send Ack<br />
-	 * blocking-method
+	 * S6F4, Discrete Variable Data Send Ack.
 	 * 
-	 * @param primary-messag0
-	 * @param ACKC6
+	 * <p>
+	 * blocking-method
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc6
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -617,11 +715,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Multi-block Grant<br />
-	 * blocking-method
+	 * S6F6, Multi-block Grant.
+	 * 
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
 	 * 
 	 * @param primaryMsg
-	 * @param GRANT6
+	 * @param grant6
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -635,11 +736,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Formatted Variable Ack<br />
-	 * blocking-method
+	 * S6F10, Formatted Variable Ack.
 	 * 
-	 * @param primary-message
-	 * @param ACKC6
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc6
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -653,11 +757,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * CollectionEvent Report Ack<br />
-	 * blocking-method
+	 * S6F12, CollectionEvent Report Ack.
 	 * 
-	 * @param primary-message
-	 * @param ACKC6
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc6
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -671,11 +778,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Annotated CollectionEvent Report Ack<br />
-	 * blocking-method
+	 * S6F14, Annotated CollectionEvent Report Ack.
 	 * 
-	 * @param primary-message
-	 * @param ACKC6
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc6
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -689,10 +799,13 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Event Report Request<br />
-	 * blocking-method
+	 * S6F15, Event Report Request.
 	 * 
-	 * @param DynamicCollectionEvent
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param ce DynamicCollectionEvent
 	 * @return reply-message
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -706,10 +819,13 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Annotated Event Report Request<br />
-	 * blocking-method
+	 * S6F17, Annotated Event Report Request.
 	 * 
-	 * @param DynamicCollectionEvent
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param ce DynamicCollectionEvent
 	 * @return reply-message
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -723,10 +839,13 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Individual Report Request<br />
-	 * blocking-method
+	 * S6F19, Individual Report Request.
 	 * 
-	 * @param DynamicReport
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param report DynamicReport
 	 * @return reply-message
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -740,10 +859,13 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Annotated Individual Report Request<br />
-	 * blocking-method
+	 * S6F21, Annotated Individual Report Request.
 	 * 
-	 * @param DynamicReport
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param report DynamicReport
 	 * @return reply-message
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -757,11 +879,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Notification Report Send Ack<br />
-	 * blocking-method
+	 * S6F26, Notification Report Send Ack.
 	 * 
-	 * @param primary-message
-	 * @param ACKC6
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc6
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -775,11 +900,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Process Program Send Acknowledge<br />
-	 * blocking-method
+	 * S7F14, Process Program Send Acknowledge.
 	 * 
-	 * @param primary-message
-	 * @param ACKC7
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc7
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -793,11 +921,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Matl/Process Matrix Update Ack<br />
-	 * blocking-method
+	 * S7F12, Matl/Process Matrix Update Ack.
 	 * 
-	 * @param primary-message
-	 * @param ACKC7
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc7
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -811,11 +942,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Delete Matl/Process Matrix Entry Acknowledge<br />
-	 * blocking-method
+	 * S7F14, Delete Matl/Process Matrix Entry Acknowledge.
 	 * 
-	 * @param primary-message
-	 * @param ACKC7
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc7
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -829,11 +963,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Matrix Mode Select Ack<br />
-	 * blocking-method
+	 * S7F16, Matrix Mode Select Ack.
 	 * 
-	 * @param primary-message
-	 * @param ACKC7
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc7
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -847,11 +984,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Delete Process Program Acknowledge<br />
-	 * blocking-method
+	 * S7F18, Delete Process Program Acknowledge.
 	 * 
-	 * @param primary-message
-	 * @param ACKC7
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc7
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -865,11 +1005,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Formatted Process Program Acknowledge<br />
-	 * blocking-method
+	 * S7F24, Formatted Process Program Acknowledge.
 	 * 
-	 * @param primary-message
-	 * @param ACKC7
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc7
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -883,11 +1026,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Verification Request Acknowledge<br />
-	 * blocking-method
+	 * S7F32, Verification Request Acknowledge.
 	 * 
-	 * @param primary-message
-	 * @param ACKC7
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc7
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -901,11 +1047,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Large PP Send Ack<br />
-	 * blocking-method
+	 * S7F38, Large PP Send Ack.
 	 * 
-	 * @param primary-message
-	 * @param ACKC7
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc7
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -919,11 +1068,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Large Formatted PP Ack<br />
-	 * blocking-method
+	 * S7F40, Large Formatted PP Ack.
 	 * 
-	 * @param primary-message
-	 * @param ACKC7
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc7
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -937,11 +1089,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Large PP Req Ack<br />
-	 * blocking-method
+	 * S7F42, Large PP Req Ack.
 	 * 
-	 * @param primary-message
-	 * @param ACKC7
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc7
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -955,11 +1110,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Large Formatted PP Req Ack<br />
-	 * blocking-method
+	 * S7F44, Large Formatted PP Req Ack.
 	 * 
-	 * @param primary-message
-	 * @param ACKC7
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param ackc7
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -973,10 +1131,13 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Unknown Device ID<br />
-	 * blocking-method
+	 * S9F1, Unknown Device ID.
 	 * 
-	 * @param reference-message
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param refMsg
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -990,10 +1151,13 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Unknown Stream<br />
-	 * blocking-method
+	 * S9F3, Unknown Stream.
 	 * 
-	 * @param reference-message
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param refMsg
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -1007,10 +1171,13 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Unknown Function<br />
-	 * blocking-method
+	 * S9F5, Unknown Function.
 	 * 
-	 * @param reference-message
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param refMsg
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -1024,10 +1191,13 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Illegal Data<br />
-	 * blocking-method
+	 * S9F7, Illegal Data.
 	 * 
-	 * @param reference-message
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param refMsg
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -1041,10 +1211,13 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Transaction Timeout<br />
-	 * blocking-method
+	 * S9F9, Transaction Timeout.
 	 * 
-	 * @param reference-message
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param refMsg
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -1058,10 +1231,13 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Data Too Long<br />
-	 * blocking-method
+	 * S9F11, Data Too Long.
 	 * 
-	 * @param reference-message
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param refMsg
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -1079,8 +1255,11 @@ public interface Gem {
 	
 	
 	/**
-	 * Terminal Request Acknowledge<br />
-	 * blocking-method
+	 * S10F2, Terminal Request Acknowledge.
+	 * 
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc10
@@ -1097,8 +1276,11 @@ public interface Gem {
 			, InterruptedException;
 
 	/**
-	 * Terminal Display, Single Acknowledge<br />
-	 * blocking-method
+	 * S10F4, Terminal Display, Single Acknowledge.
+	 * 
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc10
@@ -1115,8 +1297,11 @@ public interface Gem {
 			, InterruptedException;
 
 	/**
-	 * Terminal Display, Multi-Block Acknowledge<br />
-	 * blocking-method
+	 * S10F6, Terminal Display, Multi-Block Acknowledge.
+	 * 
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc10
@@ -1133,8 +1318,11 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Broadcast Acknowledge<br />
-	 * blocking-method
+	 * S10F10, Broadcast Acknowledge.
+	 * 
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc10
@@ -1151,11 +1339,14 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * Data Set Obj Multi-Block Grant<br />
-	 * blocking-method
+	 * S13F12, Data Set Obj Multi-Block Grant.
 	 * 
-	 * @param primary-message
-	 * @param GRANT
+	 * <p>
+	 * blocking-method<br />
+	 * </p>
+	 * 
+	 * @param primaryMsg
+	 * @param grant
 	 * @return Optional.empty
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException

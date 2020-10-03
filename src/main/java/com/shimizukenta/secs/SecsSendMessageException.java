@@ -1,5 +1,11 @@
 package com.shimizukenta.secs;
 
+/**
+ * This Exception is super class of SECS-Communicator send-message failed Exception.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class SecsSendMessageException extends SecsException {
 	
 	private static final long serialVersionUID = 7063333511988028224L;

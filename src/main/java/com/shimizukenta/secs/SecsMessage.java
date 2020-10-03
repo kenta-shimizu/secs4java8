@@ -3,16 +3,20 @@ package com.shimizukenta.secs;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
- * This interface is implementation of Send and Recieve Message.<br />
- * SecsMessage contains<br />
- * <ul>
- * <li>SECS-II Stream</li>
- * <li>SECS-II Function</li>
- * <li>W-Bit</li>
- * <li>SECS-II Data</li>
- * <li>Header-10-bytes</li>
- * </ul>
- * Instances of this class are immutable.
+ * This interface is implementation of Send and Receive Message.
+ * 
+ * <p>
+ * SecsMessage contains Stream, Function, WBit, Datta<br />
+ * <br />
+ * To get SECS-II-Stream-Number, {@link #getStream()}<br />
+ * To get SECS-II-Function-Number, {@link #getFunction()}<br />
+ * To get SECS-II-WBit, {@link #wbit()}<br />
+ * To get SECS-II-Data, {@link #secs2()}<br />
+ * To get Header-10-bytes, {@link #header10Bytes()}<br />
+ * To get Message-Device-ID, {@link #deviceId()}<br />
+ * <br />
+ * Instances of this class are immutable.<br />
+ * </p>
  * 
  * @author kenta-shimizu
  *

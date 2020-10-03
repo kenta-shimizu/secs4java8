@@ -17,7 +17,11 @@ import java.util.concurrent.TimeoutException;
 import com.shimizukenta.secs.SecsException;
 
 /**
- * This abstract class is implementation of HSMS-SS-Passive (SEMI-E37.1)<br />
+ * This abstract class is implementation of HSMS-SS-Passive Communicator(SEMI-E37.1).
+ * 
+ * <p>
+ * This class is called from {@link HsmsSsCommunicator#newInstance(HsmsSsCommunicatorConfig)<br />
+ * </p>
  * 
  * @author kenta-shimizu
  *

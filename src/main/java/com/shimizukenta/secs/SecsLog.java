@@ -1,5 +1,7 @@
 package com.shimizukenta.secs;
 
+import com.shimizukenta.secs.SecsCommunicator;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -10,13 +12,22 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * SecsLog contains<br />
- * <ul>
- * <li>Log-subject</li>
- * <li>Log-timestamp</li>
- * <li>Log-value (detail-information)</li>
- * </ul>
- * Instances of this class are immutable.
+ * SecsLog contains subject, timestamp, defail-information.
+ * 
+ * <p>
+ * This instance is received from {@link SecsCommunicator#addSecsLogListener(SecsLogListener)}<br />
+ * </p>
+ * <p>
+ * To get subject, {@link #subject()}<br />
+ * To get {@link LocalDateTime} timestamp, {@link #timestamp()}<br />
+ * To get defail-information, {@link #value()}<br />
+ * </p>
+ * <p>
+ * {@link #toString()} is overrided to pretty-printing.<br />
+ * </p>
+ * <p>
+ * Instances of this class are immutable.<br />
+ * </p>
  * 
  * @author kenta-shimizu
  *
@@ -55,14 +66,29 @@ public class SecsLog implements Serializable {
 		return Objects.requireNonNull(t).getClass().getSimpleName();
 	}
 	
+	/**
+	 * Log subject getter.
+	 * 
+	 * @return subject-string
+	 */
 	public String subject() {
 		return this.subject;
 	}
 	
+	/**
+	 * Log timestamp getter.
+	 * 
+	 * @return timestamp
+	 */
 	public LocalDateTime timestamp() {
 		return this.timestamp;
 	}
 	
+	/**
+	 * Log detail-information getter.
+	 * 
+	 * @return value if exist
+	 */
 	public Optional<Object> value() {
 		return this.value == null ? Optional.empty() : Optional.of(this.value);
 	}

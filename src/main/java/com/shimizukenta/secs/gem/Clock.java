@@ -6,9 +6,14 @@ import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 /**
- * This interface is implementation of Clock in GEM (SEMI-E30)<br />
+ * This interface is implementation of Clock in GEM (SEMI-E30)
+ * 
+ * <p>
  * Relates: S2F17, S2F18, S2F31<br />
- * Instances of this class are immutable.
+ * </p>
+ * <p>
+ * Instances of this class are immutable.<br />
+ * </p>
  * 
  * @author kenta-shimizu
  *
@@ -18,7 +23,7 @@ public interface Clock {
 	/**
 	 * Create new Clock instance from LocalDateTime.
 	 * 
-	 * @param LocalDateTime
+	 * @param ldt LocalDateTime
 	 * @return Clock-of-LocalDateTime
 	 */
 	public static Clock from(LocalDateTime ldt) {
@@ -35,8 +40,11 @@ public interface Clock {
 	}
 	
 	/**
-	 * Create new Clock instance from Secs2<br />
-	 * use for Secs2 of S2F18, S2F31
+	 * Create new Clock instance from Secs2.
+	 * 
+	 * <p>
+	 * use for Secs2 of S2F18, S2F31<br />
+	 * </p>
 	 * 
 	 * @param secs2
 	 * @return Clock
@@ -47,18 +55,21 @@ public interface Clock {
 	}
 	
 	/**
+	 * LocalDateTime getter.
 	 * 
 	 * @return LocalDateTime
 	 */
 	public LocalDateTime toLocalDateTime();
 	
 	/**
+	 * A12 getter.
 	 * 
 	 * @return Secs2.ascii(yyMMddhhmmss)
 	 */
 	public Secs2 toAscii12();
 	
 	/**
+	 * A16 getter.
 	 * 
 	 * @return Secs2.ascii(yyyyMMddhhmmssSS)
 	 */

@@ -11,9 +11,26 @@ import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 /**
- * This interface is implementation of Dynamic-Event-Report-Configuration in GEM (SEMI-E30)<br />
- * To create new instance, {@link #newInstance(AbstractGem)}<br />
+ * This interface is implementation of Dynamic-Event-Report-Configuration in GEM (SEMI-E30).
+ * 
+ * <p>
+ * To create new instance, {@link Gem#newDynamicEventReportConfig()}<br />
+ * </p>
+ * <p>
+ * To add Define-Report, {@link #addDefineReport(CharSequence, List)}<br />
+ * To add Enable-CEID, {@link #addEnableCollectionEvent(CharSequence, long)}<br />
+ * To add Link, {@link #addLinkByReport(DynamicCollectionEvent, List)}<br />
+ * </p>
+ * <p>
+ * To S2F37 Disable-All-CEIDs, {@link #s2f37DisableAll()}<br />
+ * To S2F33 Delete-All-Reports, {@link #s2f33DeleteAll()}<br />
+ * To S2F33 Define-Reports, {@link #s2f33Define()}<br />
+ * To S2F35 Link, {@link #s2f35()}<br />
+ * To S2F37 Enable-CEIDs, {@link #s2f37Enable()}<br />
+ * </p>
+ * <p>
  * Relates: S2F33, S2F35, S2F37, S6F11, S6F13, S6F15, S6F17, S6F19, S6F21
+ * </p>
  * 
  * @author kenta-shimizu
  *
@@ -34,51 +51,64 @@ public interface DynamicEventReportConfig {
 	}
 	
 	/**
-	 * Add Define-Report.<br />
+	 * Add Define-Report.
+	 * 
+	 * <p>
 	 * Use for S2F33
+	 * </p>
 	 * 
 	 * @param reportId
-	 * @param alias
-	 * @param VIDs
+	 * @param alias of use in {@link #getReport(CharSequence)}, {@link #s6f19(CharSequence)}, {@link #s6f21(CharSequence)}
+	 * @param vids
 	 * @return DynamicReport
 	 */
 	public DynamicReport addDefineReport(long reportId, CharSequence alias, List<? extends Number> vids);
 	
 	/**
-	 * Add Define-Report.<br />
+	 * Add Define-Report.
+	 * 
+	 * <p>
 	 * Use for S2F33
+	 * </p>
 	 * 
 	 * @param reportId
-	 * @param VIDs
+	 * @param vids
 	 * @return DynamicReport
 	 */
 	public DynamicReport addDefineReport(long reportId, List<? extends Number> vids);
 	
 	/**
-	 * Add Define-Report.<br />
-	 * Use for S2F33<br />
-	 * Report-ID is AutoNumber.
+	 * Add Define-Report.
 	 * 
-	 * @param alias
-	 * @param VIDs
+	 * <p>
+	 * Use for S2F33<br />
+	 * Report-ID is AutoNumber<br />
+	 * </p>
+	 * 
+	 * @param alias of use in {@link #getReport(CharSequence)}, {@link #s6f19(CharSequence)}, {@link #s6f21(CharSequence)}
+	 * @param vids
 	 * @return DynamicReport
 	 */
 	public DynamicReport addDefineReport(CharSequence alias, List<? extends Number> vids);
 	
 	/**
-	 * Add Define-Report.<br />
-	 * Use for S2F33<br />
-	 * Report-ID is AutoNumber.
+	 * Add Define-Report.
 	 * 
-	 * @param VIDs
+	 * <p>
+	 * Use for S2F33<br />
+	 * Report-ID is AutoNumber.<br />
+	 * </p>
+	 * 
+	 * @param vids
 	 * @return DynamicReport
 	 */
 	public DynamicReport addDefineReport(List<? extends Number> vids);
 	
 	/**
+	 * Remove Report
 	 * 
 	 * @param DynamicReport
-	 * @return true if success
+	 * @return {@code true} if remove success
 	 */
 	public boolean removeReport(DynamicReport report);
 	
@@ -91,10 +121,13 @@ public interface DynamicEventReportConfig {
 	public Optional<DynamicReport> getReport(CharSequence alias);
 	
 	/**
-	 * Seek in Define-Reports by report-id.<br />
-	 * Used for S6F11, S6F13,...
+	 * Seek in Define-Reports by report-id.
 	 * 
-	 * @param report-id
+	 * <p>
+	 * Used for S6F11, S6F13, ...
+	 * </p>
+	 * 
+	 * @param reportId
 	 * @return DynamicReport if exist
 	 */
 	public Optional<DynamicReport> getReport(Secs2 reportId);
@@ -110,65 +143,82 @@ public interface DynamicEventReportConfig {
 	public DynamicLink addLinkById(long ceid, List<? extends Number> reportIds);
 	
 	/**
-	 * Add Event-Report-Link.<br />
-	 * Use for S2F35
+	 * Add Event-Report-Link.
 	 * 
-	 * @param DynamicCollectionEvent
-	 * @param Report-IDs
+	 * <p>
+	 * Use for S2F35.
+	 * </p>
+	 * 
+	 * @param ce DynamicCollectionEvent
+	 * @param reportIds Report-IDs
 	 * @return DynamicLink
 	 */
 	public DynamicLink addLinkById(DynamicCollectionEvent ce, List<? extends Number> reportIds);
 	
 	/**
-	 * Add Event-Report-Link.<br />
-	 * Use for S2F35
+	 * Add Event-Report-Link.
 	 * 
-	 * @param Collection-Event-ID
-	 * @param DynamicReports
+	 * <p>
+	 * Use for S2F35.
+	 * </p>
+	 * 
+	 * @param ceid Collection-Event-ID
+	 * @param reports DynamicReports
 	 * @return DynamicLink
 	 */
 	public DynamicLink addLinkByReport(long ceid, List<? extends DynamicReport> reports);
 	
 	/**
-	 * Add Event-Report-Link.<br />
-	 * Use for S2F35
+	 * Add Event-Report-Link.
 	 * 
-	 * @param DynamicCollectionEvent
-	 * @param DynamicReports
+	 * <p>
+	 * Use for S2F35.
+	 * </p>
+	 * 
+	 * @param ce DynamicCollectionEvent
+	 * @param reports DynamicReports
 	 * @return DynamicLink
 	 */
 	public DynamicLink addLinkByReport(DynamicCollectionEvent ce, List<? extends DynamicReport> reports);
 	
 	/**
+	 * Remove Link.
 	 * 
 	 * @param DynamicLink
-	 * @return true if success
+	 * @return {@code true} if remove success
 	 */
 	public boolean removeLink(DynamicLink link);
 	
 	/**
-	 * Add Enable-Collection-Event.<br />
-	 * Use for S2F37
+	 * Add Enable-Collection-Event.
 	 * 
-	 * @param Collection-Event-ID
+	 * <p>
+	 * Use for S2F37.
+	 * </p>
+	 * 
+	 * @param ceid Collection-Event-ID
 	 * @return DynamicCollectionEvent
 	 */
 	public DynamicCollectionEvent addEnableCollectionEvent(long ceid);
 	
 	/**
-	 * Add Enable-Collection-Event.<br />
-	 * Use for S2F37
+	 * Add Enable-Collection-Event.
 	 * 
-	 * @param alias
-	 * @param Collection-Event-ID
+	 * <p>
+	 * Use for S2F37.
+	 * </p>
+	 * 
+	 * @param alias of {@link #getCollectionEvent(CharSequence)}, {@link #s6f15(CharSequence)}, {@link #s6f17(CharSequence)}
+	 * @param ceid Collection-Event-ID
 	 * @return DynamicCollectionEvent
 	 */
 	public DynamicCollectionEvent addEnableCollectionEvent(CharSequence alias, long ceid);
 	
 	/**
+	 * Remove Enable-Collection-Event.
 	 * 
-	 * @param DynamicCollectionEvent
-	 * @return true if success
+	 * @param ce DynamicCollectionEvent
+	 * @return {@code true} if remove success
 	 */
 	public boolean removeEnableCollectionEvent(DynamicCollectionEvent ce);
 	
@@ -181,8 +231,11 @@ public interface DynamicEventReportConfig {
 	public Optional<DynamicCollectionEvent> getCollectionEvent(CharSequence alias);
 	
 	/**
-	 * Seek in Enable-Collection-Events by Collection-Event-ID.<br />
+	 * Seek in Enable-Collection-Events by Collection-Event-ID.
+	 * 
+	 * <p>
 	 * Used for S6F11, S6F13,...
+	 * </p>
 	 * 
 	 * @param ceid
 	 * @return DynamicCollectionEvent if exist
@@ -190,9 +243,12 @@ public interface DynamicEventReportConfig {
 	public Optional<DynamicCollectionEvent> getCollectionEvent(Secs2 ceid);
 	
 	/**
-	 * Delete All Define-Report<br />
+	 * S2F33, Delete All Define-Report.
+	 * 
+	 * <p>
 	 * DATA-ID is AutoNumber.<br />
-	 * blocking-method
+	 * blocking-method.<br />
+	 * </p>
 	 * 
 	 * @return DRACK
 	 * @throws SecsSendMessageException
@@ -209,9 +265,12 @@ public interface DynamicEventReportConfig {
 			, InterruptedException;
 	
 	/**
-	 * Define Report<br />
+	 * S2F33, Define Report.
+	 * 
+	 * <p>
 	 * DATA-ID is AutoNumber.<br />
-	 * blocking-method
+	 * blocking-method<br />
+	 * </p>
 	 * 
 	 * @return DRACK
 	 * @throws SecsSendMessageException
@@ -228,9 +287,12 @@ public interface DynamicEventReportConfig {
 			, InterruptedException;
 	
 	/**
-	 * Link Collection Event Report<br />
+	 * S2F35, Link Collection Event Report.
+	 * 
+	 * <p>
 	 * DATA-ID is AutoNumber.<br />
-	 * blocking-method
+	 * blocking-method<br />
+	 * </p>
 	 * 
 	 * @return LRACK
 	 * @throws SecsSendMessageException
@@ -247,8 +309,11 @@ public interface DynamicEventReportConfig {
 			, InterruptedException;
 	
 	/**
-	 * Disable All Collection-Event-Report<br />
-	 * blocking-method
+	 * S2F37, Disable All Collection-Event-Report.
+	 * 
+	 * <p>
+	 * blocking-method.
+	 * </p>
 	 * 
 	 * @return ERACK
 	 * @throws SecsSendMessageException
@@ -265,8 +330,11 @@ public interface DynamicEventReportConfig {
 			, InterruptedException;
 	
 	/**
-	 * Enable All Collection-Event-Report<br />
+	 * S2F37, Enable All Collection-Event-Report.
+	 * 
+	 * <p>
 	 * blocking-method
+	 * </p>
 	 * 
 	 * @return ERACK
 	 * @throws SecsSendMessageException
@@ -283,8 +351,11 @@ public interface DynamicEventReportConfig {
 			, InterruptedException;
 	
 	/**
-	 * Enable Collection-Event-Report<br />
+	 * S2F37, Enable Collection-Event-Report.
+	 * 
+	 * <p>
 	 * blocking-method
+	 * </p>
 	 * 
 	 * @return ERACK
 	 * @throws SecsSendMessageException
@@ -301,10 +372,13 @@ public interface DynamicEventReportConfig {
 			, InterruptedException;
 	
 	/**
-	 * Event Report Request<br />
-	 * blocking-method
+	 * S6F15, Event Report Request.
 	 * 
-	 * @param DynamicCollectionEvent
+	 * <p>
+	 * blocking-method
+	 * </p>
+	 * 
+	 * @param ce DynamicCollectionEvent
 	 * @return reply-message
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -318,13 +392,16 @@ public interface DynamicEventReportConfig {
 			, InterruptedException;
 	
 	/**
-	 * Event Report Request<br />
+	 * S6F15, Event Report Request.
+	 * 
+	 * <p>
 	 * Parameter "alias" is setted in #addEnableCollectionEvent<br />
 	 * Seek in enable-collection-events by alias.<br />
 	 * blocking-method.<br />
-	 * If alias not found, throw AliasNotFoundDynamicEventReportException.
+	 * If alias not found, throw AliasNotFoundDynamicEventReportException.<br />
+	 * </p>
 	 * 
-	 * @param Enable-Collection-Event alias
+	 * @param alias of Enable-Collection-Event
 	 * @return reply-message
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -340,10 +417,13 @@ public interface DynamicEventReportConfig {
 			, InterruptedException;
 	
 	/**
-	 * Annotated Event Report Request<br />
-	 * blocking-method
+	 * S6F17, Annotated Event Report Request.
 	 * 
-	 * @param DynamicCollectionEvent
+	 * <p>
+	 * blocking-method
+	 * </p>
+	 * 
+	 * @param ce DynamicCollectionEvent
 	 * @return reply-message
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -357,13 +437,16 @@ public interface DynamicEventReportConfig {
 			, InterruptedException;
 	
 	/**
-	 * Annotated Event Report Request<br />
+	 * S6F17, Annotated Event Report Request.
+	 * 
+	 * <p>
 	 * Parameter "alias" is setted in #addEnableCollectionEvent<br />
 	 * Seek in enable-collection-events by alias.<br />
 	 * blocking-method.<br />
 	 * If alias not found, throw AliasNotFoundDynamicEventReportException.
+	 * </p>
 	 * 
-	 * @param Enable-Collection-Event alias
+	 * @param alias of Enable-Collection-Event
 	 * @return reply-message
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -379,10 +462,13 @@ public interface DynamicEventReportConfig {
 			, InterruptedException;
 	
 	/**
-	 * Individual Report Request<br />
-	 * blocking-method
+	 * S6F19, Individual Report Request
 	 * 
-	 * @param DynamicReport
+	 * <p>
+	 * blocking-method
+	 * </p>
+	 * 
+	 * @param report DynamicReport
 	 * @return reply-message
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -396,13 +482,16 @@ public interface DynamicEventReportConfig {
 			, InterruptedException;
 	
 	/**
-	 * Individual Report Request<br />
+	 * S6F19, Individual Report Request.
+	 * 
+	 * <p>
 	 * Parameter "alias" is setted in #addDefineReport<br />
 	 * Seek in define-reports by alias.<br />
 	 * blocking-method.<br />
-	 * If alias not found, throw AliasNotFoundDynamicEventReportException.
+	 * If alias not found, throw AliasNotFoundDynamicEventReportException.<br />
+	 * </p>
 	 * 
-	 * @param Define-Report alias
+	 * @param alias of Define-Report
 	 * @return reply-message
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -418,10 +507,13 @@ public interface DynamicEventReportConfig {
 			, InterruptedException;
 	
 	/**
-	 * Annotated Individual Report Request<br />
-	 * blocking-method
+	 * S6F21, Annotated Individual Report Request.
 	 * 
-	 * @param DynamicReport
+	 * <p>
+	 * blocking-method
+	 * </p>
+	 * 
+	 * @param report DynamicReport
 	 * @return reply-message
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
@@ -435,13 +527,16 @@ public interface DynamicEventReportConfig {
 			, InterruptedException;
 	
 	/**
-	 * Annotated Individual Report Request<br />
+	 * S6F21, Annotated Individual Report Request.
+	 * 
+	 * <p>
 	 * Parameter "alias" is setted in #addDefineReport<br />
 	 * Seek in define-reports by alias.<br />
 	 * blocking-method.<br />
-	 * If alias not found, throw AliasNotFoundDynamicEventReportException.
+	 * If alias not found, throw AliasNotFoundDynamicEventReportException.<br />
+	 * </p>
 	 * 
-	 * @param Define-Report alias
+	 * @param alias of Define-Report
 	 * @return reply-message
 	 * @throws SecsSendMessageException
 	 * @throws SecsWaitReplyMessageException
