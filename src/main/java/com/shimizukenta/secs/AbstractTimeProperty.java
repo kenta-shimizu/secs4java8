@@ -8,8 +8,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Time value Getter, Setter, Value-Change-Observer<br />
+ * Time value Getter, Setter, Value-Change-Observer
+ * 
+ * <p>
  * Not accept null.
+ * </p>
  * 
  * @author kenta-shimizu
  *

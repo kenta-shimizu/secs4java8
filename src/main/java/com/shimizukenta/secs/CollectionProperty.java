@@ -3,6 +3,12 @@ package com.shimizukenta.secs;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+/**
+ * 
+ * @author kenta-shimizu
+ *
+ * @param <T>
+ */
 public interface CollectionProperty<T>
 		extends ReadOnlyCollectionProperty<T>,
 		WritableCollectionValue<T> {

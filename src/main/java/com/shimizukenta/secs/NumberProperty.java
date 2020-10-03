@@ -1,8 +1,11 @@
 package com.shimizukenta.secs;
 
 /**
- * Number value Getter, Setter, Value-Change-Observer<br />
+ * Number value Getter, Setter, Value-Change-Observer
+ * 
+ * <p>
  * Not accept null.
+ * </p>
  * 
  * @author kenta-shimizu
  *

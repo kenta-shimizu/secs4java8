@@ -11,8 +11,11 @@ import java.net.SocketAddress;
 public interface ReadOnlySocketAddressProperty extends ReadOnlyProperty<SocketAddress> {
 	
 	/**
-	 * SocketAddress getter<br />
-	 * if set null, throw IllegalStateException.
+	 * SocketAddress getter
+	 * 
+	 * <p>
+	 * if set {@code null}, throw IllegalStateException.
+	 * </p>
 	 * 
 	 * @throws IllegalStateException
 	 * @return SocketAddress
