@@ -339,9 +339,9 @@ From RPTID in received S6F11 or S6F13, Get Report-Alias if aliased.
 - Reply S2F18 Now examples
 
 ```
-    active.gem().s2f18(Clock.from(LocalDateTime.now()));
-    active.gem().s2f18(Clock.now());
-    active.gem().s2f18Now();
+    active.gem().s2f18(primaryMsg, Clock.from(LocalDateTime.now()));
+    active.gem().s2f18(primaryMsg, Clock.now());
+    active.gem().s2f18Now(primaryMsg);
 ```
 
 - Send S2F31 Now examples
