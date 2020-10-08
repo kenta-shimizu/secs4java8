@@ -38,7 +38,7 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
 public interface DynamicEventReportConfig {
 	
 	/**
-	 * Create new instance.
+	 * Returns new instance.
 	 * 
 	 * @param gem
 	 * @return newInstance

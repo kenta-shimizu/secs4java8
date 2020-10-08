@@ -26,7 +26,7 @@ public class SmlMessageParser {
 	}
 	
 	/**
-	 * Parser getter
+	 * Returns parser instance.
 	 * 
 	 * <p>
 	 * This instance is Singleton-pattern.

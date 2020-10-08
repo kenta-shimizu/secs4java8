@@ -25,7 +25,7 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
 public interface DynamicLink {
 	
 	/**
-	 * Create new instance
+	 * Returns new instance
 	 * 
 	 * @param collectionEvent
 	 * @param reportIds
@@ -58,21 +58,21 @@ public interface DynamicLink {
 	public Secs2 toS2F35Link();
 	
 	/**
-	 * getter Collection-Event
+	 * Returns Collection-Event
 	 * 
 	 * @return DynamicCollectionEvent
 	 */
 	public DynamicCollectionEvent collectionEvent();
 	
 	/**
-	 * getter CEID SECS-II
+	 * Returns CEID SECS-II
 	 * 
 	 * @return CEID SECS-II
 	 */
 	public Secs2 collectionEventId();
 	
 	/**
-	 * getter RPTIDs
+	 * Returns RPTIDs
 	 * 
 	 * @return List<Secs2> of RPTIDs
 	 */

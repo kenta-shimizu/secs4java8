@@ -7,14 +7,16 @@ import com.shimizukenta.secs.secs2.Secs2;
  * 
  * <p>
  * SecsMessage contains Stream, Function, WBit, Datta<br />
- * <br />
+ * </p>
+ * <p>
  * To get SECS-II-Stream-Number, {@link #getStream()}<br />
  * To get SECS-II-Function-Number, {@link #getFunction()}<br />
  * To get SECS-II-WBit, {@link #wbit()}<br />
  * To get SECS-II-Data, {@link #secs2()}<br />
  * To get Header-10-bytes, {@link #header10Bytes()}<br />
  * To get Message-Device-ID, {@link #deviceId()}<br />
- * <br />
+ * </p>
+ * <p>
  * Instances of this class are immutable.<br />
  * </p>
  * 
@@ -24,49 +26,49 @@ import com.shimizukenta.secs.secs2.Secs2;
 public interface SecsMessage {
 	
 	/**
-	 * Message Stream getter
+	 * Returns Message Stream number.
 	 * 
 	 * @return stream-number. -1 if not Data-Message
 	 */
 	public int getStream();
 	
 	/**
-	 * Message Function getter
+	 * Returns Message Function number.
 	 * 
 	 * @return function-number. -1 if not Data-Message
 	 */
 	public int getFunction();
 	
 	/**
-	 * Message W-Bit getter
+	 * Returns Message W-Bit.
 	 * 
 	 * @return true if has wbit
 	 */
 	public boolean wbit();
 	
 	/**
-	 * Message SESC-II data getter
+	 * Returns Message SESC-II data.
 	 * 
 	 * @return Secs2
 	 */
 	public Secs2 secs2();
 	
 	/**
-	 * Message Device-ID getter.
+	 * Returns Message Device-ID.
 	 * 
 	 * @return device-id
 	 */
 	public int deviceId();
 	
 	/**
-	 * Message Session-ID getter.
+	 * Returns Message Session-ID.
 	 * 
 	 * @return session-id
 	 */
 	public int sessionId();
 	
 	/**
-	 * Message Header 10 bytes getter
+	 * Returns Message Header 10 bytes.
 	 * 
 	 * @return header-10-bytes
 	 */

@@ -24,7 +24,7 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
 public interface Gem {
 	
 	/**
-	 * Crate new instance.
+	 * Returns new instance.
 	 * 
 	 * @param communicator
 	 * @param config
@@ -35,14 +35,14 @@ public interface Gem {
 	}
 	
 	/**
-	 * Create auto number DATAID
+	 * Returns auto number DATAID.
 	 * 
 	 * @return Auto-DATAID
 	 */
 	public Secs2 autoDataId();
 	
 	/**
-	 * Create DATAID
+	 * Returns DATAID.
 	 * 
 	 * @param id DATA-ID-Nubmer
 	 * @return SECS-II DATAID
@@ -50,14 +50,14 @@ public interface Gem {
 	public Secs2 dataId(long id);
 	
 	/**
-	 * Create DynamicEventReportConfig instance
+	 * Returns DynamicEventReportConfig instance.
 	 * 
 	 * @return DynamicEventReportConfig new-Instance
 	 */
 	public DynamicEventReportConfig newDynamicEventReportConfig();
 	
 	/**
-	 * S1F1, Are You Online?
+	 * S1F1, Are You Online?.
 	 * 
 	 * <p>
 	 * blocking-method

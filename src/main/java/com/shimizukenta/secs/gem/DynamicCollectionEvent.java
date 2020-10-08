@@ -22,7 +22,7 @@ import com.shimizukenta.secs.secs2.Secs2;
 public interface DynamicCollectionEvent {
 	
 	/**
-	 * Create new instance.
+	 * Returns new instance.
 	 * 
 	 * @param alias
 	 * @param collectionEventId
@@ -36,7 +36,7 @@ public interface DynamicCollectionEvent {
 	}
 	
 	/**
-	 * Alias getter
+	 * Returns Alias
 	 * 
 	 * @return has valus if aliased.
 	 */
@@ -50,7 +50,7 @@ public interface DynamicCollectionEvent {
 	public Secs2 toS2F37CollectionEvent();
 	
 	/**
-	 * CEID getter
+	 * Returns CEID
 	 * 
 	 * @return SECS-II CEID
 	 */

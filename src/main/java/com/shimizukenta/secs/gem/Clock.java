@@ -21,7 +21,7 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
 public interface Clock {
 	
 	/**
-	 * Create new Clock instance from LocalDateTime.
+	 * Returns new Clock instance from LocalDateTime.
 	 * 
 	 * @param ldt LocalDateTime
 	 * @return Clock-of-LocalDateTime
@@ -31,7 +31,7 @@ public interface Clock {
 	}
 	
 	/**
-	 * Create new Clock instance of now.
+	 * Returns new Clock instance of now.
 	 * 
 	 * @return Clock-of-Now
 	 */
@@ -40,7 +40,7 @@ public interface Clock {
 	}
 	
 	/**
-	 * Create new Clock instance from Secs2.
+	 * Returns new Clock instance from Secs2.
 	 * 
 	 * <p>
 	 * use for Secs2 of S2F18, S2F31<br />
@@ -55,21 +55,21 @@ public interface Clock {
 	}
 	
 	/**
-	 * LocalDateTime getter.
+	 * Returns LocalDateTime.
 	 * 
 	 * @return LocalDateTime
 	 */
 	public LocalDateTime toLocalDateTime();
 	
 	/**
-	 * A12 getter.
+	 * Returns A12.
 	 * 
 	 * @return Secs2.ascii(yyMMddhhmmss)
 	 */
 	public Secs2 toAscii12();
 	
 	/**
-	 * A16 getter.
+	 * Returns A16.
 	 * 
 	 * @return Secs2.ascii(yyyyMMddhhmmssSS)
 	 */

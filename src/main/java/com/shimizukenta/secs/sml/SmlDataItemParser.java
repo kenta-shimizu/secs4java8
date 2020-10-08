@@ -32,7 +32,7 @@ public class SmlDataItemParser {
 	}
 	
 	/**
-	 * parser getter
+	 * Returns parser instance.
 	 * 
 	 * @return parser instance
 	 */

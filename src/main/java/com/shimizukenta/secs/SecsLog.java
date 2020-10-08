@@ -67,7 +67,7 @@ public class SecsLog implements Serializable {
 	}
 	
 	/**
-	 * Log subject getter.
+	 * Returns Log subject.
 	 * 
 	 * @return subject-string
 	 */
@@ -76,7 +76,7 @@ public class SecsLog implements Serializable {
 	}
 	
 	/**
-	 * Log timestamp getter.
+	 * Returns Log timestamp.
 	 * 
 	 * @return timestamp
 	 */
@@ -85,7 +85,7 @@ public class SecsLog implements Serializable {
 	}
 	
 	/**
-	 * Log detail-information getter.
+	 * Returns Log detail-information.
 	 * 
 	 * @return value if exist
 	 */

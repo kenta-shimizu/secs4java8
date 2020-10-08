@@ -5,12 +5,11 @@ import java.io.Serializable;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
- * This class is implementation of SML (Peer-Group)
+ * This class is implementation of SML (Peer-Group).
  * 
  * <p>
  * This instance is creatad from {@link SmlMessageParser#parse(CharSequence)}<br />
  * </p>
- * 
  * <p>
  * Instances of this class are immutable.<br />
  * </p>
@@ -35,7 +34,7 @@ public class SmlMessage implements Serializable {
 	}
 	
 	/**
-	 * SML SECS-II-Stream-Number getter
+	 * Returns SML SECS-II-Stream-Number.
 	 * 
 	 * @return stream-number
 	 */
@@ -44,7 +43,7 @@ public class SmlMessage implements Serializable {
 	}
 	
 	/**
-	 * SML SECS-II-Function-Number getter
+	 * Returns SML SECS-II-Function-Number.
 	 * 
 	 * @return function-number
 	 */
@@ -53,7 +52,7 @@ public class SmlMessage implements Serializable {
 	}
 	
 	/**
-	 * SML SECS-II-WBit getter
+	 * Returns SML SECS-II-WBit.
 	 * 
 	 * @return {@code true} if Wbit is {@code 1}
 	 */
@@ -62,7 +61,7 @@ public class SmlMessage implements Serializable {
 	}
 	
 	/**
-	 * SML SECS-II-Data getter
+	 * Returns SML SECS-II-Data.
 	 * 
 	 * @return SECS-II-Data
 	 */

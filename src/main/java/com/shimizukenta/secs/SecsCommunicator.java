@@ -70,35 +70,35 @@ public interface SecsCommunicator extends Closeable {
 	public void open() throws IOException;
 	
 	/**
-	 * is-open getter.
+	 * Returns is-open.
 	 * 
 	 * @return {@code true} if opened and not closed
 	 */
 	public boolean isOpen();
 	
 	/**
-	 * is-closed getter.
+	 * Returns is-closed.
 	 * 
 	 * @return {@code true} if closed
 	 */
 	public boolean isClosed();
 	
 	/**
-	 * GEM-interface getter.
+	 * Returns GEM-interface.
 	 * 
 	 * @return GEM-interface-instance
 	 */
 	public Gem gem();
 	
 	/**
-	 * device-id getter.
+	 * Returns communicator device-id.
 	 * 
 	 * @return communicator device-id
 	 */
 	public int deviceId();
 	
 	/**
-	 * is-equip getter.
+	 * Returns is-equip.
 	 * 
 	 * @return {@code true} if Equipment
 	 */

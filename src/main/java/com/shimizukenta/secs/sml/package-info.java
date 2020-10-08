@@ -1,7 +1,6 @@
 /**
  * Provides SML-Parsing
- */
-/**
+ * 
  * @author kenta-shimizu
  *
  */

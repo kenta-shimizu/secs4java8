@@ -27,7 +27,7 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
 public interface DynamicReport {
 	
 	/**
-	 * Create new instance.
+	 * Returns new instance.
 	 * 
 	 * @param reportId
 	 * @param alias
@@ -61,21 +61,21 @@ public interface DynamicReport {
 	public Secs2 toS2F33Report();
 	
 	/**
-	 * RPTID getter
+	 * Returns RPTID.
 	 * 
 	 * @return SECS-II RPTID
 	 */
 	public Secs2 reportId();
 	
 	/**
-	 * Alias getter
+	 * Returns Alias.
 	 * 
 	 * @return has value if aliased.
 	 */
 	public Optional<String> alias();
 	
 	/**
-	 * VIDs getter
+	 * Returns VIDs.
 	 * 
 	 * @return List of SECS-II VID
 	 */
