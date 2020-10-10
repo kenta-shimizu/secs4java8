@@ -106,7 +106,7 @@ public interface SecsCommunicator extends Closeable {
 	
 	
 	/**
-	 * {@link #open()} and wait until communicating.
+	 * Open and wait until communicating.
 	 * 
 	 * <p>
 	 * Blocking-method.<br />
