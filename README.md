@@ -203,7 +203,7 @@ See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/exam
         ">.             "
     );
 
-    passive.send(primarySecsMsg, replySml);
+    passive.send(primaryMsg, replySml);
 ```
 
 ## GEM
@@ -359,7 +359,7 @@ From RPTID in received S6F11 or S6F13, Get Report-Alias if aliased.
     LocalDateTime ldt = clock.toLocalDateTime();
 ```
 
-TimeFormat (A[12] or A[16]) can be set from `AbstractConfig#gem#clockType`.
+TimeFormat (A[12] or A[16]) can be set from `AbstractSecsCommunicatorConfig#gem#clockType`.
 
 ### Others
 
