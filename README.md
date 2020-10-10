@@ -16,7 +16,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
 
 - For use HSMS-SS-Passive example
 
-```
+```java
     /* HSMS-SS-Passive open example */
     HsmsSsCommunicatorConfig config = new HsmsSsCommunicatorConfig();
     config.protocol(HsmsSsProtocol.PASSIVE);
@@ -36,7 +36,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
 
 - For use HSMS-SS-Active example
 
-```
+```java
     /* HSMS-SS-Active open example */
     HsmsSsCommunicatorConfig config = new HsmsSsCommunicatorConfig();
     config.protocol(HsmsSsProtocol.ACTIVE);
@@ -55,7 +55,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
 
 - For use SECS-I (onTcpIp) example
 
-```
+```java
     /* SECS-I (onTcpIp) open example */
     Secs1OnTcpIpConfig config = new Secs1OnTcpIpConfig();
     config.socketAddress(new InetSocketAddress("127.0.0.1", 10000));
@@ -80,7 +80,7 @@ How to convert TCP/IP <-> RS232C
 
 1. Create SECS-II
 
-```
+```java
     /* example */
     Secs2 secs2 = Secs2.list(               /* <L                       */
         Secs2.binary((byte)0x81),           /*   <B  0x81>              */
@@ -93,7 +93,7 @@ See also ["/src/examples/example3/ExampleBuildSecs2.java"](/src/examples/example
 
 2. Send Primary-Message
 
-```
+```java
     /* Send S5F1 W. example */
     Optional<SecsMessage> reply = passive.send(
         5,          /* Stream-Number   */
@@ -115,7 +115,7 @@ See also ["/src/examples/example3/ExampleBuildSecs2.java"](/src/examples/example
 
 1. Add Listener
 
-```
+```java
     /* Add-Listener example */
     active.addSecsMessageReceiveListener((SecsMessage msg) -> {
 
@@ -128,7 +128,7 @@ See also ["/src/examples/example3/ExampleBuildSecs2.java"](/src/examples/example
 
 2. Parse SECS-II
 
-```
+```java
     /* example Receive Message */
     S5F1 W
     <L [3]
@@ -160,7 +160,7 @@ See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/exam
 
 3. Send Reply-Message
 
-```
+```java
     Secs2 reply = Secs2.binary((byte)0x0);  /* <B 0x0> */
 
     active.send(
@@ -176,13 +176,13 @@ See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/exam
 
 1. Get SML-Parser instance
 
-```
+```java
     SmlMessageParser parser = SmlMessageParser.getInstance();
 ```
 
 2. Send Primary-Message
 
-```
+```java
     /* Send S1F1 W. example */
     SmlMessage primarySml = parser.parse(
         "S1F1 W."
@@ -193,7 +193,7 @@ See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/exam
 
 3. Send Reply-Message
 
-```
+```java
     /* Send S1F2. example */
     SmlMessage replySml = parser.parse(
         "S1F2           " +
@@ -214,7 +214,7 @@ Access from SecsCommunicator#gem
 
 1. Create Configuration instance
 
-```
+```java
     DynamicEventReportConfig evRptConf = active.gem().newDynamicEventReportConfig();
 ```
 
@@ -225,7 +225,7 @@ Access from SecsCommunicator#gem
     Can be aliased.  
     RPTID is auto number.
 
-```
+```java
     /* no ALias */
     DynamicReport rptSimple = evRptConf.addDefineReport(
         Arrays.asList(
@@ -248,7 +248,7 @@ Access from SecsCommunicator#gem
 
     Can be aliased.
 
-```
+```java
     /* no Alias */
     DynamicCollectionEvent evSimple = evRptConf.addEnableCollectionEvent(
         101L            /* CEID         */
@@ -263,7 +263,7 @@ Access from SecsCommunicator#gem
 
 - Add Links
 
-```
+```java
     /* by DynamicReport */
     evRptConf.addLinkByReport(
         evAlias,                /* DynamicCollectionEvent   */
@@ -285,7 +285,7 @@ Access from SecsCommunicator#gem
 
 3. Execute Scenario
 
-```
+```java
     ERACK erack = evRptConf.s2f37DisableAll();
     DRACK drack = evRptConf.s2f33DeleteAll();
     DRACK drack = evRptConf.s2f33Define();
@@ -297,7 +297,7 @@ Access from SecsCommunicator#gem
 
 If has Report-Alias, S6F19 and S6F21 called by Alias.
 
-```
+```java
     Optional<SecsMessage> s6f20 = evRptConf.s6f19("report-alias");
     Optional<SecsMessage> s6f22 = evRptConf.s6f21("report-alias");
 ```
@@ -311,7 +311,7 @@ If has Event-Alias, S6F15 and S6F17 called by Alias.
 
 From CEID in received S6F11 or S6F13, Get Event-Alias if aliased.
 
-```
+```java
     Secs2 ceid = recvS6F11Msg.secs2().get(1);   /* Get CEID SECS-II */
 
     Optional<DynamicCollectionEvent> op = evRptConf.getCollectionEvent(ceid);
@@ -320,7 +320,7 @@ From CEID in received S6F11 or S6F13, Get Event-Alias if aliased.
 
 From RPTID in received S6F11 or S6F13, Get Report-Alias if aliased.
 
-```
+```java
     Secs2 rptid = recvS6F11Msg.secs2().get(2, ...);   /* Get RPTID SECS-II */
 
     Optional<DynamicReport> op = evRptConf.getReport(rptid);
@@ -331,14 +331,14 @@ From RPTID in received S6F11 or S6F13, Get Report-Alias if aliased.
 
 - Send S2F17 and receive reply, parse to LocalDateTime
 
-```
+```java
     Clock clock = passive.gem().s2f17();
     LocalDateTime ldt = clock.toLocalDateTime();
 ```
 
 - Reply S2F18 Now examples
 
-```
+```java
     active.gem().s2f18(primaryMsg, Clock.from(LocalDateTime.now()));
     active.gem().s2f18(primaryMsg, Clock.now());
     active.gem().s2f18Now(primaryMsg);
@@ -346,7 +346,7 @@ From RPTID in received S6F11 or S6F13, Get Report-Alias if aliased.
 
 - Send S2F31 Now examples
 
-```
+```java
     TIACK tiack = active.gem().s2f31(Clock.from(LocalDateTime.now()));
     TIACK tiack = active.gem().s2f31(Clock.now());
     TIACK tiack = active.gem().s2f31Now();
@@ -354,7 +354,7 @@ From RPTID in received S6F11 or S6F13, Get Report-Alias if aliased.
 
 - Receive S2F31, parse to LocalDateTime
 
-```
+```java
     Clock clock = Clock.from(recvS2F31Msg.secs2());
     LocalDateTime ldt = clock.toLocalDateTime();
 ```
@@ -363,7 +363,7 @@ TimeFormat (A[12] or A[16]) can be set from `AbstractConfig#gem#clockType`.
 
 ### Others
 
-```
+```java
     /* examples */
     COMMACK commack = active.gem().s1f13();
     OFLACK  oflack  = active.gem().s1f15();
