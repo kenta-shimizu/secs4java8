@@ -1,7 +1,7 @@
 package com.shimizukenta.secs;
 
 /**
- * Boolean getter
+ * Boolean getter.
  * 
  * @author kenta-shimizu
  *

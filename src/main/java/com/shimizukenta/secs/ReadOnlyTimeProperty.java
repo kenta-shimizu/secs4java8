@@ -6,7 +6,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Time getter
+ * Time getter.
  * 
  * @author kenta-shimizu
  *
@@ -14,9 +14,9 @@ import java.util.concurrent.TimeoutException;
 public interface ReadOnlyTimeProperty extends ReadOnlyNumberProperty {
 	
 	/**
-	 * Seconds float getter
+	 * Seconds float getter.
 	 * 
-	 * @return Seconds from get().floatValue()
+	 * @return Seconds
 	 */
 	public float getSeconds();
 	
@@ -28,26 +28,28 @@ public interface ReadOnlyTimeProperty extends ReadOnlyNumberProperty {
 	public long getMilliSeconds();
 	
 	/**
+	 * Returns true if > 0.
 	 * 
-	 * @return true if > 0
+	 * @return {@code true} if > 0
 	 */
 	public boolean gtZero();
 	
 	/**
+	 * Returns true if >= 0.
 	 * 
-	 * @return true if >= 0
+	 * @return {@code true} if >= 0
 	 */
 	public boolean geZero();
 	
 	/**
-	 * Thread#sleep
+	 * Thread#sleep.
 	 * 
 	 * @throws InterruptedException
 	 */
 	public void sleep() throws InterruptedException;
 	
 	/**
-	 * Synchronized wait
+	 * Synchronized wait.
 	 * 
 	 * @param sync-object
 	 * @throws InterruptedException
@@ -55,7 +57,7 @@ public interface ReadOnlyTimeProperty extends ReadOnlyNumberProperty {
 	public void wait(Object syncObj) throws InterruptedException;
 	
 	/**
-	 * Future#get
+	 * Future#get.
 	 * 
 	 * @param <T>
 	 * @param f
@@ -67,7 +69,7 @@ public interface ReadOnlyTimeProperty extends ReadOnlyNumberProperty {
 	public <T> T future(Future<T> f) throws InterruptedException, TimeoutException, ExecutionException;
 	
 	/**
-	 * BlockingQueue#poll
+	 * BlockingQueue#poll.
 	 * 
 	 * @param <T>
 	 * @param queue

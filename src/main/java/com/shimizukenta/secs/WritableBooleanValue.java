@@ -1,7 +1,7 @@
 package com.shimizukenta.secs;
 
 /**
- * Boolean Setter
+ * Boolean Setter.
  * 
  * @author kenta-shimizu
  *
@@ -9,7 +9,7 @@ package com.shimizukenta.secs;
 public interface WritableBooleanValue extends WritableValue<Boolean> {
 	
 	/**
-	 * setter
+	 * setter.
 	 * 
 	 * @param v
 	 */

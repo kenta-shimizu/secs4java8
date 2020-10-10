@@ -9,7 +9,7 @@ import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
- * This interface is implementation of SECS-I (SEMI-E4)<br />
+ * This interface is implementation of SECS-I (SEMI-E4).
  * 
  * @author kenta-shimizu
  *

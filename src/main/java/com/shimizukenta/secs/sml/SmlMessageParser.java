@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This class is implementation of SML-Parse
+ * This class is implementation of SML-Parse.
  * 
  * <p>
  * To get parser instance, {@link #getInstance()}<br />
@@ -56,7 +56,7 @@ public class SmlMessageParser {
 	protected static final Pattern ptnMessage = Pattern.compile("^" + pregMessage + "$");
 
 	/**
-	 * parse to SML-Message
+	 * parse to SML-Message.
 	 * 
 	 * @param cs SML-Format-Character
 	 * @return SmlMessage

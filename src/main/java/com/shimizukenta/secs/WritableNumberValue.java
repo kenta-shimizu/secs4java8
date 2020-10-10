@@ -1,7 +1,7 @@
 package com.shimizukenta.secs;
 
 /**
- * Number setter
+ * Number setter.
  * 
  * @author kenta-shimizu
  *
@@ -9,36 +9,39 @@ package com.shimizukenta.secs;
 public interface WritableNumberValue extends WritableValue<Number> {
 	
 	/**
-	 * setter<br />
-	 * Not Accept null.
+	 * setter.
+	 * 
+	 * <p>
+	 * Not Accept {@code null}.<br />
+	 * </p>
 	 * 
 	 */
 	@Override
 	public void set(Number v);
 	
 	/**
-	 * int setter
+	 * int setter.
 	 * 
 	 * @param v
 	 */
 	public void set(int v);
 	
 	/**
-	 * long setter
+	 * long setter.
 	 * 
 	 * @param v
 	 */
 	public void set(long v);
 	
 	/**
-	 * float setter
+	 * float setter.
 	 * 
 	 * @param v
 	 */
 	public void set(float v);
 	
 	/**
-	 * double setter
+	 * double setter.
 	 * 
 	 * @param v
 	 */

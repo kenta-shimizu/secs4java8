@@ -19,7 +19,7 @@ import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
- * This abstract class is implementation of SECS-I (SEMI-E4)<br />
+ * This abstract class is implementation of SECS-I (SEMI-E4).
  * 
  * @author kenta-shimizu
  *

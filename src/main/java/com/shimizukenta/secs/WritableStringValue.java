@@ -1,7 +1,7 @@
 package com.shimizukenta.secs;
 
 /**
- * String setter
+ * String setter.
  * 
  * @author kenta-shimizu
  *
@@ -9,7 +9,7 @@ package com.shimizukenta.secs;
 public interface WritableStringValue extends WritableValue<String> {
 	
 	/**
-	 * setter
+	 * setter.
 	 * 
 	 * @param cs
 	 */

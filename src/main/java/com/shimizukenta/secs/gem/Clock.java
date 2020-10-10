@@ -6,7 +6,7 @@ import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 /**
- * This interface is implementation of Clock in GEM (SEMI-E30)
+ * This interface is implementation of Clock in GEM (SEMI-E30).
  * 
  * <p>
  * Relates: S2F17, S2F18, S2F31<br />

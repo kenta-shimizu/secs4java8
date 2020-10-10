@@ -1,5 +1,5 @@
 /**
- * Provides SML-Parsing
+ * Provides SML-Parsing.
  * 
  * @author kenta-shimizu
  *

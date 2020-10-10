@@ -60,12 +60,12 @@ public interface Gem {
 	 * S1F1, Are You Online?.
 	 * 
 	 * <p>
-	 * blocking-method
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @return Reply-Message
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -79,14 +79,14 @@ public interface Gem {
 	 * S1F2, On Line Data.
 	 * 
 	 * <p>
-	 * MDLN, SOFTREV is reference AbstractGemConfig value<br />
-	 * Blocking-method<br />
+	 * MDLN, SOFTREV is reference AbstractGemConfig value.<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -100,12 +100,12 @@ public interface Gem {
 	 * S1F13, Establish Communications Request.
 	 * 
 	 * <p>
-	 * blocking-method
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @return COMMACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
@@ -121,14 +121,14 @@ public interface Gem {
 	 * S1F14, Establish Communications Request Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-mothod
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param commack
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -139,15 +139,15 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * S1F15, Request OFF-LINE
+	 * S1F15, Request OFF-LINE.
 	 * 
 	 * <p>
-	 * blocking-method
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @return OFLACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
@@ -163,13 +163,13 @@ public interface Gem {
 	 * S1F16, OFF-LINE Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
-	 * @return Optional.empty()
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -183,12 +183,12 @@ public interface Gem {
 	 * S1F17, Request ON-LINE.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @return ONLACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
@@ -204,14 +204,14 @@ public interface Gem {
 	 * S1F18, ON-LINE Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-mehod
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param onlack
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -225,12 +225,12 @@ public interface Gem {
 	 * S2F17, Date and Time Request.
 	 * 
 	 * <p>
-	 * blocking-method
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @return Clock
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
@@ -246,14 +246,14 @@ public interface Gem {
 	 * S2F18, Date and Time Response.
 	 * 
 	 * <p>
-	 * blocking-method
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param clock
-	 * @return Optional.empty()
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
@@ -269,13 +269,13 @@ public interface Gem {
 	 * S2F18, Now Date and Time Response.
 	 * 
 	 * <p>
-	 * blocking-method
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
-	 * @return Optional.empty()
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
@@ -291,14 +291,14 @@ public interface Gem {
 	 * S2F22, Remote Command Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param cmda
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -312,14 +312,14 @@ public interface Gem {
 	 * S2F28, Initiate Processing Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param cmda
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -333,13 +333,13 @@ public interface Gem {
 	 * S2F31, Date and Time Set Request.
 	 * 
 	 * <p>
-	 * blocking-method
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param clock
 	 * @return TIACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
@@ -355,12 +355,12 @@ public interface Gem {
 	 * S2F31, Now Date and Time Set Request.
 	 * 
 	 * <p>
-	 * blocking-method.
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @return TIACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
@@ -376,14 +376,14 @@ public interface Gem {
 	 * S2F32, Date and Time Set Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method.
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param tiack
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -398,12 +398,12 @@ public interface Gem {
 	 * 
 	 * <p>
 	 * DATA-ID is AutoNumber.<br />
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @return DRACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
@@ -420,13 +420,13 @@ public interface Gem {
 	 * 
 	 * <p>
 	 * DATA-ID is AutoNumber.<br />
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param config DynamicEventReportConfig
 	 * @return DRACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
@@ -442,14 +442,14 @@ public interface Gem {
 	 * S2F34, Define Report Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param drack
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -464,13 +464,13 @@ public interface Gem {
 	 * 
 	 * <p>
 	 * DATA-ID is AutoNumber.<br />
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param config DynamicEventReportConfig
 	 * @return LRACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
@@ -486,14 +486,14 @@ public interface Gem {
 	 * S2F36, Link Collection Event Report Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param lrack
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -507,12 +507,12 @@ public interface Gem {
 	 * S2F37, Disable All Collection-Event-Report.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @return ERACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
@@ -528,12 +528,12 @@ public interface Gem {
 	 * S2F37, Enable All Collection-Event-Report.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @return ERACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
@@ -554,8 +554,8 @@ public interface Gem {
 	 * 
 	 * @param DynamicEventReportConfig
 	 * @return ERACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws Secs2Exception
 	 * @throws InterruptedException
@@ -571,14 +571,14 @@ public interface Gem {
 	 * S2F38, Enable/Disable CollectionEvent Report Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param erack
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -592,14 +592,14 @@ public interface Gem {
 	 * S2F40, Multi-block Grant.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param grant
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -613,14 +613,14 @@ public interface Gem {
 	 * S3F16, Matls Multi-block Grant.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param grant
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -634,14 +634,14 @@ public interface Gem {
 	 * S5F2, Alarm Report Ack.
 	 * 
 	 * <p>
-	 * blocking-method.
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc5
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -655,14 +655,14 @@ public interface Gem {
 	 * S5F4, Enable/Disable Alarm Ack.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc5
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -676,14 +676,14 @@ public interface Gem {
 	 * S6F2, Trace Data Ack.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc6
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -697,14 +697,14 @@ public interface Gem {
 	 * S6F4, Discrete Variable Data Send Ack.
 	 * 
 	 * <p>
-	 * blocking-method
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc6
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -718,14 +718,14 @@ public interface Gem {
 	 * S6F6, Multi-block Grant.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param grant6
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -739,14 +739,14 @@ public interface Gem {
 	 * S6F10, Formatted Variable Ack.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc6
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -760,14 +760,14 @@ public interface Gem {
 	 * S6F12, CollectionEvent Report Ack.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc6
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -781,14 +781,14 @@ public interface Gem {
 	 * S6F14, Annotated CollectionEvent Report Ack.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc6
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -802,13 +802,13 @@ public interface Gem {
 	 * S6F15, Event Report Request.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param ce DynamicCollectionEvent
 	 * @return reply-message
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -822,13 +822,13 @@ public interface Gem {
 	 * S6F17, Annotated Event Report Request.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param ce DynamicCollectionEvent
 	 * @return reply-message
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -842,13 +842,13 @@ public interface Gem {
 	 * S6F19, Individual Report Request.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param report DynamicReport
 	 * @return reply-message
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -862,13 +862,13 @@ public interface Gem {
 	 * S6F21, Annotated Individual Report Request.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param report DynamicReport
 	 * @return reply-message
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -882,14 +882,14 @@ public interface Gem {
 	 * S6F26, Notification Report Send Ack.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc6
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -900,17 +900,17 @@ public interface Gem {
 			, InterruptedException;
 	
 	/**
-	 * S7F14, Process Program Send Acknowledge.
+	 * S7F4, Process Program Send Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc7
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -924,14 +924,14 @@ public interface Gem {
 	 * S7F12, Matl/Process Matrix Update Ack.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc7
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -945,14 +945,14 @@ public interface Gem {
 	 * S7F14, Delete Matl/Process Matrix Entry Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc7
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -966,14 +966,14 @@ public interface Gem {
 	 * S7F16, Matrix Mode Select Ack.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc7
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -987,14 +987,14 @@ public interface Gem {
 	 * S7F18, Delete Process Program Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc7
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1008,14 +1008,14 @@ public interface Gem {
 	 * S7F24, Formatted Process Program Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc7
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1029,14 +1029,14 @@ public interface Gem {
 	 * S7F32, Verification Request Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc7
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1050,14 +1050,14 @@ public interface Gem {
 	 * S7F38, Large PP Send Ack.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc7
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1071,14 +1071,14 @@ public interface Gem {
 	 * S7F40, Large Formatted PP Ack.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc7
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1092,14 +1092,14 @@ public interface Gem {
 	 * S7F42, Large PP Req Ack.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc7
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1113,14 +1113,14 @@ public interface Gem {
 	 * S7F44, Large Formatted PP Req Ack.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc7
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1134,13 +1134,13 @@ public interface Gem {
 	 * S9F1, Unknown Device ID.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param refMsg
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1154,13 +1154,13 @@ public interface Gem {
 	 * S9F3, Unknown Stream.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param refMsg
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1174,13 +1174,13 @@ public interface Gem {
 	 * S9F5, Unknown Function.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param refMsg
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1194,13 +1194,13 @@ public interface Gem {
 	 * S9F7, Illegal Data.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param refMsg
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1214,13 +1214,13 @@ public interface Gem {
 	 * S9F9, Transaction Timeout.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param refMsg
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1234,13 +1234,13 @@ public interface Gem {
 	 * S9F11, Data Too Long.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param refMsg
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1258,14 +1258,14 @@ public interface Gem {
 	 * S10F2, Terminal Request Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc10
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1279,14 +1279,14 @@ public interface Gem {
 	 * S10F4, Terminal Display, Single Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc10
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1300,14 +1300,14 @@ public interface Gem {
 	 * S10F6, Terminal Display, Multi-Block Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc10
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1321,14 +1321,14 @@ public interface Gem {
 	 * S10F10, Broadcast Acknowledge.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param ackc10
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
@@ -1342,14 +1342,14 @@ public interface Gem {
 	 * S13F12, Data Set Obj Multi-Block Grant.
 	 * 
 	 * <p>
-	 * blocking-method<br />
+	 * blocking-method.<br />
 	 * </p>
 	 * 
 	 * @param primaryMsg
 	 * @param grant
-	 * @return Optional.empty
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
+	 * @return {@code Optional.empty()}
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */

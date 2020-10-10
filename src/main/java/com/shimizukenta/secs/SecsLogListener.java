@@ -5,7 +5,7 @@ import com.shimizukenta.secs.SecsCommunicator;
 import java.util.EventListener;
 
 /**
- * SecsLog receive Listener
+ * SecsLog receive Listener.
  * 
  * <p>
  * This interface is used in {@link SecsCommunicator#addSecsLogListener(SecsLogListener)}<br />

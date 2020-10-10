@@ -2,6 +2,12 @@ package com.shimizukenta.secs.secs2;
 
 import java.util.Objects;
 
+/**
+ * SECS-II Data Item Type.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public enum Secs2Item {
 	
 	UNDEFINED( (byte)0xFF, -1, "UNDEFINED"),

@@ -1,7 +1,7 @@
 package com.shimizukenta.secs;
 
 /**
- * Number getter
+ * Number getter.
  * 
  * @author kenta-shimizu
  *

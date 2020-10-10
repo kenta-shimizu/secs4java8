@@ -218,7 +218,7 @@ public interface SecsCommunicator extends Closeable {
 	 * 
 	 * <p>
 	 * Blocking-method.<br />
-	 * Wait until sended Primay-Message and received Reply-Message if exist.
+	 * Wait until sended Primay-Message and received Reply-Message if exist.<br />
 	 * </p>
 	 * 
 	 * @param sml
@@ -263,7 +263,7 @@ public interface SecsCommunicator extends Closeable {
 	 * Add Listener to receive Primary-Message.
 	 * 
 	 * <p>
-	 * This Listener not receive Reply-Message.
+	 * This Listener not receive Reply-Message.<br />
 	 * </p>
 	 * 
 	 * @param lstnr Not accept {@code null}

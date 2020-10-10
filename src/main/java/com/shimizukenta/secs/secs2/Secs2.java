@@ -10,7 +10,9 @@ import java.util.stream.Stream;
  * <p>
  * Used for build and parse SECS-II data.<br />
  * Support item-type: L, B, BOOLEAN, A, I1, I2, I4, I8, U1, U2, U4, U8, F4, F8<br />
- * Instances of this class are immutable.
+ * </p>
+ * <p>
+ * Instances of this class are immutable.<br />
  * </p>
  * 
  * @author kenta-shimizu

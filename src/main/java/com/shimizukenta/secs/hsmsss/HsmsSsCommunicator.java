@@ -15,7 +15,7 @@ import com.shimizukenta.secs.secs2.Secs2;
  * <p>
  * To create newInstance, {@link #newInstance(HsmsSsCommunicatorConfig)}<br />
  * To create newInstance and open, {@link #open(HsmsSsCommunicatorConfig)}<br />
- * To linktest, {@link #linktest()}
+ * To linktest, {@link #linktest()}<br />
  * </p>
  * 
  * @author kenta-shimizu

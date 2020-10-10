@@ -1,7 +1,7 @@
 package com.shimizukenta.secs;
 
 /**
- * String value Getter, Setter, Value-Change-Observer<br />
+ * String value Getter, Setter, Value-Change-Observer.
  * 
  * @author kenta-shimizu
  *

@@ -1,10 +1,10 @@
 package com.shimizukenta.secs;
 
 /**
- * Byte Array value Getter, Setter, Value-Change-Observer
+ * Byte Array value Getter, Setter, Value-Change-Observer.
  * 
  * <p>
- * Not accept null.
+ * Not accept {@code null}.
  * </p>
  * 
  * @author kenta-shimizu

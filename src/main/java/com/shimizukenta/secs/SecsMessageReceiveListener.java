@@ -5,7 +5,7 @@ import com.shimizukenta.secs.SecsCommunicator;
 import java.util.EventListener;
 
 /**
- * SecsMessage receive Listener
+ * SecsMessage receive Listener.
  * 
  * <p>
  * This interface is used in {@link SecsCommunicator#addSecsMessageReceiveListener(SecsMessageReceiveListener)}<br />
@@ -21,7 +21,7 @@ public interface SecsMessageReceiveListener extends EventListener {
 	 * Putter Received Primary-Message.
 	 * 
 	 * <p>
-	 * Not accept {@code null}
+	 * Not accept {@code null}.<br />
 	 * </p>
 	 * 
 	 * @param message only Primary-Message
