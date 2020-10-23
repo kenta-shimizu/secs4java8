@@ -1,7 +1,5 @@
 package com.shimizukenta.secs;
 
-import com.shimizukenta.secs.SecsCommunicator;
-
 import java.util.EventListener;
 
 /**
