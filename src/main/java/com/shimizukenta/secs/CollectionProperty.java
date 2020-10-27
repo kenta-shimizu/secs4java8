@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
- * Collectio value Getter, Setter, Value-Change-Observer.
+ * Collection value Getter, Setter, Value-Change-Observer.
  * 
  * @author kenta-shimizu
  *
