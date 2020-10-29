@@ -201,8 +201,11 @@ public abstract class AbstractCollectionProperty<T>
 	
 	@Override
 	public boolean removeIf(Predicate<? super T> filter) {
-		
-		return true;
+		synchronized ( sync ) {
+			boolean f = vv.removeIf(filter);
+			notifyChanged(f);
+			return f;
+		}
 	}
 	
 	
