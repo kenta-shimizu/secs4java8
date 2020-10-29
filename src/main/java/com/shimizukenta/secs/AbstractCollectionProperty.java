@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Spliterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,7 +27,7 @@ public abstract class AbstractCollectionProperty<T>
 	@Override
 	public Collection<T> get() {
 		synchronized ( sync ) {
-			return vv.stream().map(v -> (T)v).collect(Collectors.toUnmodifiableList());
+			return vv.stream().map(v -> (T)v).collect(Collectors.toList());
 		}
 	}
 	
@@ -145,13 +144,6 @@ public abstract class AbstractCollectionProperty<T>
 		}
 	}
 	
-	@Override
-	public <U> U[] toArray(IntFunction<U[]> generator) {
-		synchronized ( sync ) {
-			return get().toArray(generator);
-		}
-	}
-
 	@Override
 	public boolean add(T v) {
 		synchronized ( sync ) {

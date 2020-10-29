@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import java.util.function.IntFunction;
 import java.util.stream.Stream;
 
 /**
@@ -68,15 +67,6 @@ public interface ReadOnlyCollectionProperty<T> extends ReadOnlyProperty<Collecti
 	 * @return a the array into which the elements of this collection are to be stored, if it is big enough; otherwise, a new array of the same runtime type is allocated for this purpose.
 	 */
 	public <U> U[] toArray(U[] a);
-	
-	/**
-	 * Getter by {@link Collection#toArray(IntFunction)}
-	 * 
-	 * @param <U>
-	 * @param generator
-	 * @return an array containing all of the elements in this collection
-	 */
-	public <U> U[] toArray(IntFunction<U[]> generator);
 	
 	/**
 	 * Getter by {@link Collection#spliterator()}
