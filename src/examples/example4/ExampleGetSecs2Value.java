@@ -3,6 +3,16 @@ package example4;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
+/**
+ * Example-3.
+ * 
+ * <p>
+ * This is getting SECS-II value examples.<br />
+ * </p>
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class ExampleGetSecs2Value {
 
 	public ExampleGetSecs2Value() {

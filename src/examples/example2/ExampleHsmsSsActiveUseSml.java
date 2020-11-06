@@ -15,6 +15,20 @@ import com.shimizukenta.secs.sml.SmlMessage;
 import com.shimizukenta.secs.sml.SmlMessageParser;
 import com.shimizukenta.secs.sml.SmlParseException;
 
+/**
+ * Example-2 (Use SML).
+ * 
+ * <p>
+ * Use 'example1/ExampleHsmsSsPassive.java' with this, too.
+ * </p>
+ * <p>
+ * This example is HSMS-SS Active Host.<br />
+ * This example try-connect repeatedly until 'SELECTED' with T5-timeout intervals.<br />
+ * </p>
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class ExampleHsmsSsActiveUseSml {
 
 	public ExampleHsmsSsActiveUseSml() {
@@ -22,7 +36,7 @@ public class ExampleHsmsSsActiveUseSml {
 	}
 	
 	/*
-	 * Example-3 (Use SML)
+	 * Example-2 (Use SML)
 	 * 1. open ACTIVE-instance
 	 * 2. wait until SELECTED
 	 * 3. get SmlMessageParser

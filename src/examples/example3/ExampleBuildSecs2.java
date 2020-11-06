@@ -7,6 +7,16 @@ import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.sml.SmlDataItemParser;
 import com.shimizukenta.secs.sml.SmlParseException;
 
+/**
+ * Example-3.
+ * 
+ * <p>
+ * This is building SECS-II examples.
+ * </p>
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class ExampleBuildSecs2 {
 
 	public ExampleBuildSecs2() {

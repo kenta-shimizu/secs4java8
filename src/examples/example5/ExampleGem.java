@@ -26,6 +26,16 @@ import com.shimizukenta.secs.hsmsss.HsmsSsProtocol;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
+/**
+ * Example-5.
+ * 
+ * <p>
+ * This is using gem examples.
+ * </p>
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class ExampleGem {
 
 	public ExampleGem() {

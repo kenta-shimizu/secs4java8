@@ -17,6 +17,17 @@ import com.shimizukenta.secs.hsmsss.HsmsSsProtocol;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
+/**
+ * Example-1.
+ * 
+ * <p>
+ * This example is HSMS-SS Passive Equipment.<br />
+ * Bind SocketAddress and waiting request.<br />
+ * Receiving Primary-Message and reply.<br />
+ * </p>
+ * 
+ * @author kenta-shimizu
+ */
 public class ExampleHsmsSsPassive {
 
 	public ExampleHsmsSsPassive() {

@@ -10,6 +10,20 @@ import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
 import com.shimizukenta.secs.hsmsss.HsmsSsProtocol;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
+/**
+ * Example-2 (Use gem).
+ * 
+ * <p>
+ * Use 'example1/ExampleHsmsSsPassive.java' with this, too.
+ * </p>
+ * <p>
+ * This example is HSMS-SS Active Host.<br />
+ * This example try-connect repeatedly until 'SELECTED' with T5-timeout intervals.<br />
+ * </p>
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class ExampleHsmsSsActiveUseGem {
 
 	public ExampleHsmsSsActiveUseGem() {
@@ -17,7 +31,7 @@ public class ExampleHsmsSsActiveUseGem {
 	}
 	
 	/*
-	 * Example-4
+	 * Example-2 (Use gem)
 	 * 1. open ACTIVE-instance
 	 * 2. wait until SELECTED
 	 * 3. send S1F13
