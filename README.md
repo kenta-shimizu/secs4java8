@@ -196,11 +196,11 @@ See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/exam
 ```java
     /* Send S1F2. example */
     SmlMessage replySml = parser.parse(
-        "S1F2           " +
-        "<L             " +
-        "   <A 'MDLN-A'>" +
-        "   <A '000001'>" +
-        ">.             "
+        "S1F2             " +
+        "<L               " +
+        "   <A \"MDLN-A\">" +
+        "   <A \"000001\">" +
+        ">.               "
     );
 
     passive.send(primaryMsg, replySml);
