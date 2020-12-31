@@ -10,7 +10,7 @@ public abstract class AbstractSecsInnerEngine {
 	
 	private final AbstractSecsCommunicator engine;
 	
-	protected AbstractSecsInnerEngine(AbstractSecsCommunicator engine) {
+	public AbstractSecsInnerEngine(AbstractSecsCommunicator engine) {
 		this.engine = engine;
 	}
 	
@@ -31,39 +31,9 @@ public abstract class AbstractSecsInnerEngine {
 		return engine.executeInvokeAny(tasks);
 	}
 	
-	protected <T> T executeInvokeAny(Callable<T> task)
-			throws InterruptedException, ExecutionException{
-		return engine.executeInvokeAny(task);
-	}
-	
-	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2)
-			throws InterruptedException, ExecutionException{
-		return engine.executeInvokeAny(task1, task2);
-	}
-	
-	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, Callable<T> task3)
-			throws InterruptedException, ExecutionException{
-		return engine.executeInvokeAny(task1, task2, task3);
-	}
-	
 	protected <T> T executeInvokeAny(Collection<? extends Callable<T>> tasks, ReadOnlyTimeProperty timeout)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		return engine.executeInvokeAny(tasks, timeout);
-	}
-	
-	protected <T> T executeInvokeAny(Callable<T> task, ReadOnlyTimeProperty timeout)
-			throws InterruptedException, ExecutionException, TimeoutException {
-		return engine.executeInvokeAny(task, timeout);
-	}
-	
-	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, ReadOnlyTimeProperty timeout)
-			throws InterruptedException, ExecutionException, TimeoutException {
-		return engine.executeInvokeAny(task1, task2, timeout);
-	}
-	
-	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, Callable<T> task3, ReadOnlyTimeProperty timeout)
-			throws InterruptedException, ExecutionException, TimeoutException {
-		return engine.executeInvokeAny(task1, task2, task3, timeout);
 	}
 	
 	protected void notifyReceiveMessage(SecsMessage msg) {

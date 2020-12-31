@@ -4,6 +4,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -166,11 +167,15 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 				
 				Throwable t = e.getCause();
 				
+				if ( t instanceof Error ) {
+					throw (Error)t;
+				}
+				
 				if ( t instanceof RuntimeException ) {
 					throw (RuntimeException)t;
 				}
 				
-				throw new HsmsSsSendMessageException(msg, e);
+				throw new HsmsSsSendMessageException(msg, t);
 			}
 			catch ( Secs2BuildException | HsmsSsDetectTerminateException e ) {
 				throw new HsmsSsSendMessageException(msg, e);
@@ -244,7 +249,13 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 		};
 		
 		try {
-			HsmsSsMessage msg = executeInvokeAny(getMsgTask, checkTerminateTask, timeout);
+			
+			Collection<Callable<HsmsSsMessage>> tasks = Arrays.asList(
+					getMsgTask,
+					checkTerminateTask
+					);
+			
+			HsmsSsMessage msg = executeInvokeAny(tasks, timeout);
 			
 			if ( msg == null ) {
 				throw new HsmsSsDetectTerminateException();
@@ -260,11 +271,15 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 			
 			Throwable t = e.getCause();
 			
+			if ( t instanceof Error ) {
+				throw (Error)t;
+			}
+			
 			if ( t instanceof RuntimeException ) {
 				throw (RuntimeException)t;
 			}
 			
-			throw new SecsException(e);
+			throw new SecsException(t);
 		}
 	}
 	

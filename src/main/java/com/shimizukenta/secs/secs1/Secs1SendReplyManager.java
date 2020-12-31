@@ -1,6 +1,7 @@
 package com.shimizukenta.secs.secs1;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -124,7 +125,13 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 		};
 		
 		try {
-			Pack pp = executeInvokeAny(sendedTask, failedTask, terminateTask);
+			Collection<Callable<Pack>> tasks = Arrays.asList(
+					sendedTask,
+					failedTask,
+					terminateTask
+					);
+			
+			Pack pp = executeInvokeAny(tasks);
 			
 			if ( pp == null ) {
 				throw new Secs1DetectTerminateException(p.primaryMsg());
@@ -138,11 +145,15 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 			
 			Throwable t = e.getCause();
 			
+			if ( t instanceof Error ) {
+				throw (Error)t;
+			}
+			
 			if ( t instanceof RuntimeException ) {
 				throw (RuntimeException)t;
 			}
 			
-			throw new Secs1SendMessageException(p.primaryMsg(), e.getCause());
+			throw new Secs1SendMessageException(p.primaryMsg(), t);
 		}
 		
 	}
@@ -202,9 +213,16 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 			
 			for ( ;; ) {
 				
+				Collection<Callable<ReplyStatus>> tasks = Arrays.asList(
+						replyTask,
+						resetTimerTask,
+						terminateTask
+						);
+				
 				ReplyStatus r = executeInvokeAny(
-						replyTask, resetTimerTask, terminateTask,
-						parent.secs1Config().timeout().t3());
+						tasks,
+						parent.secs1Config().timeout().t3()
+						);
 				
 				if ( r.resetTimer() ) {
 					continue;
@@ -224,11 +242,15 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 			
 			Throwable t = e.getCause();
 			
+			if ( t instanceof Error ) {
+				throw (Error)t;
+			}
+			
 			if ( t instanceof RuntimeException ) {
 				throw (RuntimeException)t;
 			}
 			
-			throw new SecsException(e);
+			throw new SecsException(t);
 		}
 	}
 	

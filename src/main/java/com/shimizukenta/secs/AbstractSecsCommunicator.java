@@ -1,9 +1,7 @@
 package com.shimizukenta.secs;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -62,48 +60,9 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 		return execServ.invokeAny(tasks);
 	}
 	
-	protected <T> T executeInvokeAny(Callable<T> task)
-			throws InterruptedException, ExecutionException{
-		return execServ.invokeAny(Collections.singleton(task));
-	}
-	
-	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2)
-			throws InterruptedException, ExecutionException{
-		return execServ.invokeAny(Arrays.asList(task1, task2));
-	}
-	
-	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, Callable<T> task3)
-			throws InterruptedException, ExecutionException{
-		return execServ.invokeAny(Arrays.asList(task1, task2, task3));
-	}
-	
 	protected <T> T executeInvokeAny(Collection<? extends Callable<T>> tasks, ReadOnlyTimeProperty timeout)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		return execServ.invokeAny(tasks, timeout.getMilliSeconds(), TimeUnit.MILLISECONDS);
-	}
-	
-	protected <T> T executeInvokeAny(Callable<T> task, ReadOnlyTimeProperty timeout)
-			throws InterruptedException, ExecutionException, TimeoutException {
-		return execServ.invokeAny(
-				Collections.singleton(task),
-				timeout.getMilliSeconds(),
-				TimeUnit.MILLISECONDS);
-	}
-	
-	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, ReadOnlyTimeProperty timeout)
-			throws InterruptedException, ExecutionException, TimeoutException {
-		return execServ.invokeAny(
-				Arrays.asList(task1, task2),
-				timeout.getMilliSeconds(),
-				TimeUnit.MILLISECONDS);
-	}
-	
-	protected <T> T executeInvokeAny(Callable<T> task1, Callable<T> task2, Callable<T> task3, ReadOnlyTimeProperty timeout)
-			throws InterruptedException, ExecutionException, TimeoutException {
-		return execServ.invokeAny(
-				Arrays.asList(task1, task2, task3),
-				timeout.getMilliSeconds(),
-				TimeUnit.MILLISECONDS);
 	}
 	
 	

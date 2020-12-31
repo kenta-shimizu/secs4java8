@@ -1,6 +1,7 @@
 package com.shimizukenta.secs.secs1;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -298,7 +299,10 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			};
 			
 			try {
-				return executeInvokeAny(task, secs1Config().timeout().t2());
+				return executeInvokeAny(
+						Arrays.asList(task),
+						secs1Config().timeout().t2()
+						);
 			}
 			catch ( TimeoutException giveup ) {
 			}
@@ -314,7 +318,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 					throw (RuntimeException)t;
 				}
 				
-				notifyLog(e);
+				notifyLog(t);
 			}
 			
 			return PollCircuitControl.RETRY;

@@ -6,6 +6,7 @@ import java.net.StandardSocketOptions;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -223,9 +224,11 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			};
 			
 			try {
+				
 				boolean f = executeInvokeAny(
-						connectTask,
-						hsmsSsConfig().timeout().t7());
+						Arrays.asList(connectTask),
+						hsmsSsConfig().timeout().t7()
+						);
 				
 				if ( f ) {
 					/* selected */
@@ -245,6 +248,9 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				return null;
 			}
 			catch ( RejectedExecutionException e ) {
+				
+				//TODO
+				
 				if ( ! isClosed() ) {
 					throw e;
 				}
@@ -254,11 +260,16 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				
 				Throwable t = e.getCause();
 				
+				if ( t instanceof Error ) {
+					throw (Error)t;
+				}
+				
 				if ( t instanceof RuntimeException ) {
 					throw (RuntimeException)t;
 				}
 				
-				notifyLog(e);
+				notifyLog(t);
+				
 				return null;
 			}
 			
@@ -332,11 +343,21 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			};
 			
 			try {
-				executeInvokeAny(linktest, selectTask);
+				
+				executeInvokeAny(
+						Arrays.asList(
+								linktest,
+								selectTask
+								)
+						);
+				
 			}
 			catch ( InterruptedException ignore ) {
 			}
 			catch ( RejectedExecutionException e ) {
+				
+				//TODO
+				
 				if ( ! isClosed() ) {
 					throw e;
 				}
@@ -345,11 +366,15 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				
 				Throwable t = e.getCause();
 				
+				if ( t instanceof Error ) {
+					throw (Error)t;
+				}
+				
 				if ( t instanceof RuntimeException ) {
 					throw (RuntimeException)t;
 				}
 				
-				notifyLog(e);
+				notifyLog(t);
 			}
 			finally {
 				notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
@@ -359,11 +384,19 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		};
 		
 		try {
-			executeInvokeAny(reader, mainTask);
+			executeInvokeAny(
+					Arrays.asList(
+							reader,
+							mainTask
+							)
+					);
 		}
 		catch ( InterruptedException ignore ) {
 		}
 		catch ( RejectedExecutionException e ) {
+			
+			//TODO
+			
 			if ( ! isClosed() ) {
 				throw e;
 			}
@@ -372,11 +405,15 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			
 			Throwable t = e.getCause();
 			
+			if ( t instanceof Error ) {
+				throw (Error)t;
+			}
+			
 			if ( t instanceof RuntimeException ) {
 				throw (RuntimeException)t;
 			}
 			
-			notifyLog(e);
+			notifyLog(t);
 		}
 		finally {
 			

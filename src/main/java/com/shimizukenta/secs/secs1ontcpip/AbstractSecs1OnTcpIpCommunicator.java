@@ -7,6 +7,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -117,12 +119,16 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 									
 									Throwable t = e.getCause();
 									
+									if ( t instanceof Error ) {
+										throw (Error)t;
+									}
+									
 									if ( t instanceof RuntimeException ) {
 										throw (RuntimeException)t;
 									}
 									
 									if ( ! (t instanceof AsynchronousCloseException) ) {
-										notifyLog(e);
+										notifyLog(t);
 									}
 								}
 								catch ( InterruptedException ignore ) {
@@ -131,7 +137,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 								return null;
 							};
 							
-							executeInvokeAny(task);
+							executeInvokeAny(Arrays.asList(task));
 						}
 						catch ( InterruptedException ignore) {
 						}
@@ -139,12 +145,16 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 							
 							Throwable t = e.getCause();
 							
+							if ( t instanceof Error ) {
+								throw (Error)t;
+							}
+							
 							if ( t instanceof RuntimeException ) {
 								throw (RuntimeException)t;
 							}
 							
 							if ( ! (t instanceof AsynchronousCloseException) ) {
-								notifyLog(e);
+								notifyLog(t);
 							}
 						}
 						finally {
@@ -225,7 +235,12 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 	protected Optional<Byte> pollByte(byte[] request) throws InterruptedException {
 		
 		try {
-			Byte b = executeInvokeAny(createPollByteTask(request));
+			Collection<Callable<Byte>> tasks = Arrays.asList(
+					createPollByteTask(request)
+					);
+			
+			Byte b = executeInvokeAny(tasks);
+			
 			if ( b != null ) {
 				return Optional.of(b);
 			}
@@ -234,12 +249,12 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 			
 			Throwable t = e.getCause();
 			
-			if ( t instanceof RuntimeException ) {
-				throw (RuntimeException)t;
-			}
-			
 			if ( t instanceof Error ) {
 				throw (Error)t;
+			}
+			
+			if ( t instanceof RuntimeException ) {
+				throw (RuntimeException)t;
 			}
 			
 			notifyLog(t);
@@ -252,7 +267,13 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 	protected Optional<Byte> pollByte(byte[] request, ReadOnlyTimeProperty timeout) throws InterruptedException {
 		
 		try {
-			Byte b = executeInvokeAny(createPollByteTask(request), timeout);
+			
+			Collection<Callable<Byte>> tasks = Arrays.asList(
+					createPollByteTask(request)
+					);
+			
+			Byte b = executeInvokeAny(tasks, timeout);
+			
 			if ( b != null ) {
 				return Optional.of(b);
 			}
@@ -263,12 +284,12 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 			
 			Throwable t = e.getCause();
 			
-			if ( t instanceof RuntimeException ) {
-				throw (RuntimeException)t;
-			}
-			
 			if ( t instanceof Error ) {
 				throw (Error)t;
+			}
+			
+			if ( t instanceof RuntimeException ) {
+				throw (RuntimeException)t;
 			}
 			
 			notifyLog(t);
@@ -342,12 +363,12 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 				
 				Throwable t = e.getCause();
 				
-				if ( t instanceof RuntimeException ) {
-					throw (RuntimeException)t;
-				}
-				
 				if ( t instanceof Error ) {
 					throw (Error)t;
+				}
+				
+				if ( t instanceof RuntimeException ) {
+					throw (RuntimeException)t;
 				}
 				
 				throw new Secs1SendMessageException(t);

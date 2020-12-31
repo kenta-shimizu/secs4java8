@@ -5,6 +5,7 @@ import java.net.SocketAddress;
 import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -175,21 +176,34 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 								};
 								
 								try {
-									executeInvokeAny(linktest, selectTask);
+									executeInvokeAny(
+											Arrays.asList(
+													linktest,
+													selectTask
+													)
+											);
+									
 								}
 								catch ( ExecutionException e ) {
 									
 									Throwable t = e.getCause();
 									
+									if ( t instanceof Error ) {
+										throw (Error)t;
+									}
+									
 									if ( t instanceof RuntimeException ) {
 										throw (RuntimeException)t;
 									}
 									
-									notifyLog(e);
+									notifyLog(t);
 								}
 								catch ( InterruptedException ignore ) {
 								}
 								catch ( RejectedExecutionException e ) {
+									
+									//TODO
+									
 									if ( ! isClosed() ) {
 										throw e;
 									}
@@ -198,24 +212,35 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 								return null;
 							};
 							
-							executeInvokeAny(reader, mainTask);
+							executeInvokeAny(
+									Arrays.asList(
+											reader,
+											mainTask
+											)
+									);
+							
 						}
 						catch ( ExecutionException e ) {
 							
 							Throwable t = e.getCause();
+							
+							if ( t instanceof Error ) {
+								throw (Error)t;
+							}
 							
 							if ( t instanceof RuntimeException ) {
 								throw (RuntimeException)t;
 							}
 							
 							if ( ! (t instanceof AsynchronousCloseException) ) {
-								notifyLog(e);
+								notifyLog(t);
 							}
 						}
 						catch ( InterruptedException ignore ) {
 						}
 						catch ( RejectedExecutionException e ) {
 							
+							//TODO
 							if ( ! isClosed() ) {
 								throw e;
 							}
