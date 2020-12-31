@@ -306,6 +306,10 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 				
 				Throwable t = e.getCause();
 				
+				if ( t instanceof Error ) {
+					throw (Error)t;
+				}
+				
 				if ( t instanceof RuntimeException ) {
 					throw (RuntimeException)t;
 				}
@@ -322,7 +326,13 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 				
 				sendByte(ENQ);
 				
-				switch ( pollCircuitControl() ) {
+				PollCircuitControl p = pollCircuitControl();
+				
+				if ( p == null ) {
+					throw new InterruptedException("Circuit-control-Interrupted");
+				}
+				
+				switch ( p ) {
 				case RX: {
 					
 					receiveBlock();
