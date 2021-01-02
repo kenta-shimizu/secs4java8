@@ -23,7 +23,7 @@ import com.shimizukenta.secstestutil.TcpIpAdapter;
 
 public class ProtocolConvert {
 	
-	private static final int testCycle = 100;
+	private static final int testCycle = 1000;
 	
 	private boolean equipComm;
 	private boolean hostComm;

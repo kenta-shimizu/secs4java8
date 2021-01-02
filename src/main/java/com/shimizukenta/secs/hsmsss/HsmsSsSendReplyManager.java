@@ -305,21 +305,13 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 	}
 	
 	public Optional<HsmsSsMessage> put(HsmsSsMessage msg) {
-		
-		final Integer key = msg.systemBytesKey();
-		
 		synchronized ( packs ) {
-			
 			for ( Pack p : packs ) {
-				
-				if ( p.key().equals(key) ) {
-					
-					p.put(msg);
+				if ( p.put(msg) ) {
 					packs.notifyAll();
 					return Optional.empty();
 				}
 			}
-			
 			return Optional.of(msg);
 		}
 	}
@@ -327,22 +319,20 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 	private class Pack {
 		
 		private final HsmsSsMessage primary;
-		private final Integer key;
 		private HsmsSsMessage reply;
 		
 		public Pack(HsmsSsMessage primaryMsg) {
 			this.primary = primaryMsg;
-			this.key = primary.systemBytesKey();
 			this.reply = null;
 		}
 		
-		public Integer key() {
-			return key;
-		}
-		
-		public void put(HsmsSsMessage replyMsg) {
+		public boolean put(HsmsSsMessage replyMsg) {
 			synchronized ( this ) {
-				this.reply = replyMsg;
+				if ( replyMsg.systemBytesKey().equals(primary.systemBytesKey()) ) {
+					this.reply = replyMsg;
+					return true;
+				}
+				return false;
 			}
 		}
 		
@@ -352,15 +342,19 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 			}
 		}
 		
+		private Integer key() {
+			return this.primary.systemBytesKey();
+		}
+		
 		@Override
 		public int hashCode() {
-			return key.hashCode();
+			return key().hashCode();
 		}
 		
 		@Override
 		public boolean equals(Object o) {
 			if ((o != null) && (o instanceof Pack)) {
-				return ((Pack)o).key.equals(key);
+				return ((Pack)o).key().equals(key());
 			} else {
 				return false;
 			}

@@ -411,21 +411,19 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 	private class Pack {
 		
 		private final Secs1Message primary;
-		private final Integer key;
 		private Secs1Message reply;
 		private boolean sended;
 		private Exception failedCause;
 		
 		public Pack(Secs1Message primaryMsg) {
 			this.primary = primaryMsg;
-			this.key = primaryMsg.systemBytesKey();
 			this.reply = null;
 			this.sended = false;
 			this.failedCause = null;
 		}
 		
 		public Integer key() {
-			return key;
+			return primary.systemBytesKey();
 		}
 		
 		public void put(Secs1Message replyMsg) {
@@ -470,13 +468,13 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 		
 		@Override
 		public int hashCode() {
-			return key.hashCode();
+			return key().hashCode();
 		}
 		
 		@Override
 		public boolean equals(Object o) {
 			if ((o != null) && (o instanceof Pack)) {
-				return ((Pack)o).key.equals(key);
+				return ((Pack)o).key().equals(key());
 			} else {
 				return false;
 			}
