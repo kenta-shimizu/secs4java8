@@ -133,11 +133,7 @@ public class HsmsSsByteReader extends AbstractSecsInnerEngine implements Callabl
 				throw (RuntimeException)t;
 			}
 			
-			if ( t instanceof Error ) {
-				throw (Error)t;
-			}
-			
-			throw new HsmsSsDetectTerminateException(e);
+			throw new HsmsSsDetectTerminateException(t);
 		}
 		catch ( InterruptedException e ) {
 			f.cancel(true);

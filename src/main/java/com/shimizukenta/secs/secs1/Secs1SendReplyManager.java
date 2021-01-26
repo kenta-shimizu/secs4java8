@@ -145,10 +145,6 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 			
 			Throwable t = e.getCause();
 			
-			if ( t instanceof Error ) {
-				throw (Error)t;
-			}
-			
 			if ( t instanceof RuntimeException ) {
 				throw (RuntimeException)t;
 			}
@@ -241,10 +237,6 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 		catch ( ExecutionException e ) {
 			
 			Throwable t = e.getCause();
-			
-			if ( t instanceof Error ) {
-				throw (Error)t;
-			}
 			
 			if ( t instanceof RuntimeException ) {
 				throw (RuntimeException)t;

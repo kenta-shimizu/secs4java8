@@ -310,10 +310,6 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 				
 				Throwable t = e.getCause();
 				
-				if ( t instanceof Error ) {
-					throw (Error)t;
-				}
-				
 				if ( t instanceof RuntimeException ) {
 					throw (RuntimeException)t;
 				}

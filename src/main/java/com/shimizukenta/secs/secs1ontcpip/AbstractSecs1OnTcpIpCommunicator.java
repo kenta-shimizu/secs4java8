@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -35,13 +37,12 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 		implements Secs1OnTcpIpCommunicator {
 	
 	private final Secs1OnTcpIpCommunicatorConfig secs1OnTcpIpConfig;
-	private AsynchronousSocketChannel channel;
+	private final List<AsynchronousSocketChannel> channels = new ArrayList<>();
 	
 	public AbstractSecs1OnTcpIpCommunicator(Secs1OnTcpIpCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
 		
 		this.secs1OnTcpIpConfig = config;
-		this.channel = null;
 	}
 	
 	@Override
@@ -76,8 +77,8 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 					public void completed(Void none, Void attachment) {
 						
 						try {
-							synchronized ( AbstractSecs1OnTcpIpCommunicator.this ) {
-								AbstractSecs1OnTcpIpCommunicator.this.channel = ch;
+							synchronized ( AbstractSecs1OnTcpIpCommunicator.this.channels ) {
+								AbstractSecs1OnTcpIpCommunicator.this.channels.add(ch);
 							}
 							
 							notifyCommunicatableStateChange(true);
@@ -119,16 +120,10 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 									
 									Throwable t = e.getCause();
 									
-									if ( t instanceof Error ) {
-										throw (Error)t;
-									}
-									
-									if ( t instanceof RuntimeException ) {
-										throw (RuntimeException)t;
-									}
-									
-									if ( ! (t instanceof AsynchronousCloseException) ) {
-										notifyLog(t);
+									if ( ! (t instanceof ClosedChannelException) ) {
+										if ( t instanceof Exception ) {
+											throw (Exception)t;
+										}
 									}
 								}
 								catch ( InterruptedException ignore ) {
@@ -145,24 +140,18 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 							
 							Throwable t = e.getCause();
 							
-							if ( t instanceof Error ) {
-								throw (Error)t;
-							}
-							
 							if ( t instanceof RuntimeException ) {
 								throw (RuntimeException)t;
 							}
 							
-							if ( ! (t instanceof AsynchronousCloseException) ) {
-								notifyLog(t);
-							}
+							notifyLog(t);
 						}
 						finally {
 							
 							notifyCommunicatableStateChange(false);
 							
-							synchronized ( AbstractSecs1OnTcpIpCommunicator.this ) {
-								AbstractSecs1OnTcpIpCommunicator.this.channel = null;
+							synchronized ( AbstractSecs1OnTcpIpCommunicator.this.channels ) {
+								AbstractSecs1OnTcpIpCommunicator.this.channels.remove(ch);
 							}
 							
 							try {
@@ -182,18 +171,10 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 					@Override
 					public void failed(Throwable t, Void attachment) {
 						
-						try {
-							if ( t instanceof RuntimeException ) {
-								throw (RuntimeException)t;
-							}
-							
-							notifyLog(t);
-						}
-						finally {
-							
-							synchronized ( ch ) {
-								ch.notifyAll();
-							}
+						notifyLog(t);
+						
+						synchronized ( ch ) {
+							ch.notifyAll();
 						}
 					}
 				});
@@ -249,10 +230,6 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 			
 			Throwable t = e.getCause();
 			
-			if ( t instanceof Error ) {
-				throw (Error)t;
-			}
-			
 			if ( t instanceof RuntimeException ) {
 				throw (RuntimeException)t;
 			}
@@ -284,10 +261,6 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 			
 			Throwable t = e.getCause();
 			
-			if ( t instanceof Error ) {
-				throw (Error)t;
-			}
-			
 			if ( t instanceof RuntimeException ) {
 				throw (RuntimeException)t;
 			}
@@ -303,12 +276,13 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 		return new Callable<Byte>() {
 			
 			@Override
-			public Byte call() {
+			public Byte call() throws Exception {
+				
 				try {
 					
 					for ( ;; ) {
 						
-						byte b = byteQueue.take();
+						byte b = byteQueue.take().byteValue();
 						
 						for ( byte r : request ) {
 							if ( r == b ) {
@@ -334,23 +308,22 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 	protected void sendByte(byte[] bs)
 			throws SecsSendMessageException, SecsException, InterruptedException {
 		
-		final AsynchronousSocketChannel ch;
+		final AsynchronousSocketChannel channel;
 		
-		synchronized ( this ) {
-			ch = channel;
+		synchronized ( this.channels ) {
+			if ( this.channels.isEmpty() ) {
+				throw new Secs1OnTcpIpNotConnectedException();
+			}
+			channel = channels.get(0);
 		}
 		
-		if ( ch == null ) {
-			throw new Secs1OnTcpIpNotConnectedException();
-		}
-		
-		ByteBuffer buffer = ByteBuffer.allocate(bs.length);
+		final ByteBuffer buffer = ByteBuffer.allocate(bs.length);
 		buffer.put(bs);
 		((Buffer)buffer).flip();
 		
 		while ( buffer.hasRemaining() ) {
 			
-			Future<Integer> f = ch.write(buffer);
+			final Future<Integer> f = channel.write(buffer);
 			
 			try {
 				int w = f.get().intValue();
@@ -359,23 +332,19 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 					throw new Secs1DetectTerminateException();
 				}
 			}
+			catch ( InterruptedException e ) {
+				f.cancel(true);
+				throw e;
+			}
 			catch ( ExecutionException e ) {
 				
 				Throwable t = e.getCause();
-				
-				if ( t instanceof Error ) {
-					throw (Error)t;
-				}
 				
 				if ( t instanceof RuntimeException ) {
 					throw (RuntimeException)t;
 				}
 				
 				throw new Secs1SendMessageException(t);
-			}
-			catch ( InterruptedException e ) {
-				f.cancel(true);
-				throw e;
 			}
 		}
 	}
