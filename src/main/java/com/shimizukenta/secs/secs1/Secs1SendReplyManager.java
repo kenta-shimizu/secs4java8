@@ -383,7 +383,7 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 			try {
 				Secs1Message msg = Secs1MessageBlockConverter.toSecs1Message(recvBlocks);
 				notifyReceiveMessagePassThrough(msg);
-				notifyLog("Secs1-Message received", msg);
+				notifyLog(new Secs1ReceiveMessageLog(msg));
 				put(msg);
 			}
 			catch ( Secs2Exception e ) {

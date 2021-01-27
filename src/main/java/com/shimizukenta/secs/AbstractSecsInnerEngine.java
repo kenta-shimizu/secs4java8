@@ -44,18 +44,6 @@ public abstract class AbstractSecsInnerEngine {
 		engine.notifyLog(log);
 	}
 	
-	protected void notifyLog(CharSequence subject) {
-		engine.notifyLog(subject);
-	}
-	
-	protected void notifyLog(CharSequence subject, Object value) {
-		engine.notifyLog(subject, value);
-	}
-	
-	protected void notifyLog(Throwable t) {
-		engine.notifyLog(t);
-	}
-	
 	protected void notifyTrySendMessagePassThrough(SecsMessage msg) {
 		engine.notifyTrySendMessagePassThrough(msg);
 	}

@@ -251,8 +251,10 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	
 	private void executeLogQueueTask() {
 		executeLoopTask(() -> {
-			SecsLog log = logQueue.take();
-			logListeners.forEach(l -> {l.received(log);});
+			final SecsLog log = logQueue.take();
+			logListeners.forEach(l -> {
+				l.received(log);
+			});
 		});
 	}
 	
@@ -261,34 +263,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	}
 	
 	protected void notifyLog(SecsLog log) {
-		offerLogQueue(new SecsLog(
-				createLogSubject(log.subject()),
-				log.timestamp(),
-				log.value().orElse(null)));
-	}
-	
-	protected void notifyLog(CharSequence subject) {
-		offerLogQueue(new SecsLog(createLogSubject(subject)));
-	}
-	
-	protected void notifyLog(CharSequence subject, Object value) {
-		offerLogQueue(new SecsLog(
-				createLogSubject(subject),
-				value));
-	}
-	
-	protected void notifyLog(Throwable t) {
-		offerLogQueue(new SecsLog(
-				createLogSubject(SecsLog.createThrowableSubject(t)),
-				t));
-	}
-	
-	private String createLogSubject(CharSequence subject) {
-		if ( subject == null ) {
-			return "No-subject";
-		} else {
-			return config.logSubjectHeader().get() + subject.toString();
-		}
+		offerLogQueue(log);
 	}
 	
 	

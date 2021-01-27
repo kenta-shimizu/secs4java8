@@ -108,11 +108,11 @@ public class HsmsSsByteReader extends AbstractSecsInnerEngine implements Callabl
 			
 			if ( detectT8Timeout ) {
 				
-				r = parent.hsmsSsConfig().timeout().t8().future(f);
+				r = parent.hsmsSsConfig().timeout().t8().future(f).intValue();
 				
 			} else {
 				
-				r = f.get();
+				r = f.get().intValue();
 			}
 			
 			if ( r < 0 ) {
