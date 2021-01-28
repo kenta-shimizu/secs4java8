@@ -266,6 +266,10 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 		offerLogQueue(log);
 	}
 	
+	protected void notifyLog(Throwable t) {
+		offerLogQueue(new SecsThrowableLog(t));
+	}
+	
 	
 	/* Secs-Communicatable-State-Changed-Listener */
 	private final BooleanProperty communicatable = BooleanProperty.newInstance(false);

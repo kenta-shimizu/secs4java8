@@ -56,7 +56,7 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 		super.open();
 		
 		this.hsmsSsCommStateProperty.addChangeListener(state -> {
-			notifyLog("HsmsSs-Connect-state-changed: " + state.toString());
+			notifyLog(HsmsSsCommunicateStateChangeLog.get(state));
 		});
 		
 		this.hsmsSsCommStateProperty.addChangeListener(state -> {

@@ -67,14 +67,14 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 				
 				SocketAddress socketAddr = secs1OnTcpIpConfig.socketAddress().getSocketAddress();
 				
-				String socketAddrString = socketAddr.toString();
-				
-				notifyLog("AbstractSecs1OnTcpIpCommunicator#try-connect", socketAddrString);
+				notifyLog(Secs1OnTcpIpConnectionLog.tryConnect(socketAddr));
 				
 				ch.connect(socketAddr, null, new CompletionHandler<Void, Void>() {
 
 					@Override
 					public void completed(Void none, Void attachment) {
+						
+						final String channelStr = ch.toString();
 						
 						try {
 							synchronized ( AbstractSecs1OnTcpIpCommunicator.this.channels ) {
@@ -83,11 +83,11 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 							
 							notifyCommunicatableStateChange(true);
 							
-							notifyLog("AbstractSecs1OnTcpIpCommunicator#connected", ch);
+							notifyLog(Secs1OnTcpIpConnectionLog.connected(channelStr));
 							
 							final ByteBuffer buffer = ByteBuffer.allocate(1024);
 							
-							final Callable<Void> task = () -> {
+							final Callable<Void> readingTask = () -> {
 								
 								try {
 									
@@ -132,7 +132,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 								return null;
 							};
 							
-							executeInvokeAny(Arrays.asList(task));
+							executeInvokeAny(Arrays.asList(readingTask));
 						}
 						catch ( InterruptedException ignore) {
 						}
@@ -148,11 +148,11 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 						}
 						finally {
 							
-							notifyCommunicatableStateChange(false);
-							
 							synchronized ( AbstractSecs1OnTcpIpCommunicator.this.channels ) {
 								AbstractSecs1OnTcpIpCommunicator.this.channels.remove(ch);
 							}
+							
+							notifyCommunicatableStateChange(false);
 							
 							try {
 								ch.shutdownOutput();
@@ -160,7 +160,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 							catch ( IOException giveup ) {
 							}
 							
-							notifyLog("AbstractSecs1OnTcpIpCommunicator#closed", socketAddrString);
+							notifyLog(Secs1OnTcpIpConnectionLog.disconnected(channelStr));
 							
 							synchronized ( ch ) {
 								ch.notifyAll();
@@ -171,7 +171,9 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 					@Override
 					public void failed(Throwable t, Void attachment) {
 						
-						notifyLog(t);
+						if ( ! (t instanceof ClosedChannelException) ) {
+							notifyLog(t);
+						}
 						
 						synchronized ( ch ) {
 							ch.notifyAll();
@@ -311,9 +313,11 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 		final AsynchronousSocketChannel channel;
 		
 		synchronized ( this.channels ) {
+			
 			if ( this.channels.isEmpty() ) {
 				throw new Secs1OnTcpIpNotConnectedException();
 			}
+			
 			channel = channels.get(0);
 		}
 		

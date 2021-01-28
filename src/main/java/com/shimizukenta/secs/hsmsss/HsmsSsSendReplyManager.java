@@ -109,6 +109,8 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 		synchronized ( channel ) {
 			
 			try {
+				notifyLog(new HsmsSsTrySendMessageLog(msg));
+				
 				Secs2ByteBuffersBuilder bb = Secs2ByteBuffersBuilder.build(1024, msg.secs2());
 				
 				long len = bb.size() + 10L;
@@ -161,15 +163,12 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 				}
 				
 				notifySendedMessagePassThrough(msg);
-				notifyLog("Sended HsmsSs-Message", msg);
+				
+				notifyLog(new HsmsSsSendedMessageLog(msg));
 			}
 			catch ( ExecutionException e ) {
 				
 				Throwable t = e.getCause();
-				
-				if ( t instanceof Error ) {
-					throw (Error)t;
-				}
 				
 				if ( t instanceof RuntimeException ) {
 					throw (RuntimeException)t;
@@ -270,10 +269,6 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 		catch ( ExecutionException e ) {
 			
 			Throwable t = e.getCause();
-			
-			if ( t instanceof Error ) {
-				throw (Error)t;
-			}
 			
 			if ( t instanceof RuntimeException ) {
 				throw (RuntimeException)t;

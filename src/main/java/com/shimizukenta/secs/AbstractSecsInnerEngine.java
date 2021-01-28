@@ -44,6 +44,10 @@ public abstract class AbstractSecsInnerEngine {
 		engine.notifyLog(log);
 	}
 	
+	protected void notifyLog(Throwable t) {
+		engine.notifyLog(t);
+	}
+	
 	protected void notifyTrySendMessagePassThrough(SecsMessage msg) {
 		engine.notifyTrySendMessagePassThrough(msg);
 	}

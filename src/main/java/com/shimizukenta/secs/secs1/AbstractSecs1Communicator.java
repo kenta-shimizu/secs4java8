@@ -257,14 +257,8 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 					circuitControl();
 				}
 			}
-			catch ( InterruptedException e ) {
-				throw e;
-			}
 			catch ( SecsException e ) {
 				notifyLog(e);
-			}
-			catch ( Throwable t ) {
-				throw t;
 			}
 		}
 		
@@ -327,10 +321,6 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 				sendByte(ENQ);
 				
 				PollCircuitControl p = pollCircuitControl();
-				
-				if ( p == null ) {
-					throw new InterruptedException("Circuit-control-Interrupted");
-				}
 				
 				switch ( p ) {
 				case RX: {
@@ -465,7 +455,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			}
 		}
 		
-		private void receiveBlockGarbage(String reason) throws SecsException, InterruptedException {
+		private void receiveBlockGarbage(Secs1CircuitControlLog reason) throws SecsException, InterruptedException {
 			
 			for ( ;; ) {
 				if ( ! pollByteT1().isPresent() ) {
@@ -479,6 +469,8 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		}
 		
 		private boolean sendBlock() throws SecsException, InterruptedException {
+			
+			notifyLog(new Secs1TrySendMessageBlockLog(presentBlock));
 			
 			pollByteUntilEmpty();
 			

@@ -51,10 +51,15 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 		
 		try {
 			
-			notifyLog("Secs1-Message entry-send", msg);
+			notifyLog(new Secs1TrySendMessageLog(msg));
+			
 			notifyTrySendMessagePassThrough(msg);
+			
 			waitUntilSended(p);
+			
 			notifySendedMessagePassThrough(msg);
+			
+			notifyLog(new Secs1SendedMessageLog(msg));
 			
 			if ( msg.wbit() ) {
 				
@@ -299,7 +304,7 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 	
 	public void sended(Secs1MessageBlock block) {
 		
-		notifyLog("Secs1-Message-Block sended", block);
+		notifyLog(new Secs1SendedMessageBlockLog(block));
 		
 		if ( block.ebit() ) {
 			final Integer key = block.systemBytesKey();
@@ -336,7 +341,7 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 	
 	public void received(Secs1MessageBlock block) throws InterruptedException {
 		
-		notifyLog("Secs1-Message-Block received", block);
+		notifyLog(new Secs1ReceiveMessageBlockLog(block));
 		
 		if ( recvBlocks.isEmpty() ) {
 			

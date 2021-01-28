@@ -85,7 +85,8 @@ public class HsmsSsByteReader extends AbstractSecsInnerEngine implements Callabl
 				});
 				
 				notifyReceiveMessagePassThrough(msg);
-				notifyLog("Received HsmsSs-Message", msg);
+				
+				notifyLog(new HsmsSsReceiveMessageLog(msg));
 			}
 		}
 		catch ( HsmsSsDetectTerminateException | HsmsSsTimeoutT8Exception e ) {

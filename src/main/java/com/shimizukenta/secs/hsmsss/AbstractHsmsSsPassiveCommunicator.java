@@ -87,45 +87,39 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 	
 	protected void passiveOpen() throws IOException {
 		
-		try {
-			synchronized ( this ) {
-				this.server = AsynchronousServerSocketChannel.open();
+		synchronized ( this ) {
+			this.server = AsynchronousServerSocketChannel.open();
+		}
+		
+		final SocketAddress socketAddr = hsmsSsConfig().socketAddress().getSocketAddress();
+		
+		notifyLog(HsmsSsConnectionLog.tryBind(socketAddr));
+		
+		server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+		server.bind(socketAddr);
+		
+		notifyLog(HsmsSsConnectionLog.binded(socketAddr));
+		
+		server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
+			
+			@Override
+			public void completed(AsynchronousSocketChannel channel, Void attachment) {
+				server.accept(attachment, this);
+				completedAction(channel);
 			}
 			
-			final SocketAddress socketAddr = hsmsSsConfig().socketAddress().getSocketAddress();
-			
-			String socketAddrInfo = socketAddr.toString();
-			
-			server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
-			server.bind(socketAddr);
-			
-			notifyLog("AbstractHsmsSsPassiveCommunicator#binded", socketAddrInfo);
-			
-			server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
-				
-				@Override
-				public void completed(AsynchronousSocketChannel channel, Void attachment) {
-					server.accept(attachment, this);
-					completedAction(channel);
-				}
-				
-				@Override
-				public void failed(Throwable t, Void attachment) {
-					notifyLog("AbstractHsmsSsPassiveCommunicator AsynchronousSeverSocketChannel#accept failed", t);
-				}
-			});
-		}
-		catch ( IOException e ) {
-			notifyLog(e);
-			throw e;
-		}
+			@Override
+			public void failed(Throwable t, Void attachment) {
+				notifyLog(t);
+			}
+		});
 	}
 	
 	protected void completedAction(AsynchronousSocketChannel channel) {
 		
-		String channelString = channel.toString();
+		String channelString = Objects.toString(channel);
 		
-		notifyLog("AbstractHsmsSsPassiveCommunicator channel#accept", channelString);
+		notifyLog(HsmsSsConnectionLog.accepted(channelString));
 		
 		final BlockingQueue<HsmsSsMessage> queue = new LinkedBlockingQueue<>();
 		
@@ -254,15 +248,12 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				if ( ! isClosed() ) {
 					throw e;
 				}
+				
 				return null;
 			}
 			catch ( ExecutionException e ) {
 				
 				Throwable t = e.getCause();
-				
-				if ( t instanceof Error ) {
-					throw (Error)t;
-				}
 				
 				if ( t instanceof RuntimeException ) {
 					throw (RuntimeException)t;
@@ -366,10 +357,6 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				
 				Throwable t = e.getCause();
 				
-				if ( t instanceof Error ) {
-					throw (Error)t;
-				}
-				
 				if ( t instanceof RuntimeException ) {
 					throw (RuntimeException)t;
 				}
@@ -405,10 +392,6 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			
 			Throwable t = e.getCause();
 			
-			if ( t instanceof Error ) {
-				throw (Error)t;
-			}
-			
 			if ( t instanceof RuntimeException ) {
 				throw (RuntimeException)t;
 			}
@@ -433,6 +416,8 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			catch ( IOException e ) {
 				notifyLog(e);
 			}
+			
+			notifyLog(HsmsSsConnectionLog.closed(channelString));
 		}
 	}
 	

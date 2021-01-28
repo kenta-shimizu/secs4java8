@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.util.Arrays;
 import java.util.Objects;
@@ -63,19 +64,19 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 			
 			final SocketAddress socketAddr = hsmsSsConfig().socketAddress().getSocketAddress();
 			
-			String socketAddrInfo = socketAddr.toString();
-			
 			try {
-				
-				notifyLog("AbstractHsmsSsActiveCommunicator try-connect", socketAddrInfo);
+				notifyLog(HsmsSsConnectionLog.tryConnect(socketAddr));
 
 				channel.connect(socketAddr, null, new CompletionHandler<Void, Void>(){
 					
 					@Override
 					public void completed(Void none, Void attachment) {
 						
+						final String channelStr = Objects.toString(channel);
+						
+						notifyLog(HsmsSsConnectionLog.connected(channelStr));
+						
 						try {
-							
 							if ( ! addChannel(channel) ) {
 								return;
 							}
@@ -224,10 +225,6 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 							
 							Throwable t = e.getCause();
 							
-							if ( t instanceof Error ) {
-								throw (Error)t;
-							}
-							
 							if ( t instanceof RuntimeException ) {
 								throw (RuntimeException)t;
 							}
@@ -258,17 +255,21 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 							synchronized ( channel ) {
 								channel.notifyAll();
 							}
+							
+							notifyLog(HsmsSsConnectionLog.closed(channelStr));
 						}
 					}
 					
 					@Override
 					public void failed(Throwable t, Void attachment) {
 						
+						if ( ! (t instanceof ClosedChannelException) ) {
+							notifyLog(t);
+						}
+						
 						synchronized ( channel ) {
 							channel.notifyAll();
 						}
-						
-						notifyLog("AbstractHsmsSsActiveCommunicator#open-AsynchronousSocketChannel#connect failed", t);
 					}
 				});
 				
@@ -284,5 +285,5 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 			notifyLog(e);
 		}
 	}
-
+	
 }
