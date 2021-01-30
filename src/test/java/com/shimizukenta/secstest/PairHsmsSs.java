@@ -53,6 +53,8 @@ public class PairHsmsSs {
 	
 	public static void main(String[] args) {
 		
+		long start = System.currentTimeMillis();
+		
 		SocketAddress addr = new InetSocketAddress("127.0.0.1", 5000);
 		
 		final HsmsSsCommunicatorConfig equipConfig = new HsmsSsCommunicatorConfig();
@@ -342,6 +344,10 @@ public class PairHsmsSs {
 		echo("reach end");
 		echo("equip-count: " + inst.equipCounter);
 		echo("host-count: " + inst.hostCounter);
+		
+		long end = System.currentTimeMillis();
+		
+		echo("elapsed: " + (end - start) + " milli-sec.");
 	}
 	
 	private static synchronized void echo(Object o) {

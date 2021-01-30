@@ -14,7 +14,7 @@ public class SecsTrySendMessageLog extends AbstractSecsLog {
 	}
 	
 	public SecsTrySendMessageLog(SecsMessage message) {
-		super(commonSubject, null, Objects.requireNonNull(message));
+		super(commonSubject, Objects.requireNonNull(message));
 	}
 	
 	@Override

@@ -69,7 +69,45 @@ public abstract class AbstractHsmsSsRebindPassiveCommunicator extends AbstractHs
 				@Override
 				public void completed(AsynchronousSocketChannel channel, Void attachment) {
 					server.accept(attachment, this);
-					completedAction(channel);
+					
+					
+					SocketAddress local = null;
+					SocketAddress remote = null;
+					
+					try {
+						local = channel.getLocalAddress();
+						remote = channel.getRemoteAddress();
+						
+						notifyLog(HsmsSsConnectionLog.accepted(local, remote));
+						
+						completedAction(channel);
+					}
+					catch ( IOException e ) {
+						notifyLog(e);
+					}
+					catch ( InterruptedException ignore ) {
+					}
+					finally {
+						
+						sendReplyManager.clear();
+						
+						removeChannel(channel);
+						
+						try {
+							channel.shutdownOutput();
+						}
+						catch ( IOException ignore ) {
+						}
+						
+						try {
+							channel.close();
+						}
+						catch ( IOException e ) {
+							notifyLog(e);
+						}
+						
+						notifyLog(HsmsSsConnectionLog.closed(local, remote));
+					}
 				}
 				
 				@Override

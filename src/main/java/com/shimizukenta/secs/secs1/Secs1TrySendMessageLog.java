@@ -8,7 +8,7 @@ public class Secs1TrySendMessageLog extends SecsTrySendMessageLog {
 	
 	private static final long serialVersionUID = 1353372467201283677L;
 	
-	private static final String commonSubject = "Receive SECS1-Message";
+	private static final String commonSubject = "Try-Send SECS1-Message";
 	
 	public Secs1TrySendMessageLog(Secs1Message message, LocalDateTime timestamp) {
 		super(message, timestamp);

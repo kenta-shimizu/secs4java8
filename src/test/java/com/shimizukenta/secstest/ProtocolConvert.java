@@ -57,6 +57,8 @@ public class ProtocolConvert {
 	
 	public static void main(String[] args) {
 		
+		long start = System.currentTimeMillis();
+		
 		int deviceId = 10;
 		SocketAddress innerAddr  = new InetSocketAddress("127.0.0.1", 0);
 		SocketAddress secs1Addr  = new InetSocketAddress("127.0.0.1", 23000);
@@ -367,6 +369,10 @@ public class ProtocolConvert {
 		echo("reach end");
 		echo("equip-count: " + inst.equipCounter);
 		echo("host-count: " + inst.hostCounter);
+		
+		long end = System.currentTimeMillis();
+		
+		echo("elapsed: " + (end - start) + " milli-sec.");
 	}
 	
 	private static synchronized void echo(Object o) {

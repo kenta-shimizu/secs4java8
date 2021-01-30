@@ -12,7 +12,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.SecsException;
@@ -105,7 +104,44 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			@Override
 			public void completed(AsynchronousSocketChannel channel, Void attachment) {
 				server.accept(attachment, this);
-				completedAction(channel);
+				
+				SocketAddress local = null;
+				SocketAddress remote = null;
+				
+				try {
+					local = channel.getLocalAddress();
+					remote = channel.getRemoteAddress();
+					
+					notifyLog(HsmsSsConnectionLog.accepted(local, remote));
+					
+					completedAction(channel);
+				}
+				catch ( IOException e ) {
+					notifyLog(e);
+				}
+				catch ( InterruptedException ignore ) {
+				}
+				finally {
+					
+					sendReplyManager.clear();
+					
+					removeChannel(channel);
+					
+					try {
+						channel.shutdownOutput();
+					}
+					catch ( IOException ignore ) {
+					}
+					
+					try {
+						channel.close();
+					}
+					catch ( IOException e ) {
+						notifyLog(e);
+					}
+					
+					notifyLog(HsmsSsConnectionLog.closed(local, remote));
+				}
 			}
 			
 			@Override
@@ -115,11 +151,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		});
 	}
 	
-	protected void completedAction(AsynchronousSocketChannel channel) {
-		
-		String channelString = Objects.toString(channel);
-		
-		notifyLog(HsmsSsConnectionLog.accepted(channelString));
+	protected void completedAction(AsynchronousSocketChannel channel) throws InterruptedException {
 		
 		final BlockingQueue<HsmsSsMessage> queue = new LinkedBlockingQueue<>();
 		
@@ -233,22 +265,13 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 					/* select faield */
 					return null;
 				}
+				
 			}
 			catch ( TimeoutException e ) {
 				notifyLog(new HsmsSsTimeoutT7Exception(e));
 				return null;
 			}
 			catch ( InterruptedException ignore ) {
-				return null;
-			}
-			catch ( RejectedExecutionException e ) {
-				
-				//TODO
-				
-				if ( ! isClosed() ) {
-					throw e;
-				}
-				
 				return null;
 			}
 			catch ( ExecutionException e ) {
@@ -334,24 +357,14 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			};
 			
 			try {
-				
 				executeInvokeAny(
 						Arrays.asList(
 								linktest,
 								selectTask
 								)
 						);
-				
 			}
 			catch ( InterruptedException ignore ) {
-			}
-			catch ( RejectedExecutionException e ) {
-				
-				//TODO
-				
-				if ( ! isClosed() ) {
-					throw e;
-				}
 			}
 			catch ( ExecutionException e ) {
 				
@@ -378,16 +391,6 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 							)
 					);
 		}
-		catch ( InterruptedException ignore ) {
-		}
-		catch ( RejectedExecutionException e ) {
-			
-			//TODO
-			
-			if ( ! isClosed() ) {
-				throw e;
-			}
-		}
 		catch ( ExecutionException e ) {
 			
 			Throwable t = e.getCause();
@@ -397,27 +400,6 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			}
 			
 			notifyLog(t);
-		}
-		finally {
-			
-			sendReplyManager.clear();
-			
-			removeChannel(channel);
-			
-			try {
-				channel.shutdownOutput();
-			}
-			catch ( IOException ignore ) {
-			}
-			
-			try {
-				channel.close();
-			}
-			catch ( IOException e ) {
-				notifyLog(e);
-			}
-			
-			notifyLog(HsmsSsConnectionLog.closed(channelString));
 		}
 	}
 	

@@ -62,28 +62,33 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 		executeLoopTask(() -> {
 			
 			try (
-					AsynchronousSocketChannel ch = AsynchronousSocketChannel.open();
+					AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
 					) {
 				
 				SocketAddress socketAddr = secs1OnTcpIpConfig.socketAddress().getSocketAddress();
 				
 				notifyLog(Secs1OnTcpIpConnectionLog.tryConnect(socketAddr));
 				
-				ch.connect(socketAddr, null, new CompletionHandler<Void, Void>() {
+				channel.connect(socketAddr, null, new CompletionHandler<Void, Void>() {
 
 					@Override
 					public void completed(Void none, Void attachment) {
 						
-						final String channelStr = ch.toString();
+						SocketAddress local = null;
+						SocketAddress remote = null;
 						
 						try {
+							
+							local = channel.getLocalAddress();
+							remote = channel.getRemoteAddress();
+							
 							synchronized ( AbstractSecs1OnTcpIpCommunicator.this.channels ) {
-								AbstractSecs1OnTcpIpCommunicator.this.channels.add(ch);
+								AbstractSecs1OnTcpIpCommunicator.this.channels.add(channel);
 							}
 							
 							notifyCommunicatableStateChange(true);
 							
-							notifyLog(Secs1OnTcpIpConnectionLog.connected(channelStr));
+							notifyLog(Secs1OnTcpIpConnectionLog.connected(local, remote));
 							
 							final ByteBuffer buffer = ByteBuffer.allocate(1024);
 							
@@ -95,7 +100,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 										
 										((Buffer)buffer).clear();
 										
-										Future<Integer> f = ch.read(buffer);
+										Future<Integer> f = channel.read(buffer);
 										
 										try {
 											int r = f.get().intValue();
@@ -133,6 +138,10 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 							};
 							
 							executeInvokeAny(Arrays.asList(readingTask));
+							
+						}
+						catch ( IOException e ) {
+							notifyLog(e);
 						}
 						catch ( InterruptedException ignore) {
 						}
@@ -149,21 +158,21 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 						finally {
 							
 							synchronized ( AbstractSecs1OnTcpIpCommunicator.this.channels ) {
-								AbstractSecs1OnTcpIpCommunicator.this.channels.remove(ch);
+								AbstractSecs1OnTcpIpCommunicator.this.channels.remove(channel);
 							}
 							
 							notifyCommunicatableStateChange(false);
 							
 							try {
-								ch.shutdownOutput();
+								channel.shutdownOutput();
 							}
 							catch ( IOException giveup ) {
 							}
 							
-							notifyLog(Secs1OnTcpIpConnectionLog.disconnected(channelStr));
+							notifyLog(Secs1OnTcpIpConnectionLog.disconnected(local, remote));
 							
-							synchronized ( ch ) {
-								ch.notifyAll();
+							synchronized ( channel ) {
+								channel.notifyAll();
 							}
 						}
 					}
@@ -175,14 +184,14 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 							notifyLog(t);
 						}
 						
-						synchronized ( ch ) {
-							ch.notifyAll();
+						synchronized ( channel ) {
+							channel.notifyAll();
 						}
 					}
 				});
 				
-				synchronized ( ch ) {
-					ch.wait();
+				synchronized ( channel ) {
+					channel.wait();
 				}
 			}
 			catch ( IOException e ) {

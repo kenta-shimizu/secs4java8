@@ -19,39 +19,19 @@ import com.shimizukenta.secstestutil.TcpIpAdapter;
 
 public class BothSecs1 {
 	
-	private static final int testCycle = 100;
+	private static final int testCycle = 1000;
 	
-	private boolean equipComm;
-	private boolean hostComm;
 	public int equipCounter;
 	public int hostCounter;
 	
 	public BothSecs1() {
-		this.equipComm = false;
-		this.hostComm = false;
 		this.equipCounter = 0;
 		this.hostCounter = 0;
 	}
 	
-	public void equipCommunicateState(boolean f) {
-		synchronized ( this ) {
-			equipComm = f;
-		}
-	}
-	
-	public void hostCommunicateState(boolean f) {
-		synchronized ( this ) {
-			hostComm = f;
-		}
-	}
-	
-	public boolean bothCommunicatable() {
-		synchronized ( this ) {
-			return equipComm && hostComm;
-		}
-	}
-	
 	public static void main(String[] args) {
+		
+		long start = System.currentTimeMillis();
 		
 		SocketAddress equipAddr = new InetSocketAddress("127.0.0.1", 23001);
 		SocketAddress hostAddr  = new InetSocketAddress("127.0.0.1", 23002);
@@ -92,20 +72,6 @@ public class BothSecs1 {
 				
 				equip.addSecsLogListener(BothSecs1::echo);
 				host.addSecsLogListener(BothSecs1::echo);
-				
-				equip.addSecsCommunicatableStateChangeListener(state -> {
-					synchronized ( inst ) {
-						inst.equipCommunicateState(state);
-						inst.notifyAll();
-					}
-				});
-				
-				host.addSecsCommunicatableStateChangeListener(state -> {
-					synchronized ( inst ) {
-						inst.hostCommunicateState(state);
-						inst.notifyAll();
-					}
-				});
 				
 				equip.addTrySendMessagePassThroughListener(msg -> {
 					echo("equip-pt-trysnd: strm: " + msg.getStream() + ", func: " + msg.getFunction());
@@ -221,23 +187,8 @@ public class BothSecs1 {
 					}
 				});
 				
-				equip.open();
-				host.open();
-				
-				synchronized ( inst ) {
-					
-					echo("wait-until-both-communicatable");
-					
-					for ( ;; ) {
-						if ( inst.bothCommunicatable() ) {
-							break;
-						}
-						inst.wait();
-					}
-					
-					echo("both-communicated");
-				}
-				
+				equip.openAndWaitUntilCommunicating();
+				host.openAndWaitUntilCommunicating();
 				
 				final int m = testCycle;
 				
@@ -343,6 +294,9 @@ public class BothSecs1 {
 		echo("equip-count: " + inst.equipCounter);
 		echo("host-count: " + inst.hostCounter);
 		
+		long end = System.currentTimeMillis();
+		
+		echo("elapsed: " + (end - start) + " milli-sec.");
 	}
 	
 	private static synchronized void echo(Object o) {

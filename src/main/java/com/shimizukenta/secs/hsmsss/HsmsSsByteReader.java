@@ -102,7 +102,7 @@ public class HsmsSsByteReader extends AbstractSecsInnerEngine implements Callabl
 	private int readToByteBuffer(ByteBuffer buffer, boolean detectT8Timeout)
 			throws HsmsSsDetectTerminateException, HsmsSsTimeoutT8Exception, InterruptedException {
 		
-		Future<Integer> f = channel.read(buffer);
+		final Future<Integer> f = channel.read(buffer);
 		
 		try {
 			int r;

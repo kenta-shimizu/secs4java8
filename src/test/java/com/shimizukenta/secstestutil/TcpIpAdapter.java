@@ -9,11 +9,17 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class TcpIpAdapter implements Closeable {
 	
@@ -31,16 +37,17 @@ public class TcpIpAdapter implements Closeable {
 	}
 	
 	public SocketAddress socketAddressA() throws IOException {
-		return this.a.server.getLocalAddress();
+		return this.a.socketAddress();
 	}
 	
 	public SocketAddress socketAddressB() throws IOException {
-		return this.b.server.getLocalAddress();
+		return this.b.socketAddress();
 	}
 	
 	public void open() throws IOException {
 		
 		synchronized (this) {
+			
 			if ( this.closed ) {
 				throw new IOException("Already closed");
 			}
@@ -127,7 +134,7 @@ public class TcpIpAdapter implements Closeable {
 		catch ( InterruptedException ignore ) {
 		}
 		catch ( Throwable t ) {
-			t.printStackTrace();
+			echo(t);
 		}
 	}
 	
@@ -139,89 +146,134 @@ public class TcpIpAdapter implements Closeable {
 	
 	private class Inner implements Closeable {
 		
-		private final SocketAddress addr;
-		private AsynchronousServerSocketChannel server;
+		private final ExecutorService execServ = Executors.newCachedThreadPool(r -> {
+			Thread th = new Thread(r);
+			th.setDaemon(true);
+			return th;
+		});
+		
 		private final Collection<AsynchronousSocketChannel> channels = new CopyOnWriteArrayList<>();
 		
-		private boolean closed;
+		private final SocketAddress addr;
+		
+		private AsynchronousServerSocketChannel server;
 		
 		public Inner(SocketAddress socketAddress) {
 			this.addr = socketAddress;
 			this.server = null;
-			this.closed = false;
+		}
+		
+		public SocketAddress socketAddress() throws IOException {
+			synchronized ( this ) {
+				if ( this.server == null ) {
+					throw new IOException("Socket Address not binded");
+				} else {
+					return this.server.getLocalAddress();
+				}
+			}
 		}
 		
 		public void open(Inner another) throws IOException {
 			
-			server = AsynchronousServerSocketChannel.open();
-			server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
-			server.bind(addr);
+			synchronized ( this ) {
+				this.server = AsynchronousServerSocketChannel.open();
+				
+				this.server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+				this.server.bind(addr);
+			}
 			
-			server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
-
+			this.server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
+				
 				@Override
 				public void completed(AsynchronousSocketChannel channel, Void attachment) {
 					
-					server.accept(null, this);
+					Inner.this.server.accept(attachment, this);
 					
 					try {
+						
 						channels.add(channel);
 						
-						ByteBuffer buffer = ByteBuffer.allocate(1024);
+						final Collection<Callable<Void>> tasks = Arrays.asList(
+								() -> {
+									
+									try {
+										
+										final ByteBuffer buffer = ByteBuffer.allocate(1024);
+										
+										for ( ;; ) {
+											
+											((Buffer)buffer).clear();
+											
+											final Future<Integer> f = channel.read(buffer);
+											
+											try {
+												int r = f.get().intValue();
+												
+												if ( r < 0 ) {
+													break;
+												}
+												
+												((Buffer)buffer).flip();
+												
+												byte[] bs = new byte[buffer.remaining()];
+												buffer.get(bs);
+												
+												another.put(bs);
+											}
+											catch ( InterruptedException e ) {
+												f.cancel(true);
+												throw e;
+											}
+										}
+									}
+									catch ( ExecutionException e ) {
+										
+										Throwable t = e.getCause();
+										
+										if ( t instanceof Exception ) {
+											throw (Exception)t;
+										}
+									}
+									
+									return null;
+								});
 						
-						for ( ;; ) {
-							
-							((Buffer)buffer).clear();
-							
-							Future<Integer> f = channel.read(buffer);
-							
-							try {
-								int r = f.get().intValue();
-								
-								if ( r < 0 ) {
-									break;
-								}
-								
-								((Buffer)buffer).flip();
-								
-								byte[] bs = new byte[buffer.remaining()];
-								buffer.get(bs);
-								
-								another.put(bs);
-							}
-							catch ( InterruptedException e ) {
-								f.cancel(true);
-								throw e;
-							}
-						}
+						execServ.invokeAny(tasks);
 					}
 					catch ( InterruptedException ignore ) {
 					}
 					catch ( ExecutionException e ) {
 						
-						synchronized ( this ) {
-							
-							if ( ! closed ) {
-								e.printStackTrace();
-							}
+						Throwable t = e.getCause();
+						
+						if ( t instanceof RuntimeException ) {
+							throw (RuntimeException)t;
 						}
+						
+						echo(t);
 					}
 					finally {
 						
 						channels.remove(channel);
 						
-						closeChannel(channel);
+						try {
+							channel.shutdownOutput();
+						}
+						catch ( IOException giveup ) {
+						}
+						
+						try {
+							channel.close();
+						}
+						catch ( IOException giveup ) {
+						}
 					}
 				}
 
 				@Override
 				public void failed(Throwable t, Void attachment) {
-					
-					synchronized ( this ) {
-						
-						if ( ! closed ) {
-							t.printStackTrace();
-						}
+					if ( ! (t instanceof ClosedChannelException) ) {
+						echo(t);
 					}
 				}
 			});
@@ -229,30 +281,31 @@ public class TcpIpAdapter implements Closeable {
 		
 		public void close() throws IOException {
 			
-			synchronized ( this ) {
-				closed = true;
-			}
-			
-			channels.forEach(this::closeChannel);
-			
-			if ( server != null ) {
-				server.close();
-			}
-			
-		}
-		
-		private void closeChannel(AsynchronousSocketChannel channel) {
+			IOException ioExcept = null;
 			
 			try {
-				channel.shutdownOutput();
+				execServ.shutdown();
+				if ( ! execServ.awaitTermination(1L, TimeUnit.MILLISECONDS) ) {
+					execServ.shutdownNow();
+					if ( ! execServ.awaitTermination(5L, TimeUnit.SECONDS) ) {
+						ioExcept = new IOException("ExecutorService#shurdown failed");
+					}
+				}
 			}
-			catch ( IOException giveup ) {
+			catch ( InterruptedException giveup ) {
 			}
 			
-			try {
-				channel.close();
+			if ( this.server != null ) {
+				try {
+					this.server.close();
+				}
+				catch ( IOException e ) {
+					ioExcept = e;
+				}
 			}
-			catch ( IOException giveup ) {
+			
+			if ( ioExcept != null ) {
+				throw ioExcept;
 			}
 		}
 		
@@ -267,7 +320,7 @@ public class TcpIpAdapter implements Closeable {
 				try {
 					while ( buffer.hasRemaining() ) {
 						
-						Future<Integer> f = channel.write(buffer);
+						final Future<Integer> f = channel.write(buffer);
 						
 						try {
 							int w = f.get().intValue();
@@ -283,10 +336,26 @@ public class TcpIpAdapter implements Closeable {
 					}
 				}
 				catch ( ExecutionException e ) {
-					e.printStackTrace();
+					
+					Throwable t = e.getCause();
+					
+					if ( t instanceof RuntimeException ) {
+						throw (RuntimeException)t;
+					}
+					
+					if ( ! (t instanceof ClosedChannelException) ) {
+						echo(t);
+					}
 				}
 			}
 		}
 	}
-
+	
+	private static final Object staticSyncEcho = new Object();
+	
+	private static void echo(Throwable t) {
+		synchronized ( staticSyncEcho ) {
+			t.printStackTrace();
+		}
+	}
 }
