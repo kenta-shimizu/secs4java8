@@ -57,12 +57,12 @@ public abstract class AbstractHsmsSsRebindPassiveCommunicator extends AbstractHs
 			
 			final SocketAddress socketAddr = hsmsSsConfig().socketAddress().getSocketAddress();
 			
-			notifyLog(HsmsSsConnectionLog.tryBind(socketAddr));
+			notifyLog(HsmsSsPassiveBindLog.tryBind(socketAddr));
 			
 			server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 			server.bind(socketAddr);
 			
-			notifyLog(HsmsSsConnectionLog.binded(socketAddr));
+			notifyLog(HsmsSsPassiveBindLog.binded(socketAddr));
 			
 			server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
 
@@ -124,6 +124,8 @@ public abstract class AbstractHsmsSsRebindPassiveCommunicator extends AbstractHs
 			synchronized ( server ) {
 				server.wait();
 			}
+			
+			notifyLog(HsmsSsPassiveBindLog.closed(socketAddr));
 		}
 		catch ( IOException e ) {
 			notifyLog(e);

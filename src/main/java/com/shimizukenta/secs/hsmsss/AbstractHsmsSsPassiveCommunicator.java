@@ -70,8 +70,20 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			
 			if ( server != null ) {
 				
+				SocketAddress addr = null;
+				
+				try {
+					addr = server.getLocalAddress();
+				}
+				catch ( IOException giveup ) {
+				}
+				
 				try {
 					server.close();
+					
+					if ( addr != null ) {
+						notifyLog(HsmsSsPassiveBindLog.closed(addr));
+					}
 				}
 				catch ( IOException e ) {
 					ioExcept = e;
@@ -92,12 +104,12 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		
 		final SocketAddress socketAddr = hsmsSsConfig().socketAddress().getSocketAddress();
 		
-		notifyLog(HsmsSsConnectionLog.tryBind(socketAddr));
+		notifyLog(HsmsSsPassiveBindLog.tryBind(socketAddr));
 		
 		server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 		server.bind(socketAddr);
 		
-		notifyLog(HsmsSsConnectionLog.binded(socketAddr));
+		notifyLog(HsmsSsPassiveBindLog.binded(socketAddr));
 		
 		server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
 			

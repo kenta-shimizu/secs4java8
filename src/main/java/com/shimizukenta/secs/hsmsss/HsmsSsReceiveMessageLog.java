@@ -2,9 +2,9 @@ package com.shimizukenta.secs.hsmsss;
 
 import java.time.LocalDateTime;
 
-import com.shimizukenta.secs.SecsReceiveMessageLog;
+import com.shimizukenta.secs.AbstractSecsReceiveMessageLog;
 
-public class HsmsSsReceiveMessageLog extends SecsReceiveMessageLog {
+public class HsmsSsReceiveMessageLog extends AbstractSecsReceiveMessageLog {
 	
 	private static final long serialVersionUID = 67992153842819842L;
 	
