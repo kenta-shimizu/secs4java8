@@ -40,7 +40,7 @@ public abstract class AbstractSecsInnerEngine {
 		engine.notifyReceiveMessage(msg);
 	}
 	
-	protected void notifyLog(SecsLog log) {
+	protected void notifyLog(AbstractSecsLog log) {
 		engine.notifyLog(log);
 	}
 	

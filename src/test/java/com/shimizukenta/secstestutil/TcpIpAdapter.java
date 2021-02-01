@@ -2,6 +2,8 @@ package com.shimizukenta.secstestutil;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.StandardSocketOptions;
@@ -42,6 +44,26 @@ public class TcpIpAdapter implements Closeable {
 	
 	public SocketAddress socketAddressB() throws IOException {
 		return this.b.socketAddress();
+	}
+	
+	public static interface ThrowableListener {
+		public void throwed(Throwable t);
+	}
+	
+	private final Collection<ThrowableListener> throwListeners = new CopyOnWriteArrayList<>();
+	
+	public boolean addThrowableListener(ThrowableListener l) {
+		return throwListeners.add(l);
+	}
+	
+	public boolean removeThrowableListener(ThrowableListener l) {
+		return throwListeners.remove(l);
+	}
+	
+	private void putThrowable(Throwable t) {
+		throwListeners.forEach(l -> {
+			l.throwed(t);
+		});
 	}
 	
 	public void open() throws IOException {
@@ -148,7 +170,7 @@ public class TcpIpAdapter implements Closeable {
 		
 		private final ExecutorService execServ = Executors.newCachedThreadPool(r -> {
 			Thread th = new Thread(r);
-			th.setDaemon(true);
+			th.setDaemon(false);
 			return th;
 		});
 		
@@ -250,7 +272,9 @@ public class TcpIpAdapter implements Closeable {
 							throw (RuntimeException)t;
 						}
 						
-						echo(t);
+						if ( ! (t instanceof ClosedChannelException) ) {
+							putThrowable(t);
+						}
 					}
 					finally {
 						
@@ -273,7 +297,7 @@ public class TcpIpAdapter implements Closeable {
 				@Override
 				public void failed(Throwable t, Void attachment) {
 					if ( ! (t instanceof ClosedChannelException) ) {
-						echo(t);
+						putThrowable(t);
 					}
 				}
 			});
@@ -284,12 +308,9 @@ public class TcpIpAdapter implements Closeable {
 			IOException ioExcept = null;
 			
 			try {
-				execServ.shutdown();
-				if ( ! execServ.awaitTermination(1L, TimeUnit.MILLISECONDS) ) {
-					execServ.shutdownNow();
-					if ( ! execServ.awaitTermination(5L, TimeUnit.SECONDS) ) {
-						ioExcept = new IOException("ExecutorService#shurdown failed");
-					}
+				execServ.shutdownNow();
+				if ( ! execServ.awaitTermination(5L, TimeUnit.SECONDS) ) {
+					ioExcept = new IOException("ExecutorService#shurdown failed");
 				}
 			}
 			catch ( InterruptedException giveup ) {
@@ -309,7 +330,7 @@ public class TcpIpAdapter implements Closeable {
 			}
 		}
 		
-		public void put(byte[] bs) throws InterruptedException {
+		public void put(byte[] bs) throws InterruptedException, ExecutionException {
 			
 			for ( AsynchronousSocketChannel channel : channels ) {
 				
@@ -317,34 +338,20 @@ public class TcpIpAdapter implements Closeable {
 				buffer.put(bs);
 				((Buffer)buffer).flip();
 				
-				try {
-					while ( buffer.hasRemaining() ) {
+				while ( buffer.hasRemaining() ) {
+					
+					final Future<Integer> f = channel.write(buffer);
+					
+					try {
+						int w = f.get().intValue();
 						
-						final Future<Integer> f = channel.write(buffer);
-						
-						try {
-							int w = f.get().intValue();
-							
-							if ( w <= 0 ) {
-								break;
-							}
-						}
-						catch ( InterruptedException e ) {
-							f.cancel(true);
-							throw e;
+						if ( w <= 0 ) {
+							break;
 						}
 					}
-				}
-				catch ( ExecutionException e ) {
-					
-					Throwable t = e.getCause();
-					
-					if ( t instanceof RuntimeException ) {
-						throw (RuntimeException)t;
-					}
-					
-					if ( ! (t instanceof ClosedChannelException) ) {
-						echo(t);
+					catch ( InterruptedException e ) {
+						f.cancel(true);
+						throw e;
 					}
 				}
 			}
@@ -355,7 +362,23 @@ public class TcpIpAdapter implements Closeable {
 	
 	private static void echo(Throwable t) {
 		synchronized ( staticSyncEcho ) {
-			t.printStackTrace();
+			try (
+					StringWriter sw = new StringWriter();
+					) {
+				
+				try (
+						PrintWriter pw = new PrintWriter(sw);
+						) {
+					
+					t.printStackTrace(pw);
+					pw.flush();
+					
+					System.out.println(sw.toString());
+				}
+			}
+			catch ( IOException e ) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

@@ -5,6 +5,7 @@ import java.net.SocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.util.Arrays;
 import java.util.Objects;
@@ -158,7 +159,10 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			
 			@Override
 			public void failed(Throwable t, Void attachment) {
-				notifyLog(t);
+				
+				if ( ! (t instanceof ClosedChannelException) ) {
+					notifyLog(t);
+				}
 			}
 		});
 	}

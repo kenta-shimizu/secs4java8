@@ -13,7 +13,7 @@ import java.util.Optional;
  * <p>
  * To get subject, {@link #subject()}<br />
  * To get {@link LocalDateTime} timestamp, {@link #timestamp()}<br />
- * To get detail-information, {@link #value()}<br />
+ * To get detail-information Object, {@link #value()}<br />
  * </p>
  * 
  * @author kenta-shimizu
@@ -36,7 +36,7 @@ public interface SecsLog {
 	LocalDateTime timestamp();
 
 	/**
-	 * Returns Log detail-information.
+	 * Returns Log detail-information Object.
 	 * 
 	 * @return value if exist
 	 */

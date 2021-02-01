@@ -1,13 +1,19 @@
 package com.shimizukenta.secstest;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
+import com.shimizukenta.secs.SecsThrowableLog;
 import com.shimizukenta.secs.gem.ACKC6;
 import com.shimizukenta.secs.gem.COMMACK;
 import com.shimizukenta.secs.gem.ONLACK;
@@ -19,39 +25,19 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class PairHsmsSs {
 	
-	private static final int testCycle = 1000;
+	private static final int testCycle = 100;
 	
-	private boolean equipComm;
-	private boolean hostComm;
 	public int equipCounter;
 	public int hostCounter;
 	
 	public PairHsmsSs() {
-		this.equipComm = false;
-		this.hostComm = false;
 		this.equipCounter = 0;
 		this.hostCounter = 0;
 	}
 	
-	public void equipCommunicateState(boolean f) {
-		synchronized ( this ) {
-			equipComm = f;
-		}
-	}
-	
-	public void hostCommunicateState(boolean f) {
-		synchronized ( this ) {
-			hostComm = f;
-		}
-	}
-	
-	public boolean bothCommunicatable() {
-		synchronized ( this ) {
-			return equipComm && hostComm;
-		}
-	}
-	
 	public static void main(String[] args) {
+		
+		List<Throwable> tt = new CopyOnWriteArrayList<>();
 		
 		long start = System.currentTimeMillis();
 		
@@ -86,10 +72,9 @@ public class PairHsmsSs {
 			
 			equip.addSecsLogListener(PairHsmsSs::echo);
 			
-			equip.addSecsCommunicatableStateChangeListener(state -> {
-				synchronized ( inst ) {
-					inst.equipCommunicateState(state);
-					inst.notifyAll();
+			equip.addSecsLogListener(log -> {
+				if ( log instanceof SecsThrowableLog ) {
+					tt.add(((SecsThrowableLog) log).getCause());
 				}
 			});
 			
@@ -160,10 +145,9 @@ public class PairHsmsSs {
 				
 				host.addSecsLogListener(PairHsmsSs::echo);
 				
-				host.addSecsCommunicatableStateChangeListener(state -> {
-					synchronized ( inst ) {
-						inst.hostCommunicateState(state);
-						inst.notifyAll();
+				host.addSecsLogListener(log -> {
+					if ( log instanceof SecsThrowableLog ) {
+						tt.add(((SecsThrowableLog) log).getCause());
 					}
 				});
 				
@@ -225,22 +209,9 @@ public class PairHsmsSs {
 				});
 				
 				
-				host.open();
+				host.openAndWaitUntilCommunicating();
 				
-				synchronized ( inst ) {
-					
-					echo("wait-until-both-communicatable");
-					
-					for ( ;; ) {
-						if ( inst.bothCommunicatable() ) {
-							break;
-						}
-						inst.wait();
-					}
-					
-					echo("both-communicated");
-				}
-				
+				Thread.sleep(500L);
 				
 				final int m = testCycle;
 				
@@ -341,9 +312,14 @@ public class PairHsmsSs {
 			echo(t);
 		}
 		
+		tt.forEach(t -> {
+			echo(t);
+		});
+		
 		echo("reach end");
 		echo("equip-count: " + inst.equipCounter);
 		echo("host-count: " + inst.hostCounter);
+		echo("throwables: " + tt.size());
 		
 		long end = System.currentTimeMillis();
 		
@@ -351,11 +327,32 @@ public class PairHsmsSs {
 	}
 	
 	private static synchronized void echo(Object o) {
+		
 		if ( o instanceof Throwable) {
-			((Throwable) o).printStackTrace();
+			
+			try (
+					StringWriter sw = new StringWriter();
+					) {
+				
+				try (
+						PrintWriter pw = new PrintWriter(sw);
+						) {
+					
+					((Throwable) o).printStackTrace(pw);
+					pw.flush();
+					
+					System.out.println(sw.toString());
+				}
+			}
+			catch ( IOException e ) {
+				e.printStackTrace();
+			}
+			
 		} else {
+			
 			System.out.println(o);
 		}
+		
 		System.out.println();
 	}
 	

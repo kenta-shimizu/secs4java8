@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.shimizukenta.secs.AbstractSecsCommunicator;
+import com.shimizukenta.secs.AbstractSecsWaitReplyMessageExceptionLog;
 import com.shimizukenta.secs.ByteArrayProperty;
 import com.shimizukenta.secs.Property;
 import com.shimizukenta.secs.SecsException;
@@ -166,6 +167,15 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 		
 		try {
 			return sendReplyManager.send(msg);
+		}
+		catch ( SecsWaitReplyMessageException e ) {
+			
+			notifyLog(new AbstractSecsWaitReplyMessageExceptionLog(e) {
+				
+				private static final long serialVersionUID = -1896655030432810962L;
+			});
+			
+			throw e;
 		}
 		catch ( SecsException e ) {
 			notifyLog(e);

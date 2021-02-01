@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import com.shimizukenta.secs.AbstractSecsLog;
 
-public abstract class AbstractSecs1CircuitControlLog extends AbstractSecsLog {
+public abstract class AbstractSecs1CircuitControlLog extends AbstractSecsLog implements Secs1CircuitControlLog {
 	
 	private static final long serialVersionUID = -8516994973196921648L;
 	

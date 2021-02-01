@@ -5,6 +5,7 @@ import java.net.SocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
@@ -113,7 +114,9 @@ public abstract class AbstractHsmsSsRebindPassiveCommunicator extends AbstractHs
 				@Override
 				public void failed(Throwable t, Void attachment) {
 					
-					notifyLog(t);
+					if ( ! (t instanceof ClosedChannelException) ) {
+						notifyLog(t);
+					}
 					
 					synchronized ( server ) {
 						server.notifyAll();
@@ -122,10 +125,15 @@ public abstract class AbstractHsmsSsRebindPassiveCommunicator extends AbstractHs
 			});
 			
 			synchronized ( server ) {
-				server.wait();
+				
+				try {
+					server.wait();
+				}
+				finally {
+					notifyLog(HsmsSsPassiveBindLog.closed(socketAddr));
+				}
 			}
 			
-			notifyLog(HsmsSsPassiveBindLog.closed(socketAddr));
 		}
 		catch ( IOException e ) {
 			notifyLog(e);

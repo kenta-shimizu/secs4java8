@@ -1,13 +1,19 @@
 package com.shimizukenta.secstest;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
+import com.shimizukenta.secs.SecsThrowableLog;
 import com.shimizukenta.secs.gem.ACKC6;
 import com.shimizukenta.secs.gem.COMMACK;
 import com.shimizukenta.secs.gem.ONLACK;
@@ -19,7 +25,7 @@ import com.shimizukenta.secstestutil.TcpIpAdapter;
 
 public class BothSecs1 {
 	
-	private static final int testCycle = 1000;
+	private static final int testCycle = 100;
 	
 	public int equipCounter;
 	public int hostCounter;
@@ -32,6 +38,8 @@ public class BothSecs1 {
 	public static void main(String[] args) {
 		
 		long start = System.currentTimeMillis();
+		
+		final List<Throwable> tt = new CopyOnWriteArrayList<>();
 		
 		SocketAddress equipAddr = new InetSocketAddress("127.0.0.1", 23001);
 		SocketAddress hostAddr  = new InetSocketAddress("127.0.0.1", 23002);
@@ -65,6 +73,12 @@ public class BothSecs1 {
 				TcpIpAdapter adapter = TcpIpAdapter.open(equipAddr, hostAddr);
 				) {
 			
+			adapter.addThrowableListener(t -> {
+				echo(t);
+			});
+			
+			adapter.addThrowableListener(tt::add);
+			
 			try (
 					SecsCommunicator equip = Secs1OnTcpIpCommunicator.newInstance(equipConfig);
 					SecsCommunicator host  = Secs1OnTcpIpCommunicator.newInstance(hostConfig);
@@ -72,6 +86,18 @@ public class BothSecs1 {
 				
 				equip.addSecsLogListener(BothSecs1::echo);
 				host.addSecsLogListener(BothSecs1::echo);
+				
+				equip.addSecsLogListener(log -> {
+					if ( log instanceof SecsThrowableLog ) {
+						tt.add(((SecsThrowableLog) log).getCause());
+					}
+				});
+				
+				host.addSecsLogListener(log -> {
+					if ( log instanceof SecsThrowableLog ) {
+						tt.add(((SecsThrowableLog) log).getCause());
+					}
+				});
 				
 				equip.addTrySendMessagePassThroughListener(msg -> {
 					echo("equip-pt-trysnd: strm: " + msg.getStream() + ", func: " + msg.getFunction());
@@ -219,8 +245,8 @@ public class BothSecs1 {
 							}
 							catch ( SecsException e ) {
 								threads.forEach(Thread::interrupt);
-								
 								echo(e);
+								
 								throw new RuntimeException(e);
 							}
 							catch ( InterruptedException e ) {
@@ -282,6 +308,7 @@ public class BothSecs1 {
 			}
 			
 			echo("communicators closed");
+			
 			Thread.sleep(500L);
 		}
 		catch ( InterruptedException ignore ) {
@@ -296,15 +323,42 @@ public class BothSecs1 {
 		
 		long end = System.currentTimeMillis();
 		
+		tt.forEach(t -> {
+			echo(t);
+		});
+		
+		echo("Throwables: " + tt.size());
+		
 		echo("elapsed: " + (end - start) + " milli-sec.");
 	}
 	
 	private static synchronized void echo(Object o) {
+		
 		if ( o instanceof Throwable) {
-			((Throwable) o).printStackTrace();
+			
+			try (
+					StringWriter sw = new StringWriter();
+					) {
+				
+				try (
+						PrintWriter pw = new PrintWriter(sw);
+						) {
+					
+					((Throwable) o).printStackTrace(pw);
+					pw.flush();
+					
+					System.out.println(sw.toString());
+				}
+			}
+			catch ( IOException e ) {
+				e.printStackTrace();
+			}
+			
 		} else {
+			
 			System.out.println(o);
 		}
+		
 		System.out.println();
 	}
 	

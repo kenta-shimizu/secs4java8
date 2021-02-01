@@ -54,7 +54,7 @@ public final class HsmsSsPassiveBindLog extends AbstractSecsLog {
 					
 				} else {
 					
-					ll.add("binded: " + isBinded);
+					ll.add("binded:" + isBinded);
 				}
 				
 				this.cacheToValueString = ll.stream().collect(Collectors.joining(", "));

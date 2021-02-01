@@ -3,7 +3,7 @@ package com.shimizukenta.secs;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public abstract class AbstractSecsReceiveMessageLog extends AbstractSecsLog {
+public abstract class AbstractSecsReceiveMessageLog extends AbstractSecsLog implements SecsReceiveMessageLog {
 	
 	private static final long serialVersionUID = -1198469179914563072L;
 	

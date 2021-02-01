@@ -1,13 +1,19 @@
 package com.shimizukenta.secstest;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
+import com.shimizukenta.secs.SecsThrowableLog;
 import com.shimizukenta.secs.gem.ACKC6;
 import com.shimizukenta.secs.gem.COMMACK;
 import com.shimizukenta.secs.gem.ONLACK;
@@ -23,41 +29,21 @@ import com.shimizukenta.secstestutil.TcpIpAdapter;
 
 public class ProtocolConvert {
 	
-	private static final int testCycle = 1000;
+	private static final int testCycle = 100;
 	
-	private boolean equipComm;
-	private boolean hostComm;
 	public int equipCounter;
 	public int hostCounter;
 	
 	public ProtocolConvert() {
-		this.equipComm = false;
-		this.hostComm = false;
 		this.equipCounter = 0;
 		this.hostCounter = 0;
-	}
-	
-	public void equipCommunicateState(boolean f) {
-		synchronized ( this ) {
-			equipComm = f;
-		}
-	}
-	
-	public void hostCommunicateState(boolean f) {
-		synchronized ( this ) {
-			hostComm = f;
-		}
-	}
-	
-	public boolean bothCommunicatable() {
-		synchronized ( this ) {
-			return equipComm && hostComm;
-		}
 	}
 	
 	public static void main(String[] args) {
 		
 		long start = System.currentTimeMillis();
+		
+		List<Throwable> tt = new CopyOnWriteArrayList<>();
 		
 		int deviceId = 10;
 		SocketAddress innerAddr  = new InetSocketAddress("127.0.0.1", 0);
@@ -75,6 +61,9 @@ public class ProtocolConvert {
 		try (
 				TcpIpAdapter adapter = TcpIpAdapter.open(secs1Addr, innerAddr);
 				) {
+			
+			adapter.addThrowableListener(ProtocolConvert::echo);
+			adapter.addThrowableListener(tt::add);
 			
 			Secs1OnTcpIpCommunicatorConfig secs1ConverterConfig = new Secs1OnTcpIpCommunicatorConfig();
 			secs1ConverterConfig.socketAddress(adapter.socketAddressB());
@@ -117,13 +106,6 @@ public class ProtocolConvert {
 						) {
 					
 					equip.addSecsLogListener(ProtocolConvert::echo);
-					
-					equip.addSecsCommunicatableStateChangeListener(state -> {
-						synchronized ( inst ) {
-							inst.equipCommunicateState(state);
-							inst.notifyAll();
-						}
-					});
 					
 					equip.addTrySendMessagePassThroughListener(msg -> {
 						echo("equip-pt-trysnd: strm: " + msg.getStream() + ", func: " + msg.getFunction());
@@ -185,13 +167,6 @@ public class ProtocolConvert {
 					
 					host.addSecsLogListener(ProtocolConvert::echo);
 					
-					host.addSecsCommunicatableStateChangeListener(state -> {
-						synchronized ( inst ) {
-							inst.hostCommunicateState(state);
-							inst.notifyAll();
-						}
-					});
-					
 					host.addTrySendMessagePassThroughListener(msg -> {
 						echo("host-pt-trysnd: strm: " + msg.getStream() + ", func: " + msg.getFunction());
 					});
@@ -249,23 +224,22 @@ public class ProtocolConvert {
 						}
 					});
 					
-					
-					equip.open();
-					host.open();
-					
-					synchronized ( inst ) {
-						
-						echo("wait-until-both-communicatable");
-						
-						for ( ;; ) {
-							if ( inst.bothCommunicatable() ) {
-								break;
-							}
-							inst.wait();
+					equip.addSecsLogListener(log -> {
+						if ( log instanceof SecsThrowableLog ) {
+							tt.add(((SecsThrowableLog) log).getCause());
 						}
-						
-						echo("both-communicated");
-					}
+					});
+					
+					host.addSecsLogListener(log -> {
+						if ( log instanceof SecsThrowableLog ) {
+							tt.add(((SecsThrowableLog) log).getCause());
+						}
+					});
+					
+					equip.openAndWaitUntilCommunicating();
+					host.openAndWaitUntilCommunicating();
+					
+					Thread.sleep(500L);
 					
 					
 					final int m = testCycle;
@@ -373,14 +347,37 @@ public class ProtocolConvert {
 		long end = System.currentTimeMillis();
 		
 		echo("elapsed: " + (end - start) + " milli-sec.");
+		
+		tt.forEach(ProtocolConvert::echo);
+		
+		echo("Throwables: " + tt.size());
 	}
 	
 	private static synchronized void echo(Object o) {
+		
 		if ( o instanceof Throwable) {
-			((Throwable) o).printStackTrace();
+			
+			try (
+					StringWriter sw = new StringWriter();
+					) {
+				
+				try (
+						PrintWriter pw = new PrintWriter(sw);
+						) {
+					
+					((Throwable) o).printStackTrace(pw);
+					pw.flush();
+					
+					System.out.println(sw.toString());
+				}
+			}
+			catch ( IOException e ) {
+				e.printStackTrace();
+			}
 		} else {
 			System.out.println(o);
 		}
+		
 		System.out.println();
 	}
 	

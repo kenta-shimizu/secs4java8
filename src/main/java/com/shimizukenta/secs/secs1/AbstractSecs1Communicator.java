@@ -9,6 +9,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.shimizukenta.secs.AbstractSecsCommunicator;
+import com.shimizukenta.secs.AbstractSecsWaitReplyMessageExceptionLog;
 import com.shimizukenta.secs.ByteArrayProperty;
 import com.shimizukenta.secs.InterruptableRunnable;
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
@@ -120,7 +121,16 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		try {
 			return sendReplyManager.send(msg);
 		}
-		catch (SecsException e) {
+		catch ( SecsWaitReplyMessageException e ) {
+			
+			notifyLog(new AbstractSecsWaitReplyMessageExceptionLog(e) {
+				
+				private static final long serialVersionUID = 6987300659468550084L;
+			});
+			
+			throw e;
+		}
+		catch ( SecsException e ) {
 			notifyLog(e);
 			throw e;
 		}

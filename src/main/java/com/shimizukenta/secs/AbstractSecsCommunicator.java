@@ -28,7 +28,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	
 	private final ExecutorService execServ = Executors.newCachedThreadPool(r -> {
 		Thread th = new Thread(r);
-		th.setDaemon(true);
+		th.setDaemon(false);
 		return th;
 	});
 	
@@ -247,24 +247,52 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	private final BlockingQueue<SecsLog> logQueue = new LinkedBlockingQueue<>();
 	
 	private void executeLogQueueTask() {
-		executeLoopTask(() -> {
-			final SecsLog log = logQueue.take();
-			logListeners.forEach(l -> {
-				l.received(log);
-			});
+		
+		this.executorService().execute(() -> {
+			
+			try {
+				for ( ;; ) {
+					final SecsLog log = logQueue.take();
+					logListeners.forEach(l -> {
+						l.received(log);
+					});
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+			
+			try {
+				for ( ;; ) {
+					
+					final SecsLog log = logQueue.poll(100L, TimeUnit.MILLISECONDS);
+					if ( log == null ) {
+						break;
+					}
+					logListeners.forEach(l -> {
+						l.received(log);
+					});
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
 		});
 	}
 	
-	protected final boolean offerLogQueue(SecsLog log) {
+	protected final boolean offerLogQueue(AbstractSecsLog log) {
 		return logQueue.offer(log);
 	}
 	
-	protected void notifyLog(SecsLog log) {
+	protected void notifyLog(AbstractSecsLog log) {
+		log.subjectHeader(this.config.logSubjectHeader().get());
 		offerLogQueue(log);
 	}
 	
 	protected void notifyLog(Throwable t) {
-		offerLogQueue(new SecsThrowableLog(t));
+		
+		notifyLog(new AbstractSecsThrowableLog(t) {
+			
+			private static final long serialVersionUID = -1271705310309086030L;
+		});
 	}
 	
 	

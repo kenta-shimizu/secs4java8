@@ -18,12 +18,17 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 	private final LocalDateTime timestamp;
 	private final Object value;
 	
+	protected String subjectHeader;
+	
 	private String cacheToString;
 	
 	public AbstractSecsLog(CharSequence subject, LocalDateTime timestamp, Object value) {
 		this.subject = subject.toString();
 		this.timestamp = timestamp;
 		this.value = value;
+		
+		this.subjectHeader = "";
+		
 		this.cacheToString = null;
 	}
 	
@@ -54,11 +59,17 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 		return this.value == null ? Optional.empty() : Optional.of(this.value);
 	}
 	
+	protected void subjectHeader(String header) {
+		synchronized ( this ) {
+			this.subjectHeader = header;
+		}
+	}
+	
 	
 	private static final String BR = System.lineSeparator();
 	private static final String SPACE = "\t";
 	private static DateTimeFormatter DATETIME = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-
+	
 	@Override
 	public String toString() {
 		
@@ -68,6 +79,7 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 				
 				StringBuilder sb = new StringBuilder(toStringTimestamp())
 						.append(SPACE)
+						.append(this.subjectHeader)
 						.append(subject());
 				
 				toStringValue().ifPresent(v -> {
