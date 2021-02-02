@@ -50,7 +50,7 @@ public abstract class AbstractSecsConnectionLog extends AbstractSecsLog implemen
 					ll.add("remote:" + this.remote.toString());
 				}
 				
-				ll.add("isOpen:" + this.isConneting);
+				ll.add("connecting:" + this.isConneting);
 				
 				this.cacheToStringValue = ll.stream().collect(Collectors.joining(", "));
 			}
