@@ -62,8 +62,8 @@ public class ProtocolConvert {
 				TcpIpAdapter adapter = TcpIpAdapter.open(secs1Addr, innerAddr);
 				) {
 			
-			adapter.addThrowableListener(ProtocolConvert::echo);
-			adapter.addThrowableListener(tt::add);
+//			adapter.addThrowableListener(ProtocolConvert::echo);
+//			adapter.addThrowableListener(tt::add);
 			
 			Secs1OnTcpIpCommunicatorConfig secs1ConverterConfig = new Secs1OnTcpIpCommunicatorConfig();
 			secs1ConverterConfig.socketAddress(adapter.socketAddressB());

@@ -24,7 +24,7 @@ public final class HsmsSsCommunicateStateChangeLog extends AbstractSecsCommunica
 	}
 	
 	@Override
-	protected Optional<String> toStringValue() {
+	public Optional<String> optionalValueString() {
 		return Optional.empty();
 	}
 	

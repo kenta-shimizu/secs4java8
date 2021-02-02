@@ -24,7 +24,7 @@ public final class Secs1TimeoutT1CircuitControlLog extends AbstractSecs1CircuitC
 	}
 	
 	@Override
-	protected Optional<String> toStringValue() {
+	public Optional<String> optionalValueString() {
 		return Optional.empty();
 	}
 	

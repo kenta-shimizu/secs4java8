@@ -24,7 +24,7 @@ public abstract class AbstractSecsWaitReplyMessageExceptionLog extends AbstractS
 	}
 	
 	@Override
-	protected Optional<String> toStringValue() {
+	public Optional<String> optionalValueString() {
 		return this.referenceSecsMessage()
 				.map(msg -> createHeader10BytesString(msg));
 	}

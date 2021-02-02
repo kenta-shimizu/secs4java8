@@ -24,7 +24,7 @@ public final class Secs1IllegalLengthByteCircuitControlLog extends AbstractSecs1
 	}
 	
 	@Override
-	protected Optional<String> toStringValue() {
+	public Optional<String> optionalValueString() {
 		return Optional.empty();
 	}
 	

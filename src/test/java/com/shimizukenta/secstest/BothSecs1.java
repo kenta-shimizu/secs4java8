@@ -73,11 +73,11 @@ public class BothSecs1 {
 				TcpIpAdapter adapter = TcpIpAdapter.open(equipAddr, hostAddr);
 				) {
 			
-			adapter.addThrowableListener(t -> {
-				echo(t);
-			});
-			
-			adapter.addThrowableListener(tt::add);
+//			adapter.addThrowableListener(t -> {
+//				echo(t);
+//			});
+//			
+//			adapter.addThrowableListener(tt::add);
 			
 			try (
 					SecsCommunicator equip = Secs1OnTcpIpCommunicator.newInstance(equipConfig);
@@ -305,6 +305,7 @@ public class BothSecs1 {
 				for ( Thread th : threads ) {
 					th.join();
 				}
+				
 			}
 			
 			echo("communicators closed");

@@ -248,6 +248,8 @@ public class TcpIpAdapter implements Closeable {
 											}
 										}
 									}
+									catch ( InterruptedException ignore ) {
+									}
 									catch ( ExecutionException e ) {
 										
 										Throwable t = e.getCause();
@@ -293,7 +295,7 @@ public class TcpIpAdapter implements Closeable {
 						}
 					}
 				}
-
+				
 				@Override
 				public void failed(Throwable t, Void attachment) {
 					if ( ! (t instanceof ClosedChannelException) ) {

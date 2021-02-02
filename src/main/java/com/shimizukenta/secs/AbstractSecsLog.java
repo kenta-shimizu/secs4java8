@@ -3,6 +3,7 @@ package com.shimizukenta.secs;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -59,15 +60,23 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 		return this.value == null ? Optional.empty() : Optional.of(this.value);
 	}
 	
-	protected void subjectHeader(String header) {
+	protected void subjectHeader(CharSequence header) {
 		synchronized ( this ) {
-			this.subjectHeader = header;
+			this.subjectHeader = Objects.requireNonNull(header).toString();
+			this.cacheToString = null;
+		}
+	}
+	
+	@Override
+	public String subjectHeader() {
+		synchronized ( this ) {
+			return this.subjectHeader;
 		}
 	}
 	
 	
 	private static final String BR = System.lineSeparator();
-	private static final String SPACE = "\t";
+	private static final String SPACE = "  ";
 	private static DateTimeFormatter DATETIME = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 	
 	@Override
@@ -77,12 +86,12 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 			
 			if ( this.cacheToString == null ) {
 				
-				StringBuilder sb = new StringBuilder(toStringTimestamp())
+				StringBuilder sb = new StringBuilder(toTimestampString())
 						.append(SPACE)
 						.append(this.subjectHeader)
 						.append(subject());
 				
-				toStringValue().ifPresent(v -> {
+				optionalValueString().ifPresent(v -> {
 					sb.append(BR).append(v);
 				});
 				
@@ -93,11 +102,12 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 		}
 	}
 	
-	protected String toStringTimestamp() {
+	protected String toTimestampString() {
 		return timestamp.format(DATETIME);
 	}
 	
-	protected Optional<String> toStringValue() {
+	@Override
+	public Optional<String> optionalValueString() {
 		return value().map(Object::toString);
 	}
 	

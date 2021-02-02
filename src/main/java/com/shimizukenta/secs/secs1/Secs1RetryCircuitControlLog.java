@@ -20,7 +20,7 @@ public final class Secs1RetryCircuitControlLog extends AbstractSecs1CircuitContr
 	}
 	
 	@Override
-	protected Optional<String> toStringValue() {
+	public Optional<String> optionalValueString() {
 		return Optional.empty();
 	}
 	

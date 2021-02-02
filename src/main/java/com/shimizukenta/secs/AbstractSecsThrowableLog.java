@@ -47,7 +47,7 @@ public abstract class AbstractSecsThrowableLog extends AbstractSecsLog implement
 	}
 	
 	@Override
-	protected Optional<String> toStringValue() {
+	public Optional<String> optionalValueString() {
 		
 		synchronized ( this ) {
 			

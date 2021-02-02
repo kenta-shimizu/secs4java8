@@ -26,20 +26,34 @@ public interface SecsLog {
 	 * 
 	 * @return subject-string
 	 */
-	String subject();
+	public String subject();
 
 	/**
 	 * Returns Log timestamp.
 	 * 
 	 * @return timestamp
 	 */
-	LocalDateTime timestamp();
+	public LocalDateTime timestamp();
 
 	/**
 	 * Returns Log detail-information Object.
 	 * 
 	 * @return value if exist
 	 */
-	Optional<Object> value();
-
+	public Optional<Object> value();
+	
+	/**
+	 * Returns subject-header.
+	 * 
+	 * @return subject-header
+	 */
+	public String subjectHeader();
+	
+	/**
+	 * Returns value-String
+	 * 
+	 * @return value-String if exist
+	 */
+	public Optional<String> optionalValueString();
+	
 }

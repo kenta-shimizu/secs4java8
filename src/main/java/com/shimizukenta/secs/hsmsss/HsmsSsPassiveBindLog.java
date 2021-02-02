@@ -36,7 +36,7 @@ public final class HsmsSsPassiveBindLog extends AbstractSecsLog {
 	}
 	
 	@Override
-	protected Optional<String> toStringValue() {
+	public Optional<String> optionalValueString() {
 		
 		synchronized ( this ) {
 			

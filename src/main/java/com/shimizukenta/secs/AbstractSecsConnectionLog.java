@@ -34,7 +34,7 @@ public abstract class AbstractSecsConnectionLog extends AbstractSecsLog implemen
 	}
 	
 	@Override
-	protected Optional<String> toStringValue() {
+	public Optional<String> optionalValueString() {
 		
 		synchronized ( this ) {
 			
