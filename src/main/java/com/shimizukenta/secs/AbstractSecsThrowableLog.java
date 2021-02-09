@@ -40,7 +40,7 @@ public abstract class AbstractSecsThrowableLog extends AbstractSecsLog implement
 	public String subject() {
 		synchronized ( this ) {
 			if ( this.cacheToSubject == null ) {
-				this.cacheToSubject = cause.getClass().getSimpleName();
+				this.cacheToSubject = cause.toString();
 			}
 			return this.cacheToSubject;
 		}
