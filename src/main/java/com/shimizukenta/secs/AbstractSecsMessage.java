@@ -41,7 +41,12 @@ public abstract class AbstractSecsMessage implements SecsMessage, Serializable {
 		}
 	}
 	
-	protected String toHeaderBytesString() {
+	/**
+	 * Returns Header 10 bytes String.
+	 * 
+	 * @return Header 10 bytes String
+	 */
+	public String toHeaderBytesString() {
 		
 		synchronized ( sync ) {
 			
