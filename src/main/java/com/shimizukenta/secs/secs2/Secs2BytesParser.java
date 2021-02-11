@@ -155,11 +155,49 @@ public class Secs2BytesParser {
 	}
 	
 	private static byte[] get(List<ByteBuffer> buffers, int size) throws Secs2BytesParseException {
+		
 		byte[] bs = new byte[size];
-		for (int i = 0; i < size; ++i) {
-			bs[i] = get(buffers);
+		
+		if ( size == 0 ) {
+			return bs;
 		}
-		return bs;
+		
+		int i = 0;
+		
+		for ( ByteBuffer bf : buffers ) {
+			
+			int rem = bf.remaining();
+			
+			if ( rem > 0 ) {
+				
+				if ( rem >= (size - i) ) {
+					
+					for ( ; i < size; ++i ) {
+						bs[i] = bf.get();
+					}
+					
+					return bs;
+					
+				} else {
+					
+					while ( bf.hasRemaining() ) {
+						bs[i] = bf.get();
+						++i;
+					}
+				}
+			}
+		}
+		
+		throw new Secs2BytesParseException("reach end buffers");
 	}
+	
+//	private static byte[] get(List<ByteBuffer> buffers, int size) throws Secs2BytesParseException {
+//		byte[] bs = new byte[size];
+//		for (int i = 0; i < size; ++i) {
+//			bs[i] = get(buffers);
+//		}
+//		
+//		return bs;
+//	}
 	
 }
