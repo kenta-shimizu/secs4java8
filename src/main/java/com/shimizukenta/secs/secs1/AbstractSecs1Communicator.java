@@ -17,7 +17,6 @@ import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
-import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
@@ -41,6 +40,13 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	
 	protected void circuitNotifyAll() {
 		synchronized ( circuit ) {
+			circuit.notifyAll();
+		}
+	}
+	
+	protected void circuitNotifyAll(InterruptableRunnable r) throws InterruptedException {
+		synchronized ( circuit ) {
+			r.run();
 			circuit.notifyAll();
 		}
 	}
@@ -218,6 +224,14 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		return send(createSecs1Message(head, secs2)).map(msg -> (SecsMessage)msg);
 	}
 	
+	private enum NextCircuitControlBehavior {
+		
+		ToReceiveBlock,
+		ToCircuitControl,
+		ToNextLoop,
+		
+		;
+	}
 	
 	private enum PollCircuitControl {
 		
@@ -231,7 +245,11 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	
 	private class CircuitLoop implements InterruptableRunnable {
 		
-		private final TimeProperty wdt = TimeProperty.newInstance(0.250F);
+		/**
+		 * Watch-dog-timer
+		 */
+		private final long wdt = 3000L;
+		
 		private Secs1MessageBlock presentBlock;
 		
 		public CircuitLoop() {
@@ -241,7 +259,9 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		@Override
 		public void run() throws InterruptedException {
 			
-			try {
+			NextCircuitControlBehavior next = NextCircuitControlBehavior.ToNextLoop;
+			
+			synchronized ( this ) {
 				
 				if ( presentBlock == null ) {
 					presentBlock = sendReplyManager.pollBlock();
@@ -253,18 +273,41 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 					
 					if ( b == null ) {
 						
-						wdt.wait(this);
+						long t = secs1Config().timeout().t2().getMilliSeconds();
+						
+						if ( t > wdt ) {
+							this.wait(wdt);
+						} else {
+							this.wait(t / 2L);
+						}
 						
 					} else {
 						
 						if ( b.byteValue() == ENQ ) {
-							receiveBlock();
+							next = NextCircuitControlBehavior.ToReceiveBlock;
 						}
 					}
 					
 				} else {
 					
+					next = NextCircuitControlBehavior.ToCircuitControl;
+				}
+			}
+			
+			try {
+				switch ( next ) {
+				case ToReceiveBlock: {
+					receiveBlock();
+					break;
+				}
+				case ToCircuitControl: {
 					circuitControl();
+					break;
+				}
+				case ToNextLoop:
+				default: {
+					/* Nothing */
+				}
 				}
 			}
 			catch ( SecsException e ) {

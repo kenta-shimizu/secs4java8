@@ -19,11 +19,13 @@ public class Secs2BytesParser {
 	
 	public Secs2 parse(List<ByteBuffer> buffers) throws Secs2BytesParseException {
 		
-		if ( hasRemaining(buffers) ) {
+		final ByteBuffersPack pack = new ByteBuffersPack(buffers);
+		
+		if ( pack.hasRemaining() ) {
 			
-			Secs2 ss = stpParse(buffers);
+			Secs2 ss = stpParse(pack);
 			
-			if ( hasRemaining(buffers) ) {
+			if ( pack.hasRemaining() ) {
 				throw new Secs2BytesParseException("not reach end buffers");
 			}
 			
@@ -35,9 +37,9 @@ public class Secs2BytesParser {
 		}
 	}
 	
-	private static Secs2 stpParse(List<ByteBuffer> buffers) throws Secs2BytesParseException {
+	private static Secs2 stpParse(ByteBuffersPack pack) throws Secs2BytesParseException {
 		
-		byte b = get(buffers);
+		byte b = pack.get();
 		
 		Secs2Item s2i = Secs2Item.get(b);
 		int lengthBits = b & 0x03;
@@ -45,18 +47,18 @@ public class Secs2BytesParser {
 		
 		if ( lengthBits == 3 ) {
 			
-			size =  ((int)(get(buffers)) << 16) & 0x00FF0000;
-			size |= ((int)(get(buffers)) <<  8) & 0x0000FF00;
-			size |= ((int)(get(buffers))      ) & 0x000000FF;
+			size =  ((int)(pack.get()) << 16) & 0x00FF0000;
+			size |= ((int)(pack.get()) <<  8) & 0x0000FF00;
+			size |= ((int)(pack.get())      ) & 0x000000FF;
 			
 		} else if ( lengthBits == 2 ) {
 			
-			size =  ((int)(get(buffers)) <<  8) & 0x0000FF00;
-			size |= ((int)(get(buffers))      ) & 0x000000FF;
+			size =  ((int)(pack.get()) <<  8) & 0x0000FF00;
+			size |= ((int)(pack.get())      ) & 0x000000FF;
 			
 		} else if ( lengthBits == 1 ) {
 			
-			size =  ((int)(get(buffers))      ) & 0x000000FF;
+			size =  ((int)(pack.get())      ) & 0x000000FF;
 		}
 		
 		if ( s2i == Secs2Item.LIST ) {
@@ -64,14 +66,14 @@ public class Secs2BytesParser {
 			List<Secs2> ll = new ArrayList<>();
 			
 			for (int i = 0 ; i < size ; ++i) {
-				ll.add(stpParse(buffers));
+				ll.add(stpParse(pack));
 			}
 			
 			return new Secs2List(ll);
 			
 		} else {
 			
-			byte[] bs = get(buffers, size);
+			byte[] bs = pack.get(size);
 			
 			switch ( s2i ) {
 			case ASCII: {
@@ -141,63 +143,70 @@ public class Secs2BytesParser {
 		}
 	}
 	
-	private static boolean hasRemaining(List<ByteBuffer> buffers) {
-		return buffers.stream().anyMatch(ByteBuffer::hasRemaining);
-	}
-	
-	private static byte get(List<ByteBuffer> buffers) throws Secs2BytesParseException {
-		for ( ByteBuffer bf : buffers ) {
-			if ( bf.hasRemaining() ) {
-				return bf.get();
+	private static class ByteBuffersPack {
+		
+		private final List<ByteBuffer> buffers;
+		private int buffersSize;
+		private int index;
+		
+		public ByteBuffersPack(List<ByteBuffer> buffers) {
+			this.buffers = new ArrayList<>(buffers);
+			this.buffersSize = buffers.size();
+			this.index = 0;
+		}
+		
+		public boolean hasRemaining() {
+			return buffers.stream().anyMatch(ByteBuffer::hasRemaining);
+		}
+		
+		public byte get() throws Secs2BytesParseException {
+			for ( ; index < buffersSize; ++index ) {
+				ByteBuffer bf = this.buffers.get(index);
+				if ( bf.hasRemaining() ) {
+					return bf.get();
+				}
 			}
-		}
-		throw new Secs2BytesParseException("reach end buffers");
-	}
-	
-	private static byte[] get(List<ByteBuffer> buffers, int size) throws Secs2BytesParseException {
-		
-		byte[] bs = new byte[size];
-		
-		if ( size == 0 ) {
-			return bs;
+			throw new Secs2BytesParseException("reach end buffers");
 		}
 		
-		int i = 0;
-		
-		for ( ByteBuffer bf : buffers ) {
+		public byte[] get(int size) throws Secs2BytesParseException {
 			
-			int rem = bf.remaining();
+			byte[] bs = new byte[size];
 			
-			if ( rem > 0 ) {
+			if ( size == 0 ) {
+				return bs;
+			}
+			
+			int i = 0;
+			
+			for ( ; index < this.buffersSize; ++index ) {
 				
-				if ( rem >= (size - i) ) {
+				ByteBuffer bf = this.buffers.get(index);
+				
+				int rem = bf.remaining();
+				
+				if ( rem > 0 ) {
 					
-					for ( ; i < size; ++i ) {
-						bs[i] = bf.get();
-					}
-					
-					return bs;
-					
-				} else {
-					
-					while ( bf.hasRemaining() ) {
-						bs[i] = bf.get();
-						++i;
+					if ( rem >= (size - i) ) {
+						
+						for ( ; i < size; ++i ) {
+							bs[i] = bf.get();
+						}
+						
+						return bs;
+						
+					} else {
+						
+						while ( bf.hasRemaining() ) {
+							bs[i] = bf.get();
+							++i;
+						}
 					}
 				}
 			}
+			
+			throw new Secs2BytesParseException("reach end buffers");
 		}
-		
-		throw new Secs2BytesParseException("reach end buffers");
 	}
-	
-//	private static byte[] get(List<ByteBuffer> buffers, int size) throws Secs2BytesParseException {
-//		byte[] bs = new byte[size];
-//		for (int i = 0; i < size; ++i) {
-//			bs[i] = get(buffers);
-//		}
-//		
-//		return bs;
-//	}
 	
 }

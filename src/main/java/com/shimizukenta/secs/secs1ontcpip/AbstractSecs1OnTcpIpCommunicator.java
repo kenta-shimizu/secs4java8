@@ -112,8 +112,6 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 											((Buffer)buffer).flip();
 											
 											putByte(buffer);
-											
-											circuitNotifyAll();
 										}
 										catch ( InterruptedException e ) {
 											f.cancel(true);
@@ -206,9 +204,13 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 	private final BlockingQueue<Byte> byteQueue = new LinkedBlockingQueue<>();
 	
 	protected void putByte(ByteBuffer buffer) throws InterruptedException {
-		while ( buffer.hasRemaining() ) {
-			byteQueue.put(buffer.get());
-		}
+		
+		this.circuitNotifyAll(() -> {
+			
+			while ( buffer.hasRemaining() ) {
+				byteQueue.put(buffer.get());
+			}
+		});
 	}
 	
 	@Override

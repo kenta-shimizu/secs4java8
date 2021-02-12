@@ -47,8 +47,6 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 		
 		Pack p = entry(msg);
 		
-		parent.circuitNotifyAll();
-		
 		try {
 			
 			notifyLog(new Secs1TrySendMessageLog(msg));
@@ -281,7 +279,7 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 		}
 	}
 	
-	private Pack entry(Secs1Message msg) throws Secs1SendMessageException {
+	private Pack entry(Secs1Message msg) throws Secs1SendMessageException, InterruptedException {
 		
 		synchronized ( packs ) {
 			
@@ -290,7 +288,12 @@ public class Secs1SendReplyManager extends AbstractSecsInnerEngine {
 			Pack p = new Pack(msg);
 			packs.add(p);
 			
-			blocks.forEach(sendBlockQueue::offer);
+			this.parent.circuitNotifyAll(() -> {
+				
+				for (Secs1MessageBlock block : blocks) {
+					sendBlockQueue.put(block);
+				}
+			});
 			
 			return p;
 		}

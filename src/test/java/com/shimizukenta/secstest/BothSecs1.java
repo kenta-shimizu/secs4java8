@@ -52,8 +52,10 @@ public class BothSecs1 {
 		equipConfig.isEquip(true);
 		equipConfig.isMaster(true);
 		equipConfig.socketAddress(equipAddr);
+		equipConfig.timeout().t1( 1.0F);
 		equipConfig.timeout().t2(15.0F);
 		equipConfig.timeout().t3(45.0F);
+		equipConfig.timeout().t4(45.0F);
 		equipConfig.retry(3);
 		equipConfig.gem().mdln("MDLN-A");
 		equipConfig.gem().softrev("000001");
@@ -63,8 +65,10 @@ public class BothSecs1 {
 		hostConfig.isEquip(false);
 		hostConfig.isMaster(false);
 		hostConfig.socketAddress(hostAddr);
+		hostConfig.timeout().t1( 1.0F);
 		hostConfig.timeout().t2(15.0F);
 		hostConfig.timeout().t3(45.0F);
+		hostConfig.timeout().t4(45.0F);
 		hostConfig.retry(3);
 		
 		BothSecs1 inst = new BothSecs1();
