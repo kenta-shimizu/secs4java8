@@ -164,7 +164,7 @@ public class SmlDataItemParser {
 				
 			} else if ( r.c == ZERO ) {
 				
-				SeekCharResult x = seekNextChar(str, (r.index + 1), ABE, SPACE, DQUOT);
+				SeekCharResult x = seekNextChar(str, (r.index + 1), ABE, SPACE, DQUOT, TAB, CR, LF);
 				
 				String s = str.substring(r.index, x.index);
 				byte[] bs = new byte[] {toByte(s).byteValue()};
@@ -370,6 +370,9 @@ public class SmlDataItemParser {
 	protected static final char SBE = ']';
 	protected static final char DQUOT = '"';
 	protected static final char ZERO = '0';
+	protected static final char TAB = '\t';
+	protected static final char CR = '\r';
+	protected static final char LF = '\n';
 	
 	protected final class SeekCharResult {
 		
