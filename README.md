@@ -172,6 +172,25 @@ See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/exam
     );
 ```
 
+## Detect Communicatable-state changed
+
+1. Add Listener
+
+```java
+    /* Add-Listener example */
+    active.addSecsCommunicatableStateChangeListener((boolean communicatable) -> {
+
+        if ( communicatable ) {
+            System.out.println("communicatable");
+        } else {
+            System.out.println("not communicatable");
+        }
+    });
+```
+
+Notice: This listener is blocking-method. pass through quickly.
+
+
 ## SML
 
 1. Get SML-Parser instance
