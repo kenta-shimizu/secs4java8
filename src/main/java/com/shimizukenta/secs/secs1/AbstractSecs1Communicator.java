@@ -367,47 +367,56 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			return PollCircuitControl.RETRY;
 		}
 		
-		private void circuitControl() throws SecsException, InterruptedException {
+		private void circuitControl() throws InterruptedException {
 			
-			for ( int counter = 0, m = secs1Config.retry().intValue(); counter <= m; ) {
+			try {
 				
-				sendByte(ENQ);
-				
-				PollCircuitControl p = pollCircuitControl();
-				
-				switch ( p ) {
-				case RX: {
+				for ( int counter = 0, m = secs1Config.retry().intValue(); counter <= m; ) {
 					
-					receiveBlock();
-					return;
-					/* break; */
-				}
-				case TX: {
+					sendByte(ENQ);
 					
-					if ( sendBlock() ) {
+					PollCircuitControl p = pollCircuitControl();
+					
+					switch ( p ) {
+					case RX: {
 						
+						receiveBlock();
 						return;
+						/* break; */
+					}
+					case TX: {
 						
-					} else {
+						if ( sendBlock() ) {
+							
+							return;
+							
+						} else {
+							
+							counter += 1;
+							notifyLog(Secs1RetryCircuitControlLog.newInstance(counter));
+						}
+						
+						break;
+					}
+					case RETRY: {
 						
 						counter += 1;
 						notifyLog(Secs1RetryCircuitControlLog.newInstance(counter));
+						
+						break;
 					}
-					
-					break;
+					}
 				}
-				case RETRY: {
+				
+				{
+					sendReplyManager.sendFailed(presentBlock, new Secs1RetryOverException());
 					
-					counter += 1;
-					notifyLog(Secs1RetryCircuitControlLog.newInstance(counter));
-					
-					break;
-				}
+					this.presentBlock = null;
 				}
 			}
-			
-			{
-				sendReplyManager.sendFailed(presentBlock, new Secs1RetryOverException());
+			catch ( SecsException e ) {
+				
+				sendReplyManager.sendFailed(presentBlock, e);
 				
 				this.presentBlock = null;
 			}
