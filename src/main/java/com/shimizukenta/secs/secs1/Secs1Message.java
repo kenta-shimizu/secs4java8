@@ -31,6 +31,8 @@ public class Secs1Message extends AbstractSecsMessage {
 	private final byte[] head;
 	private final Secs2  body;
 	
+	private List<Secs1MessageBlock> cacheBlocks;
+	
 	public Secs1Message(byte[] head, Secs2 body) {
 		super();
 		
@@ -40,6 +42,8 @@ public class Secs1Message extends AbstractSecsMessage {
 		if ( head.length != HEAD_SIZE ) {
 			throw new IllegalArgumentException("head size is not " + HEAD_SIZE);
 		}
+		
+		this.cacheBlocks = null;
 	}
 	
 	public Secs1Message(byte[] head) {
@@ -102,6 +106,11 @@ public class Secs1Message extends AbstractSecsMessage {
 	}
 	
 	public List<Secs1MessageBlock> toBlocks() throws Secs1SendMessageException {
-		return Secs1MessageBlockConverter.toBlocks(this);
+		synchronized ( this ) {
+			if ( this.cacheBlocks == null ) {
+				this.cacheBlocks = Secs1MessageBlockConverter.toBlocks(this);
+			}
+			return this.cacheBlocks;
+		}
 	}
 }

@@ -10,10 +10,12 @@ public class Secs1MessageBlock implements Serializable {
 	public static final int ZERO = 0;
 	public static final int ONE  = 1;
 	
+	private final int length;
 	private final byte[] bytes;
 	
 	public Secs1MessageBlock(byte[] bytes) {
-		this.bytes = Arrays.copyOf(bytes, bytes.length);
+		this.length = ((int)bytes[0]) & 0x000000FF;
+		this.bytes = Arrays.copyOf(bytes, this.length + 3);
 	}
 	
 	public int deviceId() {
@@ -46,18 +48,17 @@ public class Secs1MessageBlock implements Serializable {
 	}
 	
 	private int length() {
-		return bytes[0] & 0xFF;
+		return this.length;
 	}
 	
 	public boolean sumCheck() {
 		
 		try {
-			int len = length();
+			int sum = (((int)(bytes[this.length() + 1]) << 8) & 0xFF00)
+					| ((int)(bytes[this.length() + 2]) & 0xFF);
 			
-			int sum = (((int)(bytes[len + 1]) << 8) & 0xFF00) | ((int)(bytes[len + 2]) & 0xFF);
-			
-			for ( int i = len; i > 0; --i ) {
-				sum -= ((int)bytes[i]) & 0xFF;
+			for ( int i = this.length(); i > 0; --i ) {
+				sum -= ((int)bytes[i]) & 0x000000FF;
 			}
 			
 			return sum == 0;
