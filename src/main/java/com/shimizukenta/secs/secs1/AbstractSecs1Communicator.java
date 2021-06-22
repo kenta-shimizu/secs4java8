@@ -260,6 +260,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 					this.receiveCircuit();
 				}
 				catch ( SecsException e ) {
+					this.notifyLog(e);
 				}
 			}
 			
@@ -276,16 +277,34 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 					if ( isEOT(b) ) {
 						
 						//TODO
+						//to-send
 					
 					} else if ( isENQ(b) ) {
 						
 						if ( this.secs1Config().isMaster().booleanValue() ) {
 							
-							//TODO
+							Byte bb = this.circuitQueue.pollByte(this.secs1Config().timeout().t2());
+							
+							if ( isEOT(bb) ) {
+								
+								//TOOD
+								//to-send
+								
+							} else {
+								
+								retry += 1;
+								this.notifyLog(Secs1RetryCircuitControlLog.newInstance(retry));
+							}
 							
 						} else {
 							
-							this.receiveCircuit();
+							try {
+								this.receiveCircuit();
+							}
+							catch ( SecsException e ) {
+								this.notifyLog(e);
+							}
+							
 							retry = 0;
 							pack.reset();
 						}
@@ -299,11 +318,12 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 				
 				//TODO
 				//retry-over
+				//sendMgr.putException
 				
 			}
 			catch ( SecsException e ) {
-				
-				//TODO
+				this.notifyLog(e);
+				this.sendMgr.putException(pack.message(), e);
 			}
 		}
 	}
