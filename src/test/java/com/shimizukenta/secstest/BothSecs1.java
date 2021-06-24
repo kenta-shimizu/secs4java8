@@ -243,8 +243,8 @@ public class BothSecs1 {
 									equip.gem().s1f1();
 									Thread.sleep(1L);
 									
-//									equip.send(6, 3, true, createS6F3Secs2());
-//									Thread.sleep(1L);
+									equip.send(6, 3, true, createS6F3Secs2());
+									Thread.sleep(1L);
 									
 									++ inst.equipCounter;
 									echo("equip-count: " + inst.equipCounter);

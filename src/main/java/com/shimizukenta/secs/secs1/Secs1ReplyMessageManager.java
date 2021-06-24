@@ -84,9 +84,12 @@ public final class Secs1ReplyMessageManager {
 			
 			final Pack p = getPack(key);
 			
-			synchronized ( p ) {
-				p.resetTimer();
-				p.notifyAll();
+			if ( p != null ) {
+				
+				synchronized ( p ) {
+					p.resetTimer();
+					p.notifyAll();
+				}
 			}
 		}
 	}
@@ -144,6 +147,7 @@ public final class Secs1ReplyMessageManager {
 		
 		public void putReplyMsg(Secs1Message msg) {
 			synchronized ( this ) {
+				this.timerResetted = true;
 				this.replyMsg = msg;
 			}
 		}
