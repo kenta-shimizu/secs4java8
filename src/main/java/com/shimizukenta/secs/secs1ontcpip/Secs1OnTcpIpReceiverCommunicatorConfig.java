@@ -9,29 +9,19 @@ import com.shimizukenta.secs.SocketAddressProperty;
 import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.secs1.Secs1CommunicatorConfig;
 
-/**
- * This class is SECS-I-on-TCP/IP-Communicator config.
- * 
- * <p>
- * To set Connect SocketAddress, {@link #socketAddress(SocketAddress)}<br />
- * </p>
- * 
- * @author kenta-shimizu
- *
- */
-public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
+public class Secs1OnTcpIpReceiverCommunicatorConfig extends Secs1CommunicatorConfig {
 	
-	private static final long serialVersionUID = -7468433384957790240L;
+	private static final long serialVersionUID = 6842392464950831424L;
 	
 	private SocketAddressProperty socketAddr = SocketAddressProperty.newInstance(null);
-	private TimeProperty reconnectSeconds = TimeProperty.newInstance(5.0F);
+	private TimeProperty rebindSeconds = TimeProperty.newInstance(5.0F);
 	
-	public Secs1OnTcpIpCommunicatorConfig() {
+	public Secs1OnTcpIpReceiverCommunicatorConfig() {
 		super();
 	}
 	
 	/**
-	 * Connect SocketAddress setter.
+	 * Bind SocketAddress setter.
 	 * 
 	 * <p>
 	 * Not accept {@code null}
@@ -44,7 +34,7 @@ public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 	}
 	
 	/**
-	 * Conenct SocketAddress getter.
+	 * Bind SocketAddress getter.
 	 * 
 	 * @return Connect SocketAddress
 	 */
@@ -53,21 +43,21 @@ public class Secs1OnTcpIpCommunicatorConfig extends Secs1CommunicatorConfig {
 	}
 	
 	/**
-	 * Reconnect seconds setter.
+	 * Rebind seconds setter.
 	 * 
 	 * @param seconds
 	 */
-	public void reconnectSeconds(float seconds) {
-		this.reconnectSeconds.set(seconds);
+	public void rebindSeconds(float seconds) {
+		this.rebindSeconds.set(seconds);
 	}
 	
 	/**
-	 * Reconnect seconds getter.
+	 * Rebind seconds getter.
 	 * 
-	 * @return Reconnect-Seconds
+	 * @return Rebind-Seconds
 	 */
-	public ReadOnlyTimeProperty reconnectSeconds() {
-		return this.reconnectSeconds;
+	public ReadOnlyTimeProperty rebindSeconds() {
+		return this.rebindSeconds;
 	}
 	
 }

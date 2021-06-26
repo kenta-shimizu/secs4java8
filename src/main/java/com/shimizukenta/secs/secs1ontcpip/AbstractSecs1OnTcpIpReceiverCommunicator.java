@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
@@ -22,22 +23,15 @@ import com.shimizukenta.secs.secs1.AbstractSecs1Communicator;
 import com.shimizukenta.secs.secs1.Secs1DetectTerminateException;
 import com.shimizukenta.secs.secs1.Secs1SendMessageException;
 
-/**
- * This abstract class is implementation of SECS-I (SEMI-E4) on TCP/IP
- * 
- * @author kenta-shimizu
- *
- */
-public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Communicator
-		implements Secs1OnTcpIpCommunicator {
+public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractSecs1Communicator
+		implements Secs1OnTcpIpReceiverCommunicator {
 	
-	private final Secs1OnTcpIpCommunicatorConfig secs1OnTcpIpConfig;
+	private final Secs1OnTcpIpReceiverCommunicatorConfig config;
 	private final List<AsynchronousSocketChannel> channels = new ArrayList<>();
 	
-	public AbstractSecs1OnTcpIpCommunicator(Secs1OnTcpIpCommunicatorConfig config) {
+	public AbstractSecs1OnTcpIpReceiverCommunicator(Secs1OnTcpIpReceiverCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
-		
-		this.secs1OnTcpIpConfig = config;
+		this.config = config;
 	}
 	
 	@Override
@@ -45,8 +39,8 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 		super.open();
 		
 		this.executeLoopTask(() -> {
-			connect();
-			secs1OnTcpIpConfig.reconnectSeconds().sleep();
+			bind();
+			config.rebindSeconds().sleep();
 		});
 	}
 	
@@ -55,32 +49,39 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 		super.close();
 	}
 	
-	private void connect() throws InterruptedException {
+	private void bind() throws InterruptedException {
 		
 		try (
-				AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
+				AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
 				) {
 			
-			SocketAddress socketAddr = secs1OnTcpIpConfig.socketAddress().getSocketAddress();
+			SocketAddress gLocal = config.socketAddress().getSocketAddress();
 			
-			notifyLog(Secs1OnTcpIpConnectionLog.tryConnect(socketAddr));
+			notifyLog(Secs1OnTcpIpReceiverConnectionLog.tryBInd(gLocal));
 			
-			channel.connect(socketAddr, null, new CompletionHandler<Void, Void>() {
+			server.bind(gLocal);
+			
+			gLocal = server.getLocalAddress();
+			
+			notifyLog(Secs1OnTcpIpReceiverConnectionLog.binded(gLocal));
+			
+			server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
 
 				@Override
-				public void completed(Void none, Void attachment) {
+				public void completed(AsynchronousSocketChannel channel, Void attachment) {
 					
-					SocketAddress local = null;
+					server.accept(attachment, this);
+					
+					SocketAddress pLocal = null;
 					SocketAddress remote = null;
 					
 					try {
-						
-						local = channel.getLocalAddress();
+						pLocal = channel.getLocalAddress();
 						remote = channel.getRemoteAddress();
-						
+
 						addChannel(channel);
 						
-						notifyLog(Secs1OnTcpIpConnectionLog.connected(local, remote));
+						notifyLog(Secs1OnTcpIpReceiverConnectionLog.accepted(pLocal, remote));
 						
 						final Collection<Callable<Void>> tasks = Arrays.asList(
 								() -> {
@@ -94,8 +95,6 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 					catch ( IOException e ) {
 						notifyLog(e);
 					}
-					catch ( InterruptedException ignore) {
-					}
 					catch ( ExecutionException e ) {
 						
 						Throwable t = e.getCause();
@@ -104,7 +103,9 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 							throw (RuntimeException)t;
 						}
 						
-						notifyLog(t);
+						notifyLog(e);
+					}
+					catch ( InterruptedException ignore ) {
 					}
 					finally {
 						
@@ -116,11 +117,13 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 						catch ( IOException giveup ) {
 						}
 						
-						notifyLog(Secs1OnTcpIpConnectionLog.disconnected(local, remote));
-						
-						synchronized ( channel ) {
-							channel.notifyAll();
+						try {
+							channel.close();
 						}
+						catch ( IOException giveup ) {
+						}
+						
+						notifyLog(Secs1OnTcpIpReceiverConnectionLog.channelClosed(pLocal, remote));
 					}
 				}
 				
@@ -131,14 +134,20 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 						notifyLog(t);
 					}
 					
-					synchronized ( channel ) {
-						channel.notifyAll();
+					synchronized ( server ) {
+						server.notifyAll();
 					}
 				}
 			});
 			
-			synchronized ( channel ) {
-				channel.wait();
+			synchronized ( server ) {
+				
+				try {
+					server.wait();
+				}
+				finally {
+					notifyLog(Secs1OnTcpIpReceiverConnectionLog.serverClosed(gLocal));
+				}
 			}
 		}
 		catch ( IOException e ) {
@@ -220,7 +229,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 	@Override
 	protected void sendBytes(byte[] bs)
 			throws SecsSendMessageException, SecsException, InterruptedException {
-		
+
 		final AsynchronousSocketChannel channel = getChannel();
 		
 		final ByteBuffer buffer = ByteBuffer.allocate(bs.length);

@@ -55,15 +55,24 @@ public final class Secs1ReplyMessageManager {
 		
 		synchronized ( p ) {
 			
-			for ( ;; ) {
-				
+			{
 				final Secs1Message r = p.replyMsg();
 				
 				if ( r != null ) {
 					return Optional.of(r);
 				}
+			}
+			
+			for ( ;; ) {
 				
 				unit.timedWait(p, timeout);
+				
+				Secs1Message r = p.replyMsg();
+				
+				if ( r != null ) {
+					return Optional.of(r);
+				}
+				
 				
 				if ( ! p.isTimerResetted() ) {
 					return Optional.empty();

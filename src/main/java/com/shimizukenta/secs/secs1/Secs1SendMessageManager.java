@@ -31,7 +31,7 @@ public final class Secs1SendMessageManager {
 		}
 	}
 	
-	public Result result(Secs1Message msg) {
+	private Result result(Secs1Message msg) {
 		synchronized ( resultMap ) {
 			return resultMap.get(msg.systemBytesKey());
 		}

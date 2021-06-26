@@ -469,10 +469,10 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 				
 				this.notifyLog(Secs1TimeoutT4CircuitControlLog.newInstance(block));
 				
-			} else if ( b == ENQ ) {
-					
-					this.receiveCircuit();
-					
+			} else if ( b.byteValue() == ENQ ) {
+				
+				this.receiveCircuit();
+				
 			} else {
 				
 				this.notifyLog(Secs1NotReceiveNextBlockEnqCircuitControlLog.newInstance(block, b));
