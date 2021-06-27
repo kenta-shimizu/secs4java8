@@ -1,10 +1,10 @@
 package com.shimizukenta.secs.secs1;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BuildException;
@@ -119,18 +119,12 @@ public class Secs1MessageBlockConverter {
 		
 		byte[] head = Arrays.copyOfRange(blocks.get(blocks.size() - 1).getBytes(), 1, 11);
 		
-		List<ByteBuffer> buffers = new ArrayList<>();
+		List<byte[]> bss = blocks.stream()
+				.map(Secs1MessageBlock::getBytes)
+				.map(bs -> Arrays.copyOfRange(bs, 11, bs.length - 2))
+				.collect(Collectors.toList());
 		
-		for (Secs1MessageBlock block : blocks) {
-			byte[] bs = block.getBytes();
-			int size = bs.length - 13;
-			ByteBuffer buffer = ByteBuffer.allocate(size);
-			buffer.put(bs, 11, size);
-			((Buffer)buffer).flip();
-			buffers.add(buffer);
-		}
-		
-		Secs2 body = Secs2BytesParser.getInstance().parse(buffers);
+		Secs2 body = Secs2BytesParser.getInstance().parse(bss);
 		
 		return new Secs1Message(head, body);
 	}

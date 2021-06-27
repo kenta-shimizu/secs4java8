@@ -77,7 +77,7 @@ public class HsmsSsByteReader extends AbstractSecsInnerEngine implements Callabl
 				byte[] head = new byte[10];
 				headBf.get(head);
 				
-				Secs2 body = Secs2BytesParser.getInstance().parse(bodyReader.getByteBuffers());
+				Secs2 body = Secs2BytesParser.getInstance().parse(bodyReader.getBytes());
 				HsmsSsMessage msg = parent.createHsmsSsMessage(head, body);
 				
 				listeners.forEach(lstnr -> {
@@ -150,11 +150,13 @@ public class HsmsSsByteReader extends AbstractSecsInnerEngine implements Callabl
 		private final long size;
 		private long present;
 		private final LinkedList<ByteBuffer> buffers = new LinkedList<>();
+		private List<byte[]> cacheBytes;
 		
 		public BodyReader(HsmsSsByteReader parent, long size) {
 			this.parent = parent;
 			this.size = size;
 			this.present = 0;
+			this.cacheBytes = null;
 			addBuffer();
 		}
 		
@@ -189,14 +191,26 @@ public class HsmsSsByteReader extends AbstractSecsInnerEngine implements Callabl
 			return present == size;
 		}
 		
-		public List<ByteBuffer> getByteBuffers() {
-			return buffers.stream()
-					.map(bf -> {
-						((Buffer)bf).flip();
-						return bf;
-					})
-					.collect(Collectors.toList());
+		public List<byte[]> getBytes() {
+			
+			synchronized ( this ) {
+				
+				if ( this.cacheBytes == null ) {
+					
+					this.cacheBytes =this.buffers.stream()
+							.map(bf -> {
+								((Buffer)bf).flip();
+								byte[] bs = new byte[bf.remaining()];
+								bf.get(bs);
+								return bs;
+							})
+							.collect(Collectors.toList());
+				}
+				
+				return this.cacheBytes;
+			}
 		}
+		
 	}
 	
 	private final Collection<HsmsSsMessageReceiveListener> listeners = new CopyOnWriteArrayList<>();

@@ -1,8 +1,8 @@
 package com.shimizukenta.secs.secs2;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Secs2BytesParser {
 	
@@ -17,16 +17,16 @@ public class Secs2BytesParser {
 		return SingletonHolder.inst;
 	}
 	
-	public Secs2 parse(List<ByteBuffer> buffers) throws Secs2BytesParseException {
+	public Secs2 parse(List<byte[]> bss) throws Secs2BytesParseException {
 		
-		final ByteBuffersPack pack = new ByteBuffersPack(buffers);
+		final BytesPack pack = new BytesPack(bss);
 		
 		if ( pack.hasRemaining() ) {
 			
 			Secs2 ss = stpParse(pack);
 			
 			if ( pack.hasRemaining() ) {
-				throw new Secs2BytesParseException("not reach end buffers");
+				throw new Secs2BytesParseException("not reach end bytes");
 			}
 			
 			return ss;
@@ -37,7 +37,7 @@ public class Secs2BytesParser {
 		}
 	}
 	
-	private static Secs2 stpParse(ByteBuffersPack pack) throws Secs2BytesParseException {
+	private static Secs2 stpParse(BytesPack pack) throws Secs2BytesParseException {
 		
 		byte b = pack.get();
 		
@@ -143,69 +143,70 @@ public class Secs2BytesParser {
 		}
 	}
 	
-	private static class ByteBuffersPack {
+	private static class BytesPack {
 		
-		private final List<ByteBuffer> buffers;
-		private int buffersSize;
-		private int index;
+		private final List<byte[]> bss;
+		private final int mPack;
+		private int mBytes;
+		private int iPack;
+		private int iBytes;
 		
-		public ByteBuffersPack(List<ByteBuffer> buffers) {
-			this.buffers = new ArrayList<>(buffers);
-			this.buffersSize = buffers.size();
-			this.index = 0;
+		private BytesPack(List<byte[]> bss) {
+			this.bss = bss.stream()
+					.filter(bs -> bs.length > 0)
+					.collect(Collectors.toList());
+			this.mPack = this.bss.size() - 1;
+			this.mBytes = this.mPack < 0 ? -1 : (this.bss.get(0).length - 1);
+			this.iPack = 0;
+			this.iBytes = 0;
 		}
 		
 		public boolean hasRemaining() {
-			return buffers.stream().anyMatch(ByteBuffer::hasRemaining);
+			
+			if ( iPack < mPack ) {
+			
+				return true;
+				
+			} else if ( iPack == mPack ) {
+				
+				if ( iBytes <= mBytes ) {
+					return true;
+				}
+			}
+			
+			return false;
 		}
 		
 		public byte get() throws Secs2BytesParseException {
-			for ( ; index < buffersSize; ++index ) {
-				ByteBuffer bf = this.buffers.get(index);
-				if ( bf.hasRemaining() ) {
-					return bf.get();
+			
+			while ( iPack <= mPack ) {
+				
+				if ( iBytes > mBytes ) {
+					
+					++ iPack;
+					
+					if ( iPack <= mPack ) {
+						iBytes = 0;
+						mBytes = this.bss.get(iPack).length - 1;
+					}
+					
+				} else {
+					
+					byte b = (this.bss.get(iPack))[iBytes];
+					++ iBytes;
+					return b;
 				}
 			}
-			throw new Secs2BytesParseException("reach end buffers");
+			
+			throw new Secs2BytesParseException("reach end bytes");
 		}
 		
 		public byte[] get(int size) throws Secs2BytesParseException {
-			
 			byte[] bs = new byte[size];
-			
-			if ( size == 0 ) {
-				return bs;
+			for (int i = 0; i < size; ++i ) {
+				bs[i] = get();
 			}
-			
-			int i = 0;
-			
-			for ( ; index < this.buffersSize; ++index ) {
-				
-				ByteBuffer bf = this.buffers.get(index);
-				
-				int rem = bf.remaining();
-				
-				if ( rem > 0 ) {
-					
-					if ( rem >= (size - i) ) {
-						
-						for ( ; i < size; ++i ) {
-							bs[i] = bf.get();
-						}
-						
-						return bs;
-						
-					} else {
-						
-						while ( bf.hasRemaining() ) {
-							bs[i] = bf.get();
-							++i;
-						}
-					}
-				}
-			}
-			
-			throw new Secs2BytesParseException("reach end buffers");
+			return bs;
 		}
 	}
 	
