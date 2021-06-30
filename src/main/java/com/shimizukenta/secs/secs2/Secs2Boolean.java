@@ -61,6 +61,13 @@ public class Secs2Boolean extends AbstractSecs2 {
 		return bools().size();
 	}
 	
+	
+	@Override
+	protected void putBytesPack(Secs2BytesPackBuilder builder) throws Secs2BuildException {
+		this.putHeaderBytesToBytesPack(builder, size());
+		builder.put(bytes());
+	}
+
 	@Override
 	protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException {
 		putHeaderBytesToByteBuffers(buffers, size());

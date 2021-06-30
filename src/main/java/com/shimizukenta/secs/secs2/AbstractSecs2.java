@@ -16,6 +16,43 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 		/* Nothing */
 	}
 	
+	abstract protected void putBytesPack(Secs2BytesPackBuilder builder) throws Secs2BuildException;
+	
+	protected void putHeaderBytesToBytesPack(Secs2BytesPackBuilder builder, int length) throws Secs2BuildException {
+		
+		if ( length > 0xFFFFFF || length < 0 ) {
+			throw new Secs2LengthByteOutOfRangeException("length: " + length);
+		}
+		
+		byte b = secs2Item().code();
+		
+		if ( length > 0xFFFF ) {
+			
+			builder.put(new byte[] {
+					(byte)(b | 0x3),
+					(byte)(length >> 16),
+					(byte)(length >> 8),
+					(byte)(length)
+			});
+			
+		} else if ( length > 0xFF) {
+			
+			builder.put(new byte[] {
+					(byte)(b | 0x2),
+					(byte)(length >> 8),
+					(byte)(length)
+			});
+			
+		} else {
+			
+			builder.put(new byte[] {
+					(byte)(b | 0x1),
+					(byte)(length)
+			});
+		}
+	}
+	
+	
 	abstract protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException;
 	
 	protected void putHeaderBytesToByteBuffers(Secs2ByteBuffersBuilder buffers, int length) throws Secs2BuildException {

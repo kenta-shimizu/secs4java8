@@ -62,6 +62,24 @@ public class Secs2List extends AbstractSecs2 {
 	}
 	
 	@Override
+	protected void putBytesPack(Secs2BytesPackBuilder builder) throws Secs2BuildException {
+		
+		this.putHeaderBytesToBytesPack(builder, size());
+		
+		for ( Secs2 ss : values ) {
+			
+			if ( ss instanceof AbstractSecs2 ) {
+				
+				((AbstractSecs2)ss).putBytesPack(builder);
+				
+			} else {
+				
+				throw new Secs2BuildException("cast failed");
+			}
+		}
+	}
+	
+	@Override
 	protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException {
 		
 		putHeaderBytesToByteBuffers(buffers, size());

@@ -18,7 +18,8 @@ import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2BuildException;
-import com.shimizukenta.secs.secs2.Secs2ByteBuffersBuilder;
+import com.shimizukenta.secs.secs2.Secs2BytesPack;
+import com.shimizukenta.secs.secs2.Secs2BytesPackBuilder;
 
 public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 	
@@ -111,13 +112,14 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 			try {
 				notifyLog(new HsmsSsTrySendMessageLog(msg));
 				
-				Secs2ByteBuffersBuilder bb = Secs2ByteBuffersBuilder.build(1024, msg.secs2());
+				final Secs2BytesPack pack = Secs2BytesPackBuilder.build(1024, msg.secs2());
 				
-				long len = bb.size() + 10L;
+				long len = pack.size() + 10L;
 				
 				if ((len > 0x00000000FFFFFFFFL) || (len < 10L)) {
 					throw new HsmsSsTooBigSendMessageException(msg);
 				}
+				
 				
 				notifyTrySendMessagePassThrough(msg);
 				
@@ -139,7 +141,10 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 						send(channel, buffer);
 					}
 					
-					for ( ByteBuffer buffer : bb.getByteBuffers() ) {
+					for (byte[] bs : pack.getBytes()) {
+						ByteBuffer buffer = ByteBuffer.allocate(bs.length);
+						buffer.put(bs);
+						((Buffer)buffer).flip();
 						send(channel, buffer);
 					}
 					
@@ -153,8 +158,8 @@ public class HsmsSsSendReplyManager extends AbstractSecsInnerEngine {
 					buffer.put((byte)(len      ));
 					buffer.put(msg.header10Bytes());
 					
-					for ( ByteBuffer bf : bb.getByteBuffers() ) {
-						buffer.put(bf);
+					for (byte[] bs : pack.getBytes()) {
+						buffer.put(bs);
 					}
 					
 					((Buffer)buffer).flip();

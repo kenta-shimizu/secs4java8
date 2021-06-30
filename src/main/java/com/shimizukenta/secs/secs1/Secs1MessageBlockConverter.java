@@ -1,6 +1,5 @@
 package com.shimizukenta.secs.secs1;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,7 +7,7 @@ import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BuildException;
-import com.shimizukenta.secs.secs2.Secs2ByteBuffersBuilder;
+import com.shimizukenta.secs.secs2.Secs2BytesPackBuilder;
 import com.shimizukenta.secs.secs2.Secs2BytesParser;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
@@ -38,7 +37,7 @@ public class Secs1MessageBlockConverter {
 	private List<Secs1MessageBlock> _toBlocks(Secs1Message msg) throws Secs1SendMessageException {
 		
 		try {
-			List<Secs1MessageBlock> blocks = new ArrayList<>();
+			final List<Secs1MessageBlock> blocks = new ArrayList<>();
 			
 			byte[] head = msg.header10Bytes();
 			
@@ -46,24 +45,21 @@ public class Secs1MessageBlockConverter {
 				throw new IllegalArgumentException("head not 10 bytes");
 			}
 			
-			Secs2ByteBuffersBuilder bb = Secs2ByteBuffersBuilder.build(244, msg.secs2());
+			final List<byte[]> ll = Secs2BytesPackBuilder.build(244, msg.secs2()).getBytes();
 			
-			if ( bb.blocks() > 0x7FFF) {
+			if ( ll.size() > 0x7FFE) {
 				throw new Secs1TooBigSendMessageException(msg);
 			}
 			
-			
-			List<ByteBuffer> buffers = bb.getByteBuffers();
-			
 			int blockNum = Secs1MessageBlock.ONE;
-			int m = buffers.size() - 1;
+			int m = ll.size() - 1;
 			
 			for ( int i = 0; i < m; ++i ) {
-				blocks.add(buildBlock(head, buffers.get(i), false, blockNum));
+				blocks.add(buildBlock(head, ll.get(i), false, blockNum));
 				++ blockNum;
 			}
 			
-			blocks.add(buildBlock(head, buffers.get(m), true, blockNum));
+			blocks.add(buildBlock(head, ll.get(m), true, blockNum));
 			
 			return blocks;
 		}
@@ -72,9 +68,9 @@ public class Secs1MessageBlockConverter {
 		}
 	}
 	
-	private Secs1MessageBlock buildBlock(byte[] head, ByteBuffer buffer, boolean ebit, int blockNumber) {
+	private Secs1MessageBlock buildBlock(byte[] head, byte[] body, boolean ebit, int blockNumber) {
 		
-		int len = head.length + buffer.remaining();
+		int len = head.length + body.length;
 		
 		int sum = 0;
 		
@@ -98,19 +94,19 @@ public class Secs1MessageBlockConverter {
 		bs[9] = head[8];
 		bs[10] = head[9];
 		
-		int i = 1;
-		for (; i < 11; ++i) {
-			sum += (int)(bs[i]) & 0xFF;
+		int pos = 1;
+		for (; pos < 11; ++pos) {
+			sum += (int)(bs[pos]) & 0xFF;
 		}
 		
-		for (; buffer.hasRemaining(); ++i) {
-			byte b = buffer.get();
-			bs[i] = b;
+		for (int i = 0, m = body.length; i < m; ++pos, ++i) {
+			byte b = body[i];
+			bs[pos] = b;
 			sum += ((int)b) & 0xFF;
 		}
 		
-		bs[i] = (byte)(sum >> 8);
-		bs[i + 1] = (byte)sum;
+		bs[pos] = (byte)(sum >> 8);
+		bs[pos + 1] = (byte)sum;
 		
 		return new Secs1MessageBlock(bs);
 	}

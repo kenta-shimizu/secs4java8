@@ -39,6 +39,13 @@ public class Secs2Ascii extends AbstractSecs2 {
 	}
 	
 	@Override
+	protected void putBytesPack(Secs2BytesPackBuilder builder) throws Secs2BuildException {
+		byte[] bs = bytes();
+		putHeaderBytesToBytesPack(builder, bs.length);
+		builder.put(bs);
+	}
+	
+	@Override
 	protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException {
 		byte[] bs = bytes();
 		putHeaderBytesToByteBuffers(buffers, bs.length);
