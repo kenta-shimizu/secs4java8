@@ -52,37 +52,6 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 		}
 	}
 	
-	
-	abstract protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException;
-	
-	protected void putHeaderBytesToByteBuffers(Secs2ByteBuffersBuilder buffers, int length) throws Secs2BuildException {
-		
-		if ( length > 0xFFFFFF || length < 0 ) {
-			throw new Secs2LengthByteOutOfRangeException("length: " + length);
-		}
-		
-		byte b = secs2Item().code();
-		
-		if ( length > 0xFFFF ) {
-			
-			buffers.put( b | 0x3 );
-			buffers.put(length >> 16);
-			buffers.put(length >> 8);
-			buffers.put(length);
-			
-		} else if ( length > 0xFF) {
-			
-			buffers.put( b | 0x2 );
-			buffers.put(length >> 8);
-			buffers.put(length);
-			
-		} else {
-			
-			buffers.put( b | 0x1 );
-			buffers.put(length);
-		}
-	}
-	
 	private static LinkedList<Integer> createLinkedList(int... indices) {
 		LinkedList<Integer> ll = new LinkedList<>();
 		IntStream.of(indices).boxed().forEach(ll::add);

@@ -68,12 +68,6 @@ public class Secs2Boolean extends AbstractSecs2 {
 		builder.put(bytes());
 	}
 
-	@Override
-	protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException {
-		putHeaderBytesToByteBuffers(buffers, size());
-		buffers.put(bytes());
-	}
-	
 	private synchronized List<Boolean> bools() {
 		
 		if ( this.bools == null ) {

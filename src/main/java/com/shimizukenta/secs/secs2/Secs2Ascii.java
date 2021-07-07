@@ -45,13 +45,6 @@ public class Secs2Ascii extends AbstractSecs2 {
 		builder.put(bs);
 	}
 	
-	@Override
-	protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException {
-		byte[] bs = bytes();
-		putHeaderBytesToByteBuffers(buffers, bs.length);
-		buffers.put(bs);
-	}
-	
 	private synchronized String ascii() {
 		if ( this.ascii == null ) {
 			this.ascii = new String(bytes, charset);

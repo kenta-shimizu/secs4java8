@@ -90,10 +90,6 @@ public abstract class AbstractHsmsSsRebindPassiveCommunicator extends AbstractHs
 					}
 					finally {
 						
-						sendReplyManager.clear();
-						
-						removeChannel(channel);
-						
 						try {
 							channel.shutdownOutput();
 						}

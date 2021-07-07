@@ -37,11 +37,6 @@ public class Secs2RawBytes extends AbstractSecs2 {
 	}
 	
 	@Override
-	protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) {
-		buffers.put(bs);
-	}
-	
-	@Override
 	public String toString() {
 		return "";
 	}

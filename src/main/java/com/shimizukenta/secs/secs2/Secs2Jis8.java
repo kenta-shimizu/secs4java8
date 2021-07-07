@@ -41,12 +41,6 @@ public class Secs2Jis8 extends AbstractSecs2 {
 	}
 	
 	@Override
-	protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException {
-		putHeaderBytesToByteBuffers(buffers, size());
-		buffers.put(bytes());
-	}
-	
-	@Override
 	public Secs2Item secs2Item() {
 		return secs2Item;
 	}

@@ -21,13 +21,13 @@ public final class Secs1ReplyMessageManager {
 		}
 	}
 	
-	public void entry(Secs1Message primaryMsg) throws InterruptedException {
+	public void entry(Secs1Message primaryMsg) {
 		synchronized ( packMap ) {
 			packMap.put(primaryMsg.systemBytesKey(), new Pack());
 		}
 	}
 	
-	public void exit(Secs1Message primaryMsg) throws InterruptedException {
+	public void exit(Secs1Message primaryMsg) {
 		synchronized ( packMap ) {
 			packMap.remove(primaryMsg.systemBytesKey());
 		}
@@ -108,9 +108,8 @@ public final class Secs1ReplyMessageManager {
 	 * 
 	 * @param msg
 	 * @return Return {@code Optional.empty()} if has primaryMsg, otherwise Optional has value
-	 * @throws InterruptedException
 	 */
-	public Optional<Secs1Message> put(Secs1Message msg) throws InterruptedException {
+	public Optional<Secs1Message> put(Secs1Message msg) {
 		
 		final Pack p = getPack(msg);
 		

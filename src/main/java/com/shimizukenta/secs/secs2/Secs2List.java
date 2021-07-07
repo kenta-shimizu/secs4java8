@@ -80,24 +80,6 @@ public class Secs2List extends AbstractSecs2 {
 	}
 	
 	@Override
-	protected void putByteBuffers(Secs2ByteBuffersBuilder buffers) throws Secs2BuildException {
-		
-		putHeaderBytesToByteBuffers(buffers, size());
-		
-		for ( Secs2 ss : values ) {
-			
-			if ( ss instanceof AbstractSecs2 ) {
-				
-				((AbstractSecs2)ss).putByteBuffers(buffers);
-				
-			} else {
-				
-				throw new Secs2BuildException("cast failed");
-			}
-		}
-	}
-	
-	@Override
 	protected AbstractSecs2 get( LinkedList<Integer> list ) throws Secs2Exception {
 		
 		if ( list.isEmpty() ) {
