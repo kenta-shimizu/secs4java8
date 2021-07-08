@@ -18,6 +18,7 @@ import com.shimizukenta.secs.AbstractSecsCommunicator;
 import com.shimizukenta.secs.AbstractSecsWaitReplyMessageExceptionLog;
 import com.shimizukenta.secs.ByteArrayProperty;
 import com.shimizukenta.secs.Property;
+import com.shimizukenta.secs.PropertyChangeListener;
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
@@ -515,6 +516,7 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 				
 				if ( bufferSize > this.prototypeMaxBufferSize() ) {
 					
+					final List<ByteBuffer> buffers = new ArrayList<>();
 					{
 						ByteBuffer buffer = ByteBuffer.allocate(14);
 						
@@ -525,16 +527,21 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 						buffer.put(msg.header10Bytes());
 						
 						((Buffer)buffer).flip();
-						
-						innerSend(buffer);
+						buffers.add(buffer);
 					}
 					
 					for (byte[] bs : pack.getBytes()) {
 						ByteBuffer buffer = ByteBuffer.allocate(bs.length);
 						buffer.put(bs);
-						((Buffer)buffer).flip();
 						
-						innerSend(buffer);
+						((Buffer)buffer).flip();
+						buffers.add(buffer);
+					}
+					
+					synchronized ( this.channel ) {
+						for ( ByteBuffer buffer : buffers ) {
+							innerSend(buffer);
+						}
 					}
 					
 				} else {
@@ -553,7 +560,9 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 					
 					((Buffer)buffer).flip();
 					
-					innerSend(buffer);
+					synchronized ( this.channel ) {
+						innerSend(buffer);
+					}
 				}
 				
 				notifySendedMessagePassThrough(msg);
@@ -630,6 +639,8 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 						continue;
 					}
 					
+					this.resetLinktesting();
+					
 					while ( len > 0L ) {
 						
 						final ByteBuffer buffer = ByteBuffer.allocate(
@@ -640,6 +651,8 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 						while ( buffer.hasRemaining() ) {
 							readToBuffer(channel, buffer);
 						}
+						
+						this.resetLinktesting();
 						
 						((Buffer)buffer).flip();
 						byte[] bs = new byte[buffer.remaining()];
@@ -706,8 +719,6 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 							throw new HsmsSsDetectTerminateException();
 						}
 						
-						this.resetLinktesting();
-						
 						return r;
 					}
 					catch ( TimeoutException e ) {
@@ -722,8 +733,6 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 						throw new HsmsSsDetectTerminateException();
 					}
 					
-					this.resetLinktesting();
-					
 					return r;
 				}
 			}
@@ -737,17 +746,35 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 		
 		protected void linktesting() throws InterruptedException {
 			
-			for ( ;; ) {
-				
+			final ReadOnlyTimeProperty tpLinktest = hsmsSsConfig().linktest();
+			
+			final PropertyChangeListener<Number> lstnr = (Number n) -> {
 				synchronized ( this.syncLinktesting ) {
-					AbstractHsmsSsCommunicator.this.hsmsSsConfig().linktest().wait(this.syncLinktesting);
-					if ( this.linktestResetted ) {
-						this.linktestResetted = false;
-						continue;
-					}
+					this.linktestResetted = true;
+					this.syncLinktesting.notifyAll();
 				}
+			};
+			
+			try {
 				
-				try {
+				tpLinktest.addChangeListener(lstnr);
+				
+				for ( ;; ) {
+					
+					synchronized ( this.syncLinktesting ) {
+						
+						if ( tpLinktest.geZero() ) {
+							tpLinktest.wait(this.syncLinktesting);
+						} else {
+							this.syncLinktesting.wait();
+						}
+						
+						if ( this.linktestResetted ) {
+							this.linktestResetted = false;
+							continue;
+						}
+					}
+					
 					if ( this.send(AbstractHsmsSsCommunicator.this.createLinktestRequest())
 							.map(HsmsSsMessageType::get)
 							.filter(t -> t == HsmsSsMessageType.LINKTEST_RSP)
@@ -760,20 +787,22 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 						return;
 					}
 				}
-				catch ( SecsException e ) {
-					notifyLog(e);
-					return;
-				}
+			}
+			catch ( SecsException e ) {
+				notifyLog(e);
+				return;
+			}
+			finally {
+				tpLinktest.removeChangeListener(lstnr);
 			}
 		}
 		
 		private void resetLinktesting() {
 			synchronized ( this.syncLinktesting ) {
 				this.linktestResetted = true;
-				this.syncLinktesting.notifyAll();
 			}
 		}
-
+		
 	}
 	
 }

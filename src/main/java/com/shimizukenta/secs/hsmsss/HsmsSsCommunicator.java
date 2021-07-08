@@ -34,7 +34,7 @@ public interface HsmsSsCommunicator extends SecsCommunicator {
 		switch ( config.protocol().get() ) {
 		case PASSIVE: {
 			
-			if ( config.rebindIfPassive().getMilliSeconds() >= 0L ) {
+			if ( config.rebindIfPassive().geZero() ) {
 				
 				return new AbstractHsmsSsRebindPassiveCommunicator(config) {};
 				

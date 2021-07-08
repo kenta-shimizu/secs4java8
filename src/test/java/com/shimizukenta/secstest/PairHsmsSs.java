@@ -52,7 +52,8 @@ public class PairHsmsSs {
 		equipConfig.sessionId(10);
 		equipConfig.isEquip(true);
 		equipConfig.rebindIfPassive(5.0F);
-		equipConfig.linktest(30.0F);
+		equipConfig.timeout().t3(10.0F);
+		equipConfig.linktest(6.0F);
 		equipConfig.gem().mdln("MDLN-A");
 		equipConfig.gem().softrev("000001");
 		
@@ -61,7 +62,8 @@ public class PairHsmsSs {
 		hostConfig.socketAddress(addr);
 		hostConfig.sessionId(10);
 		hostConfig.isEquip(false);
-		hostConfig.linktest(30.0F);
+		hostConfig.timeout().t3(10.0F);
+		hostConfig.linktest(6.0F);
 		
 		
 		final PairHsmsSs inst = new PairHsmsSs();
@@ -305,6 +307,8 @@ public class PairHsmsSs {
 					th.join();
 				}
 			}
+			
+			Thread.sleep(500L);
 		}
 		catch ( InterruptedException ignore ) {
 		}

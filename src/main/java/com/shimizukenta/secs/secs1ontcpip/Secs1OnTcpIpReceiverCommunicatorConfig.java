@@ -9,6 +9,16 @@ import com.shimizukenta.secs.SocketAddressProperty;
 import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.secs1.Secs1CommunicatorConfig;
 
+/**
+ * This class is SECS-I-on-TCP/IP-Receiver-Communicator config.
+ * 
+ * <p>
+ * To set Bind SocketAddress, {@link #socketAddress(SocketAddress)}<br />
+ * </p>
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class Secs1OnTcpIpReceiverCommunicatorConfig extends Secs1CommunicatorConfig {
 	
 	private static final long serialVersionUID = 6842392464950831424L;

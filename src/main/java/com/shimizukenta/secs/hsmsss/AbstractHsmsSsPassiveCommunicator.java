@@ -295,7 +295,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				}
 			}
 			finally {
-				
+				notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
 				removeSelectedConnection(this);
 			}
 		}

@@ -222,8 +222,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 								notifyLog(e);
 							}
 							return null;
-						}
-						);
+						});
 				
 				executeInvokeAny(tasks);
 			}
