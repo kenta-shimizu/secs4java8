@@ -77,9 +77,7 @@ abstract public class Secs2Number<T extends Number> extends AbstractSecs2 {
 	
 	@Override
 	protected void putBytesPack(Secs2BytesPackBuilder builder) throws Secs2BuildException {
-		byte[] bs = bytes();
-		this.putHeaderBytesToBytesPack(builder, bs.length);
-		builder.put(bs);
+		this.putHeadAndBodyBytesToBytesPack(builder, bytes());
 	}
 
 	@Override

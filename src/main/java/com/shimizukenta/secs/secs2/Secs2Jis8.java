@@ -36,8 +36,7 @@ public class Secs2Jis8 extends AbstractSecs2 {
 	
 	@Override
 	protected void putBytesPack(Secs2BytesPackBuilder builder) throws Secs2BuildException {
-		this.putHeaderBytesToBytesPack(builder, size());
-		builder.put(bytes());
+		this.putHeadAndBodyBytesToBytesPack(builder, bytes());
 	}
 	
 	@Override
