@@ -17,11 +17,11 @@ public class Secs2BytesPackBuilder {
 		this.pos = 0;
 	}
 	
-	protected void put(byte b) {
+	public void put(byte b) {
 		put(new byte[] {b});
 	}
 	
-	protected void put(byte[] bs) {
+	public void put(byte[] bs) {
 		
 		for (int i = 0, m = bs.length ; i < m; ) {
 			
