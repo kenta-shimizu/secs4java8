@@ -56,8 +56,12 @@ This library is SEMI-SECS-communicate implementation on Java8.
 - For use SECS-I (onTcpIp) example
 
 ```java
-    /* SECS-I (onTcpIp) open example */
-    Secs1OnTcpIpConfig config = new Secs1OnTcpIpConfig();
+    /*
+        SECS-I (onTcpIp) open example.
+        This is connect/client type connection.
+        This and 'Secs1OnTcpIpReceiverCommunicator' are a pair.
+    */
+    Secs1OnTcpIpCommunicatorConfig config = new Secs1OnTcpIpCommunicatorConfig();
     config.socketAddress(new InetSocketAddress("127.0.0.1", 10000));
     config.deviceId(10);
     config.isMaster(true);
@@ -70,6 +74,29 @@ This library is SEMI-SECS-communicate implementation on Java8.
     config.gem().clockType(ClockType.A16);
 
     SecsCommunicator secs1 = Secs1OnTcpIpCommunicator.open(config);
+```
+
+- For use SECS-I (onTcpIp) Receiver example
+
+```java
+    /*
+        SECS-I (onTcpIp) Receiver open example.
+        This is bind/server type connection.
+        This and 'Secs1OnTcpIpCommunicator' are a pair.
+    */
+    Secs1OnTcpIpReceiverCommunicatorConfig config = new Secs1OnTcpIpReceiverCommunicatorConfig();
+    config.socketAddress(new InetSocketAddress("127.0.0.1", 10000));
+    config.deviceId(10);
+    config.isMaster(true);
+    config.isEquip(true);
+    config.timeout().t1( 1.0F);
+    config.timeout().t2(15.0F);
+    config.timeout().t3(45.0F);
+    config.timeout().t4(45.0F);
+    config.retry(3);
+    config.gem().clockType(ClockType.A16);
+
+    SecsCommunicator secs1r = Secs1OnTcpIpReceiverCommunicator.open(config);
 ```
 
 How to convert TCP/IP <-> RS232C
