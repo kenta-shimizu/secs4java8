@@ -87,8 +87,8 @@ This library is SEMI-SECS-communicate implementation on Java8.
     Secs1OnTcpIpReceiverCommunicatorConfig config = new Secs1OnTcpIpReceiverCommunicatorConfig();
     config.socketAddress(new InetSocketAddress("127.0.0.1", 10000));
     config.deviceId(10);
-    config.isMaster(true);
-    config.isEquip(true);
+    config.isMaster(false);
+    config.isEquip(false);
     config.timeout().t1( 1.0F);
     config.timeout().t2(15.0F);
     config.timeout().t3(45.0F);
