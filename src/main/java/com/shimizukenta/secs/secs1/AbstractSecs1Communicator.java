@@ -254,59 +254,58 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			
 			try {
 				
-				this.sendByte(ENQ);
-				
-				for (int retry = 0; retry <= this.secs1Config().retry().intValue(); ) {
+				for ( int retry = 0; retry <= this.secs1Config().retry().intValue(); ) {
 					
-					Byte b = this.circuitQueue.pollByte(this.secs1Config().timeout().t2());
+					this.sendByte(ENQ);
 					
-					if ( b == null ) {
+					for ( ;; ) {
 						
-						this.notifyLog(Secs1RetryCircuitControlLog.newInstance(retry));
-						retry += 1;
+						Byte b = this.circuitQueue.pollByte(this.secs1Config().timeout().t2());
 						
-						this.sendByte(ENQ);
-						
-					} else if ( b.byteValue() == ENQ && ! this.secs1Config().isMaster().booleanValue() ) {
-							
-						try {
-							this.receiveCircuit();
-						}
-						catch ( SecsException e ) {
-							this.notifyLog(e);
-						}
-						
-						retry = 0;
-						pack.reset();
-						
-						this.sendByte(ENQ);
-						
-					} else if ( b.byteValue() == EOT ) {
-						
-						if ( this.sendCircuit(pack.present()) ) {
-							
-							if ( pack.ebit() ) {
-								
-								this.sendMgr.putSended(pack.message());
-								this.offerSendedMsgPassThroughQueue(pack.message());
-								this.notifyLog(new Secs1SendedMessageLog(pack.message()));
-								
-								return;
-								
-							} else {
-								
-								pack.next();
-								retry = 0;
-								
-								this.sendByte(ENQ);
-							}
-							
-						} else {
+						if ( b == null ) {
 							
 							this.notifyLog(Secs1RetryCircuitControlLog.newInstance(retry));
 							retry += 1;
+							break;
 							
-							this.sendByte(ENQ);
+						} else if ( b.byteValue() == ENQ && ! this.secs1Config().isMaster().booleanValue() ) {
+								
+							try {
+								this.receiveCircuit();
+							}
+							catch ( SecsException e ) {
+								this.notifyLog(e);
+							}
+							
+							retry = 0;
+							pack.reset();
+							break;
+							
+						} else if ( b.byteValue() == EOT ) {
+							
+							if ( this.sendCircuit(pack.present()) ) {
+								
+								if ( pack.ebit() ) {
+									
+									this.sendMgr.putSended(pack.message());
+									this.offerSendedMsgPassThroughQueue(pack.message());
+									this.notifyLog(new Secs1SendedMessageLog(pack.message()));
+									
+									return;
+									
+								} else {
+									
+									pack.next();
+									retry = 0;
+									break;
+								}
+								
+							} else {
+								
+								this.notifyLog(Secs1RetryCircuitControlLog.newInstance(retry));
+								retry += 1;
+								break;
+							}
 						}
 					}
 				}
