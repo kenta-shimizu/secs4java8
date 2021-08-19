@@ -1,12 +1,14 @@
-package com.shimizukenta.secs.hsmsss;
+package com.shimizukenta.secs.hsmsgs;
 
-public enum HsmsSsMessageType {
+public enum HsmsGsMessageType {
 	
 	UNDEFINED( (byte)0x80, (byte)0x80 ),
 	
 	DATA( (byte)0, (byte)0 ),
 	SELECT_REQ( (byte)0, (byte)1 ),
 	SELECT_RSP( (byte)0, (byte)2 ),
+	DESELECT_REQ( (byte)0, (byte)3 ),
+	DESELECT_RSP( (byte)0, (byte)4 ),
 	LINKTEST_REQ( (byte)0, (byte)5 ),
 	LINKTEST_RSP( (byte)0, (byte)6 ),
 	REJECT_REQ( (byte)0, (byte)7 ),
@@ -17,7 +19,7 @@ public enum HsmsSsMessageType {
 	private final byte p;
 	private final byte s;
 	
-	private HsmsSsMessageType(byte p, byte s) {
+	private HsmsGsMessageType(byte p, byte s) {
 		this.p = p;
 		this.s = s;
 	}
@@ -30,9 +32,9 @@ public enum HsmsSsMessageType {
 		return s;
 	}
 	
-	public static HsmsSsMessageType get(byte p, byte s) {
+	public static HsmsGsMessageType get(byte p, byte s) {
 		
-		for ( HsmsSsMessageType t : values() ) {
+		for ( HsmsGsMessageType t : values() ) {
 			if ( t != UNDEFINED && t.p == p && t.s == s ) {
 				return t;
 			}
@@ -41,7 +43,7 @@ public enum HsmsSsMessageType {
 		return UNDEFINED;
 	}
 	
-	public static HsmsSsMessageType get(HsmsSsMessage msg) {
+	public static HsmsGsMessageType get(HsmsGsMessage msg) {
 		
 		byte[] head = msg.header10Bytes();
 		byte p = head[4];
@@ -52,7 +54,7 @@ public enum HsmsSsMessageType {
 	
 	public static boolean supportPType(byte p) {
 		
-		for ( HsmsSsMessageType t : values() ) {
+		for ( HsmsGsMessageType t : values() ) {
 			if ( t != UNDEFINED && t.p == p ) {
 				return true;
 			}
@@ -61,7 +63,7 @@ public enum HsmsSsMessageType {
 		return false;
 	}
 	
-	public static boolean supportPType(HsmsSsMessage msg) {
+	public static boolean supportPType(HsmsGsMessage msg) {
 		byte[] head = msg.header10Bytes();
 		byte p = head[4];
 		return supportPType(p);
@@ -69,7 +71,7 @@ public enum HsmsSsMessageType {
 	
 	public static boolean supportSType(byte s) {
 		
-		for ( HsmsSsMessageType t : values() ) {
+		for ( HsmsGsMessageType t : values() ) {
 			if ( t != UNDEFINED && t.s == s ) {
 				return true;
 			}
@@ -78,7 +80,7 @@ public enum HsmsSsMessageType {
 		return false;
 	}
 	
-	public static boolean supportSType(HsmsSsMessage msg) {
+	public static boolean supportSType(HsmsGsMessage msg) {
 		byte[] head = msg.header10Bytes();
 		byte s = head[5];
 		return supportPType(s);

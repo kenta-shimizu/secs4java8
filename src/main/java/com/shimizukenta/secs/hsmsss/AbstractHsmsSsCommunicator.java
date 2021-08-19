@@ -302,31 +302,6 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 	}
 	
 	@Override
-	public HsmsSsMessage createDeselectRequest() {
-		return createHsmsSsControlPrimaryMessage(HsmsSsMessageType.DESELECT_REQ);
-	}
-	
-	@Override
-	public HsmsSsMessage createDeselectResponse(HsmsSsMessage primary) {
-		
-		HsmsSsMessageType mt = HsmsSsMessageType.DESELECT_RSP;
-		byte[] pri = primary.header10Bytes();
-		
-		return createHsmsSsMessage(new byte[] {
-				pri[0],
-				pri[1],
-				(byte)0,
-				(byte)0,
-				mt.pType(),
-				mt.sType(),
-				pri[6],
-				pri[7],
-				pri[8],
-				pri[9]
-		});
-	}
-	
-	@Override
 	public HsmsSsMessage createLinktestRequest() {
 		return createHsmsSsControlPrimaryMessage(HsmsSsMessageType.LINKTEST_REQ);
 	}

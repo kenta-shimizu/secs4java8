@@ -31,6 +31,7 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 		private static final long serialVersionUID = -3386783271396322749L;
 	};
 	
+	private final StringProperty name = StringProperty.newInstance("");
 	private final StringProperty logSubjectHeader = StringProperty.newInstance("");
 	
 	public AbstractSecsCommunicatorConfig() {
@@ -89,6 +90,24 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	 */
 	public AbstractGemConfig gem() {
 		return gem;
+	}
+	
+	/**
+	 * Communicator-Name setter.
+	 * 
+	 * @param name Communicator Name
+	 */
+	public void name(CharSequence name) {
+		this.name.set(Objects.requireNonNull(name).toString());
+	}
+	
+	/**
+	 * Communicaotor-Name getter.
+	 * 
+	 * @return Communicator-Name
+	 */
+	public ReadOnlyProperty<String> name() {
+		return name;
 	}
 	
 	/**

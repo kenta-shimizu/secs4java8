@@ -310,7 +310,8 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				case DATA: {
 					
 					send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SELECTED));
-					break;
+					return Boolean.FALSE;
+					/* break; */
 				}
 				case SELECT_REQ: {
 					
@@ -331,8 +332,9 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				}
 				case LINKTEST_REQ: {
 					
-					send(createLinktestResponse(msg));
-					break;
+					send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SELECTED));
+					return Boolean.FALSE;
+					/* break; */
 				}
 				case SEPARATE_REQ: {
 					
@@ -340,14 +342,13 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 					/* break; */
 				}
 				case SELECT_RSP:
-				case DESELECT_RSP:
 				case LINKTEST_RSP:
 				case REJECT_REQ: {
 					
 					send(createRejectRequest(msg, HsmsSsMessageRejectReason.TRANSACTION_NOT_OPEN));
-					break;
+					return Boolean.FALSE;
+					/* break; */
 				}
-				case DESELECT_REQ:
 				default: {
 					
 					if ( HsmsSsMessageType.supportSType(msg) ) {
@@ -355,11 +356,13 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 						if ( ! HsmsSsMessageType.supportPType(msg) ) {
 							
 							send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P));
+							return Boolean.FALSE;
 						}
 						
 					} else {
 						
 						send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
+						return Boolean.FALSE;
 					}
 				}
 				}
@@ -394,14 +397,13 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 					/* break; */
 				}
 				case SELECT_RSP:
-				case DESELECT_RSP:
 				case LINKTEST_RSP:
 				case REJECT_REQ: {
 					
 					send(createRejectRequest(msg, HsmsSsMessageRejectReason.TRANSACTION_NOT_OPEN));
-					break;
+					return;
+					/* break; */
 				}
-				case DESELECT_REQ:
 				default: {
 					
 					if ( HsmsSsMessageType.supportSType(msg) ) {
@@ -409,11 +411,13 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 						if ( ! HsmsSsMessageType.supportPType(msg) ) {
 							
 							send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P));
+							return;
 						}
 						
 					} else {
 						
 						send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
+						return;
 					}
 				}
 				}

@@ -151,21 +151,6 @@ public interface HsmsSsCommunicator extends SecsCommunicator {
 	public HsmsSsMessage createSelectResponse(HsmsSsMessage primary, HsmsSsMessageSelectStatus status);
 	
 	/**
-	 * Create Deselect-Request.
-	 * 
-	 * @return Deselect-Request-HsmsSsMessage
-	 */
-	public HsmsSsMessage createDeselectRequest();
-	
-	/**
-	 * Create Deselect-Response.
-	 * 
-	 * @param primary-message
-	 * @return Deselect-Response-HsmsSsMessage
-	 */
-	public HsmsSsMessage createDeselectResponse(HsmsSsMessage primary);
-	
-	/**
 	 * Create Linktest-Request.
 	 * 
 	 * @return Linktest-Request-HsmsSsMessage

@@ -271,8 +271,6 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 					/* break; */
 				}
 				case SELECT_RSP:
-				case DESELECT_REQ:
-				case DESELECT_RSP:
 				case LINKTEST_RSP:
 				case REJECT_REQ:
 				default: {
