@@ -11,7 +11,6 @@ import java.util.EventListener;
  * </p>
  * 
  * @author kenta-shimizu
- *
  */
 public interface SecsMessageReceiveListener extends EventListener {
 	

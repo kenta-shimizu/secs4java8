@@ -1,5 +1,6 @@
 package com.shimizukenta.secs.hsmsss;
 
+@Deprecated
 public class HsmsSsNotConnectedException extends HsmsSsSendMessageException {
 	
 	private static final long serialVersionUID = -4981654208857229126L;

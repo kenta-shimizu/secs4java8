@@ -11,6 +11,7 @@ import com.shimizukenta.secs.ReadOnlySocketAddressProperty;
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.SocketAddressProperty;
 import com.shimizukenta.secs.TimeProperty;
+import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 
 /**
  * This class is config of HSMS-SS-Communicator.
@@ -28,7 +29,7 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
 	private static final long serialVersionUID = -5737187045438763249L;
 	
-	private final Property<HsmsSsProtocol> protocol = Property.newInstance(HsmsSsProtocol.PASSIVE);
+	private final Property<HsmsConnectionMode> connectionMode = Property.newInstance(HsmsConnectionMode.PASSIVE);
 	private final SocketAddressProperty sockAddr = SocketAddressProperty.newInstance(null);
 	private final TimeProperty linktest = TimeProperty.newInstance(-1.0F);
 	private final TimeProperty rebindIfPassive = TimeProperty.newInstance(10.0F);
@@ -38,12 +39,40 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	}
 	
 	/**
+	 * ACTIVE or PASSIVE Connection-Mode setter
+	 * 
+	 * @param mode
+	 */
+	public void connectionMode(HsmsConnectionMode mode) {
+		this.connectionMode.set(Objects.requireNonNull(mode));
+	}
+	
+	/**
+	 * Connection-Mode getter
+	 * 
+	 * @return connection-mode
+	 */
+	public ReadOnlyProperty<HsmsConnectionMode> connectionMode() {
+		return this.connectionMode;
+	}
+	
+	/**
 	 * ACTIVE or PASSIVE protocol setter
 	 * 
 	 * @param protocol
 	 */
+	@Deprecated
 	public void protocol(HsmsSsProtocol protocol) {
-		this.protocol.set(Objects.requireNonNull(protocol));
+		switch ( protocol ) {
+		case PASSIVE: {
+			this.connectionMode(HsmsConnectionMode.PASSIVE);
+			break;
+		}
+		case ACTIVE: {
+			this.connectionMode(HsmsConnectionMode.ACTIVE);
+			break;
+		}
+		}
 	}
 	
 	/**
@@ -51,8 +80,9 @@ public class HsmsSsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	 * 
 	 * @return protocol
 	 */
-	public ReadOnlyProperty<HsmsSsProtocol> protocol() {
-		return protocol;
+	@Deprecated
+	public ReadOnlyProperty<HsmsConnectionMode> protocol() {
+		return this.connectionMode();
 	}
 	
 	/**

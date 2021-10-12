@@ -1,5 +1,6 @@
 package com.shimizukenta.secs.hsmsss;
 
+@Deprecated
 public enum HsmsSsMessageType {
 	
 	UNDEFINED( (byte)0x80, (byte)0x80 ),

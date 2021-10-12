@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.SecsException;
+import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 
 /**
  * This abstract class is implementation of HSMS-SS-Passive Communicator(SEMI-E37.1).
@@ -39,8 +40,8 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 	@Override
 	public void open() throws IOException {
 		
-		if ( hsmsSsConfig().protocol().get() != HsmsSsProtocol.PASSIVE ) {
-			throw new IOException("HsmsSsCommunicatorConfig#protocol is not PASSIVE");
+		if ( hsmsSsConfig().connectionMode().get() != HsmsConnectionMode.PASSIVE ) {
+			throw new IOException("HsmsSsCommunicatorConfig#connectionMode is not PASSIVE");
 		}
 		
 		super.open();

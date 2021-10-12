@@ -1,6 +1,6 @@
-package com.shimizukenta.secs.hsmsss;
+package com.shimizukenta.secs.hsms;
 
-public enum HsmsSsCommunicateState {
+public enum HsmsCommunicateState {
 	
 	NOT_CONNECTED(false),
 	NOT_SELECTED(false),
@@ -9,7 +9,7 @@ public enum HsmsSsCommunicateState {
 	
 	private boolean communicatable;
 	
-	private HsmsSsCommunicateState(boolean f) {
+	private HsmsCommunicateState(boolean f) {
 		this.communicatable = f;
 	}
 	

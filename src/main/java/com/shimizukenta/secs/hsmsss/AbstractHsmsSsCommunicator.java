@@ -24,6 +24,9 @@ import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
+import com.shimizukenta.secs.hsms.HsmsCommunicateState;
+import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
+import com.shimizukenta.secs.hsms.HsmsMessageSelectStatus;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2BytesPack;
@@ -43,7 +46,7 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 	private final HsmsSsCommunicatorConfig hsmsSsConfig;
 	
 	private final ByteArrayProperty sessionIdBytes = ByteArrayProperty.newInstance(new byte[] {0, 0});
-	private final Property<HsmsSsCommunicateState> hsmsSsCommStateProperty = Property.newInstance(HsmsSsCommunicateState.NOT_CONNECTED);
+	private final Property<HsmsCommunicateState> hsmsCommStateProperty = Property.newInstance(HsmsCommunicateState.NOT_CONNECTED);
 	
 	private AbstractInnerConnection selectedConnection;
 	
@@ -72,11 +75,11 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 	public void open() throws IOException {
 		super.open();
 		
-		this.hsmsSsCommStateProperty.addChangeListener(state -> {
+		this.hsmsCommStateProperty.addChangeListener(state -> {
 			notifyLog(HsmsSsCommunicateStateChangeLog.get(state));
 		});
 		
-		this.hsmsSsCommStateProperty.addChangeListener(state -> {
+		this.hsmsCommStateProperty.addChangeListener(state -> {
 			notifyCommunicatableStateChange(state.communicatable());
 		});
 	}
@@ -124,12 +127,12 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 	}
 	
 	/* HSMS Communicate State */
-	protected HsmsSsCommunicateState hsmsSsCommunicateState() {
-		return hsmsSsCommStateProperty.get();
+	protected HsmsCommunicateState hsmsSsCommunicateState() {
+		return hsmsCommStateProperty.get();
 	}
 	
-	protected void notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState state) {
-		hsmsSsCommStateProperty.set(state);
+	protected void notifyHsmsSsCommunicateStateChange(HsmsCommunicateState state) {
+		hsmsCommStateProperty.set(state);
 	}
 	
 	
@@ -282,7 +285,7 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 	}
 	
 	@Override
-	public HsmsSsMessage createSelectResponse(HsmsSsMessage primary, HsmsSsMessageSelectStatus status) {
+	public HsmsSsMessage createSelectResponse(HsmsSsMessage primary, HsmsMessageSelectStatus status) {
 		
 		HsmsSsMessageType mt = HsmsSsMessageType.SELECT_RSP;
 		byte[] pri = primary.header10Bytes();
@@ -327,11 +330,11 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 	}
 	
 	@Override
-	public HsmsSsMessage createRejectRequest(HsmsSsMessage ref, HsmsSsMessageRejectReason reason) {
+	public HsmsSsMessage createRejectRequest(HsmsSsMessage ref, HsmsMessageRejectReason reason) {
 		
 		HsmsSsMessageType mt = HsmsSsMessageType.REJECT_REQ;
 		byte[] bs = ref.header10Bytes();
-		byte b = reason == HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P ? bs[4] : bs[5];
+		byte b = reason == HsmsMessageRejectReason.NOT_SUPPORT_TYPE_P ? bs[4] : bs[5];
 		
 		return createHsmsSsMessage(new byte[] {
 				bs[0],

@@ -213,12 +213,29 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 		return msgRecvListeners.remove(Objects.requireNonNull(l));
 	}
 	
+	private final Collection<SecsMessageReceiveBiListener> msgRecvBiListeners = new CopyOnWriteArrayList<>();
+	
+	@Override
+	public boolean addSecsMessageReceiveListener(SecsMessageReceiveBiListener l) {
+		return msgRecvBiListeners.add(Objects.requireNonNull(l));
+	}
+	
+	@Override
+	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveBiListener l) {
+		return msgRecvBiListeners.remove(Objects.requireNonNull(l));
+	}
+	
 	private final BlockingQueue<SecsMessage> msgRecvQueue = new LinkedBlockingQueue<>();
 	
 	private void executeMsgRecvQueueTask() {
 		executeLoopTask(() -> {
 			SecsMessage msg = msgRecvQueue.take();
-			msgRecvListeners.forEach(l -> {l.received(msg);});
+			msgRecvListeners.forEach(l -> {
+				l.received(msg);
+			});
+			msgRecvBiListeners.forEach(l -> {
+				l.received(msg, this);
+			});
 		});
 	}
 	

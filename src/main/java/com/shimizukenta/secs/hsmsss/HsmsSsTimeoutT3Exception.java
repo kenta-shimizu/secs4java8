@@ -2,6 +2,7 @@ package com.shimizukenta.secs.hsmsss;
 
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 
+@Deprecated
 public class HsmsSsTimeoutT3Exception extends SecsWaitReplyMessageException {
 	
 	private static final long serialVersionUID = -4951833148190707156L;

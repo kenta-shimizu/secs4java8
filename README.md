@@ -1,5 +1,7 @@
 # secs4java8
 
+building...
+
 ## Introduction
 
 This library is SEMI-SECS-communicate implementation on Java8.
@@ -9,7 +11,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
 - SECS-I (SEMI-E4)
 - SECS-II (SEMI-E5)
 - GEM (SEMI-E30, partially)
-- HSMS-SS (SEMI-E37.1)
+- HSMS (SEMI-E37, SEMI-E37.1, SEMI-E37.2)
 - [SML (PEER Group)](https://www.peergroup.com/expertise/resources/secs-message-language/)
 
 ## Create Communicator instance and open
@@ -19,14 +21,14 @@ This library is SEMI-SECS-communicate implementation on Java8.
 ```java
     /* HSMS-SS-Passive open example */
     HsmsSsCommunicatorConfig config = new HsmsSsCommunicatorConfig();
-    config.protocol(HsmsSsProtocol.PASSIVE);
+    config.connectionMode(HsmsConnectionMode.PASSIVE);
     config.socketAddress(new InetSocketAddress("127.0.0.1", 5000));
     config.sessionId(10);
     config.isEquip(true);
     config.timeout().t3(45.0F);
     config.timeout().t6( 5.0F);
     config.timeout().t7(10.0F);
-    config.timeout().t8( 6.0F);
+    config.timeout().t8( 5.0F);
     config.gem().mdln("MDLN-A");
     config.gem().softrev("000001");
     config.gem().clockType(ClockType.A16);
@@ -39,19 +41,23 @@ This library is SEMI-SECS-communicate implementation on Java8.
 ```java
     /* HSMS-SS-Active open example */
     HsmsSsCommunicatorConfig config = new HsmsSsCommunicatorConfig();
-    config.protocol(HsmsSsProtocol.ACTIVE);
+    config.connectionMode(HsmsConnectionMode.ACTIVE);
     config.socketAddress(new InetSocketAddress("127.0.0.1", 5000));
     config.sessionId(10);
     config.isEquip(false);
     config.timeout().t3(45.0F);
     config.timeout().t5(10.0F);
     config.timeout().t6( 5.0F);
-    config.timeout().t8( 6.0F);
+    config.timeout().t8( 5.0F);
     config.linktest(120.0F);
     config.gem().clockType(ClockType.A16);
 
     SecsCommunicator active = HsmsSsCommunicator.open(config);
 ```
+
+- For Use HSMS-GS
+
+  to Special page. building...
 
 - For use SECS-I (onTcpIp) example
 

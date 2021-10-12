@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import com.shimizukenta.secs.SecsException;
+import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 
 /**
  * This abstract class is implementation of HSMS-SS-Active-Communicator(SEMI-E37.1).
@@ -32,8 +33,8 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 	@Override
 	public void open() throws IOException {
 		
-		if ( hsmsSsConfig().protocol().get() != HsmsSsProtocol.ACTIVE ) {
-			throw new IOException("HsmsSsCommunicatorConfig#protocol is not ACTIVE");
+		if ( hsmsSsConfig().connectionMode().get() != HsmsConnectionMode.ACTIVE ) {
+			throw new IOException("HsmsSsCommunicatorConfig#connectionMode is not ACTIVE");
 		}
 		
 		super.open();

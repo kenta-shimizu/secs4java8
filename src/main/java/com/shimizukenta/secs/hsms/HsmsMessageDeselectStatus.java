@@ -1,6 +1,6 @@
-package com.shimizukenta.secs.hsmsgs;
+package com.shimizukenta.secs.hsms;
 
-public enum HsmsGsMessageDeselectStatus {
+public enum HsmsMessageDeselectStatus {
 
 	NOT_DESELECT_RSP((byte)0xFF),
 	UNKNOWN((byte)0xFF),
@@ -13,7 +13,7 @@ public enum HsmsGsMessageDeselectStatus {
 	
 	private final byte status;
 	
-	private HsmsGsMessageDeselectStatus(byte status) {
+	private HsmsMessageDeselectStatus(byte status) {
 		this.status = status;
 	}
 	
@@ -21,9 +21,9 @@ public enum HsmsGsMessageDeselectStatus {
 		return status;
 	}
 	
-	public static HsmsGsMessageDeselectStatus get(byte b) {
+	public static HsmsMessageDeselectStatus get(byte b) {
 		
-		for ( HsmsGsMessageDeselectStatus s : values() ) {
+		for ( HsmsMessageDeselectStatus s : values() ) {
 			
 			if ( s == NOT_DESELECT_RSP ) continue;
 			if ( s == UNKNOWN ) continue;
@@ -35,11 +35,11 @@ public enum HsmsGsMessageDeselectStatus {
 		return UNKNOWN;
 	}
 	
-	public static HsmsGsMessageDeselectStatus get(HsmsGsMessage msg) {
+	public static HsmsMessageDeselectStatus get(HsmsMessage msg) {
 		
-		HsmsGsMessageType type = HsmsGsMessageType.get(msg);
+		HsmsMessageType type = HsmsMessageType.get(msg);
 		
-		if ( type == HsmsGsMessageType.DESELECT_RSP ) {
+		if ( type == HsmsMessageType.DESELECT_RSP ) {
 			
 			byte[] head = msg.header10Bytes();
 			byte b = head[3];

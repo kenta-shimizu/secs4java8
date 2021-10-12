@@ -1,6 +1,6 @@
-package com.shimizukenta.secs.hsmsss;
+package com.shimizukenta.secs.hsms;
 
-public enum HsmsSsMessageSelectStatus {
+public enum HsmsMessageSelectStatus {
 	
 	NOT_SELECT_RSP((byte)0xFF),
 	UNKNOWN((byte)0xFF),
@@ -10,11 +10,13 @@ public enum HsmsSsMessageSelectStatus {
 	NOT_READY((byte)2),
 	ALREADY_USED((byte)3),
 	
+	//TODO
+	
 	;
 	
 	private final byte status;
 	
-	private HsmsSsMessageSelectStatus(byte status) {
+	private HsmsMessageSelectStatus(byte status) {
 		this.status = status;
 	}
 	
@@ -22,9 +24,9 @@ public enum HsmsSsMessageSelectStatus {
 		return status;
 	}
 	
-	public static HsmsSsMessageSelectStatus get(byte b) {
+	public static HsmsMessageSelectStatus get(byte b) {
 		
-		for ( HsmsSsMessageSelectStatus s : values() ) {
+		for ( HsmsMessageSelectStatus s : values() ) {
 			
 			if ( s == NOT_SELECT_RSP ) continue;
 			if ( s == UNKNOWN ) continue;
@@ -36,11 +38,11 @@ public enum HsmsSsMessageSelectStatus {
 		return UNKNOWN;
 	}
 	
-	public static HsmsSsMessageSelectStatus get(HsmsSsMessage msg) {
+	public static HsmsMessageSelectStatus get(HsmsMessage msg) {
 		
-		HsmsSsMessageType type = HsmsSsMessageType.get(msg);
+		HsmsMessageType type = HsmsMessageType.get(msg);
 		
-		if ( type == HsmsSsMessageType.SELECT_RSP ) {
+		if ( type == HsmsMessageType.SELECT_RSP ) {
 			
 			byte[] head = msg.header10Bytes();
 			byte b = head[3];

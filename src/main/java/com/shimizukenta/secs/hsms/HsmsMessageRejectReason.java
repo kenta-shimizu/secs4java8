@@ -1,6 +1,6 @@
-package com.shimizukenta.secs.hsmsss;
+package com.shimizukenta.secs.hsms;
 
-public enum HsmsSsMessageRejectReason {
+public enum HsmsMessageRejectReason {
 	
 	NOT_REJECT_REQ((byte)0xFF),
 	UNKNOWN((byte)0xFF),
@@ -14,7 +14,7 @@ public enum HsmsSsMessageRejectReason {
 	
 	private final byte reason;
 	
-	private HsmsSsMessageRejectReason(byte reason) {
+	private HsmsMessageRejectReason(byte reason) {
 		this.reason = reason;
 	}
 	
@@ -22,9 +22,9 @@ public enum HsmsSsMessageRejectReason {
 		return reason;
 	}
 	
-	public static HsmsSsMessageRejectReason get(byte b) {
+	public static HsmsMessageRejectReason get(byte b) {
 		
-		for ( HsmsSsMessageRejectReason r : values() ) {
+		for ( HsmsMessageRejectReason r : values() ) {
 			if ( r == UNKNOWN ) continue;
 			if ( r.reason == b ) {
 				return r;
@@ -34,11 +34,11 @@ public enum HsmsSsMessageRejectReason {
 		return UNKNOWN;
 	}
 	
-	public static HsmsSsMessageRejectReason get(HsmsSsMessage msg) {
+	public static HsmsMessageRejectReason get(HsmsMessage msg) {
 		
-		HsmsSsMessageType type = HsmsSsMessageType.get(msg);
+		HsmsMessageType type = HsmsMessageType.get(msg);
 		
-		if ( type == HsmsSsMessageType.REJECT_REQ ) {
+		if ( type == HsmsMessageType.REJECT_REQ ) {
 			
 			byte[] head = msg.header10Bytes();
 			byte b = head[3];
@@ -46,7 +46,7 @@ public enum HsmsSsMessageRejectReason {
 			
 		} else {
 			
-			return HsmsSsMessageRejectReason.NOT_REJECT_REQ;
+			return HsmsMessageRejectReason.NOT_REJECT_REQ;
 		}
 	}
 	

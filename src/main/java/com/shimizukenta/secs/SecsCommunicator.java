@@ -280,6 +280,27 @@ public interface SecsCommunicator extends Closeable {
 	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveListener lstnr);
 	
 	
+	/**
+	 * Add Listener to receive Primary-Message.
+	 * 
+	 * <p>
+	 * This Listener not receive Reply-Message.<br />
+	 * </p>
+	 * 
+	 * @param lstnr Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addSecsMessageReceiveListener(SecsMessageReceiveBiListener lstnr);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param lstnr Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveBiListener lstnr);
+	
+	
 	/* Secs-Log Receive Listener */
 	
 	/**

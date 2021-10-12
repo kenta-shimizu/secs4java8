@@ -2,6 +2,7 @@ package com.shimizukenta.secs.hsmsss;
 
 import com.shimizukenta.secs.SecsException;
 
+@Deprecated
 public class HsmsSsTimeoutT8Exception extends SecsException {
 	
 	private static final long serialVersionUID = -4355197912954437862L;

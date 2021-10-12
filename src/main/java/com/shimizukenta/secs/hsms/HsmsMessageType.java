@@ -1,6 +1,6 @@
-package com.shimizukenta.secs.hsmsgs;
+package com.shimizukenta.secs.hsms;
 
-public enum HsmsGsMessageType {
+public enum HsmsMessageType {
 	
 	UNDEFINED( (byte)0x80, (byte)0x80 ),
 	
@@ -19,7 +19,7 @@ public enum HsmsGsMessageType {
 	private final byte p;
 	private final byte s;
 	
-	private HsmsGsMessageType(byte p, byte s) {
+	private HsmsMessageType(byte p, byte s) {
 		this.p = p;
 		this.s = s;
 	}
@@ -32,9 +32,9 @@ public enum HsmsGsMessageType {
 		return s;
 	}
 	
-	public static HsmsGsMessageType get(byte p, byte s) {
+	public static HsmsMessageType get(byte p, byte s) {
 		
-		for ( HsmsGsMessageType t : values() ) {
+		for ( HsmsMessageType t : values() ) {
 			if ( t != UNDEFINED && t.p == p && t.s == s ) {
 				return t;
 			}
@@ -43,7 +43,7 @@ public enum HsmsGsMessageType {
 		return UNDEFINED;
 	}
 	
-	public static HsmsGsMessageType get(HsmsGsMessage msg) {
+	public static HsmsMessageType get(HsmsMessage msg) {
 		
 		byte[] head = msg.header10Bytes();
 		byte p = head[4];
@@ -54,7 +54,7 @@ public enum HsmsGsMessageType {
 	
 	public static boolean supportPType(byte p) {
 		
-		for ( HsmsGsMessageType t : values() ) {
+		for ( HsmsMessageType t : values() ) {
 			if ( t != UNDEFINED && t.p == p ) {
 				return true;
 			}
@@ -63,7 +63,7 @@ public enum HsmsGsMessageType {
 		return false;
 	}
 	
-	public static boolean supportPType(HsmsGsMessage msg) {
+	public static boolean supportPType(HsmsMessage msg) {
 		byte[] head = msg.header10Bytes();
 		byte p = head[4];
 		return supportPType(p);
@@ -71,7 +71,7 @@ public enum HsmsGsMessageType {
 	
 	public static boolean supportSType(byte s) {
 		
-		for ( HsmsGsMessageType t : values() ) {
+		for ( HsmsMessageType t : values() ) {
 			if ( t != UNDEFINED && t.s == s ) {
 				return true;
 			}
@@ -80,7 +80,7 @@ public enum HsmsGsMessageType {
 		return false;
 	}
 	
-	public static boolean supportSType(HsmsGsMessage msg) {
+	public static boolean supportSType(HsmsMessage msg) {
 		byte[] head = msg.header10Bytes();
 		byte s = head[5];
 		return supportPType(s);

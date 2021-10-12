@@ -7,6 +7,8 @@ import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
+import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
+import com.shimizukenta.secs.hsms.HsmsMessageSelectStatus;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
@@ -31,7 +33,7 @@ public interface HsmsSsCommunicator extends SecsCommunicator {
 	 */
 	public static HsmsSsCommunicator newInstance(HsmsSsCommunicatorConfig config) {
 		
-		switch ( config.protocol().get() ) {
+		switch ( config.connectionMode().get() ) {
 		case PASSIVE: {
 			
 			if ( config.rebindIfPassive().geZero() ) {
@@ -51,7 +53,7 @@ public interface HsmsSsCommunicator extends SecsCommunicator {
 		}
 		default: {
 			
-			throw new IllegalStateException("undefined protocol: " + config.protocol());
+			throw new IllegalStateException("undefined protocol: " + config.connectionMode());
 		}
 		}
 	}
@@ -148,7 +150,7 @@ public interface HsmsSsCommunicator extends SecsCommunicator {
 	 * @param select-status
 	 * @return Select-Response-HsmsSsMessage
 	 */
-	public HsmsSsMessage createSelectResponse(HsmsSsMessage primary, HsmsSsMessageSelectStatus status);
+	public HsmsSsMessage createSelectResponse(HsmsSsMessage primary, HsmsMessageSelectStatus status);
 	
 	/**
 	 * Create Linktest-Request.
@@ -172,7 +174,7 @@ public interface HsmsSsCommunicator extends SecsCommunicator {
 	 * @param reason
 	 * @return Reject-Request-HsmsSsMessage
 	 */
-	public HsmsSsMessage createRejectRequest(HsmsSsMessage ref, HsmsSsMessageRejectReason reason);
+	public HsmsSsMessage createRejectRequest(HsmsSsMessage ref, HsmsMessageRejectReason reason);
 	
 	/**
 	 * Create Separate-Request.

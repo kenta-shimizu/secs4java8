@@ -2,6 +2,7 @@ package com.shimizukenta.secs.hsmsss;
 
 import com.shimizukenta.secs.SecsSendMessageException;
 
+@Deprecated
 public class HsmsSsSendMessageException extends SecsSendMessageException {
 	
 	private static final long serialVersionUID = -4647225535173892949L;

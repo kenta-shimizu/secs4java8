@@ -1,4 +1,4 @@
-package com.shimizukenta.secs.hsmsgs;
+package com.shimizukenta.secs.hsms;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -11,7 +11,7 @@ import com.shimizukenta.secs.secs2.Secs2;
  * @author kenta-shimizu
  *
  */
-public class HsmsGsMessage extends AbstractSecsMessage {
+public class HsmsMessage extends AbstractSecsMessage {
 
 	private static final long serialVersionUID = -2949160778467912989L;
 
@@ -20,7 +20,7 @@ public class HsmsGsMessage extends AbstractSecsMessage {
 	private final byte[] head;
 	private final Secs2 body;
 	
-	public HsmsGsMessage(byte[] head, Secs2 body) {
+	public HsmsMessage(byte[] head, Secs2 body) {
 		
 		Objects.requireNonNull(head);
 		Objects.requireNonNull(body);
@@ -33,7 +33,7 @@ public class HsmsGsMessage extends AbstractSecsMessage {
 		this.body = body;
 	}
 
-	public HsmsGsMessage(byte[] head) {
+	public HsmsMessage(byte[] head) {
 		this(head, Secs2.empty());
 	}
 	

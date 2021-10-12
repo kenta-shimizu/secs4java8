@@ -104,7 +104,7 @@ public class HsmsSsReplyMessageManager {
 		}
 	}
 	
-	private static class Pack {
+	private class Pack {
 		
 		private HsmsSsMessage replyMsg;
 		

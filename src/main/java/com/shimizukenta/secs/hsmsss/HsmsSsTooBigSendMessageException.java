@@ -1,5 +1,6 @@
 package com.shimizukenta.secs.hsmsss;
 
+@Deprecated
 public class HsmsSsTooBigSendMessageException extends HsmsSsSendMessageException {
 	
 	private static final long serialVersionUID = -5088584094004132950L;
