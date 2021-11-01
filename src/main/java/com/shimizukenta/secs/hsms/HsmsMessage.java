@@ -1,103 +1,15 @@
 package com.shimizukenta.secs.hsms;
 
-import java.util.Arrays;
-import java.util.Objects;
+import com.shimizukenta.secs.SecsMessage;
 
-import com.shimizukenta.secs.AbstractSecsMessage;
-import com.shimizukenta.secs.secs2.Secs2;
-
-/**
- * 
- * @author kenta-shimizu
- *
- */
-public class HsmsMessage extends AbstractSecsMessage {
-
-	private static final long serialVersionUID = -2949160778467912989L;
-
-	private static final int HEAD_SIZE = 10;
+public interface HsmsMessage extends SecsMessage {
 	
-	private final byte[] head;
-	private final Secs2 body;
+	public HsmsMessageType messageType();
 	
-	public HsmsMessage(byte[] head, Secs2 body) {
-		
-		Objects.requireNonNull(head);
-		Objects.requireNonNull(body);
-		
-		if ( head.length != HEAD_SIZE ) {
-			throw new IllegalArgumentException("head size is not " + HEAD_SIZE);
-		}
-		
-		this.head = Arrays.copyOf(head, HEAD_SIZE);
-		this.body = body;
-	}
-
-	public HsmsMessage(byte[] head) {
-		this(head, Secs2.empty());
-	}
+	public boolean isDataMessage();
 	
-	@Override
-	public int getStream() {
-		//TODO
-		return 0;
-	}
-
-	@Override
-	public int getFunction() {
-		//TODO
-		return 0;
-	}
-
-	@Override
-	public boolean wbit() {
-		//TODO
-		return false;
-	}
-
-	@Override
-	public Secs2 secs2() {
-		return body;
-	}
+	public byte pType();
 	
-	@Override
-	public int deviceId() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	public byte sType();
 	
-	@Override
-	public int sessionId() {
-		//TODO
-		
-		return -1;
-	}
-
-	protected boolean dataMessage() {
-		
-		//TODO
-		
-		return false;
-	}
-	
-	@Override
-	public byte[] header10Bytes() {
-		return Arrays.copyOf(head, head.length);
-	}
-	
-	@Override
-	public String toString() {
-		//TODO
-		
-		return "";
-	}
-	
-	@Override
-	public String toJson() {
-		
-		//TODO
-		
-		return "";
-	}
-
 }

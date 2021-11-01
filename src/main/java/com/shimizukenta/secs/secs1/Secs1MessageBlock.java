@@ -1,102 +1,70 @@
 package com.shimizukenta.secs.secs1;
 
-import java.io.Serializable;
-import java.util.Arrays;
-
-public class Secs1MessageBlock implements Serializable {
+public interface Secs1MessageBlock {
 	
-	private static final long serialVersionUID = -4733761372402097825L;
+	/**
+	 * Returns Block Device-ID number.
+	 * 
+	 * @return Device-ID
+	 */
+	public int deviceId();
 	
-	public static final int ZERO = 0;
-	public static final int ONE  = 1;
+	/**
+	 * Returns Block E-Bit.
+	 * 
+	 * @return true if has e-bit
+	 */
+	public boolean ebit();
 	
-	private final int length;
-	private final byte[] bytes;
+	/**
+	 * Returns Block number.
+	 * 
+	 * @return block number
+	 */
+	public int blockNumber();
 	
-	public Secs1MessageBlock(byte[] bytes) {
-		this.length = ((int)bytes[0]) & 0x000000FF;
-		this.bytes = Arrays.copyOf(bytes, this.length + 3);
-	}
+	/**
+	 * Return Block is First.
+	 * 
+	 * @return true if block-number is ZERO or ONE
+	 */
+	public boolean isFirstBlock();
 	
-	public int deviceId() {
-		return (((int)(bytes[1]) << 8) & 0x00007F00) | (bytes[2] & 0x000000FF);
-	}
+	/**
+	 * Returns Length-byte number.
+	 * 
+	 * @return Length-byte number
+	 */
+	public int length();
 	
-	public boolean ebit() {
-		return (bytes[5] & 0x80) == 0x80;
-	}
+	/**
+	 * Returns Block bytes.
+	 * 
+	 * @return Block bytes
+	 */
+	public byte[] getBytes();
 	
-	public int blockNumber() {
-		return (((int)(bytes[5]) << 8) & 0x00007F00) | ((int)(bytes[6]) & 0x000000FF);
-	}
+	/**
+	 * Returns Check SUM result.
+	 * 
+	 * @return true if check-sum is valid
+	 */
+	public boolean checkSum();
 	
-	public boolean isFirst() {
-		int n = blockNumber();
-		return n == ONE || n == ZERO;
-	}
+	/**
+	 * Returns Block system bytes is equals.
+	 * 
+	 * @param otherBlock
+	 * @return true if system bytes is equals
+	 */
+	public boolean equalsSystemBytes(Secs1MessageBlock otherBlock);
 	
-	public byte[] getBytes() {
-		return Arrays.copyOf(bytes, bytes.length);
-	}
-	
-	public Integer systemBytesKey() {
-		int i = ((int)(bytes[7]) << 24) & 0xFF000000;
-		i |= ((int)(bytes[8]) << 16) & 0x00FF0000;
-		i |= ((int)(bytes[9]) <<  8) & 0x0000FF00;
-		i |= (int)(bytes[10]) & 0x000000FF;
-		return Integer.valueOf(i);
-	}
-	
-	private int length() {
-		return this.length;
-	}
-	
-	public boolean sumCheck() {
-		
-		try {
-			int sum = (((int)(bytes[this.length() + 1]) << 8) & 0xFF00)
-					| ((int)(bytes[this.length() + 2]) & 0xFF);
-			
-			for ( int i = this.length(); i > 0; --i ) {
-				sum -= ((int)bytes[i]) & 0x000000FF;
-			}
-			
-			return sum == 0;
-		}
-		catch ( IndexOutOfBoundsException e ) {
-			return false;
-		}
-	}
-	
-	public boolean sameSystemBytes(Secs1MessageBlock block) {
-		return block.systemBytesKey().equals(systemBytesKey());
-	}
-	
-	public boolean isNextBlock(Secs1MessageBlock block) {
-		return block.blockNumber() == (this.blockNumber() + 1);
-	}
-	
-	@Override
-	public String toString() {
-		
-		try {
-			return new StringBuilder()
-					.append("[").append(String.format("%02X", bytes[1]))
-					.append(" ").append(String.format("%02X", bytes[2]))
-					.append("|").append(String.format("%02X", bytes[3]))
-					.append(" ").append(String.format("%02X", bytes[4]))
-					.append("|").append(String.format("%02X", bytes[5]))
-					.append(" ").append(String.format("%02X", bytes[6]))
-					.append("|").append(String.format("%02X", bytes[7]))
-					.append(" ").append(String.format("%02X", bytes[8]))
-					.append(" ").append(String.format("%02X", bytes[9]))
-					.append(" ").append(String.format("%02X", bytes[10]))
-					.append("] length: ").append(length())
-					.toString();
-		}
-		catch ( IndexOutOfBoundsException e ) {
-			return "#toString failed";
-		}
-	}
+	/**
+	 * Returns nextBlock is next block.
+	 * 
+	 * @param nextBlock
+	 * @return true if nextBlock is next block.
+	 */
+	public boolean isNextBlock(Secs1MessageBlock nextBlock);
 	
 }

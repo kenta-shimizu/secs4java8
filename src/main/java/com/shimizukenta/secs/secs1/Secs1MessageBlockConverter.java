@@ -25,19 +25,19 @@ public class Secs1MessageBlockConverter {
 		return SingletonHolder.inst;
 	}
 	
-	public static List<Secs1MessageBlock> toBlocks(Secs1Message msg) throws Secs1SendMessageException {
+	public static List<Secs1MessageBlock> toBlocks(AbstractSecs1Message msg) throws Secs1SendMessageException {
 		return getInstance()._toBlocks(msg);
 	}
 	
-	public static Secs1Message toSecs1Message(List<Secs1MessageBlock> blocks) throws Secs2Exception {
+	public static AbstractSecs1Message toSecs1Message(List<? extends Secs1MessageBlock> blocks) throws Secs2Exception {
 		return getInstance()._toSecs1Message(blocks);
 	}
 	
 	
-	private List<Secs1MessageBlock> _toBlocks(Secs1Message msg) throws Secs1SendMessageException {
+	private List<SimpleSecs1MessageBlock> _toBlocks(SimpleSecs1Message msg) throws Secs1SendMessageException {
 		
 		try {
-			final List<Secs1MessageBlock> blocks = new ArrayList<>();
+			final List<SimpleSecs1MessageBlock> blocks = new ArrayList<>();
 			
 			byte[] head = msg.header10Bytes();
 			
@@ -51,7 +51,7 @@ public class Secs1MessageBlockConverter {
 				throw new Secs1TooBigSendMessageException(msg);
 			}
 			
-			int blockNum = Secs1MessageBlock.ONE;
+			int blockNum = SimpleSecs1MessageBlock.ONE;
 			int m = ll.size() - 1;
 			
 			for ( int i = 0; i < m; ++i ) {
@@ -68,7 +68,7 @@ public class Secs1MessageBlockConverter {
 		}
 	}
 	
-	private Secs1MessageBlock buildBlock(byte[] head, byte[] body, boolean ebit, int blockNumber) {
+	private SimpleSecs1MessageBlock buildBlock(byte[] head, byte[] body, boolean ebit, int blockNumber) {
 		
 		int len = head.length + body.length;
 		
@@ -108,21 +108,21 @@ public class Secs1MessageBlockConverter {
 		bs[pos] = (byte)(sum >> 8);
 		bs[pos + 1] = (byte)sum;
 		
-		return new Secs1MessageBlock(bs);
+		return new SimpleSecs1MessageBlock(bs);
 	}
 	
-	private Secs1Message _toSecs1Message(List<Secs1MessageBlock> blocks) throws Secs2Exception {
+	private SimpleSecs1Message _toSecs1Message(List<SimpleSecs1MessageBlock> blocks) throws Secs2Exception {
 		
 		byte[] head = Arrays.copyOfRange(blocks.get(blocks.size() - 1).getBytes(), 1, 11);
 		
 		List<byte[]> bss = blocks.stream()
-				.map(Secs1MessageBlock::getBytes)
+				.map(SimpleSecs1MessageBlock::getBytes)
 				.map(bs -> Arrays.copyOfRange(bs, 11, bs.length - 2))
 				.collect(Collectors.toList());
 		
 		Secs2 body = Secs2BytesParser.getInstance().parse(bss);
 		
-		return new Secs1Message(head, body);
+		return new SimpleSecs1Message(head, body);
 	}
 	
 }

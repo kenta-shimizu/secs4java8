@@ -91,7 +91,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	}
 	
 	@Override
-	public Optional<Secs1Message> send(Secs1Message msg)
+	public Optional<SimpleSecs1Message> send(SimpleSecs1Message msg)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -111,7 +111,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 					
 					this.sendMgr.waitUntilSended(msg);
 					
-					Optional<Secs1Message> r = this.replyMgr.reply(msg, this.secs1Config().timeout().t3());
+					Optional<SimpleSecs1Message> r = this.replyMgr.reply(msg, this.secs1Config().timeout().t3());
 					
 					if ( ! r.isPresent() ) {
 						throw new Secs1TimeoutT3Exception(msg);
@@ -152,13 +152,13 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	}
 	
 	@Override
-	public Secs1Message createSecs1Message(byte[] header) {
+	public AbstractSecs1Message createSecs1Message(byte[] header) {
 		return createSecs1Message(header, Secs2.empty());
 	}
 	
 	@Override
-	public Secs1Message createSecs1Message(byte[] header, Secs2 body) {
-		return new Secs1Message(header, body);
+	public AbstractSecs1Message createSecs1Message(byte[] header, Secs2 body) {
+		return new SimpleSecs1Message(header, body);
 	}
 	
 	private final AtomicInteger autoNumber = new AtomicInteger();
@@ -329,7 +329,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	private boolean sendCircuit(Secs1MessageBlock block)
+	private boolean sendCircuit(SimpleSecs1MessageBlock block)
 			throws SecsSendMessageException, SecsException, InterruptedException {
 		
 		this.notifyLog(new Secs1TrySendMessageBlockLog(block));
@@ -355,7 +355,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		}
 	}
 	
-	private final LinkedList<Secs1MessageBlock> cacheBlocks = new LinkedList<>();
+	private final LinkedList<SimpleSecs1MessageBlock> cacheBlocks = new LinkedList<>();
 	
 	private void receiveCircuit() throws SecsException, InterruptedException {
 		
@@ -397,7 +397,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			}
 		}
 		
-		Secs1MessageBlock block = new Secs1MessageBlock(bs);
+		SimpleSecs1MessageBlock block = new SimpleSecs1MessageBlock(bs);
 		
 		if ( block.sumCheck() ) {
 			
@@ -423,7 +423,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			
 		} else {
 			
-			Secs1MessageBlock prev = this.cacheBlocks.getLast();
+			SimpleSecs1MessageBlock prev = this.cacheBlocks.getLast();
 			
 			if ( prev.sameSystemBytes(block) ) {
 				
@@ -441,7 +441,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		if ( block.ebit() ) {
 			
 			try {
-				Secs1Message s1msg = Secs1MessageBlockConverter.toSecs1Message(this.cacheBlocks);
+				SimpleSecs1Message s1msg = Secs1MessageBlockConverter.toSecs1Message(this.cacheBlocks);
 				
 				this.replyMgr.put(s1msg).ifPresent(m -> {
 					this.offerMsgRecvQueue(m);

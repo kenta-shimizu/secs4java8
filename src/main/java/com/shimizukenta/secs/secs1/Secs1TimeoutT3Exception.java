@@ -1,26 +1,8 @@
 package com.shimizukenta.secs.secs1;
 
-import com.shimizukenta.secs.SecsWaitReplyMessageException;
-
-public class Secs1TimeoutT3Exception extends SecsWaitReplyMessageException {
+public class Secs1TimeoutT3Exception extends Secs1WaitReplyMessageException {
 	
-	private static final long serialVersionUID = 7313332817972338765L;
-
-	public Secs1TimeoutT3Exception() {
-		super();
-	}
-
-	public Secs1TimeoutT3Exception(String message) {
-		super(message);
-	}
-
-	public Secs1TimeoutT3Exception(Throwable cause) {
-		super(cause);
-	}
-
-	public Secs1TimeoutT3Exception(String message, Throwable cause) {
-		super(message, cause);
-	}
+	private static final long serialVersionUID = -2366554276167734382L;
 
 	public Secs1TimeoutT3Exception(Secs1Message primaryMessage) {
 		super(primaryMessage);

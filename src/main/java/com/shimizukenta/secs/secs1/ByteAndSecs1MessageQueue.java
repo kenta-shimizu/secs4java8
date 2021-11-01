@@ -41,9 +41,9 @@ public final class ByteAndSecs1MessageQueue {
 		}
 	}
 	
-	public void putSecs1Message(Secs1Message msg) throws Secs1SendMessageException, InterruptedException {
+	public void putSecs1Message(AbstractSecs1Message msg) throws Secs1SendMessageException, InterruptedException {
 		synchronized ( sync ) {
-			mm.add(Secs1MessageBlockPack.get(msg));
+			mm.add(new Secs1MessageBlockPack(msg));
 			sync.notifyAll();
 		}
 	}

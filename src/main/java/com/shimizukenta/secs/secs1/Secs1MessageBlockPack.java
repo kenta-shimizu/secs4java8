@@ -5,17 +5,17 @@ import java.util.List;
 
 public final class Secs1MessageBlockPack {
 	
-	private final Secs1Message msg;
+	private final AbstractSecs1Message msg;
 	private final List<Secs1MessageBlock> blocks;
 	private int present;
 	
-	private Secs1MessageBlockPack(Secs1Message msg, List<Secs1MessageBlock> blocks) {
+	public Secs1MessageBlockPack(AbstractSecs1Message msg) {
 		this.msg = msg;
-		this.blocks = new ArrayList<>(blocks);
+		this.blocks = new ArrayList<>(msg.toBlocks());
 		this.present = 0;
 	}
 	
-	public Secs1Message message() {
+	public AbstractSecs1Message message() {
 		return msg;
 	}
 	
@@ -35,7 +35,4 @@ public final class Secs1MessageBlockPack {
 		return this.blocks.get(this.present).ebit();
 	}
 	
-	public static Secs1MessageBlockPack get(Secs1Message msg) throws Secs1SendMessageException {
-		return new Secs1MessageBlockPack(msg, msg.toBlocks());
-	}
 }

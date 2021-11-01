@@ -7,14 +7,17 @@ public abstract class AbstractSecsMessage implements SecsMessage, Serializable {
 	private static final long serialVersionUID = 6003913058174391972L;
 	
 	private final Object sync = new Object();
-	private Integer systemBytesKey;
-	private String toHeaderBytesString;
-	private String toJson;
+	
+	private Integer cacheSystemBytesKey;
+	private String cacheToJson;
+	private String cacheToHeaderBytesString;
+	private String cacheToString;
 	
 	protected AbstractSecsMessage() {
-		this.systemBytesKey = null;
-		this.toHeaderBytesString = null;
-		this.toJson = null;
+		this.cacheSystemBytesKey = null;
+		this.cacheToJson = null;
+		this.cacheToHeaderBytesString = null;
+		this.cacheToString = null;
 	}
 	
 	/**
@@ -26,7 +29,7 @@ public abstract class AbstractSecsMessage implements SecsMessage, Serializable {
 		
 		synchronized ( sync ) {
 			
-			if ( this.systemBytesKey == null ) {
+			if ( this.cacheSystemBytesKey == null ) {
 				
 				byte[] bs = this.header10Bytes();
 				int i = ((int)(bs[6]) << 24) & 0xFF000000;
@@ -34,10 +37,22 @@ public abstract class AbstractSecsMessage implements SecsMessage, Serializable {
 				i |= ((int)(bs[8]) <<  8) & 0x0000FF00;
 				i |= (int)(bs[9]) & 0x000000FF;
 				
-				this.systemBytesKey = Integer.valueOf(i);
+				this.cacheSystemBytesKey = Integer.valueOf(i);
 			}
 			
-			return this.systemBytesKey;
+			return this.cacheSystemBytesKey;
+		}
+	}
+	
+	abstract protected String toJsonProxy();
+	
+	@Override
+	public String toJson() {
+		synchronized ( sync ) {
+			if ( this.cacheToJson == null ) {
+				this.cacheToJson = this.toJsonProxy();
+			}
+			return this.cacheToJson;
 		}
 	}
 	
@@ -46,15 +61,15 @@ public abstract class AbstractSecsMessage implements SecsMessage, Serializable {
 	 * 
 	 * @return Header 10 bytes String
 	 */
-	public String toHeaderBytesString() {
+	protected String toHeaderBytesString() {
 		
 		synchronized ( sync ) {
 			
-			if ( this.toHeaderBytesString == null ) {
+			if ( this.cacheToHeaderBytesString == null ) {
 				
 				byte[] bs = header10Bytes();
 				
-				this.toHeaderBytesString = "[" + String.format("%02X", bs[0])
+				this.cacheToHeaderBytesString = "[" + String.format("%02X", bs[0])
 						+ " " + String.format("%02X", bs[1])
 						+ "|" + String.format("%02X", bs[2])
 						+ " " + String.format("%02X", bs[3])
@@ -67,32 +82,20 @@ public abstract class AbstractSecsMessage implements SecsMessage, Serializable {
 						+ "]";
 			}
 			
-			return this.toHeaderBytesString;
+			return this.cacheToHeaderBytesString;
 		}
 	}
 	
+	abstract protected String toStringProxy();
+	
 	@Override
-	public int sessionId() {
-		return deviceId();
-	}
-
-	@Override
-	public String toJson() {
-		
+	public String toString() {
 		synchronized ( sync ) {
-			
-			if ( this.toJson == null ) {
-				
-				this.toJson = "{\"strm\":" + getStream()
-				+ ",\"func\":" + getFunction()
-				+ ",\"wbit\":" + (wbit() ? "true" : "false")
-				+ ",\"deviceId\":" + deviceId()
-				+ ",\"systemBytes\":"+ systemBytesKey().toString()
-				+ ",\"secs2\":"+ secs2().toJson()
-				+ "}";
+			if ( this.cacheToString == null ) {
+				this.cacheToString = this.toStringProxy();
 			}
-			
-			return this.toJson;
+			return this.cacheToString;
 		}
 	}
+	
 }

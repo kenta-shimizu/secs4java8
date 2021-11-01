@@ -10,11 +10,11 @@ public class Secs1TrySendMessageLog extends AbstractSecsTrySendMessageLog {
 	
 	private static final String commonSubject = "Try-Send SECS1-Message";
 	
-	public Secs1TrySendMessageLog(Secs1Message message, LocalDateTime timestamp) {
+	public Secs1TrySendMessageLog(SimpleSecs1Message message, LocalDateTime timestamp) {
 		super(message, timestamp);
 	}
 
-	public Secs1TrySendMessageLog(Secs1Message message) {
+	public Secs1TrySendMessageLog(SimpleSecs1Message message) {
 		super(message);
 	}
 	

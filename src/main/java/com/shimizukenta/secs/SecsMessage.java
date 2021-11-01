@@ -42,14 +42,14 @@ public interface SecsMessage {
 	/**
 	 * Returns Message W-Bit.
 	 * 
-	 * @return true if has wbit
+	 * @return true if has W-Bit
 	 */
 	public boolean wbit();
 	
 	/**
-	 * Returns Message SESC-II data.
+	 * Returns Message SESC-II Body Data.
 	 * 
-	 * @return Secs2
+	 * @return Secs2 Body Data
 	 */
 	public Secs2 secs2();
 	

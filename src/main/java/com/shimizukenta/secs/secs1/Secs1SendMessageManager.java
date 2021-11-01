@@ -19,25 +19,25 @@ public final class Secs1SendMessageManager {
 		}
 	}
 	
-	public void entry(Secs1Message msg) {
+	public void entry(SimpleSecs1Message msg) {
 		synchronized ( resultMap ) {
 			resultMap.put(msg.systemBytesKey(), new Result());
 		}
 	}
 	
-	public void exit(Secs1Message msg) {
+	public void exit(SimpleSecs1Message msg) {
 		synchronized ( resultMap ) {
 			resultMap.remove(msg.systemBytesKey());
 		}
 	}
 	
-	private Result result(Secs1Message msg) {
+	private Result result(SimpleSecs1Message msg) {
 		synchronized ( resultMap ) {
 			return resultMap.get(msg.systemBytesKey());
 		}
 	}
 	
-	public void waitUntilSended(Secs1Message msg)
+	public void waitUntilSended(SimpleSecs1Message msg)
 			throws SecsException, InterruptedException {
 		
 		final Result r = result(msg);
@@ -61,7 +61,7 @@ public final class Secs1SendMessageManager {
 		}
 	}
 	
-	public void putSended(Secs1Message msg) throws InterruptedException {
+	public void putSended(SimpleSecs1Message msg) throws InterruptedException {
 		
 		final Result r = result(msg);
 		
@@ -71,7 +71,7 @@ public final class Secs1SendMessageManager {
 		}
 	}
 	
-	public void putException(Secs1Message msg, SecsException e) throws InterruptedException {
+	public void putException(SimpleSecs1Message msg, SecsException e) throws InterruptedException {
 		
 		final Result r = result(msg);
 		

@@ -20,18 +20,18 @@ public interface Secs1Communicator extends SecsCommunicator {
 	 * Create header-only Sesc1Message.
 	 * 
 	 * @param header header-10-bytes
-	 * @return Secs1Message
+	 * @return AbstractSecs1Message
 	 */
-	public Secs1Message createSecs1Message(byte[] header);
+	public AbstractSecs1Message createSecs1Message(byte[] header);
 	
 	/**
 	 * Create Secs1Message.
 	 * 
 	 * @param header header-10-bytes
 	 * @param body SECS-II data
-	 * @return Secs1Message
+	 * @return AbstractSecs1Message
 	 */
-	public Secs1Message createSecs1Message(byte[] header, Secs2 body);
+	public AbstractSecs1Message createSecs1Message(byte[] header, Secs2 body);
 	
 	/**
 	 * Send SECS-I-Message.
@@ -49,7 +49,7 @@ public interface Secs1Communicator extends SecsCommunicator {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<Secs1Message> send(Secs1Message msg)
+	public Optional<Secs1Message> send(AbstractSecs1Message msg)
 			throws SecsSendMessageException,
 			SecsWaitReplyMessageException,
 			SecsException,
