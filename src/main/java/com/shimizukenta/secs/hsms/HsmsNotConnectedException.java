@@ -1,15 +1,15 @@
 package com.shimizukenta.secs.hsms;
 
-public class HsmsNotConnectedException extends HsmsSendMessageException {
+public class HsmsNotConnectedException extends HsmsException {
 	
-	private static final long serialVersionUID = -5939879202806123248L;
+	private static final long serialVersionUID = 183609995184389928L;
 	
-	public HsmsNotConnectedException(HsmsMessage msg) {
-		super(msg);
+	public HsmsNotConnectedException() {
+		super();
 	}
 	
-	public HsmsNotConnectedException(HsmsMessage msg, Throwable cause) {
-		super(msg, cause);
+	public HsmsNotConnectedException(Throwable cause) {
+		super(cause);
 	}
-
+	
 }

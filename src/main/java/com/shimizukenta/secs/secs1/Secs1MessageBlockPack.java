@@ -6,12 +6,12 @@ import java.util.List;
 public final class Secs1MessageBlockPack {
 	
 	private final AbstractSecs1Message msg;
-	private final List<Secs1MessageBlock> blocks;
+	private final List<AbstractSecs1MessageBlock> absBlocks;
 	private int present;
 	
 	public Secs1MessageBlockPack(AbstractSecs1Message msg) {
 		this.msg = msg;
-		this.blocks = new ArrayList<>(msg.toBlocks());
+		this.absBlocks = new ArrayList<>(msg.toAbstractBlocks());
 		this.present = 0;
 	}
 	
@@ -19,8 +19,8 @@ public final class Secs1MessageBlockPack {
 		return msg;
 	}
 	
-	public Secs1MessageBlock present() {
-		return this.blocks.get(present);
+	public AbstractSecs1MessageBlock present() {
+		return this.absBlocks.get(present);
 	}
 	
 	public void reset() {
@@ -32,7 +32,7 @@ public final class Secs1MessageBlockPack {
 	}
 	
 	public boolean ebit() {
-		return this.blocks.get(this.present).ebit();
+		return this.absBlocks.get(this.present).ebit();
 	}
 	
 }

@@ -3,44 +3,50 @@ package com.shimizukenta.secs.secs1;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.shimizukenta.secs.SecsException;
-
 public final class Secs1SendMessageManager {
 	
-	private final Map<Integer, Result> resultMap = new HashMap<>();
+	private final Map<Integer, Result> map = new HashMap<>();
 	
 	public Secs1SendMessageManager() {
 		/* Nothing */
 	}
 	
 	public void clear() {
-		synchronized ( resultMap ) {
-			resultMap.clear();
+		synchronized ( this.map ) {
+			this.map.clear();
 		}
 	}
 	
-	public void entry(SimpleSecs1Message msg) {
-		synchronized ( resultMap ) {
-			resultMap.put(msg.systemBytesKey(), new Result());
+	public void enter(AbstractSecs1Message msg) {
+		synchronized ( this.map ) {
+			this.map.put(msg.systemBytesKey(), new Result());
 		}
 	}
 	
-	public void exit(SimpleSecs1Message msg) {
-		synchronized ( resultMap ) {
-			resultMap.remove(msg.systemBytesKey());
+	public void exit(AbstractSecs1Message msg) {
+		synchronized ( this.map ) {
+			this.map.remove(msg.systemBytesKey());
 		}
 	}
 	
-	private Result result(SimpleSecs1Message msg) {
-		synchronized ( resultMap ) {
-			return resultMap.get(msg.systemBytesKey());
+	private Result getResult(Integer key) {
+		synchronized ( this.map ) {
+			return this.map.get(key);
 		}
 	}
 	
-	public void waitUntilSended(SimpleSecs1Message msg)
-			throws SecsException, InterruptedException {
+	private Result getResult(AbstractSecs1Message msg) {
+		return this.getResult(msg.systemBytesKey());
+	}
+	
+	public void waitUntilSended(AbstractSecs1Message msg)
+			throws Secs1SendMessageException, InterruptedException {
 		
-		final Result r = result(msg);
+		final Result r = getResult(msg);
+		
+		if ( r == null ) {
+			throw new IllegalStateException("message not enter");
+		}
 		
 		synchronized ( r ) {
 			
@@ -50,9 +56,9 @@ public final class Secs1SendMessageManager {
 					return;
 				}
 				
-				SecsException e = r.except();
+				Secs1Exception e = r.except();
 				if ( e != null ) {
-					throw e;
+					throw new Secs1SendMessageException(msg, e);
 				}
 				
 				r.wait();
@@ -61,30 +67,28 @@ public final class Secs1SendMessageManager {
 		}
 	}
 	
-	public void putSended(SimpleSecs1Message msg) throws InterruptedException {
+	public void putSended(AbstractSecs1Message msg) {
 		
-		final Result r = result(msg);
+		final Result r = this.getResult(msg);
 		
-		synchronized ( r ) {
+		if ( r != null ) {
 			r.setSended();
-			r.notifyAll();
 		}
 	}
 	
-	public void putException(SimpleSecs1Message msg, SecsException e) throws InterruptedException {
+	public void putException(AbstractSecs1Message msg, Secs1Exception e) {
 		
-		final Result r = result(msg);
+		final Result r = this.getResult(msg);
 		
-		synchronized ( r ) {
+		if ( r != null ) {
 			r.setExcept(e);
-			r.notifyAll();
 		}
 	}
 	
-	private static class Result {
+	private class Result {
 		
 		private boolean sended;
-		private SecsException except;
+		private Secs1Exception except;
 		
 		public Result() {
 			this.sended = false;
@@ -94,6 +98,7 @@ public final class Secs1SendMessageManager {
 		public void setSended() {
 			synchronized ( this ) {
 				this.sended = true;
+				this.notifyAll();
 			}
 		}
 		
@@ -103,18 +108,18 @@ public final class Secs1SendMessageManager {
 			}
 		}
 		
-		public void setExcept(SecsException e) {
+		public void setExcept(Secs1Exception e) {
 			synchronized ( this ) {
 				this.except = e;
+				this.notifyAll();
 			}
 		}
 		
-		public SecsException except() {
+		public Secs1Exception except() {
 			synchronized ( this ) {
 				return this.except;
 			}
 		}
 	}
-
 	
 }

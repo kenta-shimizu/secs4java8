@@ -16,11 +16,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import com.shimizukenta.secs.SecsException;
-import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.secs1.AbstractSecs1Communicator;
-import com.shimizukenta.secs.secs1.Secs1DetectTerminateException;
-import com.shimizukenta.secs.secs1.Secs1SendMessageException;
+import com.shimizukenta.secs.secs1.Secs1SendByteException;
 
 /**
  * This abstract class is implementation of SECS-I (SEMI-E4) on TCP/IP
@@ -219,7 +216,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 	
 	@Override
 	protected void sendBytes(byte[] bs)
-			throws SecsSendMessageException, SecsException, InterruptedException {
+			throws Secs1SendByteException, InterruptedException {
 		
 		final AsynchronousSocketChannel channel = getChannel();
 		
@@ -235,7 +232,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 				int w = f.get().intValue();
 				
 				if ( w <= 0 ) {
-					throw new Secs1DetectTerminateException();
+					throw new Secs1OnTcpIpDetectTerminateException();
 				}
 			}
 			catch ( InterruptedException e ) {
@@ -250,7 +247,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 					throw (RuntimeException)t;
 				}
 				
-				throw new Secs1SendMessageException(t);
+				throw new Secs1SendByteException(t);
 			}
 		}
 	}

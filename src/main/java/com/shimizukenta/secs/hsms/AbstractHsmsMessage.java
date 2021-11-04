@@ -1,5 +1,7 @@
 package com.shimizukenta.secs.hsms;
 
+import java.util.Arrays;
+
 import com.shimizukenta.secs.AbstractSecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 
@@ -7,84 +9,117 @@ public abstract class AbstractHsmsMessage extends AbstractSecsMessage implements
 	
 	private static final long serialVersionUID = 7234808180120409439L;
 	
-	public AbstractHsmsMessage() {
+	private static final int HEADER_SIZE = 10;
+	
+	private final byte[] header;
+	private final Secs2 body;
+	
+	private int tentativeSessionId;
+	
+	public AbstractHsmsMessage(byte[] header, Secs2 body) {
 		super();
-		
-		//TODO
+		this.header = Arrays.copyOf(header, HEADER_SIZE);
+		this.body = body;
+		this.tentativeSessionId = -1;
 	}
 	
-	@Override
-	public int getStream() {
-		// TODO Auto-generated method stub
-		return 0;
+	public AbstractHsmsMessage(byte[] header) {
+		super();
+		this.header = Arrays.copyOf(header, HEADER_SIZE);
+		this.body = Secs2.empty();
+		this.tentativeSessionId = -1;
 	}
-
-	@Override
-	public int getFunction() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public boolean wbit() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
+	
 	@Override
 	public Secs2 secs2() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int deviceId() {
-		
-		// TODO Auto-generated method stub
-		return -1;
-	}
-	
-	@Override
-	public int sessionId() {
-		
-		//TODO
-		return -1;
+		return this.body;
 	}
 	
 	@Override
 	public byte[] header10Bytes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	protected String toJsonProxy() {
-		//TODO
-		return "{}";
+		return Arrays.copyOf(this.header, HEADER_SIZE);
 	}
 	
 	@Override
 	public HsmsMessageType messageType() {
-		// TODO Auto-generated method stub
-		return null;
+		return HsmsMessageType.get(this);
 	}
-
-	@Override
-	public boolean isDataMessage() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
+	
 	@Override
 	public byte pType() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.messageType().pType();
 	}
-
+	
 	@Override
 	public byte sType() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.messageType().sType();
 	}
-
+	
+	private final Object syncTentativeSessionId = new Object();
+	
+	protected int tentativeSessionId() {
+		
+		synchronized ( this.syncTentativeSessionId ) {
+			
+			if ( this.tentativeSessionId < 0 ) {
+				
+				this.tentativeSessionId = (((int)(this.header[0]) << 8) & 0x0000FF00)
+						| ((int)(header[1]) & 0x000000FF);
+			}
+			
+			return this.tentativeSessionId;
+		}
+	}
+	
+	protected String toDataMessageJsonProxy() {
+		
+		return "{\"messageType\":\"" + messageType().toString()
+				+ "\",\"strm\":" + getStream()
+				+ ",\"func\":" + getFunction()
+				+ ",\"wbit\":" + (wbit() ? "true" : "false")
+				+ ",\"sessionId\":" + sessionId()
+				+ ",\"systemBytes\":"+ systemBytesKey().toString()
+				+ ",\"secs2\":"+ secs2().toJson()
+				+ "}";
+	}
+	
+	protected String toControllMessageJsonProxy() {
+		
+		return "{\"messageType\":\"" + messageType().toString()
+				+ "\",\"p\":" + pType()
+				+ ",\"s\":" + sType()
+				+ ",\"sessionId\":" + sessionId()
+				+ ",\"systemBytes\":"+ systemBytesKey().toString()
+				+ "}";
+	}
+	
+	private static final String BR = System.lineSeparator();
+	
+	protected String toDataMessageStringProxy() {
+		
+		StringBuilder sb = new StringBuilder(toHeaderBytesString());
+		
+		sb.append(BR)
+		.append("S").append(getStream())
+		.append("F").append(getFunction());
+		
+		if (wbit()) {
+			sb.append(" W");
+		}
+		
+		String body = secs2().toString();
+		
+		if ( ! body.isEmpty() ) {
+			sb.append(BR).append(body);
+		}
+		
+		sb.append(".");
+		
+		return sb.toString();
+	}
+	
+	protected String toControllMessageStringProxy() {
+		return toHeaderBytesString();
+	}
+	
 }

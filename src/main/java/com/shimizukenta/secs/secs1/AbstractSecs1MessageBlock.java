@@ -3,7 +3,7 @@ package com.shimizukenta.secs.secs1;
 import java.io.Serializable;
 import java.util.Arrays;
 
-public class AbstractSecs1MessageBlock implements Secs1MessageBlock, Serializable {
+public abstract class AbstractSecs1MessageBlock implements Secs1MessageBlock, Serializable {
 	
 	private static final long serialVersionUID = 1841349953959422187L;
 	
@@ -12,11 +12,15 @@ public class AbstractSecs1MessageBlock implements Secs1MessageBlock, Serializabl
 	
 	private final Object sync = new Object();
 	
+	private final int length;
 	private final byte[] bs;
+	private String cacheToString;
 	private Integer cacheSystemBytesKey;
 	
 	public AbstractSecs1MessageBlock(byte[] bs) {
-		this.bs = Arrays.copyOf(bs, bs.length);
+		this.length = ((int)(bs[0])) & 0x000000FF;
+		this.bs = Arrays.copyOf(bs, this.length + 3);
+		this.cacheToString = null;
 		this.cacheSystemBytesKey = null;
 	}
 	
@@ -43,7 +47,7 @@ public class AbstractSecs1MessageBlock implements Secs1MessageBlock, Serializabl
 	
 	@Override
 	public int length() {
-		return (int)(this.bs[0]) & 0x000000FF;
+		return this.length;
 	}
 	
 	@Override
@@ -89,6 +93,37 @@ public class AbstractSecs1MessageBlock implements Secs1MessageBlock, Serializabl
 		} else {
 			
 			return nextBlock.blockNumber() == n + 1;
+		}
+	}
+	
+	@Override
+	public String toString() {
+		
+		synchronized ( this ) {
+			
+			if ( this.cacheToString == null ) {
+				
+				try {
+					this.cacheToString = new StringBuilder()
+							.append("[").append(String.format("%02X", bs[1]))
+							.append(" ").append(String.format("%02X", bs[2]))
+							.append("|").append(String.format("%02X", bs[3]))
+							.append(" ").append(String.format("%02X", bs[4]))
+							.append("|").append(String.format("%02X", bs[5]))
+							.append(" ").append(String.format("%02X", bs[6]))
+							.append("|").append(String.format("%02X", bs[7]))
+							.append(" ").append(String.format("%02X", bs[8]))
+							.append(" ").append(String.format("%02X", bs[9]))
+							.append(" ").append(String.format("%02X", bs[10]))
+							.append("] length: ").append(length())
+							.toString();
+				}
+				catch ( IndexOutOfBoundsException e ) {
+					this.cacheToString = "#toString failed";
+				}
+			}
+			
+			return this.cacheToString;
 		}
 	}
 	

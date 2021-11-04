@@ -6,15 +6,15 @@ import com.shimizukenta.secs.AbstractSecsSendedMessageLog;
 
 public class Secs1SendedMessageLog extends AbstractSecsSendedMessageLog {
 	
-	private static final long serialVersionUID = -7409606143132143490L;
+	private static final long serialVersionUID = 5464441728143108575L;
 	
 	private static final String commonSubject = "Sended SECS1-Message";
 	
-	public Secs1SendedMessageLog(SimpleSecs1Message message, LocalDateTime timestamp) {
+	public Secs1SendedMessageLog(Secs1Message message, LocalDateTime timestamp) {
 		super(message, timestamp);
 	}
 
-	public Secs1SendedMessageLog(SimpleSecs1Message message) {
+	public Secs1SendedMessageLog(Secs1Message message) {
 		super(message);
 	}
 	

@@ -1,18 +1,25 @@
 package com.shimizukenta.secs.secs1ontcpip;
 
-import com.shimizukenta.secs.secs1.Secs1Message;
-import com.shimizukenta.secs.secs1.Secs1SendMessageException;
+import com.shimizukenta.secs.secs1.Secs1SendByteException;
 
-public class Secs1OnTcpIpNotConnectedException extends Secs1SendMessageException {
+public class Secs1OnTcpIpNotConnectedException extends Secs1SendByteException {
 	
-	private static final long serialVersionUID = 7138823455190061871L;
+	private static final long serialVersionUID = 1762320175657050884L;
 	
-	public Secs1OnTcpIpNotConnectedException(Secs1Message msg) {
-		super(msg);
+	public Secs1OnTcpIpNotConnectedException() {
+		super();
 	}
-
-	public Secs1OnTcpIpNotConnectedException(Secs1Message msg, Throwable cause) {
-		super(msg, cause);
+	
+	public Secs1OnTcpIpNotConnectedException(String message) {
+		super(message);
 	}
-
+	
+	public Secs1OnTcpIpNotConnectedException(Throwable cause) {
+		super(cause);
+	}
+	
+	public Secs1OnTcpIpNotConnectedException(String message, Throwable cause) {
+		super(message, cause);
+	}
+	
 }

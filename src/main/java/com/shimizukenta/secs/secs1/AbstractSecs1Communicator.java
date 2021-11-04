@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.shimizukenta.secs.AbstractSecsCommunicator;
-import com.shimizukenta.secs.AbstractSecsWaitReplyMessageExceptionLog;
 import com.shimizukenta.secs.ByteArrayProperty;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
@@ -33,7 +32,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	
 	private final ByteAndSecs1MessageQueue circuitQueue = new ByteAndSecs1MessageQueue();
 	private final Secs1SendMessageManager sendMgr = new Secs1SendMessageManager();
-	private final Secs1ReplyMessageManager replyMgr = new Secs1ReplyMessageManager();
+	private final Secs1TransactionManager<AbstractSecs1Message, AbstractSecs1MessageBlock> transMgr = new Secs1TransactionManager<>();
 	
 	public AbstractSecs1Communicator(Secs1CommunicatorConfig config) {
 		super(config);
@@ -59,7 +58,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		super.open();
 		
 		executeLoopTask(() -> {
-			entryCircuit();
+			enterCircuit();
 		});
 	}
 	
@@ -84,20 +83,20 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	}
 	
 	
-	abstract protected void sendBytes(byte[] bs) throws SecsSendMessageException, SecsException, InterruptedException;
+	abstract protected void sendBytes(byte[] bs) throws Secs1SendByteException, InterruptedException;
 	
-	private void sendByte(byte b) throws SecsSendMessageException, SecsException, InterruptedException {
+	private void sendByte(byte b) throws Secs1SendByteException, InterruptedException {
 		this.sendBytes(new byte[] {b});
 	}
 	
 	@Override
-	public Optional<SimpleSecs1Message> send(SimpleSecs1Message msg)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+	public Optional<Secs1Message> send(AbstractSecs1Message msg)
+			throws Secs1SendMessageException, Secs1WaitReplyMessageException, Secs1Exception
 			, InterruptedException {
 		
 		try {
 			
-			this.sendMgr.entry(msg);
+			this.sendMgr.enter(msg);
 			
 			this.offerTrySendMsgPassThroughQueue(msg);
 			this.notifyLog(new Secs1TrySendMessageLog(msg));
@@ -105,23 +104,28 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			if ( msg.wbit() ) {
 				
 				try {
-					this.replyMgr.entry(msg);
+					this.transMgr.enter(msg);
 					
 					this.circuitQueue.putSecs1Message(msg);
 					
 					this.sendMgr.waitUntilSended(msg);
 					
-					Optional<SimpleSecs1Message> r = this.replyMgr.reply(msg, this.secs1Config().timeout().t3());
+					Secs1Message r = this.transMgr.waitReply(
+							msg,
+							this.secs1Config().timeout().t3());
 					
-					if ( ! r.isPresent() ) {
+					if ( r == null ) {
+						
 						throw new Secs1TimeoutT3Exception(msg);
+						
+					} else {
+						
+						return Optional.of(r);
 					}
-					
-					return r;
 				}
 				finally {
 					
-					this.replyMgr.exit(msg);
+					this.transMgr.exit(msg);
 				}
 				
 			} else {
@@ -133,16 +137,11 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 				return Optional.empty();
 			}
 		}
-		catch ( SecsWaitReplyMessageException e ) {
-			
-			notifyLog(new AbstractSecsWaitReplyMessageExceptionLog(e) {
-				
-				private static final long serialVersionUID = 6987300659468550084L;
-			});
-			
+		catch ( Secs1SendMessageException e ) {
+			notifyLog(e);
 			throw e;
 		}
-		catch ( SecsException e ) {
+		catch ( Secs1WaitReplyMessageException e ) {
 			notifyLog(e);
 			throw e;
 		}
@@ -152,13 +151,13 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	}
 	
 	@Override
-	public AbstractSecs1Message createSecs1Message(byte[] header) {
-		return createSecs1Message(header, Secs2.empty());
+	public AbstractSecs1Message createSecs1Message(byte[] header) throws Secs1SendMessageException {
+		return Secs1MessageBuilder.getInstance().build(header);
 	}
 	
 	@Override
-	public AbstractSecs1Message createSecs1Message(byte[] header, Secs2 body) {
-		return new SimpleSecs1Message(header, body);
+	public AbstractSecs1Message createSecs1Message(byte[] header, Secs2 body) throws Secs1SendMessageException {
+		return Secs1MessageBuilder.getInstance().build(header, body);
 	}
 	
 	private final AtomicInteger autoNumber = new AtomicInteger();
@@ -232,7 +231,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		return send(createSecs1Message(head, secs2)).map(msg -> (SecsMessage)msg);
 	}
 	
-	private void entryCircuit() throws InterruptedException {
+	private void enterCircuit() throws InterruptedException {
 		
 		ByteOrSecs1Message v = this.circuitQueue.takeByteOrSecs1Message();
 		
@@ -245,7 +244,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 				try {
 					this.receiveCircuit();
 				}
-				catch ( SecsException e ) {
+				catch ( Secs1Exception e ) {
 					this.notifyLog(e);
 				}
 			}
@@ -310,10 +309,11 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 					}
 				}
 				
-				this.sendMgr.putException(pack.message(), new Secs1RetryOverException());
-				
+				this.sendMgr.putException(
+						pack.message(),
+						new Secs1RetryOverException());
 			}
-			catch ( SecsException e ) {
+			catch ( Secs1Exception e ) {
 				this.sendMgr.putException(pack.message(), e);
 				this.notifyLog(e);
 			}
@@ -325,12 +325,11 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	 * 
 	 * @param block
 	 * @return true if send success and receive ACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsException
+	 * @throws Secs1Exception
 	 * @throws InterruptedException
 	 */
-	private boolean sendCircuit(SimpleSecs1MessageBlock block)
-			throws SecsSendMessageException, SecsException, InterruptedException {
+	private boolean sendCircuit(AbstractSecs1MessageBlock block)
+			throws Secs1Exception, InterruptedException {
 		
 		this.notifyLog(new Secs1TrySendMessageBlockLog(block));
 		
@@ -355,9 +354,9 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		}
 	}
 	
-	private final LinkedList<SimpleSecs1MessageBlock> cacheBlocks = new LinkedList<>();
+	private final LinkedList<AbstractSecs1MessageBlock> cacheBlocks = new LinkedList<>();
 	
-	private void receiveCircuit() throws SecsException, InterruptedException {
+	private void receiveCircuit() throws Secs1Exception, InterruptedException {
 		
 		this.sendByte(EOT);
 		
@@ -397,9 +396,12 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			}
 		}
 		
-		SimpleSecs1MessageBlock block = new SimpleSecs1MessageBlock(bs);
+		AbstractSecs1MessageBlock block = new AbstractSecs1MessageBlock(bs) {
+
+			private static final long serialVersionUID = -1187993676063154279L;
+		};
 		
-		if ( block.sumCheck() ) {
+		if ( block.checkSum() ) {
 			
 			this.sendByte(ACK);
 			
@@ -423,9 +425,9 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			
 		} else {
 			
-			SimpleSecs1MessageBlock prev = this.cacheBlocks.getLast();
+			AbstractSecs1MessageBlock prev = this.cacheBlocks.getLast();
 			
-			if ( prev.sameSystemBytes(block) ) {
+			if ( prev.equalsSystemBytes(block) ) {
 				
 				if ( prev.isNextBlock(block) ) {
 					this.cacheBlocks.add(block);
@@ -441,15 +443,17 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		if ( block.ebit() ) {
 			
 			try {
-				SimpleSecs1Message s1msg = Secs1MessageBlockConverter.toSecs1Message(this.cacheBlocks);
 				
-				this.replyMgr.put(s1msg).ifPresent(m -> {
+				AbstractSecs1Message s1msg = Secs1MessageBuilder.getInstance().fromBlocks(cacheBlocks);
+				
+				AbstractSecs1Message m = this.transMgr.put(s1msg);
+				
+				if ( m != null ) {
 					this.offerMsgRecvQueue(m);
-				});
+				}
 				
 				this.offerRecvMsgPassThroughQueue(s1msg);
 				this.notifyLog(new Secs1ReceiveMessageLog(s1msg));
-				
 			}
 			catch ( Secs2Exception e ) {
 				this.notifyLog(e);
@@ -460,7 +464,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			
 		} else {
 			
-			this.replyMgr.resetTimer(block);
+			this.transMgr.resetTimer(block);
 			
 			Byte b = this.circuitQueue.pollByte(this.secs1Config().timeout().t4());
 			

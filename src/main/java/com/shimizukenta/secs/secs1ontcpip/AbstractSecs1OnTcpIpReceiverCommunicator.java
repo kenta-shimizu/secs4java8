@@ -17,11 +17,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import com.shimizukenta.secs.SecsException;
-import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.secs1.AbstractSecs1Communicator;
-import com.shimizukenta.secs.secs1.Secs1DetectTerminateException;
-import com.shimizukenta.secs.secs1.Secs1SendMessageException;
+import com.shimizukenta.secs.secs1.Secs1SendByteException;
 
 public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractSecs1Communicator
 		implements Secs1OnTcpIpReceiverCommunicator {
@@ -164,7 +161,7 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 				
 				((Buffer)buffer).clear();
 				
-				Future<Integer> f = channel.read(buffer);
+				final Future<Integer> f = channel.read(buffer);
 				
 				try {
 					int r = f.get().intValue();
@@ -228,7 +225,7 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 	
 	@Override
 	protected void sendBytes(byte[] bs)
-			throws SecsSendMessageException, SecsException, InterruptedException {
+			throws Secs1SendByteException, InterruptedException {
 
 		final AsynchronousSocketChannel channel = getChannel();
 		
@@ -244,7 +241,7 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 				int w = f.get().intValue();
 				
 				if ( w <= 0 ) {
-					throw new Secs1DetectTerminateException();
+					throw new Secs1OnTcpIpDetectTerminateException();
 				}
 			}
 			catch ( InterruptedException e ) {
@@ -259,7 +256,7 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 					throw (RuntimeException)t;
 				}
 				
-				throw new Secs1SendMessageException(t);
+				throw new Secs1SendByteException(t);
 			}
 		}
 	}
