@@ -385,7 +385,7 @@ public interface DynamicEventReportConfig {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> s6f15(DynamicCollectionEvent ce)
+	public Optional<? extends SecsMessage> s6f15(DynamicCollectionEvent ce)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -409,7 +409,7 @@ public interface DynamicEventReportConfig {
 	 * @throws DynamicEventReportException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> s6f15(CharSequence alias)
+	public Optional<? extends SecsMessage> s6f15(CharSequence alias)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -430,7 +430,7 @@ public interface DynamicEventReportConfig {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> s6f17(DynamicCollectionEvent ce)
+	public Optional<? extends SecsMessage> s6f17(DynamicCollectionEvent ce)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -454,7 +454,7 @@ public interface DynamicEventReportConfig {
 	 * @throws DynamicEventReportException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> s6f17(CharSequence alias)
+	public Optional<? extends SecsMessage> s6f17(CharSequence alias)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -475,7 +475,7 @@ public interface DynamicEventReportConfig {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> s6f19(DynamicReport report)
+	public Optional<? extends SecsMessage> s6f19(DynamicReport report)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -499,7 +499,7 @@ public interface DynamicEventReportConfig {
 	 * @throws DynamicEventReportException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> s6f19(CharSequence alias)
+	public Optional<? extends SecsMessage> s6f19(CharSequence alias)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -520,7 +520,7 @@ public interface DynamicEventReportConfig {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> s6f21(DynamicReport report)
+	public Optional<? extends SecsMessage> s6f21(DynamicReport report)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -544,7 +544,7 @@ public interface DynamicEventReportConfig {
 	 * @throws DynamicEventReportException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> s6f21(CharSequence alias)
+	public Optional<? extends SecsMessage> s6f21(CharSequence alias)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException

@@ -27,14 +27,14 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	protected static final byte ACK = (byte)0x06;
 	protected static final byte NAK = (byte)0x15;
 	
-	private final Secs1CommunicatorConfig secs1Config;
+	private final AbstractSecs1CommunicatorConfig secs1Config;
 	private final ByteArrayProperty deviceIdBytes = ByteArrayProperty.newInstance(new byte[] {0, 0});
 	
 	private final ByteAndSecs1MessageQueue circuitQueue = new ByteAndSecs1MessageQueue();
 	private final Secs1SendMessageManager sendMgr = new Secs1SendMessageManager();
 	private final Secs1TransactionManager<AbstractSecs1Message, AbstractSecs1MessageBlock> transMgr = new Secs1TransactionManager<>();
 	
-	public AbstractSecs1Communicator(Secs1CommunicatorConfig config) {
+	public AbstractSecs1Communicator(AbstractSecs1CommunicatorConfig config) {
 		super(config);
 		
 		this.secs1Config = config;
@@ -49,7 +49,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		});
 	}
 	
-	protected Secs1CommunicatorConfig secs1Config() {
+	protected AbstractSecs1CommunicatorConfig secs1Config() {
 		return secs1Config;
 	}
 	
@@ -90,7 +90,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	}
 	
 	@Override
-	public Optional<Secs1Message> send(AbstractSecs1Message msg)
+	public Optional<? extends Secs1Message> send(AbstractSecs1Message msg)
 			throws Secs1SendMessageException, Secs1WaitReplyMessageException, Secs1Exception
 			, InterruptedException {
 		
@@ -110,7 +110,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 					
 					this.sendMgr.waitUntilSended(msg);
 					
-					Secs1Message r = this.transMgr.waitReply(
+					AbstractSecs1Message r = this.transMgr.waitReply(
 							msg,
 							this.secs1Config().timeout().t3());
 					
@@ -163,7 +163,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	private final AtomicInteger autoNumber = new AtomicInteger();
 	
 	@Override
-	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<? extends SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -194,11 +194,11 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			head[2] |= (byte)0x80;
 		}
 		
-		return send(createSecs1Message(head, secs2)).map(msg -> (SecsMessage)msg);
+		return send(createSecs1Message(head, secs2));
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<? extends SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -228,7 +228,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			head[2] |= (byte)0x80;
 		}
 		
-		return send(createSecs1Message(head, secs2)).map(msg -> (SecsMessage)msg);
+		return send(createSecs1Message(head, secs2));
 	}
 	
 	private void enterCircuit() throws InterruptedException {

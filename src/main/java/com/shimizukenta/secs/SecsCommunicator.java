@@ -91,21 +91,6 @@ public interface SecsCommunicator extends Closeable {
 	public Gem gem();
 	
 	/**
-	 * Returns communicator device-id.
-	 * 
-	 * @return communicator device-id
-	 */
-	public int deviceId();
-	
-	/**
-	 * Returns is-equip.
-	 * 
-	 * @return {@code true} if Equipment
-	 */
-	public boolean isEquip();
-	
-	
-	/**
 	 * Open and wait until communicating.
 	 * 
 	 * <p>
@@ -134,7 +119,7 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> send(int strm, int func, boolean wbit)
+	public Optional<? extends SecsMessage> send(int strm, int func, boolean wbit)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -158,7 +143,7 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<? extends SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -182,7 +167,7 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit)
+	public Optional<? extends SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -207,7 +192,7 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<? extends SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -228,7 +213,7 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> send(SmlMessage sml)
+	public Optional<? extends SecsMessage> send(SmlMessage sml)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -250,7 +235,7 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> send(SecsMessage primary, SmlMessage sml)
+	public Optional<? extends SecsMessage> send(SecsMessage primary, SmlMessage sml)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -343,7 +328,27 @@ public interface SecsCommunicator extends Closeable {
 	 */
 	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener lstnr);	
 	
+	/**
+	 * Add Listener to get communicate-state-changed.
+	 * 
+	 * <p>
+	 * Blocking-Listener.<br />
+	 * Pass through quickly.<br />
+	 * </p>
+	 * 
+	 * @param lstnr Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener lstnr);
 	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param lstnr Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener lstnr);
+
 	/* Try-Send Secs-Message Pass-through Listener */
 	
 	/**

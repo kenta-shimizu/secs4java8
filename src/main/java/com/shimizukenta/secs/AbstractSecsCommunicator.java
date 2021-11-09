@@ -1,6 +1,7 @@
 package com.shimizukenta.secs;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
@@ -66,6 +67,9 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	}
 	
 	
+	private final BooleanProperty communicatable = BooleanProperty.newInstance(false);
+	private final Collection<SecsCommunicatableStateChangeBiListener> commStateChangeBiLstnrs = new ArrayList<>();
+	
 	private final AbstractSecsCommunicatorConfig config;
 	private final Gem gem;
 	
@@ -73,6 +77,12 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	private boolean closed;
 	
 	public AbstractSecsCommunicator(AbstractSecsCommunicatorConfig config) {
+		
+		this.communicatable.addChangeListener(f -> {
+			this.commStateChangeBiLstnrs.forEach(l -> {
+				l.changed(this, f);
+			});
+		});
 		
 		this.config = config;
 		this.gem = Gem.newInstance(this, config.gem());
@@ -145,12 +155,11 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 		return gem;
 	}
 	
-	@Override
-	public int deviceId() {
-		return config.deviceId().intValue();
-	}
+//	@Override
+//	public int deviceId() {
+//		return config.deviceId().intValue();
+//	}
 	
-	@Override
 	public boolean isEquip() {
 		return config.isEquip().booleanValue();
 	}
@@ -168,7 +177,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(int strm, int func, boolean wbit)
+	public Optional<? extends SecsMessage> send(int strm, int func, boolean wbit)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -176,7 +185,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit)
+	public Optional<? extends SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -184,7 +193,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(SmlMessage sml)
+	public Optional<? extends SecsMessage> send(SmlMessage sml)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -192,7 +201,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(SecsMessage primary, SmlMessage sml)
+	public Optional<? extends SecsMessage> send(SecsMessage primary, SmlMessage sml)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
@@ -314,7 +323,6 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	
 	
 	/* Secs-Communicatable-State-Changed-Listener */
-	private final BooleanProperty communicatable = BooleanProperty.newInstance(false);
 	
 	@Override
 	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener l) {
@@ -326,10 +334,27 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 		return this.communicatable.removeChangeListener(l::changed);
 	}
 	
-	protected void notifyCommunicatableStateChange(boolean communicatable) {
-		this.communicatable.set(communicatable);
+	@Override
+	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener l) {
+		synchronized ( this.commStateChangeBiLstnrs ) {
+			boolean f = this.commStateChangeBiLstnrs.add(l);
+			l.changed(this, this.communicatable.booleanValue());
+			return f;
+		}
 	}
 	
+	@Override
+	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener l) {
+		synchronized ( this.commStateChangeBiLstnrs ) {
+			return this.commStateChangeBiLstnrs.remove(l);
+		}
+	}
+	
+	protected void notifyCommunicatableStateChange(boolean communicatable) {
+		synchronized ( this.commStateChangeBiLstnrs ) {
+			this.communicatable.set(communicatable);
+		}
+	}
 	
 	/* Try-Send Secs-Message Pass-through Listener */
 	private final Collection<SecsMessagePassThroughListener> trySendMsgPassThroughListeners = new CopyOnWriteArrayList<>();

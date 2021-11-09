@@ -24,10 +24,10 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	private static final long serialVersionUID = -8456991094606676409L;
 	
 	private final SecsTimeout timeout = new SecsTimeout();
-	private final NumberProperty deviceId = NumberProperty.newInstance(10);
 	private final BooleanProperty isEquip = BooleanProperty.newInstance(false);
 	
 	private final AbstractGemConfig gem = new AbstractGemConfig() {
+		
 		private static final long serialVersionUID = -3386783271396322749L;
 	};
 	
@@ -36,24 +36,6 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	
 	public AbstractSecsCommunicatorConfig() {
 		/* Nothing */
-	}
-	
-	/**
-	 * Device-ID setter.
-	 * 
-	 * @param id Device-ID
-	 */
-	public void deviceId(int id) {
-		this.deviceId.set(id);
-	}
-	
-	/**
-	 * Device-ID getter
-	 * 
-	 * @return device-id
-	 */
-	public ReadOnlyNumberProperty deviceId() {
-		return deviceId;
 	}
 	
 	/**

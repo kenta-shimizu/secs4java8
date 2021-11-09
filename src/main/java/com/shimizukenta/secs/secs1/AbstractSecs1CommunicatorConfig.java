@@ -17,17 +17,36 @@ import com.shimizukenta.secs.ReadOnlyNumberProperty;
  * @author kenta-shimizu
  *
  */
-public class Secs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
+public abstract class AbstractSecs1CommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
 	private static final long serialVersionUID = 4897063498275749609L;
 	
+	private final NumberProperty deviceId = NumberProperty.newInstance(10);
 	private final BooleanProperty isMaster = BooleanProperty.newInstance(true);
 	private final NumberProperty retry = NumberProperty.newInstance(3);
 	
-	public Secs1CommunicatorConfig() {
+	public AbstractSecs1CommunicatorConfig() {
 		super();
 	}
 	
+	/**
+	 * Device-ID setter.
+	 * 
+	 * @param id Device-ID
+	 */
+	public void deviceId(int id) {
+		this.deviceId.set(id);
+	}
+	
+	/**
+	 * Device-ID getter
+	 * 
+	 * @return device-id
+	 */
+	public ReadOnlyNumberProperty deviceId() {
+		return deviceId;
+	}
+
 	/**
 	 * Set {@code true} if Master Mode.
 	 * 

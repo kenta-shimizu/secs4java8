@@ -1,23 +1,23 @@
 package com.shimizukenta.secs.hsmsgs;
 
-import com.shimizukenta.secs.hsms.AbstractHsmsCommunicatorConfig;
 import com.shimizukenta.secs.hsms.AbstractHsmsControlMessage;
 import com.shimizukenta.secs.hsms.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.AbstractHsmsMessageBuilder;
+import com.shimizukenta.secs.hsms.AbstractHsmsSession;
 import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.secs2.Secs2;
 
 public class AbstractHsmsGsMessageBuilder extends AbstractHsmsMessageBuilder {
 	
-	public AbstractHsmsGsMessageBuilder(AbstractHsmsCommunicatorConfig config) {
-		super(config);
+	public AbstractHsmsGsMessageBuilder(AbstractHsmsSession session) {
+		super(session);
 	}
 	
 	@Override
 	public AbstractHsmsMessage buildSelectRequest() {
 		
 		byte[] ss = this.getSessionId2Bytes();
-		byte[] sysbytes = this.getSystem4Bytes(ss);
+		byte[] sysbytes = this.getSystem4Bytes();
 		
 		byte[] header = new byte[] {
 				ss[0],
@@ -39,7 +39,7 @@ public class AbstractHsmsGsMessageBuilder extends AbstractHsmsMessageBuilder {
 	public AbstractHsmsMessage buildDeselectRequest() {
 		
 		byte[] ss = this.getSessionId2Bytes();
-		byte[] sysbytes = this.getSystem4Bytes(ss);
+		byte[] sysbytes = this.getSystem4Bytes();
 		
 		byte[] header = new byte[] {
 				ss[0],
@@ -61,7 +61,7 @@ public class AbstractHsmsGsMessageBuilder extends AbstractHsmsMessageBuilder {
 	public AbstractHsmsMessage buildSeparateRequest() {
 		
 		byte[] ss = this.getSessionId2Bytes();
-		byte[] sysbytes = this.getSystem4Bytes(ss);
+		byte[] sysbytes = this.getSystem4Bytes();
 		
 		byte[] header = new byte[] {
 				ss[0],

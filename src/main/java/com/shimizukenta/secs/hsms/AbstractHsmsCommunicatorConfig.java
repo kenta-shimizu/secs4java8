@@ -4,7 +4,6 @@ import java.util.Objects;
 
 import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 import com.shimizukenta.secs.Property;
-import com.shimizukenta.secs.ReadOnlyNumberProperty;
 import com.shimizukenta.secs.ReadOnlyProperty;
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.TimeProperty;
@@ -48,24 +47,6 @@ public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommuni
 	 */
 	public ReadOnlyProperty<HsmsConnectionMode> connectionMode() {
 		return this.connectionMode;
-	}
-	
-	/**
-	 * Session-ID setter
-	 * 
-	 * @param sessionId
-	 */
-	public void sessionId(int sessionId) {
-		deviceId(sessionId);
-	}
-	
-	/**
-	 * Session-ID getter
-	 * 
-	 * @return session-id
-	 */
-	public ReadOnlyNumberProperty sessionId() {
-		return deviceId();
 	}
 	
 	/*

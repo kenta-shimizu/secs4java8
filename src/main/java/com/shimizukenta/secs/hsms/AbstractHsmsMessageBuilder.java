@@ -1,32 +1,56 @@
 package com.shimizukenta.secs.hsms;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
+import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
 import com.shimizukenta.secs.secs2.Secs2BytesParser;
 
 public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	
-	private final AbstractHsmsCommunicatorConfig config;
+	private final byte[] sessionId2Bytes;
+	private final Supplier<byte[]> system4BytesSupplier;
 	
-	private final Object syncSessionId = new Object();
-	private byte[] sessionIdBytes = new byte[2];
-	
-	public AbstractHsmsMessageBuilder(AbstractHsmsCommunicatorConfig config) {
-		this.config = config;
+	public AbstractHsmsMessageBuilder(AbstractHsmsSession session) {
 		
-		this.config.sessionId().addChangeListener(n -> {
+		int n = session.sessionId();
+		
+		this.sessionId2Bytes = new byte[] {
+				(byte)(n >> 8),
+				(byte)n
+		};
+		
+		if ( session.isEquip() ) {
 			
-			synchronized ( this.syncSessionId ) {
+			this.system4BytesSupplier = () -> {
 				
-				int i = n.intValue();
-				this.sessionIdBytes[0] = (byte)(i >> 8);
-				this.sessionIdBytes[1] = (byte)i;
-			}
-		});
+				byte[] aa = this.getAutoNumber2Bytes();
+				
+				return new byte[] {
+						sessionId2Bytes[0],
+						sessionId2Bytes[1],
+						aa[0],
+						aa[1]
+				};
+			};
+			
+		} else {
+			
+			this.system4BytesSupplier = () -> {
+				
+				byte[] aa = this.getAutoNumber2Bytes();
+				
+				return new byte[] {
+						(byte)0x0,
+						(byte)0x0,
+						aa[0],
+						aa[1]
+				};
+			};
+		}
 	}
 	
 	private final AtomicInteger autoNum = new AtomicInteger(0);
@@ -40,33 +64,11 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	}
 	
 	protected byte[] getSessionId2Bytes() {
-		synchronized ( this.syncSessionId ) {
-			return Arrays.copyOf(this.sessionIdBytes, 2);
-		}
+		return this.sessionId2Bytes;
 	}
 	
-	protected byte[] getSystem4Bytes(byte[] sessionId2Bytes) {
-		
-		byte[] aa = this.getAutoNumber2Bytes();
-		
-		if ( config.isEquip().booleanValue() ) {
-			
-			return new byte[] {
-					(byte)0x0,
-					(byte)0x0,
-					aa[0],
-					aa[1]
-			};
-			
-		} else {
-			
-			return new byte[] {
-					sessionId2Bytes[0],
-					sessionId2Bytes[1],
-					aa[0],
-					aa[1]
-			};
-		}
+	protected byte[] getSystem4Bytes() {
+		return this.system4BytesSupplier.get();
 	}
 	
 	@Override
@@ -114,7 +116,7 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	@Override
 	public AbstractHsmsMessage buildLinktestRequest() {
 		
-		byte[] sysbytes = this.getSystem4Bytes(this.getSessionId2Bytes());
+		byte[] sysbytes = this.getSystem4Bytes();
 		
 		byte[] header = new byte[] {
 				(byte)0xFF,
@@ -193,12 +195,11 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	@Override
 	public AbstractHsmsMessage buildDataMessage(int strm, int func, boolean wbit, Secs2 body) {
 		
-		byte[] ss = this.getSessionId2Bytes();
-		byte[] sysbytes = this.getSystem4Bytes(ss);
+		byte[] sysbytes = this.getSystem4Bytes();
 		
 		byte[] header = new byte[] {
-				ss[0],
-				ss[1],
+				this.sessionId2Bytes[0],
+				this.sessionId2Bytes[1],
 				(byte)(strm & 0x7F),
 				(byte)func,
 				HsmsMessageType.DATA.pType(),
@@ -213,12 +214,12 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildDataMessage(HsmsMessage primaryMsg, int strm, int func, boolean wbit) {
+	public AbstractHsmsMessage buildDataMessage(SecsMessage primaryMsg, int strm, int func, boolean wbit) {
 		return buildDataMessage(primaryMsg, strm, func, wbit, Secs2.empty());
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildDataMessage(HsmsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 body) {
+	public AbstractHsmsMessage buildDataMessage(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 body) {
 		
 		byte[] bs = primaryMsg.header10Bytes();
 		

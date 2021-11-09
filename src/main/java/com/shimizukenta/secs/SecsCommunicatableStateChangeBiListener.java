@@ -1,0 +1,30 @@
+package com.shimizukenta.secs;
+
+import java.util.EventListener;
+
+/**
+ * SECS-Communicate-State Change Listener.
+ * 
+ * <p>
+ * This interface is called in {@link SecsCommunicator#addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener)}<br />
+ * </p>
+ * 
+ * @author kenta-shimizu
+ *
+ */
+public interface SecsCommunicatableStateChangeBiListener extends EventListener {
+	
+	/**
+	 * SECS-Communicate-State Changed
+	 * 
+	 * <p>
+	 * Blocking-method.<br />
+	 * pass through quickly.<br />
+	 * </p>
+	 * 
+	 * @param communicaotr
+	 * @param communicatable {@code true} if state is communicatable
+	 */
+	public void changed(SecsCommunicator communicator, boolean communicatable);
+	
+}
