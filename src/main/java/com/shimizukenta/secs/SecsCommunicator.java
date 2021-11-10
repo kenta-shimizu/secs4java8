@@ -119,7 +119,7 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> send(int strm, int func, boolean wbit)
+	public Optional<SecsMessage> send(int strm, int func, boolean wbit)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -143,7 +143,7 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -167,7 +167,7 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit)
+	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -192,7 +192,7 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -213,7 +213,7 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> send(SmlMessage sml)
+	public Optional<SecsMessage> send(SmlMessage sml)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -235,7 +235,7 @@ public interface SecsCommunicator extends Closeable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends SecsMessage> send(SecsMessage primary, SmlMessage sml)
+	public Optional<SecsMessage> send(SecsMessage primary, SmlMessage sml)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException

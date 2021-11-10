@@ -23,7 +23,7 @@ public interface HsmsGsCommunicator extends Closeable {
 	
 	public HsmsSession getSession(int sessionId);
 	
-	public Optional<? extends SecsMessage> send(
+	public Optional<SecsMessage> send(
 			int sessionId,
 			int strm,
 			int func,
@@ -33,7 +33,7 @@ public interface HsmsGsCommunicator extends Closeable {
 					HsmsException,
 					InterruptedException;
 	
-	public Optional<? extends SecsMessage> send(
+	public Optional<SecsMessage> send(
 			int sessionId,
 			int strm,
 			int func,
@@ -44,7 +44,7 @@ public interface HsmsGsCommunicator extends Closeable {
 					HsmsException,
 					InterruptedException;
 	
-	public Optional<? extends SecsMessage> send(
+	public Optional<SecsMessage> send(
 			int sessionId,
 			SecsMessage primaryMsg,
 			int strm,
@@ -55,7 +55,7 @@ public interface HsmsGsCommunicator extends Closeable {
 					HsmsException,
 					InterruptedException;
 	
-	public Optional<? extends SecsMessage> send(
+	public Optional<SecsMessage> send(
 			int sessionId,
 			SecsMessage primaryMsg,
 			int strm,
@@ -67,7 +67,7 @@ public interface HsmsGsCommunicator extends Closeable {
 					HsmsException,
 					InterruptedException;
 	
-	public Optional<? extends SecsMessage> send(
+	public Optional<SecsMessage> send(
 			int sessionId,
 			SmlMessage sml)
 					throws HsmsSendMessageException,

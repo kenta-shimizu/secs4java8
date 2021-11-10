@@ -15,23 +15,23 @@ public abstract class AbstractHsmsSession extends AbstractSecsCommunicator imple
 	abstract protected HsmsMessageBuilder msgBuilder();
 	
 	@Override
-	public Optional<? extends SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException {
 		
-		return this.send(this.msgBuilder().buildDataMessage(strm, func, wbit, secs2));
+		return this.send(this.msgBuilder().buildDataMessage(strm, func, wbit, secs2)).map(m -> (SecsMessage)m);
 	}
 	
 	@Override
-	public Optional<? extends SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException {
 		
-		return this.send(this.msgBuilder().buildDataMessage(primary, strm, func, wbit, secs2));
+		return this.send(this.msgBuilder().buildDataMessage(primary, strm, func, wbit, secs2)).map(m -> (SecsMessage)m);
 	}
 	
 	@Override
-	public Optional<? extends HsmsMessage> send(AbstractHsmsMessage msg)
+	public Optional<HsmsMessage> send(AbstractHsmsMessage msg)
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException {
 		

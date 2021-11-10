@@ -48,7 +48,7 @@ public interface Secs1Communicator extends SecsCommunicator {
 	 * @throws Secs1Exception
 	 * @throws InterruptedException
 	 */
-	public Optional<? extends Secs1Message> send(AbstractSecs1Message msg)
+	public Optional<Secs1Message> send(AbstractSecs1Message msg)
 			throws Secs1SendMessageException,
 			Secs1WaitReplyMessageException,
 			Secs1Exception,
