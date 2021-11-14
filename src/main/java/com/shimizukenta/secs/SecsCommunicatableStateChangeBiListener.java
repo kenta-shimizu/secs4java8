@@ -22,9 +22,9 @@ public interface SecsCommunicatableStateChangeBiListener extends EventListener {
 	 * pass through quickly.<br />
 	 * </p>
 	 * 
-	 * @param communicaotr
 	 * @param communicatable {@code true} if state is communicatable
+	 * @param communicaotr
 	 */
-	public void changed(SecsCommunicator communicator, boolean communicatable);
+	public void changed(boolean communicatable, SecsCommunicator communicator);
 	
 }

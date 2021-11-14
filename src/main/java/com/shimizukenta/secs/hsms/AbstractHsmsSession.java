@@ -19,7 +19,7 @@ public abstract class AbstractHsmsSession extends AbstractSecsCommunicator imple
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException {
 		
-		return this.send(this.msgBuilder().buildDataMessage(strm, func, wbit, secs2)).map(m -> (SecsMessage)m);
+		return this.send(this.msgBuilder().buildDataMessage(this, strm, func, wbit, secs2)).map(m -> (SecsMessage)m);
 	}
 	
 	@Override
@@ -37,6 +37,19 @@ public abstract class AbstractHsmsSession extends AbstractSecsCommunicator imple
 		
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.sessionId();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if ( (o != null) && (o instanceof AbstractHsmsSession) ) {
+			return ((AbstractHsmsSession)o).sessionId() == this.sessionId();
+		}
+		return false;
 	}
 	
 }

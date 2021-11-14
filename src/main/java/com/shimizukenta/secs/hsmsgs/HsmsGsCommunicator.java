@@ -1,36 +1,36 @@
 package com.shimizukenta.secs.hsmsgs;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 
+import com.shimizukenta.secs.OpenAndCloseable;
 import com.shimizukenta.secs.SecsCommunicatableStateChangeBiListener;
+import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessageReceiveBiListener;
-import com.shimizukenta.secs.hsms.HsmsException;
-import com.shimizukenta.secs.hsms.HsmsSendMessageException;
+import com.shimizukenta.secs.SecsSendMessageException;
+import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.HsmsSession;
-import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
+import com.shimizukenta.secs.hsms.HsmsUnknownSessionIdException;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.sml.SmlMessage;
 
-public interface HsmsGsCommunicator extends Closeable {
-	
-	public void open() throws IOException;
+public interface HsmsGsCommunicator extends OpenAndCloseable {
 	
 	public Set<HsmsSession> getSessions();
 	
-	public HsmsSession getSession(int sessionId);
+	public HsmsSession getSession(int sessionId) throws HsmsUnknownSessionIdException;
+	
+	public boolean existSession(int sessionId);
 	
 	public Optional<SecsMessage> send(
 			int sessionId,
 			int strm,
 			int func,
 			boolean wbit)
-					throws HsmsSendMessageException,
-					HsmsWaitReplyMessageException,
-					HsmsException,
+					throws SecsSendMessageException,
+					SecsWaitReplyMessageException,
+					SecsException,
 					InterruptedException;
 	
 	public Optional<SecsMessage> send(
@@ -39,9 +39,9 @@ public interface HsmsGsCommunicator extends Closeable {
 			int func,
 			boolean wbit,
 			Secs2 secs2)
-					throws HsmsSendMessageException,
-					HsmsWaitReplyMessageException,
-					HsmsException,
+					throws SecsSendMessageException,
+					SecsWaitReplyMessageException,
+					SecsException,
 					InterruptedException;
 	
 	public Optional<SecsMessage> send(
@@ -50,9 +50,9 @@ public interface HsmsGsCommunicator extends Closeable {
 			int strm,
 			int func,
 			boolean wbit)
-					throws HsmsSendMessageException,
-					HsmsWaitReplyMessageException,
-					HsmsException,
+					throws SecsSendMessageException,
+					SecsWaitReplyMessageException,
+					SecsException,
 					InterruptedException;
 	
 	public Optional<SecsMessage> send(
@@ -62,26 +62,26 @@ public interface HsmsGsCommunicator extends Closeable {
 			int func,
 			boolean wbit,
 			Secs2 secs2)
-					throws HsmsSendMessageException,
-					HsmsWaitReplyMessageException,
-					HsmsException,
+					throws SecsSendMessageException,
+					SecsWaitReplyMessageException,
+					SecsException,
 					InterruptedException;
 	
 	public Optional<SecsMessage> send(
 			int sessionId,
 			SmlMessage sml)
-					throws HsmsSendMessageException,
-					HsmsWaitReplyMessageException,
-					HsmsException,
+					throws SecsSendMessageException,
+					SecsWaitReplyMessageException,
+					SecsException,
 					InterruptedException;
 	
 	public Optional<? extends SecsMessage> send(
 			int sessionId,
 			SecsMessage primaryMsg,
 			SmlMessage sml)
-					throws HsmsSendMessageException,
-					HsmsWaitReplyMessageException,
-					HsmsException,
+					throws SecsSendMessageException,
+					SecsWaitReplyMessageException,
+					SecsException,
 					InterruptedException;
 	
 	/**
@@ -92,7 +92,7 @@ public interface HsmsGsCommunicator extends Closeable {
 	 * </p>
 	 * 
 	 * @param lstnr Not accept {@code null}
-	 * @return {@code true} if add success
+	 * @return {@code true} if add success in all sessions
 	 */
 	public boolean addSecsMessageReceiveListener(SecsMessageReceiveBiListener lstnr);
 	
@@ -100,7 +100,7 @@ public interface HsmsGsCommunicator extends Closeable {
 	 * Remove Listener.
 	 * 
 	 * @param lstnr Not accept {@code null}
-	 * @return {@code true} if remove success
+	 * @return {@code true} if remove success in all sessions
 	 */
 	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveBiListener lstnr);
 	
@@ -113,7 +113,7 @@ public interface HsmsGsCommunicator extends Closeable {
 	 * </p>
 	 * 
 	 * @param lstnr Not accept {@code null}
-	 * @return {@code true} if add success
+	 * @return {@code true} if add success in all sessions
 	 */
 	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener lstnr);
 	
@@ -121,7 +121,7 @@ public interface HsmsGsCommunicator extends Closeable {
 	 * Remove Listener.
 	 * 
 	 * @param lstnr Not accept {@code null}
-	 * @return {@code true} if remove success
+	 * @return {@code true} if remove success in all sessions
 	 */
 	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener lstnr);
 	

@@ -6,14 +6,9 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.gem.Gem;
 import com.shimizukenta.secs.secs2.Secs2;
@@ -25,47 +20,7 @@ import com.shimizukenta.secs.sml.SmlMessage;
  * @author kenta-shimizu
  *
  */
-public abstract class AbstractSecsCommunicator implements SecsCommunicator {
-	
-	private final ExecutorService execServ = Executors.newCachedThreadPool(r -> {
-		Thread th = new Thread(r);
-		th.setDaemon(true);
-		return th;
-	});
-	
-	protected ExecutorService executorService() {
-		return execServ;
-	}
-	
-	protected static Runnable createLoopTask(InterruptableRunnable task) {
-		return new Runnable() {
-			@Override
-			public void run() {
-				try {
-					for ( ;; ) {
-						task.run();
-					}
-				}
-				catch ( InterruptedException ignore ) {
-				}
-			}
-		};
-	}
-	
-	protected void executeLoopTask(InterruptableRunnable r) {
-		execServ.execute(createLoopTask(r));
-	}
-	
-	protected <T> T executeInvokeAny(Collection<? extends Callable<T>> tasks)
-			throws InterruptedException, ExecutionException{
-		return execServ.invokeAny(tasks);
-	}
-	
-	protected <T> T executeInvokeAny(Collection<? extends Callable<T>> tasks, ReadOnlyTimeProperty timeout)
-			throws InterruptedException, ExecutionException, TimeoutException {
-		return execServ.invokeAny(tasks, timeout.getMilliSeconds(), TimeUnit.MILLISECONDS);
-	}
-	
+public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator implements SecsCommunicator {
 	
 	private final BooleanProperty communicatable = BooleanProperty.newInstance(false);
 	private final Collection<SecsCommunicatableStateChangeBiListener> commStateChangeBiLstnrs = new ArrayList<>();
@@ -73,53 +28,23 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	private final AbstractSecsCommunicatorConfig config;
 	private final Gem gem;
 	
-	private boolean opened;
-	private boolean closed;
-	
 	public AbstractSecsCommunicator(AbstractSecsCommunicatorConfig config) {
+		super();
 		
 		this.communicatable.addChangeListener(f -> {
 			this.commStateChangeBiLstnrs.forEach(l -> {
-				l.changed(this, f);
+				l.changed(f, this);
 			});
 		});
 		
 		this.config = config;
 		this.gem = Gem.newInstance(this, config.gem());
-		
-		opened = false;
-		closed = false;
-	}
-	
-	@Override
-	public boolean isOpen() {
-		synchronized ( this ) {
-			return this.opened && ! this.closed;
-		}
-	}
-	
-	@Override
-	public boolean isClosed() {
-		synchronized ( this ) {
-			return this.closed;
-		}
 	}
 	
 	@Override
 	public void open() throws IOException {
 		
-		synchronized ( this ) {
-			
-			if ( this.closed ) {
-				throw new IOException("Already closed");
-			}
-			
-			if ( this.opened ) {
-				throw new IOException("Already opened");
-			}
-			
-			this.opened = true;
-		}
+		super.open();
 		
 		executeLogQueueTask();
 		executeMsgRecvQueueTask();
@@ -130,24 +55,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	
 	@Override
 	public void close() throws IOException {
-		
-		synchronized ( this ) {
-			
-			if ( this.closed ) {
-				return ;
-			}
-			
-			this.closed = true;
-		}
-		
-		try {
-			execServ.shutdownNow();
-			if (! execServ.awaitTermination(5L, TimeUnit.SECONDS)) {
-				throw new IOException("ExecutorService#shutdown failed");
-			}
-		}
-		catch ( InterruptedException ignore ) {
-		}
+		super.close();
 	}
 	
 	@Override
@@ -338,7 +246,7 @@ public abstract class AbstractSecsCommunicator implements SecsCommunicator {
 	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener l) {
 		synchronized ( this.commStateChangeBiLstnrs ) {
 			boolean f = this.commStateChangeBiLstnrs.add(l);
-			l.changed(this, this.communicatable.booleanValue());
+			l.changed(this.communicatable.booleanValue(), this);
 			return f;
 		}
 	}

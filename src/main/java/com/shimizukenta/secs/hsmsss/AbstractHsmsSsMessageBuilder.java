@@ -1,6 +1,5 @@
 package com.shimizukenta.secs.hsmsss;
 
-import com.shimizukenta.secs.hsms.AbstractHsmsControlMessage;
 import com.shimizukenta.secs.hsms.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.AbstractHsmsMessageBuilder;
 import com.shimizukenta.secs.hsms.AbstractHsmsSession;
@@ -9,14 +8,14 @@ import com.shimizukenta.secs.secs2.Secs2;
 
 public abstract class AbstractHsmsSsMessageBuilder extends AbstractHsmsMessageBuilder {
 	
-	public AbstractHsmsSsMessageBuilder(AbstractHsmsSession session) {
-		super(session);
+	public AbstractHsmsSsMessageBuilder() {
+		super();
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildSelectRequest() {
+	public AbstractHsmsMessage buildSelectRequest(AbstractHsmsSession session) {
 		
-		byte[] sysbytes = this.getSystem4Bytes();
+		byte[] sysbytes = this.getSystem4Bytes(session);
 		
 		byte[] header = new byte[] {
 				(byte)0xFF,
@@ -35,9 +34,9 @@ public abstract class AbstractHsmsSsMessageBuilder extends AbstractHsmsMessageBu
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildDeselectRequest() {
+	public AbstractHsmsMessage buildDeselectRequest(AbstractHsmsSession session) {
 		
-		byte[] sysbytes = this.getSystem4Bytes();
+		byte[] sysbytes = this.getSystem4Bytes(session);
 		
 		byte[] header = new byte[] {
 				(byte)0xFF,
@@ -56,9 +55,9 @@ public abstract class AbstractHsmsSsMessageBuilder extends AbstractHsmsMessageBu
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildSeparateRequest() {
+	public AbstractHsmsMessage buildSeparateRequest(AbstractHsmsSession session) {
 		
-		byte[] sysbytes = this.getSystem4Bytes();
+		byte[] sysbytes = this.getSystem4Bytes(session);
 		
 		byte[] header = new byte[] {
 				(byte)0xFF,
@@ -77,7 +76,7 @@ public abstract class AbstractHsmsSsMessageBuilder extends AbstractHsmsMessageBu
 	}
 	
 	@Override
-	protected AbstractHsmsControlMessage buildHsmsControlMessage(byte[] header, Secs2 body) {
+	protected AbstractHsmsSsControlMessage buildHsmsControlMessage(byte[] header, Secs2 body) {
 		
 		return new AbstractHsmsSsControlMessage(header, body) {
 			

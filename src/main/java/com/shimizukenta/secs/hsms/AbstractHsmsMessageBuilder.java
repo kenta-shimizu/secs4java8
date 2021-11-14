@@ -2,7 +2,6 @@ package com.shimizukenta.secs.hsms;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
@@ -11,46 +10,8 @@ import com.shimizukenta.secs.secs2.Secs2BytesParser;
 
 public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	
-	private final byte[] sessionId2Bytes;
-	private final Supplier<byte[]> system4BytesSupplier;
-	
-	public AbstractHsmsMessageBuilder(AbstractHsmsSession session) {
-		
-		int n = session.sessionId();
-		
-		this.sessionId2Bytes = new byte[] {
-				(byte)(n >> 8),
-				(byte)n
-		};
-		
-		if ( session.isEquip() ) {
-			
-			this.system4BytesSupplier = () -> {
-				
-				byte[] aa = this.getAutoNumber2Bytes();
-				
-				return new byte[] {
-						sessionId2Bytes[0],
-						sessionId2Bytes[1],
-						aa[0],
-						aa[1]
-				};
-			};
-			
-		} else {
-			
-			this.system4BytesSupplier = () -> {
-				
-				byte[] aa = this.getAutoNumber2Bytes();
-				
-				return new byte[] {
-						(byte)0x0,
-						(byte)0x0,
-						aa[0],
-						aa[1]
-				};
-			};
-		}
+	public AbstractHsmsMessageBuilder() {
+		/* Nothing */
 	}
 	
 	private final AtomicInteger autoNum = new AtomicInteger(0);
@@ -63,12 +24,38 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 		};
 	}
 	
-	protected byte[] getSessionId2Bytes() {
-		return this.sessionId2Bytes;
+	protected byte[] getSessionId2Bytes(AbstractHsmsSession session) {
+		int n = session.sessionId();
+		return new byte[] {
+				(byte)(n >> 8),
+				(byte)n
+		};
 	}
 	
-	protected byte[] getSystem4Bytes() {
-		return this.system4BytesSupplier.get();
+	protected byte[] getSystem4Bytes(AbstractHsmsSession session) {
+		
+		byte[] aa = this.getAutoNumber2Bytes();
+		
+		if ( session.isEquip() ) {
+			
+			byte[] ss = this.getSessionId2Bytes(session);
+			
+			return new byte[] {
+					ss[0],
+					ss[1],
+					aa[0],
+					aa[1]
+			};
+			
+		} else {
+			
+			return new byte[] {
+					(byte)0x0,
+					(byte)0x0,
+					aa[0],
+					aa[1]
+			};
+		}
 	}
 	
 	@Override
@@ -114,9 +101,9 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildLinktestRequest() {
+	public AbstractHsmsMessage buildLinktestRequest(AbstractHsmsSession session) {
 		
-		byte[] sysbytes = this.getSystem4Bytes();
+		byte[] sysbytes = this.getSystem4Bytes(session);
 		
 		byte[] header = new byte[] {
 				(byte)0xFF,
@@ -188,18 +175,19 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildDataMessage(int strm, int func, boolean wbit) {
-		return buildDataMessage(strm, func, wbit, Secs2.empty());
+	public AbstractHsmsMessage buildDataMessage(AbstractHsmsSession session, int strm, int func, boolean wbit) {
+		return buildDataMessage(session, strm, func, wbit, Secs2.empty());
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildDataMessage(int strm, int func, boolean wbit, Secs2 body) {
+	public AbstractHsmsMessage buildDataMessage(AbstractHsmsSession session, int strm, int func, boolean wbit, Secs2 body) {
 		
-		byte[] sysbytes = this.getSystem4Bytes();
+		byte[] sessionId2Bytes = this.getSessionId2Bytes(session);
+		byte[] sysbytes = this.getSystem4Bytes(session);
 		
 		byte[] header = new byte[] {
-				this.sessionId2Bytes[0],
-				this.sessionId2Bytes[1],
+				sessionId2Bytes[0],
+				sessionId2Bytes[1],
 				(byte)(strm & 0x7F),
 				(byte)func,
 				HsmsMessageType.DATA.pType(),
@@ -244,14 +232,14 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	}
 	
 	@Override
-	public AbstractHsmsMessage fromBytes(byte[] header, List<byte[]> bodies) throws Secs2BytesParseException {
+	public AbstractHsmsMessage fromBytes(byte[] header, List<byte[]> bodies)  throws Secs2BytesParseException {
 		
-		Secs2 body = Secs2BytesParser.getInstance().parse(bodies);
+		Secs2 s2b = Secs2BytesParser.getInstance().parse(bodies);
 		
 		if ( HsmsMessageType.get(header[4], header[5]) == HsmsMessageType.DATA ) {
-			return buildHsmsDataMessage(header, body);
+			return this.buildHsmsDataMessage(header, s2b);
 		} else {
-			return buildHsmsControlMessage(header, body);
+			return this.buildHsmsControlMessage(header, s2b);
 		}
 	}
 	

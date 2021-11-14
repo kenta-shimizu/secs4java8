@@ -9,15 +9,15 @@ import com.shimizukenta.secs.secs2.Secs2;
 
 public class AbstractHsmsGsMessageBuilder extends AbstractHsmsMessageBuilder {
 	
-	public AbstractHsmsGsMessageBuilder(AbstractHsmsSession session) {
-		super(session);
+	public AbstractHsmsGsMessageBuilder() {
+		super();
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildSelectRequest() {
+	public AbstractHsmsMessage buildSelectRequest(AbstractHsmsSession session) {
 		
-		byte[] ss = this.getSessionId2Bytes();
-		byte[] sysbytes = this.getSystem4Bytes();
+		byte[] ss = this.getSessionId2Bytes(session);
+		byte[] sysbytes = this.getSystem4Bytes(session);
 		
 		byte[] header = new byte[] {
 				ss[0],
@@ -36,10 +36,10 @@ public class AbstractHsmsGsMessageBuilder extends AbstractHsmsMessageBuilder {
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildDeselectRequest() {
+	public AbstractHsmsMessage buildDeselectRequest(AbstractHsmsSession session) {
 		
-		byte[] ss = this.getSessionId2Bytes();
-		byte[] sysbytes = this.getSystem4Bytes();
+		byte[] ss = this.getSessionId2Bytes(session);
+		byte[] sysbytes = this.getSystem4Bytes(session);
 		
 		byte[] header = new byte[] {
 				ss[0],
@@ -58,10 +58,10 @@ public class AbstractHsmsGsMessageBuilder extends AbstractHsmsMessageBuilder {
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildSeparateRequest() {
+	public AbstractHsmsMessage buildSeparateRequest(AbstractHsmsSession session) {
 		
-		byte[] ss = this.getSessionId2Bytes();
-		byte[] sysbytes = this.getSystem4Bytes();
+		byte[] ss = this.getSessionId2Bytes(session);
+		byte[] sysbytes = this.getSystem4Bytes(session);
 		
 		byte[] header = new byte[] {
 				ss[0],
@@ -87,5 +87,5 @@ public class AbstractHsmsGsMessageBuilder extends AbstractHsmsMessageBuilder {
 			private static final long serialVersionUID = 8056330389461174158L;
 		};
 	}
-
+	
 }

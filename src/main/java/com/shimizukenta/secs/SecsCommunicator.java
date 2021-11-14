@@ -1,14 +1,13 @@
 package com.shimizukenta.secs;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.Optional;
 
+import com.shimizukenta.secs.gem.Gem;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicator;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicatorConfig;
-import com.shimizukenta.secs.gem.Gem;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.sml.SmlMessage;
 
@@ -60,28 +59,7 @@ import com.shimizukenta.secs.sml.SmlMessage;
  * @author kenta-shimizu
  *
  */
-public interface SecsCommunicator extends Closeable {
-	
-	/**
-	 * open communicating.
-	 * 
-	 * @throws IOException
-	 */
-	public void open() throws IOException;
-	
-	/**
-	 * Returns is-open.
-	 * 
-	 * @return {@code true} if opened and not closed
-	 */
-	public boolean isOpen();
-	
-	/**
-	 * Returns is-closed.
-	 * 
-	 * @return {@code true} if closed
-	 */
-	public boolean isClosed();
+public interface SecsCommunicator extends OpenAndCloseable {
 	
 	/**
 	 * Returns GEM-interface.

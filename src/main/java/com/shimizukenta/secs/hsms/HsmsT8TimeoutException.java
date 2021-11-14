@@ -8,4 +8,8 @@ public class HsmsT8TimeoutException extends HsmsException {
 		super();
 	}
 
+	public HsmsT8TimeoutException(Throwable cause) {
+		super(cause);
+	}
+	
 }
