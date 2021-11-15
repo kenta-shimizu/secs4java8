@@ -15,10 +15,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
-import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
-import com.shimizukenta.secs.SecsSendMessageException;
-import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
 
@@ -31,7 +28,6 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 	}
 	
 	private static final byte[] length4Zero = new byte[] {(byte)0, (byte)0, (byte)0, (byte)0};
-	private static final long defaultBodySize = 1024L;
 	
 	@Override
 	public void reading() throws HsmsException, InterruptedException {
@@ -54,12 +50,10 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 				}
 				
 				((Buffer)lengthBuffer).flip();
-				long rem = lengthBuffer.getLong();
+				long msgLength = lengthBuffer.getLong();
 				
-				if ( rem < 10L ) {
-					
-					//TODO
-					//throw exception
+				if ( msgLength < 10L ) {
+					throw new HsmsMessageLengthBytesLowerThanTenException(msgLength);
 				}
 				
 				/* reading header */
@@ -70,10 +64,10 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 				
 				/* reading body */
 				bodyBuffers.clear();
-				rem -= 10L;
-				while (rem > 0L) {
+				for (long rem = msgLength - 10L; rem > 0L;) {
 					
-					int size = (int)(rem > defaultBodySize ? defaultBodySize : rem);
+					long bodySize = prototypeDefaultReceiveBodySize();
+					int size = (int)(rem > bodySize ? bodySize : rem);
 					ByteBuffer bf = ByteBuffer.allocate(size);
 					
 					rem -= (long)(this.readingBuffer(bf));
@@ -95,6 +89,14 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 						.collect(Collectors.toList());
 				
 				AbstractHsmsMessage msg = this.messageBuilder().fromBytes(headerBytes, bodyBytes);
+				
+				HsmsMessageType type = msg.messageType();
+				if ( ! prototypeCheckControlMessageLength(type, msgLength) ) {
+					throw new HsmsControlMessageLengthBytesUpperThanTenException(type, msgLength);
+				}
+				
+				//TODO
+				//put path-through-listener
 				
 				AbstractHsmsMessage r = this.transactionManager().put(msg);
 				
@@ -119,6 +121,35 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 			if ( ! (t instanceof ClosedChannelException) ) {
 				throw new HsmsException(t);
 			}
+		}
+	}
+	
+	private static final long defaultReceiveBodySize = 1024L;
+	
+	protected long prototypeDefaultReceiveBodySize() {
+		return defaultReceiveBodySize;
+	}
+	
+	protected boolean prototypeCheckControlMessageLength(HsmsMessageType type, long length) {
+		
+		switch ( type ) {
+		case SELECT_REQ:
+		case SELECT_RSP:
+		case DESELECT_REQ:
+		case DESELECT_RSP:
+		case LINKTEST_REQ:
+		case LINKTEST_RSP:
+		case REJECT_REQ:
+		case SEPARATE_REQ: {
+			
+			return length == 10L;
+			/* break */
+		}
+		case DATA:
+		default: {
+			
+			return true;
+		}
 		}
 	}
 	
@@ -168,11 +199,6 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 		}
 	}
 	
-	public void linktesting() throws InterruptedException {
-		
-		//TODO
-	}
-	
 	private final Collection<HsmsMessageReceiveListener> recvLstnrs = new CopyOnWriteArrayList<>();
 	
 	@Override
@@ -187,134 +213,193 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 	
 	abstract protected HsmsMessageBuilder messageBuilder();
 	abstract protected HsmsTransactionManager<AbstractHsmsMessage> transactionManager();
-	abstract ReadOnlyTimeProperty timeoutT3();
-	abstract ReadOnlyTimeProperty timeoutT6();
-	abstract ReadOnlyTimeProperty timeoutT8();
-	abstract ReadOnlyTimeProperty linktest();
+	abstract protected ReadOnlyTimeProperty timeoutT3();
+	abstract protected ReadOnlyTimeProperty timeoutT6();
+	abstract protected ReadOnlyTimeProperty timeoutT8();
 	
 	@Override
-	public AbstractHsmsMessage sendSelectRequest(
+	public Optional<HsmsMessage> sendSelectRequest(
 			AbstractHsmsSession session)
-					throws SecsSendMessageException,
-					SecsWaitReplyMessageException,
-					SecsException,
+					throws HsmsSendMessageException,
+					HsmsWaitReplyMessageException,
+					HsmsException,
 					InterruptedException {
 		
-		//TODO
+		final AbstractHsmsMessage msg = this.messageBuilder().buildSelectRequest(session);
 		
-		return null;
+		final Optional<HsmsMessage> r = this.sendAndReplyHsmsMessage(msg);
+		
+		HsmsMessageType type = r.get().messageType();
+		
+		if ( type == HsmsMessageType.REJECT_REQ ) {
+			throw new HsmsRejectException(msg);
+		}
+		
+		if ( type != HsmsMessageType.SELECT_RSP ) {
+			throw new HsmsIllegalTypeReplyMessageException(msg);
+		}
+		
+		return r;
 	}
 	
 	@Override
-	public AbstractHsmsMessage sendSelectResponse(
+	public Optional<HsmsMessage> sendSelectResponse(
 			HsmsMessage primaryMsg,
 			HsmsMessageSelectStatus status)
-					throws SecsSendMessageException,
-					SecsWaitReplyMessageException,
-					SecsException,
+					throws HsmsSendMessageException,
+					HsmsWaitReplyMessageException,
+					HsmsException,
 					InterruptedException {
 		
-		//TODO
-		
-		return null;
+		return this.sendAndReplyHsmsMessage(this.messageBuilder().buildSelectResponse(primaryMsg, status));
 	}
 	
 	@Override
 	public Optional<HsmsMessage> sendDeselectRequest(
 			AbstractHsmsSession session)
-					throws SecsSendMessageException,
-					SecsWaitReplyMessageException,
-					SecsException,
+					throws HsmsSendMessageException,
+					HsmsWaitReplyMessageException,
+					HsmsException,
 					InterruptedException {
 		
-		//TODO
+		final AbstractHsmsMessage msg = this.messageBuilder().buildDeselectRequest(session);
 		
-		return null;
+		final Optional<HsmsMessage> r = this.sendAndReplyHsmsMessage(msg);
+		
+		HsmsMessageType type = r.get().messageType();
+		
+		if ( type == HsmsMessageType.REJECT_REQ ) {
+			throw new HsmsRejectException(msg);
+		}
+		
+		if ( type != HsmsMessageType.DESELECT_RSP ) {
+			throw new HsmsIllegalTypeReplyMessageException(msg);
+		}
+		
+		return r;
 	}
 	
 	@Override
 	public Optional<HsmsMessage> sendDeselectResponse(
 			HsmsMessage primaryMsg,
 			HsmsMessageDeselectStatus status)
-					throws SecsSendMessageException,
-					SecsWaitReplyMessageException,
-					SecsException,
+					throws HsmsSendMessageException,
+					HsmsWaitReplyMessageException,
+					HsmsException,
 					InterruptedException {
 		
-		//TODO
-		
-		return null;
+		return this.sendAndReplyHsmsMessage(this.messageBuilder().buildDeselectResponse(primaryMsg, status));
 	}
-			
+	
 	@Override
 	public Optional<HsmsMessage> sendLinktestRequest(
 			AbstractHsmsSession session)
-					throws SecsSendMessageException,
-					SecsWaitReplyMessageException,
-					SecsException,
+					throws HsmsSendMessageException,
+					HsmsWaitReplyMessageException,
+					HsmsException,
 					InterruptedException {
 		
-		//TODO
+		final AbstractHsmsMessage msg = this.messageBuilder().buildLinktestRequest(session);
 		
-		return null;
+		final Optional<HsmsMessage> r = this.sendAndReplyHsmsMessage(msg);
+		
+		HsmsMessageType type = r.get().messageType();
+		
+		if ( type == HsmsMessageType.REJECT_REQ ) {
+			throw new HsmsRejectException(msg);
+		}
+		
+		if ( type != HsmsMessageType.LINKTEST_RSP ) {
+			throw new HsmsIllegalTypeReplyMessageException(msg);
+		}
+		
+		return r;
 	}
 	
 	@Override
 	public Optional<HsmsMessage> sendLinktestResponse(
 			HsmsMessage primaryMsg)
-					throws SecsSendMessageException,
-					SecsWaitReplyMessageException,
-					SecsException,
+					throws HsmsSendMessageException,
+					HsmsWaitReplyMessageException,
+					HsmsException,
 					InterruptedException {
 		
-		//TODO
-		
-		return null;
+		return this.sendAndReplyHsmsMessage(this.messageBuilder().buildLinktestResponse(primaryMsg));
 	}
-			
+	
 	@Override
 	public Optional<HsmsMessage> sendRejectRequest(
 			HsmsMessage referenceMsg,
 			HsmsMessageRejectReason reason)
-					throws SecsSendMessageException,
-					SecsWaitReplyMessageException,
-					SecsException,
+					throws HsmsSendMessageException,
+					HsmsWaitReplyMessageException,
+					HsmsException,
 					InterruptedException {
 		
-		//TODO
-		
-		return null;
+		return this.sendAndReplyHsmsMessage(this.messageBuilder().buildRejectRequest(referenceMsg, reason));
 	}
 	
 	@Override
 	public Optional<HsmsMessage> sendSeparateRequest(
 			AbstractHsmsSession session)
-					throws SecsSendMessageException,
-					SecsWaitReplyMessageException,
-					SecsException,
+					throws HsmsSendMessageException,
+					HsmsWaitReplyMessageException,
+					HsmsException,
 					InterruptedException {
 		
-		//TOOD
-		
-		return null;
+		return this.sendAndReplyHsmsMessage(this.messageBuilder().buildSeparateRequest(session));
 	}
 	
 	@Override
-	public Optional<HsmsMessage> send(AbstractHsmsSession session, int strm, int func, boolean wbit, Secs2 secs2)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
+	public Optional<HsmsMessage> send(
+			AbstractHsmsSession session,
+			int strm, int func, boolean wbit, Secs2 secs2)
+					throws HsmsSendMessageException,
+					HsmsWaitReplyMessageException,
+					HsmsException,
+					InterruptedException {
 		
-		return sendAndReplyHsmsMessage(this.messageBuilder().buildDataMessage(session, strm, func, wbit, secs2));
+		return this.sendDataMsg(this.messageBuilder().buildDataMessage(session, strm, func, wbit, secs2));
 	}
 	
 	@Override
-	public Optional<HsmsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
+	public Optional<HsmsMessage> send(
+			SecsMessage primaryMsg,
+			int strm, int func, boolean wbit, Secs2 secs2)
+					throws HsmsSendMessageException,
+					HsmsWaitReplyMessageException,
+					HsmsException,
+					InterruptedException {
 		
-		return sendAndReplyHsmsMessage(this.messageBuilder().buildDataMessage(primaryMsg, strm, func, wbit, secs2));
+		return this.sendDataMsg(this.messageBuilder().buildDataMessage(primaryMsg, strm, func, wbit, secs2));
+	}
+	
+	private Optional<HsmsMessage> sendDataMsg(AbstractHsmsMessage msg)
+			throws HsmsSendMessageException,
+			HsmsWaitReplyMessageException,
+			HsmsException,
+			InterruptedException {
+		
+		final Optional<HsmsMessage> r = this.sendAndReplyHsmsMessage(msg);
+		
+		HsmsMessageType type = r.map(HsmsMessage::messageType).orElse(null);
+		
+		if ( type != null ) {
+			
+			if ( type == HsmsMessageType.REJECT_REQ ) {
+				throw new HsmsRejectException(msg);
+			}
+			
+			if ( type != HsmsMessageType.DATA ) {
+				throw new HsmsIllegalTypeReplyMessageException(msg);
+			}
+		}
+		
+		return r;
 	}
 	
 	private Optional<HsmsMessage> sendAndReplyHsmsMessage(AbstractHsmsMessage msg)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
+			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException, InterruptedException {
 		
 		switch ( msg.messageType() ) {
 		case DATA: {
@@ -382,8 +467,14 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 		}
 	}
 	
+	private static final int defaultSendBufferSize = 65536;
+	
+	protected int prototypeDefaultSendBufferSize() {
+		return defaultSendBufferSize;
+	}
+	
 	private void sendOnlyHsmsMessage(AbstractHsmsMessage msg)
-			throws SecsSendMessageException, SecsException, InterruptedException {
+			throws HsmsSendMessageException, HsmsException, InterruptedException {
 		
 		//TODO
 		//try-send
