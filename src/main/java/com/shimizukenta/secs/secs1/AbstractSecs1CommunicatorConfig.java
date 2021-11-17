@@ -35,6 +35,9 @@ public abstract class AbstractSecs1CommunicatorConfig extends AbstractSecsCommun
 	 * @param id Device-ID
 	 */
 	public void deviceId(int id) {
+		if ( id < 0 || id > 0x7FFF ) {
+			throw new IllegalArgumentException("Device-ID is in 0 - 32767, id=" + id);
+		}
 		this.deviceId.set(id);
 	}
 	

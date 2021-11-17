@@ -73,54 +73,61 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 					SocketAddress remote = null;
 					
 					try {
-						pLocal = channel.getLocalAddress();
-						remote = channel.getRemoteAddress();
-
-						addChannel(channel);
 						
-						notifyLog(Secs1OnTcpIpReceiverConnectionLog.accepted(pLocal, remote));
-						
-						final Collection<Callable<Void>> tasks = Arrays.asList(
-								() -> {
-									reading(channel);
-									return null;
-								});
-						
-						executeInvokeAny(tasks);
-						
-					}
-					catch ( IOException e ) {
-						notifyLog(e);
-					}
-					catch ( ExecutionException e ) {
-						
-						Throwable t = e.getCause();
-						
-						if ( t instanceof RuntimeException ) {
-							throw (RuntimeException)t;
+						try {
+							pLocal = channel.getLocalAddress();
+							remote = channel.getRemoteAddress();
+	
+							addChannel(channel);
+							
+							notifyLog(Secs1OnTcpIpReceiverConnectionLog.accepted(pLocal, remote));
+							
+							final Collection<Callable<Void>> tasks = Arrays.asList(
+									() -> {
+										reading(channel);
+										return null;
+									});
+							
+							executeInvokeAny(tasks);
+							
 						}
-						
-						notifyLog(e);
+						catch ( IOException e ) {
+							notifyLog(e);
+						}
+						catch ( ExecutionException e ) {
+							
+							Throwable t = e.getCause();
+							
+							if ( t instanceof RuntimeException ) {
+								throw (RuntimeException)t;
+							}
+							
+							notifyLog(t);
+						}
+						finally {
+							
+							removeChannel(channel);
+							
+							try {
+								channel.shutdownOutput();
+							}
+							catch ( IOException giveup ) {
+							}
+							
+							try {
+								channel.close();
+							}
+							catch ( IOException giveup ) {
+							}
+							
+							try {
+								notifyLog(Secs1OnTcpIpReceiverConnectionLog.channelClosed(pLocal, remote));
+							}
+							catch ( InterruptedException ignore ) {
+							}
+						}
 					}
 					catch ( InterruptedException ignore ) {
-					}
-					finally {
-						
-						removeChannel(channel);
-						
-						try {
-							channel.shutdownOutput();
-						}
-						catch ( IOException giveup ) {
-						}
-						
-						try {
-							channel.close();
-						}
-						catch ( IOException giveup ) {
-						}
-						
-						notifyLog(Secs1OnTcpIpReceiverConnectionLog.channelClosed(pLocal, remote));
 					}
 				}
 				
@@ -128,7 +135,11 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 				public void failed(Throwable t, Void attachment) {
 					
 					if ( ! (t instanceof ClosedChannelException) ) {
-						notifyLog(t);
+						try {
+							notifyLog(t);
+						}
+						catch ( InterruptedException ignore ) {
+						}
 					}
 					
 					synchronized ( server ) {

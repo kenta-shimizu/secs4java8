@@ -135,7 +135,7 @@ public interface SecsCommunicator extends OpenAndCloseable {
 	 * Wait until sended.<br />
 	 * </p>
 	 * 
-	 * @param primary Primary-Message
+	 * @param primaryMsg Primary-Message
 	 * @param strm SECS-II-Stream-Number
 	 * @param func SECS-II-Function-Number
 	 * @param wbit SECS-II-WBit, set {@code false}
@@ -145,7 +145,7 @@ public interface SecsCommunicator extends OpenAndCloseable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit)
+	public Optional<SecsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -159,7 +159,7 @@ public interface SecsCommunicator extends OpenAndCloseable {
 	 * Wait until sended.<br />
 	 * </p>
 	 * 
-	 * @param primary Primary-Message
+	 * @param primaryMsg Primary-Message
 	 * @param strm SECS-II-Stream-Number
 	 * @param func SECS-II-Function-Number
 	 * @param wbit SECS-II-WBit, set {@code false}
@@ -170,7 +170,7 @@ public interface SecsCommunicator extends OpenAndCloseable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
@@ -205,7 +205,7 @@ public interface SecsCommunicator extends OpenAndCloseable {
 	 * Wait until sended.<br />
 	 * </p>
 	 * 
-	 * @param primary Primary-Message.
+	 * @param primaryMsg Primary-Message.
 	 * @param sml
 	 * @return {@code Optional.empty()}
 	 * @throws SecsSendMessageException if send failed
@@ -213,7 +213,7 @@ public interface SecsCommunicator extends OpenAndCloseable {
 	 * @throws SecsException
 	 * @throws InterruptedException
 	 */
-	public Optional<SecsMessage> send(SecsMessage primary, SmlMessage sml)
+	public Optional<SecsMessage> send(SecsMessage primaryMsg, SmlMessage sml)
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException

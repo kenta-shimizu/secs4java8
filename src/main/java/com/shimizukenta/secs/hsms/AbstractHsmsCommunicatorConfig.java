@@ -12,8 +12,7 @@ import com.shimizukenta.secs.TimeProperty;
  * This class is config of HSMS-SS-Communicator.
  * 
  * <p>
- * To set Active or Passive protocol, {@link #protocol(HsmsSsProtocol)}<br />
- * To set Session-ID, {@link #sessionId(int)}<br />
+ * To set Active or Passive mode, {@link #connectionMode(HsmsConnectionMode)}<br />
  * </p>
  * 
  * @author kenta-shimizu

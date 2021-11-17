@@ -34,4 +34,6 @@ public interface HsmsMessageBuilder {
 	
 	public AbstractHsmsMessage fromBytes(byte[] header, List<byte[]> bodies)  throws Secs2BytesParseException;
 	
+	public AbstractHsmsMessage fromMessage(HsmsMessage msg);
+	
 }

@@ -8,35 +8,76 @@ import com.shimizukenta.secs.secs2.Secs2;
 
 public abstract class AbstractHsmsSession extends AbstractSecsCommunicator implements HsmsSession {
 	
+	private AbstractHsmsAsyncSocketChannel channel;
+	
 	public AbstractHsmsSession(AbstractHsmsCommunicatorConfig config) {
 		super(config);
+		this.channel = null;
 	}
 	
-	abstract protected HsmsMessageBuilder msgBuilder();
+	private final Object syncChannel = new Object();
+	
+	public boolean setAsyncSocketChannel(AbstractHsmsAsyncSocketChannel channel) {
+		synchronized ( this.syncChannel ) {
+			if ( this.channel == null ) {
+				this.channel = channel;
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+	
+	public boolean unsetAsyncSocketChannel() {
+		synchronized ( this.syncChannel ) {
+			if ( this.channel == null ) {
+				return false;
+			} else {
+				this.channel = null;
+				return false;
+			}
+		}
+	}
+	
+	protected HsmsAsyncSocketChannel asyncSocketChannel() {
+		synchronized ( this.syncChannel ) {
+			if ( this.channel == null ) {
+				
+				//TODO
+				//throw exception
+			}
+			return this.channel;
+		}
+	}
 	
 	@Override
 	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException {
 		
-		return this.send(this.msgBuilder().buildDataMessage(this, strm, func, wbit, secs2)).map(m -> (SecsMessage)m);
+		synchronized ( this.syncChannel ) {
+			return this.asyncSocketChannel().send(this, strm, func, wbit, secs2).map(m -> (SecsMessage)m);
+		}
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
+	public Optional<SecsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException {
 		
-		return this.send(this.msgBuilder().buildDataMessage(primary, strm, func, wbit, secs2)).map(m -> (SecsMessage)m);
+		synchronized ( this.syncChannel ) {
+			return this.asyncSocketChannel().send(primaryMsg, strm, func, wbit, secs2).map(m -> (SecsMessage)m);
+		}
 	}
 	
 	@Override
-	public Optional<HsmsMessage> send(AbstractHsmsMessage msg)
+	public Optional<HsmsMessage> send(HsmsMessage msg)
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException {
 		
-		// TODO Auto-generated method stub
-		return null;
+		synchronized ( this.syncChannel ) {
+			return this.asyncSocketChannel().sendHsmsMessage(msg);
+		}
 	}
 	
 	@Override

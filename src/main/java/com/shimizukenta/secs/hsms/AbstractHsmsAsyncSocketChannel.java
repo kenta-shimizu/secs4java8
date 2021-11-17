@@ -17,6 +17,9 @@ import java.util.stream.Collectors;
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.Secs2BuildException;
+import com.shimizukenta.secs.secs2.Secs2BytesPack;
+import com.shimizukenta.secs.secs2.Secs2BytesPackBuilder;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
 
 public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketChannel {
@@ -70,7 +73,10 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 					int size = (int)(rem > bodySize ? bodySize : rem);
 					ByteBuffer bf = ByteBuffer.allocate(size);
 					
-					rem -= (long)(this.readingBuffer(bf));
+					while ( bf.hasRemaining() ) {
+						rem -= (long)(this.readingBuffer(bf));
+					}
+					
 					bodyBuffers.add(bf);
 				}
 				
@@ -95,13 +101,17 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 					throw new HsmsControlMessageLengthBytesUpperThanTenException(type, msgLength);
 				}
 				
+				this.recvMsgPassThroughLstnrs.forEach(l -> {
+					l.passThrough(msg);
+				});
+				
 				//TODO
-				//put path-through-listener
+				//log-received
 				
 				AbstractHsmsMessage r = this.transactionManager().put(msg);
 				
 				if ( r != null ) {
-					this.recvLstnrs.forEach(l -> {
+					this.recvMsgLstnrs.forEach(l -> {
 						l.received(r);
 					});
 				}
@@ -199,16 +209,52 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 		}
 	}
 	
-	private final Collection<HsmsMessageReceiveListener> recvLstnrs = new CopyOnWriteArrayList<>();
+	private final Collection<HsmsMessageReceiveListener> recvMsgLstnrs = new CopyOnWriteArrayList<>();
 	
 	@Override
 	public boolean addHsmsMessageReceiveListener(HsmsMessageReceiveListener l) {
-		return this.recvLstnrs.add(l);
+		return this.recvMsgLstnrs.add(l);
 	}
 	
 	@Override
 	public boolean removeHsmsMessageReceiveListener(HsmsMessageReceiveListener l) {
-		return this.recvLstnrs.remove(l);
+		return this.recvMsgLstnrs.remove(l);
+	}
+	
+	private final Collection<HsmsMessagePassThroughListener> trySendMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	
+	@Override
+	public boolean addTrySendMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
+		return this.trySendMsgPassThroughLstnrs.add(lstnr);
+	}
+	
+	@Override
+	public boolean removeTrySendMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
+		return this.trySendMsgPassThroughLstnrs.remove(lstnr);
+	}
+	
+	private final Collection<HsmsMessagePassThroughListener> sendedMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	
+	@Override
+	public boolean addSendedMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
+		return this.sendedMsgPassThroughLstnrs.add(lstnr);
+	}
+	
+	@Override
+	public boolean removeSendedMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
+		return this.sendedMsgPassThroughLstnrs.remove(lstnr);
+	}
+	
+	private final Collection<HsmsMessagePassThroughListener> recvMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	
+	@Override
+	public boolean addReceiveMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
+		return this.recvMsgPassThroughLstnrs.add(lstnr);
+	}
+	
+	@Override
+	public boolean removeReceiveMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
+		return this.recvMsgPassThroughLstnrs.remove(lstnr);
 	}
 	
 	abstract protected HsmsMessageBuilder messageBuilder();
@@ -398,6 +444,13 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 		return r;
 	}
 	
+	@Override
+	public Optional<HsmsMessage> sendHsmsMessage(HsmsMessage msg)
+			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException, InterruptedException {
+		
+		return this.sendAndReplyHsmsMessage(this.messageBuilder().fromMessage(msg));
+	}
+	
 	private Optional<HsmsMessage> sendAndReplyHsmsMessage(AbstractHsmsMessage msg)
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException, InterruptedException {
 		
@@ -473,17 +526,121 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 		return defaultSendBufferSize;
 	}
 	
+	private final Object syncSendMsg = new Object();
+	
 	private void sendOnlyHsmsMessage(AbstractHsmsMessage msg)
 			throws HsmsSendMessageException, HsmsException, InterruptedException {
 		
-		//TODO
-		//try-send
+		this.trySendMsgPassThroughLstnrs.forEach(l -> {
+			l.passThrough(msg);
+		});
 		
 		//TODO
-		//send
+		//log-try-send
+		
+		synchronized ( this.syncSendMsg ) {
+			
+			try {
+				
+				final Secs2BytesPack pack = Secs2BytesPackBuilder.build(1024, msg.secs2());
+				
+				long len = pack.size() + 10L;
+				
+				if ( len > 0x00000000FFFFFFFFL || len < 10L ) {
+					throw new HsmsTooBigSendMessageException(msg);
+				}
+				
+				long msglen = len + 4;
+				
+				if ( msglen > (long)(this.prototypeDefaultSendBufferSize()) ) {
+					
+					{
+						final ByteBuffer buffer = ByteBuffer.allocate(14);
+						
+						buffer.put((byte)(len >> 24));
+						buffer.put((byte)(len >> 16));
+						buffer.put((byte)(len >>  8));
+						buffer.put((byte)(len      ));
+						buffer.put(msg.header10Bytes());
+						
+						((Buffer)buffer).flip();
+						
+						this.sendByteBuffer(buffer, msg);
+					}
+					
+					for ( byte[] bs : pack.getBytes() ) {
+						
+						final ByteBuffer buffer = ByteBuffer.allocate(bs.length);
+						buffer.put(bs);
+						((Buffer)buffer).flip();
+						
+						this.sendByteBuffer(buffer, msg);
+					}
+					
+				} else {
+					
+					final ByteBuffer buffer = ByteBuffer.allocate((int)msglen);
+					
+					buffer.put((byte)(len >> 24));
+					buffer.put((byte)(len >> 16));
+					buffer.put((byte)(len >>  8));
+					buffer.put((byte)(len      ));
+					buffer.put(msg.header10Bytes());
+					
+					for ( byte[] bs : pack.getBytes() ) {
+						buffer.put(bs);
+					}
+					
+					((Buffer)buffer).flip();
+					
+					this.sendByteBuffer(buffer, msg);
+				}
+			}
+			catch ( Secs2BuildException e ) {
+				throw new HsmsSendMessageException(msg);
+			}
+		}
+		
+		this.sendedMsgPassThroughLstnrs.forEach(l -> {
+			l.passThrough(msg);
+		});
 		
 		//TODO
-		//sended
+		//log-semded
+	}
+	
+	private void sendByteBuffer(ByteBuffer buffer, HsmsMessage msg)
+			throws HsmsSendMessageException, HsmsException,
+			InterruptedException {
+		
+		while ( buffer.hasRemaining() ) {
+			
+			final Future<Integer> f = this.channel.write(buffer);
+			
+			try {
+				int w = f.get().intValue();
+				
+				if ( w <= 0 ) {
+					throw new HsmsSendMessageException(
+							msg,
+							new HsmsDetectTerminateException());
+				}
+			}
+			catch ( InterruptedException e ) {
+				f.cancel(true);
+				throw e;
+			}
+			catch ( ExecutionException e ) {
+				
+				Throwable t = e.getCause();
+				
+				if ( t instanceof RuntimeException ) {
+					throw (RuntimeException)t;
+				}
+				
+				throw new HsmsSendMessageException(msg, t);
+			}
+		}
 	}
 	
 }

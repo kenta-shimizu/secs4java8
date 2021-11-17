@@ -2,7 +2,9 @@ package com.shimizukenta.secs.hsmsgs;
 
 import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 import com.shimizukenta.secs.AbstractBaseCommunicator;
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
@@ -15,15 +17,14 @@ import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.AbstractHsmsLinktest;
 import com.shimizukenta.secs.hsms.AbstractHsmsMessage;
+import com.shimizukenta.secs.hsms.AbstractHsmsSession;
 import com.shimizukenta.secs.hsms.HsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.HsmsException;
-import com.shimizukenta.secs.hsms.HsmsLinktest;
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageBuilder;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsSession;
 import com.shimizukenta.secs.hsms.HsmsTransactionManager;
-import com.shimizukenta.secs.hsms.HsmsUnknownSessionIdException;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.sml.SmlMessage;
@@ -46,19 +47,26 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		super.close();
 	}
 	
+	abstract protected Set<AbstractHsmsSession> getAbstractHsmsSessions();
+	
 	@Override
-	public HsmsSession getSession(int sessionId) throws HsmsUnknownSessionIdException {
-		for ( HsmsSession s : this.getSessions() ) {
+	public Set<HsmsSession> getSessions() {
+		return Collections.unmodifiableSet(this.getAbstractHsmsSessions());
+	}
+	
+	@Override
+	public HsmsSession getSession(int sessionId) throws HsmsGsUnknownSessionIdException {
+		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 			if ( s.sessionId() == sessionId ) {
 				return s;
 			}
 		}
-		throw new HsmsUnknownSessionIdException(sessionId);
+		throw new HsmsGsUnknownSessionIdException(sessionId);
 	}
 	
 	@Override
 	public boolean existSession(int sessionId) {
-		for ( HsmsSession s : getSessions() ) {
+		for ( AbstractHsmsSession s : getAbstractHsmsSessions() ) {
 			if ( s.sessionId() == sessionId ) {
 				return true;
 			}
@@ -111,7 +119,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	@Override
 	public boolean addSecsMessageReceiveListener(SecsMessageReceiveBiListener lstnr) {
 		boolean r = true;
-		for ( HsmsSession s : this.getSessions() ) {
+		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 			if ( ! s.addSecsMessageReceiveListener(lstnr) ) {
 				r = false;
 			}
@@ -122,7 +130,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	@Override
 	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveBiListener lstnr) {
 		boolean r = true;
-		for ( HsmsSession s : this.getSessions() ) {
+		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 			if ( ! s.removeSecsMessageReceiveListener(lstnr) ) {
 				r = false;
 			}
@@ -133,7 +141,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	@Override
 	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener lstnr) {
 		boolean r = true;
-		for ( HsmsSession s : this.getSessions() ) {
+		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 			if ( ! s.addSecsCommunicatableStateChangeListener(lstnr) ) {
 				r = false;
 			}
@@ -144,7 +152,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	@Override
 	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener lstnr) {
 		boolean r = true;
-		for ( HsmsSession s : this.getSessions() ) {
+		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 			if ( ! s.removeSecsCommunicatableStateChangeListener(lstnr) ) {
 				r = false;
 			}
@@ -154,65 +162,83 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	
 	private final HsmsMessageBuilder msgBuilder = new AbstractHsmsGsMessageBuilder() {};
 	
-	protected HsmsAsyncSocketChannel buildAsyncSocketChannel(AsynchronousSocketChannel channel) {
+	private class InnerHsmsGsAsyncSocketChannel extends AbstractHsmsAsyncSocketChannel {
 		
-		return new AbstractHsmsAsyncSocketChannel(channel) {
+		public InnerHsmsGsAsyncSocketChannel(AsynchronousSocketChannel channel) {
+			super(channel);
+		}
+		
+		private final class InnerHsmsGsLinktest extends AbstractHsmsLinktest {
 			
-			private final HsmsLinktest linktest = new AbstractHsmsLinktest() {
-				
-				@Override
-				protected ReadOnlyTimeProperty timer() {
-					return AbstractHsmsGsCommunicator.this.config.linktest();
-				}
-				
-				@Override
-				protected Optional<HsmsMessage> send()
-						throws HsmsSendMessageException,
-						HsmsWaitReplyMessageException,
-						HsmsException,
-						InterruptedException {
-					
-					// TODO Auto-generated method stub
-					return null;
-				}
-			};
+			public InnerHsmsGsLinktest() {
+				super();
+			}
 			
 			@Override
-			public void linktesting()
+			protected ReadOnlyTimeProperty timer() {
+				return AbstractHsmsGsCommunicator.this.config.linktest();
+			}
+			
+			@Override
+			protected Optional<HsmsMessage> send()
 					throws HsmsSendMessageException,
 					HsmsWaitReplyMessageException,
 					HsmsException,
 					InterruptedException {
 				
-				this.linktest.testing();
+				for (AbstractHsmsSession s : AbstractHsmsGsCommunicator.this.getAbstractHsmsSessions()) {
+					return InnerHsmsGsAsyncSocketChannel.this.sendLinktestRequest(s);
+				}
+				
+				//TODO
+				//throw
+				
+				return null;
 			}
+		}
+		
+		private final InnerHsmsGsLinktest linktest = new InnerHsmsGsLinktest();
+		
+		@Override
+		public void linktesting()
+				throws HsmsSendMessageException,
+				HsmsWaitReplyMessageException,
+				HsmsException,
+				InterruptedException {
 			
-			@Override
-			protected HsmsMessageBuilder messageBuilder() {
-				return AbstractHsmsGsCommunicator.this.msgBuilder;
-			}
-			
-			private final HsmsTransactionManager<AbstractHsmsMessage> transMgr = new HsmsTransactionManager<>();
-			
-			@Override
-			protected HsmsTransactionManager<AbstractHsmsMessage> transactionManager() {
-				return this.transMgr;
-			}
-			
-			@Override
-			protected ReadOnlyTimeProperty timeoutT3() {
-				return AbstractHsmsGsCommunicator.this.config.timeout().t3();
-			}
-			
-			@Override
-			protected ReadOnlyTimeProperty timeoutT6() {
-				return AbstractHsmsGsCommunicator.this.config.timeout().t6();
-			}
-			
-			@Override
-			protected ReadOnlyTimeProperty timeoutT8() {
-				return AbstractHsmsGsCommunicator.this.config.timeout().t8();
-			}
-		};
+			this.linktest.testing();
+		}
+		
+		@Override
+		protected HsmsMessageBuilder messageBuilder() {
+			return AbstractHsmsGsCommunicator.this.msgBuilder;
+		}
+		
+		private final HsmsTransactionManager<AbstractHsmsMessage> transMgr = new HsmsTransactionManager<>();
+		
+		@Override
+		protected HsmsTransactionManager<AbstractHsmsMessage> transactionManager() {
+			return this.transMgr;
+		}
+		
+		@Override
+		protected ReadOnlyTimeProperty timeoutT3() {
+			return AbstractHsmsGsCommunicator.this.config.timeout().t3();
+		}
+		
+		@Override
+		protected ReadOnlyTimeProperty timeoutT6() {
+			return AbstractHsmsGsCommunicator.this.config.timeout().t6();
+		}
+		
+		@Override
+		protected ReadOnlyTimeProperty timeoutT8() {
+			return AbstractHsmsGsCommunicator.this.config.timeout().t8();
+		}
 	}
+	
+	protected HsmsAsyncSocketChannel buildAsyncSocketChannel(AsynchronousSocketChannel channel) {
+		return new InnerHsmsGsAsyncSocketChannel(channel);
+	}
+	
 }

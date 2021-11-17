@@ -243,6 +243,16 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 		}
 	}
 	
+	@Override
+	public AbstractHsmsMessage fromMessage(HsmsMessage msg) {
+		
+		if ( msg.isDataMessage() ) {
+			return this.buildHsmsDataMessage(msg.header10Bytes(), msg.secs2());
+		} else {
+			return this.buildHsmsControlMessage(msg.header10Bytes(), msg.secs2());
+		}
+	}
+	
 	protected AbstractHsmsDataMessage buildHsmsDataMessage(byte[] header, Secs2 body) {
 		
 		return new AbstractHsmsDataMessage(header, body) {

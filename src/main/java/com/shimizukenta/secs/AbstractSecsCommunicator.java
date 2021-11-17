@@ -1,8 +1,9 @@
 package com.shimizukenta.secs;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -23,19 +24,12 @@ import com.shimizukenta.secs.sml.SmlMessage;
 public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator implements SecsCommunicator {
 	
 	private final BooleanProperty communicatable = BooleanProperty.newInstance(false);
-	private final Collection<SecsCommunicatableStateChangeBiListener> commStateChangeBiLstnrs = new ArrayList<>();
 	
 	private final AbstractSecsCommunicatorConfig config;
 	private final Gem gem;
 	
 	public AbstractSecsCommunicator(AbstractSecsCommunicatorConfig config) {
 		super();
-		
-		this.communicatable.addChangeListener(f -> {
-			this.commStateChangeBiLstnrs.forEach(l -> {
-				l.changed(f, this);
-			});
-		});
 		
 		this.config = config;
 		this.gem = Gem.newInstance(this, config.gem());
@@ -93,11 +87,11 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit)
+	public Optional<SecsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
-		return send(primary, strm, func, wbit, Secs2.empty());
+		return send(primaryMsg, strm, func, wbit, Secs2.empty());
 	}
 	
 	@Override
@@ -109,11 +103,11 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(SecsMessage primary, SmlMessage sml)
+	public Optional<SecsMessage> send(SecsMessage primaryMsg, SmlMessage sml)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
-		return send(primary, sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
+		return send(primaryMsg, sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
 	}
 	
 	
@@ -156,12 +150,8 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		});
 	}
 	
-	protected final boolean offerMsgRecvQueue(SecsMessage msg) {
-		return msgRecvQueue.offer(msg);
-	}
-	
-	protected void notifyReceiveMessage(SecsMessage msg) {
-		offerMsgRecvQueue(msg);
+	public void notifyReceiveMessage(SecsMessage msg) throws InterruptedException {
+		msgRecvQueue.put(msg);
 	}
 	
 	
@@ -186,7 +176,7 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 			
 			try {
 				for ( ;; ) {
-					final SecsLog log = logQueue.take();
+					final SecsLog log = this.logQueue.take();
 					logListeners.forEach(l -> {
 						l.received(log);
 					});
@@ -198,7 +188,7 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 			try {
 				for ( ;; ) {
 					
-					final SecsLog log = logQueue.poll(100L, TimeUnit.MILLISECONDS);
+					final SecsLog log = this.logQueue.poll(100L, TimeUnit.MILLISECONDS);
 					if ( log == null ) {
 						break;
 					}
@@ -212,18 +202,14 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		});
 	}
 	
-	protected final boolean offerLogQueue(AbstractSecsLog log) {
-		return logQueue.offer(log);
-	}
-	
-	protected void notifyLog(AbstractSecsLog log) {
+	public void notifyLog(AbstractSecsLog log) throws InterruptedException {
 		log.subjectHeader(this.config.logSubjectHeader().get());
-		offerLogQueue(log);
+		this.logQueue.put(log);
 	}
 	
-	protected void notifyLog(Throwable t) {
+	protected void notifyLog(Throwable t) throws InterruptedException {
 		
-		notifyLog(new AbstractSecsThrowableLog(t) {
+		this.notifyLog(new AbstractSecsThrowableLog(t) {
 			
 			private static final long serialVersionUID = -1271705310309086030L;
 		});
@@ -242,27 +228,36 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		return this.communicatable.removeChangeListener(l::changed);
 	}
 	
+	private final Map<SecsCommunicatableStateChangeBiListener, SecsCommunicatableStateChangeListener> biCommStateMap = new HashMap<>();
+	
 	@Override
 	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener l) {
-		synchronized ( this.commStateChangeBiLstnrs ) {
-			boolean f = this.commStateChangeBiLstnrs.add(l);
-			l.changed(this.communicatable.booleanValue(), this);
-			return f;
+		
+		final SecsCommunicatableStateChangeListener x = f -> {
+			l.changed(f, this);
+		};
+		
+		synchronized ( this.biCommStateMap ) {
+			this.biCommStateMap.put(l, x);
+			return this.communicatable.addChangeListener(x::changed);
 		}
 	}
 	
 	@Override
 	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener l) {
-		synchronized ( this.commStateChangeBiLstnrs ) {
-			return this.commStateChangeBiLstnrs.remove(l);
+		synchronized ( this.biCommStateMap ) {
+			final SecsCommunicatableStateChangeListener x = this.biCommStateMap.remove(l);
+			if ( x != null ) {
+				return this.communicatable.removeChangeListener(x::changed);
+			}
+			return false;
 		}
 	}
 	
-	protected void notifyCommunicatableStateChange(boolean communicatable) {
-		synchronized ( this.commStateChangeBiLstnrs ) {
-			this.communicatable.set(communicatable);
-		}
+	public void notifyCommunicatableStateChange(boolean f) {
+		this.communicatable.set(f);
 	}
+	
 	
 	/* Try-Send Secs-Message Pass-through Listener */
 	private final Collection<SecsMessagePassThroughListener> trySendMsgPassThroughListeners = new CopyOnWriteArrayList<>();
@@ -286,12 +281,8 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		});
 	}
 	
-	protected final boolean offerTrySendMsgPassThroughQueue(SecsMessage msg) {
-		return trySendMsgPassThroughQueue.offer(msg);
-	}
-	
-	protected void notifyTrySendMessagePassThrough(SecsMessage msg) {
-		offerTrySendMsgPassThroughQueue(msg);
+	public void notifyTrySendMessagePassThrough(SecsMessage msg) throws InterruptedException {
+		trySendMsgPassThroughQueue.put(msg);
 	}
 	
 	
@@ -317,14 +308,9 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		});
 	}
 	
-	protected final boolean offerSendedMsgPassThroughQueue(SecsMessage msg) {
-		return sendedMsgPassThroughQueue.offer(msg);
+	public void notifySendedMessagePassThrough(SecsMessage msg) throws InterruptedException {
+		sendedMsgPassThroughQueue.put(msg);
 	}
-	
-	protected void notifySendedMessagePassThrough(SecsMessage msg) {
-		offerSendedMsgPassThroughQueue(msg);
-	}
-	
 	
 	/* Receive Secs-Message Pass-through Listener */
 	private final Collection<SecsMessagePassThroughListener> recvMsgPassThroughListeners = new CopyOnWriteArrayList<>();
@@ -348,12 +334,8 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		});
 	}
 	
-	protected final boolean offerRecvMsgPassThroughQueue(SecsMessage msg) {
-		return recvMsgPassThroughQueue.offer(msg);
-	}
-	
-	protected void notifyReceiveMessagePassThrough(SecsMessage msg) {
-		offerRecvMsgPassThroughQueue(msg);
+	public void notifyReceiveMessagePassThrough(SecsMessage msg) throws InterruptedException {
+		recvMsgPassThroughQueue.put(msg);
 	}
 	
 }

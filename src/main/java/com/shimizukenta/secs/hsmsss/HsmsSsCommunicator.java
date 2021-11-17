@@ -1,15 +1,9 @@
 package com.shimizukenta.secs.hsmsss;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
-import com.shimizukenta.secs.SecsSendMessageException;
-import com.shimizukenta.secs.SecsWaitReplyMessageException;
-import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
-import com.shimizukenta.secs.hsms.HsmsMessageSelectStatus;
-import com.shimizukenta.secs.secs2.Secs2;
 
 /**
  * This interface is implementation of HSMS-SS (SEMI-E37.1).
@@ -53,7 +47,7 @@ public interface HsmsSsCommunicator extends SecsCommunicator {
 		}
 		default: {
 			
-			throw new IllegalStateException("undefined protocol: " + config.connectionMode());
+			throw new IllegalStateException("undefined connecton-mode: " + config.connectionMode());
 		}
 		}
 	}
@@ -99,88 +93,4 @@ public interface HsmsSsCommunicator extends SecsCommunicator {
 	 */
 	public boolean linktest() throws InterruptedException;
 	
-	/**
-	 * Send HSMS-SS-Message and receive Reply-Message if exist.
-	 * 
-	 * <p>
-	 * Blocking-method.<br />
-	 * Send Primary-HsmsSsMessage and 
-	 * wait until received Reply-HsmsSsMessage if exist.
-	 * </p>
-	 * 
-	 * @param msg
-	 * @return reply-HsmsSsMessage if exist
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws InterruptedException
-	 */
-	public Optional<HsmsSsMessage> send(HsmsSsMessage msg)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException,
-			InterruptedException;
-	
-	/**
-	 * Create header-only HsmsSsMessage.
-	 * 
-	 * @param header
-	 * @return HsmsSsMessage
-	 */
-	public HsmsSsMessage createHsmsSsMessage(byte[] header);
-	
-	/**
-	 * Create HsmsSsMessage.
-	 * 
-	 * @param header
-	 * @param body
-	 * @return HsmsSsMessage
-	 */
-	public HsmsSsMessage createHsmsSsMessage(byte[] header, Secs2 body);
-	
-	/**
-	 * Create Select-Request.
-	 * 
-	 * @return Select-Request-HsmsSsMessage
-	 */
-	public HsmsSsMessage createSelectRequest();
-	
-	/**
-	 * Create Select-Response.
-	 * 
-	 * @param primary-message
-	 * @param select-status
-	 * @return Select-Response-HsmsSsMessage
-	 */
-	public HsmsSsMessage createSelectResponse(HsmsSsMessage primary, HsmsMessageSelectStatus status);
-	
-	/**
-	 * Create Linktest-Request.
-	 * 
-	 * @return Linktest-Request-HsmsSsMessage
-	 */
-	public HsmsSsMessage createLinktestRequest();
-	
-	/**
-	 * Create Linktest-Response.
-	 * 
-	 * @param primary-message
-	 * @return Linktest-Response-HsmsSsMessage
-	 */
-	public HsmsSsMessage createLinktestResponse(HsmsSsMessage primary);
-	
-	/**
-	 * Create Reject-Request.
-	 * 
-	 * @param ref
-	 * @param reason
-	 * @return Reject-Request-HsmsSsMessage
-	 */
-	public HsmsSsMessage createRejectRequest(HsmsSsMessage ref, HsmsMessageRejectReason reason);
-	
-	/**
-	 * Create Separate-Request.
-	 * 
-	 * @return Separate-Request-HsmsSsMessage
-	 */
-	public HsmsSsMessage createSeparateRequest();
-
 }

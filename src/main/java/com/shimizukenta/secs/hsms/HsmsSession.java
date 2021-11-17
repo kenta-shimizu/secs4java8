@@ -23,7 +23,7 @@ public interface HsmsSession extends SecsCommunicator {
 	 * @throws HsmsException
 	 * @throws InterruptedException
 	 */
-	public Optional<HsmsMessage> send(AbstractHsmsMessage msg)
+	public Optional<HsmsMessage> send(HsmsMessage msg)
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException;
 	

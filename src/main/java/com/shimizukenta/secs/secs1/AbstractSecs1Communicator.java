@@ -98,7 +98,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			
 			this.sendMgr.enter(msg);
 			
-			this.offerTrySendMsgPassThroughQueue(msg);
+			this.notifyTrySendMessagePassThrough(msg);
 			this.notifyLog(new Secs1TrySendMessageLog(msg));
 			
 			if ( msg.wbit() ) {
@@ -287,7 +287,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 								if ( pack.ebit() ) {
 									
 									this.sendMgr.putSended(pack.message());
-									this.offerSendedMsgPassThroughQueue(pack.message());
+									this.notifySendedMessagePassThrough(pack.message());
 									this.notifyLog(new Secs1SendedMessageLog(pack.message()));
 									
 									return;
@@ -449,10 +449,10 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 				AbstractSecs1Message m = this.transMgr.put(s1msg);
 				
 				if ( m != null ) {
-					this.offerMsgRecvQueue(m);
+					this.notifyReceiveMessage(m);
 				}
 				
-				this.offerRecvMsgPassThroughQueue(s1msg);
+				this.notifyReceiveMessagePassThrough(s1msg);
 				this.notifyLog(new Secs1ReceiveMessageLog(s1msg));
 			}
 			catch ( Secs2Exception e ) {

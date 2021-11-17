@@ -22,6 +22,9 @@ public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	private final CollectionProperty<Integer> sessionIds = CollectionProperty.newSet();
 	
 	public boolean addSessionId(int id) {
+		if ( id < 0 || id > 0xFFFF ) {
+			throw new IllegalArgumentException("Session-ID is in 0 - 65535, id=" + id);
+		}
 		return this.sessionIds.add(Integer.valueOf(id));
 	}
 	

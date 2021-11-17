@@ -11,7 +11,6 @@ import com.shimizukenta.secs.SecsMessageReceiveBiListener;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.HsmsSession;
-import com.shimizukenta.secs.hsms.HsmsUnknownSessionIdException;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.sml.SmlMessage;
 
@@ -19,7 +18,7 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	
 	public Set<HsmsSession> getSessions();
 	
-	public HsmsSession getSession(int sessionId) throws HsmsUnknownSessionIdException;
+	public HsmsSession getSession(int sessionId) throws HsmsGsUnknownSessionIdException;
 	
 	public boolean existSession(int sessionId);
 	

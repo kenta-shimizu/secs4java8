@@ -19,6 +19,15 @@ public interface HsmsAsyncSocketChannel {
 	public boolean addHsmsMessageReceiveListener(HsmsMessageReceiveListener l);
 	public boolean removeHsmsMessageReceiveListener(HsmsMessageReceiveListener l);
 	
+	public boolean addTrySendMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	public boolean removeTrySendMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);	
+	
+	public boolean addSendedMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	public boolean removeSendedMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);	
+	
+	public boolean addReceiveMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	public boolean removeReceiveMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	
 	public Optional<HsmsMessage> sendSelectRequest(
 			AbstractHsmsSession session)
 					throws HsmsSendMessageException,
@@ -99,5 +108,11 @@ public interface HsmsAsyncSocketChannel {
 					HsmsWaitReplyMessageException,
 					HsmsException,
 					InterruptedException;
+	
+	public Optional<HsmsMessage> sendHsmsMessage(HsmsMessage msg)
+			throws HsmsSendMessageException,
+			HsmsWaitReplyMessageException,
+			HsmsException,
+			InterruptedException;
 	
 }

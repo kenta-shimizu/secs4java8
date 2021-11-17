@@ -71,53 +71,59 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 					SocketAddress remote = null;
 					
 					try {
-						
-						local = channel.getLocalAddress();
-						remote = channel.getRemoteAddress();
-						
-						addChannel(channel);
-						
-						notifyLog(Secs1OnTcpIpConnectionLog.connected(local, remote));
-						
-						final Collection<Callable<Void>> tasks = Arrays.asList(
-								() -> {
-									reading(channel);
-									return null;
-								});
-						
-						executeInvokeAny(tasks);
-						
-					}
-					catch ( IOException e ) {
-						notifyLog(e);
-					}
-					catch ( InterruptedException ignore) {
-					}
-					catch ( ExecutionException e ) {
-						
-						Throwable t = e.getCause();
-						
-						if ( t instanceof RuntimeException ) {
-							throw (RuntimeException)t;
-						}
-						
-						notifyLog(t);
-					}
-					finally {
-						
-						removeChannel(channel);
-						
 						try {
-							channel.shutdownOutput();
+							
+							local = channel.getLocalAddress();
+							remote = channel.getRemoteAddress();
+							
+							addChannel(channel);
+							
+							notifyLog(Secs1OnTcpIpConnectionLog.connected(local, remote));
+							
+							final Collection<Callable<Void>> tasks = Arrays.asList(
+									() -> {
+										reading(channel);
+										return null;
+									});
+							
+							executeInvokeAny(tasks);
+							
 						}
-						catch ( IOException giveup ) {
+						catch ( IOException e ) {
+							notifyLog(e);
 						}
-						
-						notifyLog(Secs1OnTcpIpConnectionLog.disconnected(local, remote));
-						
-						synchronized ( channel ) {
-							channel.notifyAll();
+						catch ( ExecutionException e ) {
+							
+							Throwable t = e.getCause();
+							
+							if ( t instanceof RuntimeException ) {
+								throw (RuntimeException)t;
+							}
+							
+							notifyLog(t);
 						}
+						finally {
+							
+							removeChannel(channel);
+							
+							try {
+								channel.shutdownOutput();
+							}
+							catch ( IOException giveup ) {
+							}
+							
+							try {
+								notifyLog(Secs1OnTcpIpConnectionLog.disconnected(local, remote));
+							}
+							catch ( InterruptedException ignore ) {
+							}
+							
+							synchronized ( channel ) {
+								channel.notifyAll();
+							}
+						}
+					}
+					catch ( InterruptedException ignore ) {
 					}
 				}
 				
@@ -125,7 +131,11 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 				public void failed(Throwable t, Void attachment) {
 					
 					if ( ! (t instanceof ClosedChannelException) ) {
-						notifyLog(t);
+						try {
+							notifyLog(t);
+						}
+						catch ( InterruptedException ignore ) {
+						}
 					}
 					
 					synchronized ( channel ) {
