@@ -27,17 +27,7 @@ public interface HsmsSsCommunicator extends HsmsCommunicator {
 		
 		switch ( config.connectionMode().get() ) {
 		case PASSIVE: {
-			
-//			if ( config.rebindIfPassive().geZero() ) {
-//				
-//				return new AbstractHsmsSsRebindPassiveCommunicator(config) {};
-//				
-//			} else {
-//				
-//				return new AbstractHsmsSsPassiveCommunicator(config) {};
-//			}
-			
-			return null;
+			return new AbstractHsmsSsPassiveCommunicator(config) {};
 			/* break; */
 		}
 		case ACTIVE: {

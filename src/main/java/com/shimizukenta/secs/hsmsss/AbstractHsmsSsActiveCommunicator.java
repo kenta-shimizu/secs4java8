@@ -18,6 +18,7 @@ import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsException;
 import com.shimizukenta.secs.hsms.HsmsMessage;
+import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
 import com.shimizukenta.secs.hsms.HsmsMessageSelectStatus;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
@@ -41,9 +42,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 		super.open();
 		
 		executeLoopTask(() -> {
-			
 			activeCircuit();
-			
 			this.config.timeout().t5().sleep();
 		});
 	}
@@ -218,7 +217,8 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 				if ( ! this.getSession().setAsyncSocketChannel(asyncChannel) ) {
 					return;
 				}
-				break;
+				
+				break; /* success */
 			}
 			default: {
 				return;
@@ -227,8 +227,79 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 			
 			this.notifyHsmsCommunicateState(HsmsCommunicateState.SELECTED);
 			
-			//TODO
+			final Collection<Callable<Void>> tasks = Arrays.asList(
+					() -> {
+						try {
+							for ( ;; ) {
+								HsmsMessage msg = queue.take();
+								
+								switch ( msg.messageType() ) {
+								case DATA: {
+									
+									this.notifyReceiveMessage(msg);
+									break;
+								}
+								case SELECT_REQ:
+								case DESELECT_REQ: {
+									
+									asyncChannel.sendRejectRequest(msg, HsmsMessageRejectReason.NOT_SUPPORT_TYPE_S);
+									break;
+								}
+								case LINKTEST_REQ: {
+									
+									asyncChannel.sendLinktestResponse(msg);
+									break;
+								}
+								case SEPARATE_REQ: {
+									
+									return null;
+									/* break; */
+								}
+								case SELECT_RSP:
+								case DESELECT_RSP:
+								case LINKTEST_RSP:
+								case REJECT_REQ:
+								default: {
+									/* ignore */
+								}
+								}
+							}
+						}
+						catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException e ) {
+							this.notifyLog(e);
+						}
+						catch ( InterruptedException ignore ) {
+						}
+						
+						return null;
+					},
+					() -> {
+						try {
+							asyncChannel.linktesting();
+						}
+						catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException e ) {
+							this.notifyLog(e);
+						}
+						catch ( InterruptedException ignore ) {
+						}
+						
+						return null;
+					}
+					);
 			
+			try {
+				this.executeInvokeAny(tasks);
+			}
+			catch ( ExecutionException e ) {
+				
+				Throwable t = e.getCause();
+				
+				if ( t instanceof RuntimeException ) {
+					throw (RuntimeException)t;
+				}
+				
+				this.notifyLog(t);
+			}
 		}
 		finally {
 			this.getSession().unsetAsyncSocketChannel();
