@@ -2,9 +2,7 @@ package com.shimizukenta.secs.hsms;
 
 import java.util.Optional;
 
-import com.shimizukenta.secs.SecsCommunicator;
-
-public interface HsmsSession extends SecsCommunicator {
+public interface HsmsSession extends HsmsCommunicator {
 	
 	/**
 	 * Returns Session-ID

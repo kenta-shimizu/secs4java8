@@ -4,19 +4,23 @@ import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.Optional;
 
-import com.shimizukenta.secs.AbstractSecsCommunicator;
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
+import com.shimizukenta.secs.SecsException;
+import com.shimizukenta.secs.SecsMessage;
+import com.shimizukenta.secs.SecsSendMessageException;
+import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
+import com.shimizukenta.secs.hsms.AbstractHsmsCommunicator;
 import com.shimizukenta.secs.hsms.AbstractHsmsLinktest;
 import com.shimizukenta.secs.hsms.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.AbstractHsmsSession;
-import com.shimizukenta.secs.hsms.HsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.HsmsException;
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageBuilder;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsTransactionManager;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
+import com.shimizukenta.secs.secs2.Secs2;
 
 /**
  * This abstract class is implementation of HSMS-SS (SEMI-E37.1).
@@ -24,7 +28,7 @@ import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
  * @author kenta-shimizu
  *
  */
-public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicator
+public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicator
 		implements HsmsSsCommunicator {
 	
 	private final HsmsSsCommunicatorConfig config;
@@ -35,32 +39,42 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 		
 		this.config = config;
 		
-		this.session = new AbstractHsmsSession(config) {
+		this.session = new InnerHsmsSsSession(
+				config,
+				config.sessionId().intValue());
+	}
+	
+	private final class InnerHsmsSsSession extends AbstractHsmsSession {
+		
+		private final int sessionId;
+		
+		public InnerHsmsSsSession(HsmsSsCommunicatorConfig config, int sessionId) {
+			super(config);
+			this.sessionId = sessionId;
+		}
 
-			@Override
-			public int sessionId() {
-				
-				return 1;
+		@Override
+		public int sessionId() {
+			return this.sessionId;
+		}
+
+		@Override
+		public boolean linktest() throws InterruptedException {
+			
+			try {
+				Optional<HsmsMessage> op = this.asyncSocketChannel().sendLinktestRequest(this);
+				return op.isPresent();
 			}
-
-			@Override
-			protected HsmsAsyncSocketChannel asyncSocketChannel() {
-				// TODO Auto-generated method stub
-				return null;
-			}};
+			catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException giveup ) {
+			}
+			
+			return false;
+		}
 	}
 	
 	@Override
 	public void open() throws IOException {
 		super.open();
-		
-//		this.hsmsCommStateProperty.addChangeListener(state -> {
-//			notifyLog(HsmsSsCommunicateStateChangeLog.get(state));
-//		});
-//		
-//		this.hsmsCommStateProperty.addChangeListener(state -> {
-//			notifyCommunicatableStateChange(state.communicatable());
-//		});
 	}
 	
 	@Override
@@ -68,11 +82,42 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 		super.close();
 	}
 	
+	@Override
+	public boolean linktest() throws InterruptedException {
+		return this.getSession().linktest();
+	}
+	
+	@Override
+	public Optional<SecsMessage> send(
+			int strm,
+			int func,
+			boolean wbit,
+			Secs2 secs2)
+					throws SecsSendMessageException,
+					SecsWaitReplyMessageException,
+					SecsException,
+					InterruptedException {
+		
+		return this.getSession().send(strm, func, wbit, secs2);
+	}
+
+	@Override
+	public Optional<SecsMessage> send(
+			SecsMessage primaryMsg,
+			int strm,
+			int func,
+			boolean wbit,
+			Secs2 secs2)
+					throws SecsSendMessageException,
+					SecsWaitReplyMessageException,
+					SecsException,
+					InterruptedException {
+		
+		return this.getSession().send(primaryMsg, strm, func, wbit, secs2);
+	}
+	
 	protected AbstractHsmsSession getSession() {
-		
-		//TODO
-		
-		return null;
+		return this.session;
 	}
 	
 	private final HsmsMessageBuilder msgBuilder = new AbstractHsmsSsMessageBuilder() {};
@@ -101,14 +146,8 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 					HsmsException,
 					InterruptedException {
 				
-				for (AbstractHsmsSession s : AbstractHsmsSsCommunicator.this.getAbstractHsmsSessions()) {
-					return InnerHsmsSsAsyncSocketChannel.this.sendLinktestRequest(s);
-				}
-				
-				//TODO
-				//throw
-				
-				return null;
+				return InnerHsmsSsAsyncSocketChannel.this.sendLinktestRequest(
+						AbstractHsmsSsCommunicator.this.getSession());
 			}
 		}
 		
@@ -152,55 +191,46 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 		}
 	}
 	
-	protected HsmsAsyncSocketChannel buildAsyncSocketChannel(AsynchronousSocketChannel channel) {
-		return new InnerHsmsSsAsyncSocketChannel(channel);
+	protected AbstractHsmsAsyncSocketChannel buildAsyncSocketChannel(AsynchronousSocketChannel channel) {
+		
+		final AbstractHsmsAsyncSocketChannel x = new InnerHsmsSsAsyncSocketChannel(channel);
+		
+		x.addSecsLogListener(log -> {
+			try {
+				this.notifyLog(log);
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		});
+		
+		x.addTrySendHsmsMessagePassThroughListener(msg -> {
+			try {
+				this.notifyTrySendHsmsMessagePassThrough(msg);
+				this.notifyTrySendMessagePassThrough(msg);
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		});
+		
+		x.addSendedHsmsMessagePassThroughListener(msg -> {
+			try {
+				this.notifySendedHsmsMessagePassThrough(msg);
+				this.notifySendedMessagePassThrough(msg);
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		});
+		
+		x.addReceiveHsmsMessagePassThroughListener(msg -> {
+			try {
+				this.notifyReceiveHsmsMessagePassThrough(msg);
+				this.notifyReceiveMessagePassThrough(msg);
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		});
+		
+		return x;
 	}
-
-	
-	
-//	private final Object syncSelectedConnection = new Object();
-//	
-//	protected boolean addSelectedConnection(AbstractInnerConnection c) {
-//		synchronized ( syncSelectedConnection ) {
-//			if ( this.selectedConnection == null ) {
-//				this.selectedConnection = c;
-//				return true;
-//			} else {
-//				return false;
-//			}
-//		}
-//	}
-//	
-//	protected boolean removeSelectedConnection(AbstractInnerConnection c) {
-//		synchronized ( this.syncSelectedConnection ) {
-//			if ( this.selectedConnection == null ) {
-//				return false;
-//			} else {
-//				this.selectedConnection = null;
-//				return true;
-//			}
-//		}
-//	}
-//	
-//	/* HSMS Communicate State */
-//	protected HsmsCommunicateState hsmsSsCommunicateState() {
-//		return hsmsCommStateProperty.get();
-//	}
-//	
-//	protected void notifyHsmsSsCommunicateStateChange(HsmsCommunicateState state) {
-//		hsmsCommStateProperty.set(state);
-//	}
-//	
-//	
-//	
-//	@Override
-//	public boolean linktest() throws InterruptedException {
-//		try {
-//			return send(createLinktestRequest()).isPresent();
-//		}
-//		catch ( SecsException e ) {
-//			return false;
-//		}
-//	}
 	
 }

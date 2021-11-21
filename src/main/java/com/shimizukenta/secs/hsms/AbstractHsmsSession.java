@@ -2,11 +2,10 @@ package com.shimizukenta.secs.hsms;
 
 import java.util.Optional;
 
-import com.shimizukenta.secs.AbstractSecsCommunicator;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 
-public abstract class AbstractHsmsSession extends AbstractSecsCommunicator implements HsmsSession {
+public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator implements HsmsSession {
 	
 	private AbstractHsmsAsyncSocketChannel channel;
 	
@@ -39,12 +38,10 @@ public abstract class AbstractHsmsSession extends AbstractSecsCommunicator imple
 		}
 	}
 	
-	protected HsmsAsyncSocketChannel asyncSocketChannel() {
+	protected AbstractHsmsAsyncSocketChannel asyncSocketChannel() throws HsmsSessionNotSelectedException {
 		synchronized ( this.syncChannel ) {
 			if ( this.channel == null ) {
-				
-				//TODO
-				//throw exception
+				throw new HsmsSessionNotSelectedException();
 			}
 			return this.channel;
 		}
@@ -55,9 +52,7 @@ public abstract class AbstractHsmsSession extends AbstractSecsCommunicator imple
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException {
 		
-		synchronized ( this.syncChannel ) {
-			return this.asyncSocketChannel().send(this, strm, func, wbit, secs2).map(m -> (SecsMessage)m);
-		}
+		return this.asyncSocketChannel().send(this, strm, func, wbit, secs2).map(m -> (SecsMessage)m);
 	}
 	
 	@Override
@@ -65,9 +60,7 @@ public abstract class AbstractHsmsSession extends AbstractSecsCommunicator imple
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException {
 		
-		synchronized ( this.syncChannel ) {
-			return this.asyncSocketChannel().send(primaryMsg, strm, func, wbit, secs2).map(m -> (SecsMessage)m);
-		}
+		return this.asyncSocketChannel().send(primaryMsg, strm, func, wbit, secs2).map(m -> (SecsMessage)m);
 	}
 	
 	@Override
@@ -75,9 +68,7 @@ public abstract class AbstractHsmsSession extends AbstractSecsCommunicator imple
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException {
 		
-		synchronized ( this.syncChannel ) {
-			return this.asyncSocketChannel().sendHsmsMessage(msg);
-		}
+		return this.asyncSocketChannel().sendHsmsMessage(msg);
 	}
 	
 	@Override

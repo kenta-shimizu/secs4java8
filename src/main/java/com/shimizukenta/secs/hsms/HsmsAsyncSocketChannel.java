@@ -1,7 +1,9 @@
 package com.shimizukenta.secs.hsms;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
+import com.shimizukenta.secs.AbstractSecsLog;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 
@@ -19,14 +21,17 @@ public interface HsmsAsyncSocketChannel {
 	public boolean addHsmsMessageReceiveListener(HsmsMessageReceiveListener l);
 	public boolean removeHsmsMessageReceiveListener(HsmsMessageReceiveListener l);
 	
-	public boolean addTrySendMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
-	public boolean removeTrySendMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);	
+	public boolean addTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	public boolean removeTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);	
 	
-	public boolean addSendedMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
-	public boolean removeSendedMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);	
+	public boolean addSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	public boolean removeSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);	
 	
-	public boolean addReceiveMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
-	public boolean removeReceiveMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	public boolean addReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	
+	public boolean addSecsLogListener(Consumer<? super AbstractSecsLog> lstnr);
+	public boolean removeSecsLogListener(Consumer<? super AbstractSecsLog> lstnr);
 	
 	public Optional<HsmsMessage> sendSelectRequest(
 			AbstractHsmsSession session)

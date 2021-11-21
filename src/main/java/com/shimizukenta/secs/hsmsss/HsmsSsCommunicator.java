@@ -2,8 +2,7 @@ package com.shimizukenta.secs.hsmsss;
 
 import java.io.IOException;
 
-import com.shimizukenta.secs.SecsCommunicator;
-import com.shimizukenta.secs.SecsException;
+import com.shimizukenta.secs.hsms.HsmsCommunicator;
 
 /**
  * This interface is implementation of HSMS-SS (SEMI-E37.1).
@@ -11,13 +10,12 @@ import com.shimizukenta.secs.SecsException;
  * <p>
  * To create newInstance, {@link #newInstance(HsmsSsCommunicatorConfig)}<br />
  * To create newInstance and open, {@link #open(HsmsSsCommunicatorConfig)}<br />
- * To linktest, {@link #linktest()}<br />
  * </p>
  * 
  * @author kenta-shimizu
  *
  */
-public interface HsmsSsCommunicator extends SecsCommunicator {
+public interface HsmsSsCommunicator extends HsmsCommunicator {
 	
 	/**
 	 * create new HSMS-SS-Communicator instance.
@@ -30,14 +28,16 @@ public interface HsmsSsCommunicator extends SecsCommunicator {
 		switch ( config.connectionMode().get() ) {
 		case PASSIVE: {
 			
-			if ( config.rebindIfPassive().geZero() ) {
-				
-				return new AbstractHsmsSsRebindPassiveCommunicator(config) {};
-				
-			} else {
-				
-				return new AbstractHsmsSsPassiveCommunicator(config) {};
-			}
+//			if ( config.rebindIfPassive().geZero() ) {
+//				
+//				return new AbstractHsmsSsRebindPassiveCommunicator(config) {};
+//				
+//			} else {
+//				
+//				return new AbstractHsmsSsPassiveCommunicator(config) {};
+//			}
+			
+			return null;
 			/* break; */
 		}
 		case ACTIVE: {
@@ -79,18 +79,5 @@ public interface HsmsSsCommunicator extends SecsCommunicator {
 		
 		return inst;
 	}
-	
-	/**
-	 * HSMS-SS linktest.
-	 * 
-	 * <p>
-	 * Blocking-method.
-	 * </p>
-	 * 
-	 * @return {@code true} if success
-	 * @throws InterruptedException
-	 * @throws SecsException
-	 */
-	public boolean linktest() throws InterruptedException;
 	
 }

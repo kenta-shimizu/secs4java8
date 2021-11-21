@@ -8,32 +8,33 @@ import java.nio.channels.CompletionHandler;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.LinkedBlockingQueue;
 
-import com.shimizukenta.secs.SecsException;
+import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
+import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
+import com.shimizukenta.secs.hsms.HsmsException;
+import com.shimizukenta.secs.hsms.HsmsMessage;
+import com.shimizukenta.secs.hsms.HsmsMessageSelectStatus;
+import com.shimizukenta.secs.hsms.HsmsSendMessageException;
+import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 
-/**
- * This abstract class is implementation of HSMS-SS-Active-Communicator(SEMI-E37.1).
- * 
- * <p>
- * This class is called from {@link HsmsSsCommunicator#newInstance(HsmsSsCommunicatorConfig)<br />
- * </p>
- * 
- * @author kenta-shimizu
- *
- */
 public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCommunicator {
 
+	private final HsmsSsCommunicatorConfig config;
+	
 	public AbstractHsmsSsActiveCommunicator(HsmsSsCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
+		this.config = config;
 	}
 	
 	@Override
 	public void open() throws IOException {
 		
-		if ( hsmsSsConfig().connectionMode().get() != HsmsConnectionMode.ACTIVE ) {
+		if ( this.config.connectionMode().get() != HsmsConnectionMode.ACTIVE ) {
 			throw new IOException("HsmsSsCommunicatorConfig#connectionMode is not ACTIVE");
 		}
 		
@@ -43,7 +44,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 			
 			activeCircuit();
 			
-			hsmsSsConfig().timeout().t5().sleep();
+			this.config.timeout().t5().sleep();
 		});
 	}
 	
@@ -58,7 +59,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 				AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
 				) {
 			
-			final SocketAddress socketAddr = hsmsSsConfig().socketAddress().getSocketAddress();
+			final SocketAddress socketAddr = this.config.socketAddress().getSocketAddress();
 			
 			try {
 				notifyLog(HsmsSsConnectionLog.tryConnect(socketAddr));
@@ -72,15 +73,18 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 						SocketAddress remote = null;
 						
 						try {
-							local = channel.getLocalAddress();
-							remote = channel.getRemoteAddress();
 							
-							notifyLog(HsmsSsConnectionLog.connected(local, remote));
-							
-							completionAction(channel);
-						}
-						catch ( IOException e ) {
-							notifyLog(e);
+							try {
+								local = channel.getLocalAddress();
+								remote = channel.getRemoteAddress();
+								
+								notifyLog(HsmsSsConnectionLog.connected(local, remote));
+								
+								completionAction(channel);
+							}
+							catch ( IOException e ) {
+								notifyLog(e);
+							}
 						}
 						catch ( InterruptedException ignore ) {
 						}
@@ -96,7 +100,11 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 								channel.notifyAll();
 							}
 							
-							notifyLog(HsmsSsConnectionLog.closed(local, remote));
+							try {
+								notifyLog(HsmsSsConnectionLog.closed(local, remote));
+							}
+							catch ( InterruptedException ignore ) {
+							}
 						}
 					}
 					
@@ -104,7 +112,12 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 					public void failed(Throwable t, Void attachment) {
 						
 						if ( ! (t instanceof ClosedChannelException) ) {
-							notifyLog(t);
+							
+							try {
+								notifyLog(t);
+							}
+							catch ( InterruptedException ignore ) {
+							}
 						}
 						
 						synchronized ( channel ) {
@@ -118,7 +131,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 				}
 			}
 			finally {
-				notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
+				notifyHsmsCommunicateState(HsmsCommunicateState.NOT_CONNECTED);
 			}
 		}
 		catch ( IOException e ) {
@@ -128,25 +141,37 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 	
 	private void completionAction(AsynchronousSocketChannel channel) throws InterruptedException {
 		
-		final ActiveInnerConnection conn = new ActiveInnerConnection(channel);
+		final AbstractHsmsAsyncSocketChannel asyncChannel = buildAsyncSocketChannel(channel);
 		
 		try {
 			
 			final Collection<Callable<Void>> tasks = Arrays.asList(
 					() -> {
 						try {
-							conn.reading();
+							try {
+								asyncChannel.reading();
+							}
+							catch ( HsmsException e ) {
+								this.notifyLog(e);
+							}
 						}
 						catch ( InterruptedException ignore ) {
 						}
+						
 						return null;
 					},
 					() -> {
 						try {
-							conn.mainTask();
+							try {
+								this.mainTask(asyncChannel);
+							}
+							catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException  e ) {
+								this.notifyLog(e);
+							}
 						}
 						catch ( InterruptedException ignore ) {
 						}
+						
 						return null;
 					});
 			
@@ -164,122 +189,49 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 		}
 	}
 	
-	protected class ActiveInnerConnection extends AbstractInnerConnection {
-
-		protected ActiveInnerConnection(AsynchronousSocketChannel channel) {
-			super(channel);
-		}
+	private final void mainTask(AbstractHsmsAsyncSocketChannel asyncChannel)
+			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
+			InterruptedException {
 		
-		protected void mainTask() throws InterruptedException {
-			
-			notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_SELECTED);
-			
+		final BlockingQueue<HsmsMessage> queue = new LinkedBlockingQueue<>();
+		
+		asyncChannel.addHsmsMessageReceiveListener(msg -> {
 			try {
-				HsmsSsMessageSelectStatus ss = send(createSelectRequest())
-						.map(HsmsSsMessageSelectStatus::get)
-						.orElse(HsmsSsMessageSelectStatus.NOT_SELECT_RSP);
+				queue.put(msg);
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		});
+		
+		try {
 			
-				switch ( ss ) {
-				case SUCCESS:
-				case ACTIVED: {
-					
-					/* to next Loop */
-					break;
-				}
-				default: {
+			this.notifyHsmsCommunicateState(HsmsCommunicateState.NOT_SELECTED);
+			
+			HsmsMessageSelectStatus selectStatus = asyncChannel.sendSelectRequest(this.getSession())
+					.map(HsmsMessageSelectStatus::get)
+					.orElse(HsmsMessageSelectStatus.NOT_SELECT_RSP);
+			
+			switch ( selectStatus ) {
+			case SUCCESS:
+			case ACTIVED: {
+				
+				if ( ! this.getSession().setAsyncSocketChannel(asyncChannel) ) {
 					return;
 				}
-				}
+				break;
 			}
-			catch ( SecsException e ) {
-				notifyLog(e);
+			default: {
 				return;
 			}
+			}
 			
-			try {
-				
-				if ( ! addSelectedConnection(this) ) {
-					return;
-				}
-				
-				notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.SELECTED);
-				
-				final Collection<Callable<Void>> tasks = Arrays.asList(
-						() -> {
-							try {
-								this.linktesting();
-							}
-							catch ( InterruptedException ignore ) {
-							}
-							return null;
-						},
-						() -> {
-							try {
-								this.receivingMsgTask();
-							}
-							catch ( InterruptedException ignore ) {
-							}
-							catch ( SecsException e ) {
-								notifyLog(e);
-							}
-							return null;
-						});
-				
-				executeInvokeAny(tasks);
-			}
-			catch ( ExecutionException e ) {
-				
-				Throwable t = e.getCause();
-				
-				if ( t instanceof RuntimeException ) {
-					throw (RuntimeException)t;
-				}
-				
-				notifyLog(t);
-			}
-			finally {
-				notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
-				removeSelectedConnection(this);
-			}
+			this.notifyHsmsCommunicateState(HsmsCommunicateState.SELECTED);
+			
+			//TODO
 			
 		}
-		
-		protected void receivingMsgTask() throws InterruptedException, SecsException {
-			
-			for ( ;; ) {
-				
-				final HsmsSsMessage msg = this.takeReceiveMessage();
-				
-				switch ( HsmsSsMessageType.get(msg) ) {
-				case DATA: {
-					
-					notifyReceiveMessage(msg);
-					break;
-				}
-				case SELECT_REQ: {
-					
-					send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
-					break;
-				}
-				case LINKTEST_REQ: {
-					
-					send(createLinktestResponse(msg));
-					break;
-				}
-				case SEPARATE_REQ: {
-					
-					return;
-					/* break; */
-				}
-				case SELECT_RSP:
-				case LINKTEST_RSP:
-				case REJECT_REQ:
-				default: {
-					
-					/* ignore */
-				}
-				}
-			}
+		finally {
+			this.getSession().unsetAsyncSocketChannel();
 		}
 	}
 	

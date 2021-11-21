@@ -12,8 +12,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.shimizukenta.secs.AbstractSecsLog;
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
@@ -101,20 +103,19 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 					throw new HsmsControlMessageLengthBytesUpperThanTenException(type, msgLength);
 				}
 				
-				this.recvMsgPassThroughLstnrs.forEach(l -> {
-					l.passThrough(msg);
-				});
-				
-				//TODO
-				//log-received
-				
 				AbstractHsmsMessage r = this.transactionManager().put(msg);
 				
 				if ( r != null ) {
-					this.recvMsgLstnrs.forEach(l -> {
+					this.recvHsmsMsgLstnrs.forEach(l -> {
 						l.received(r);
 					});
 				}
+				
+				this.recvHsmsMsgPassThroughLstnrs.forEach(l -> {
+					l.passThrough(msg);
+				});
+				
+					this.notifyLog(new HsmsReceiveMessageLog(msg));
 			}
 		}
 		catch ( Secs2BytesParseException e ) {
@@ -209,52 +210,70 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 		}
 	}
 	
-	private final Collection<HsmsMessageReceiveListener> recvMsgLstnrs = new CopyOnWriteArrayList<>();
+	private final Collection<HsmsMessageReceiveListener> recvHsmsMsgLstnrs = new CopyOnWriteArrayList<>();
 	
 	@Override
 	public boolean addHsmsMessageReceiveListener(HsmsMessageReceiveListener l) {
-		return this.recvMsgLstnrs.add(l);
+		return this.recvHsmsMsgLstnrs.add(l);
 	}
 	
 	@Override
 	public boolean removeHsmsMessageReceiveListener(HsmsMessageReceiveListener l) {
-		return this.recvMsgLstnrs.remove(l);
+		return this.recvHsmsMsgLstnrs.remove(l);
 	}
 	
-	private final Collection<HsmsMessagePassThroughListener> trySendMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	private final Collection<HsmsMessagePassThroughListener> trySendHsmsMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
 	
 	@Override
-	public boolean addTrySendMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.trySendMsgPassThroughLstnrs.add(lstnr);
-	}
-	
-	@Override
-	public boolean removeTrySendMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.trySendMsgPassThroughLstnrs.remove(lstnr);
-	}
-	
-	private final Collection<HsmsMessagePassThroughListener> sendedMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
-	
-	@Override
-	public boolean addSendedMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.sendedMsgPassThroughLstnrs.add(lstnr);
+	public boolean addTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
+		return this.trySendHsmsMsgPassThroughLstnrs.add(lstnr);
 	}
 	
 	@Override
-	public boolean removeSendedMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.sendedMsgPassThroughLstnrs.remove(lstnr);
+	public boolean removeTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
+		return this.trySendHsmsMsgPassThroughLstnrs.remove(lstnr);
 	}
 	
-	private final Collection<HsmsMessagePassThroughListener> recvMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	private final Collection<HsmsMessagePassThroughListener> sendedHsmsMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
 	
 	@Override
-	public boolean addReceiveMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.recvMsgPassThroughLstnrs.add(lstnr);
+	public boolean addSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
+		return this.sendedHsmsMsgPassThroughLstnrs.add(lstnr);
 	}
 	
 	@Override
-	public boolean removeReceiveMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.recvMsgPassThroughLstnrs.remove(lstnr);
+	public boolean removeSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
+		return this.sendedHsmsMsgPassThroughLstnrs.remove(lstnr);
+	}
+	
+	private final Collection<HsmsMessagePassThroughListener> recvHsmsMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	
+	@Override
+	public boolean addReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
+		return this.recvHsmsMsgPassThroughLstnrs.add(lstnr);
+	}
+	
+	@Override
+	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
+		return this.recvHsmsMsgPassThroughLstnrs.remove(lstnr);
+	}
+	
+	private final Collection<Consumer<? super AbstractSecsLog>> logLstnrs = new CopyOnWriteArrayList<>();
+	
+	@Override
+	public boolean addSecsLogListener(Consumer<? super AbstractSecsLog> lstnr) {
+		return this.logLstnrs.add(lstnr);
+	}
+	
+	@Override
+	public boolean removeSecsLogListener(Consumer<? super AbstractSecsLog> lstnr) {
+		return this.logLstnrs.remove(lstnr);
+	}
+	
+	protected void notifyLog(AbstractSecsLog log) {
+		this.logLstnrs.forEach(l -> {
+			l.accept(log);
+		});
 	}
 	
 	abstract protected HsmsMessageBuilder messageBuilder();
@@ -464,7 +483,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 					
 					this.sendOnlyHsmsMessage(msg);
 					
-					AbstractHsmsMessage r = this.transactionManager().reply(msg, this.timeoutT6());
+					AbstractHsmsMessage r = this.transactionManager().reply(msg, this.timeoutT3());
 					
 					if ( r == null ) {
 						throw new HsmsT3TimeoutException(msg);
@@ -531,12 +550,11 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 	private void sendOnlyHsmsMessage(AbstractHsmsMessage msg)
 			throws HsmsSendMessageException, HsmsException, InterruptedException {
 		
-		this.trySendMsgPassThroughLstnrs.forEach(l -> {
+		this.trySendHsmsMsgPassThroughLstnrs.forEach(l -> {
 			l.passThrough(msg);
 		});
 		
-		//TODO
-		//log-try-send
+		this.notifyLog(new HsmsTrySendMessageLog(msg));
 		
 		synchronized ( this.syncSendMsg ) {
 			
@@ -601,12 +619,11 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 			}
 		}
 		
-		this.sendedMsgPassThroughLstnrs.forEach(l -> {
+		this.sendedHsmsMsgPassThroughLstnrs.forEach(l -> {
 			l.passThrough(msg);
 		});
 		
-		//TODO
-		//log-semded
+		this.notifyLog(new HsmsSendedMessageLog(msg));
 	}
 	
 	private void sendByteBuffer(ByteBuffer buffer, HsmsMessage msg)
