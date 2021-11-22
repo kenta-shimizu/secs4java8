@@ -7,9 +7,9 @@ import java.util.Optional;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.gem.ONLACK;
+import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
-import com.shimizukenta.secs.hsmsss.HsmsSsProtocol;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 import com.shimizukenta.secs.sml.SmlMessage;
 import com.shimizukenta.secs.sml.SmlMessageParser;
@@ -50,7 +50,7 @@ public class ExampleHsmsSsActiveUseSml {
 		HsmsSsCommunicatorConfig config = new HsmsSsCommunicatorConfig();
 		
 		config.socketAddress(new InetSocketAddress("127.0.0.1", 5000));
-		config.protocol(HsmsSsProtocol.ACTIVE);
+		config.connectionMode(HsmsConnectionMode.ACTIVE);
 		config.sessionId(10);
 		config.isEquip(false);
 		config.linktest(60.0F);

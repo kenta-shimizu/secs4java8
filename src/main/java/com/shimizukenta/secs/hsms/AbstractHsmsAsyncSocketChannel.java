@@ -84,14 +84,14 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 				
 				/* build message */
 				((Buffer)headerBuffer).flip();
-				final byte[] headerBytes = new byte[10];
-				headerBuffer.put(headerBytes);
+				byte[] headerBytes = new byte[10];
+				headerBuffer.get(headerBytes);
 				
 				final List<byte[]> bodyBytes = bodyBuffers.stream()
 						.map(bf -> {
 							((Buffer)bf).flip();
 							byte[] bs = new byte[bf.remaining()];
-							bf.put(bs);
+							bf.get(bs);
 							return bs;
 						})
 						.collect(Collectors.toList());

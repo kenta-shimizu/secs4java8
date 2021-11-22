@@ -17,9 +17,9 @@ import com.shimizukenta.secs.SecsThrowableLog;
 import com.shimizukenta.secs.gem.ACKC6;
 import com.shimizukenta.secs.gem.COMMACK;
 import com.shimizukenta.secs.gem.ONLACK;
+import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
-import com.shimizukenta.secs.hsmsss.HsmsSsProtocol;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
@@ -47,7 +47,7 @@ public class PairHsmsSs {
 		final HsmsSsCommunicatorConfig hostConfig  = new HsmsSsCommunicatorConfig();
 		
 		equipConfig.logSubjectHeader("Equip: ");
-		equipConfig.protocol(HsmsSsProtocol.PASSIVE);
+		equipConfig.connectionMode(HsmsConnectionMode.PASSIVE);
 		equipConfig.socketAddress(addr);
 		equipConfig.sessionId(10);
 		equipConfig.isEquip(true);
@@ -58,7 +58,7 @@ public class PairHsmsSs {
 		equipConfig.gem().softrev("000001");
 		
 		hostConfig.logSubjectHeader("Host: ");
-		hostConfig.protocol(HsmsSsProtocol.ACTIVE);
+		hostConfig.connectionMode(HsmsConnectionMode.ACTIVE);
 		hostConfig.socketAddress(addr);
 		hostConfig.sessionId(10);
 		hostConfig.isEquip(false);

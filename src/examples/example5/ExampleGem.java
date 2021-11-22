@@ -20,9 +20,9 @@ import com.shimizukenta.secs.gem.LRACK;
 import com.shimizukenta.secs.gem.OFLACK;
 import com.shimizukenta.secs.gem.ONLACK;
 import com.shimizukenta.secs.gem.TIACK;
+import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
-import com.shimizukenta.secs.hsmsss.HsmsSsProtocol;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
@@ -45,7 +45,7 @@ public class ExampleGem {
 	public static void main(String[] args) {
 		
 		final HsmsSsCommunicatorConfig equipConf = new HsmsSsCommunicatorConfig();
-		equipConf.protocol(HsmsSsProtocol.PASSIVE);
+		equipConf.connectionMode(HsmsConnectionMode.PASSIVE);
 		equipConf.socketAddress(new InetSocketAddress("127.0.0.1", 5000));
 		equipConf.sessionId(10);
 		equipConf.isEquip(true);
@@ -54,7 +54,7 @@ public class ExampleGem {
 		equipConf.gem().clockType(ClockType.A16);
 		
 		final HsmsSsCommunicatorConfig hostConf = new HsmsSsCommunicatorConfig();
-		hostConf.protocol(HsmsSsProtocol.ACTIVE);
+		hostConf.connectionMode(HsmsConnectionMode.ACTIVE);
 		hostConf.socketAddress(new InetSocketAddress("127.0.0.1", 5000));
 		hostConf.sessionId(10);
 		hostConf.isEquip(false);

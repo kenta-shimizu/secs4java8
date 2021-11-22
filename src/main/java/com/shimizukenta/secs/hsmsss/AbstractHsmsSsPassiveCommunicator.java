@@ -20,6 +20,9 @@ import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsException;
 import com.shimizukenta.secs.hsms.HsmsMessage;
+import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
+import com.shimizukenta.secs.hsms.HsmsMessageSelectStatus;
+import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsT7TimeoutException;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
@@ -37,12 +40,12 @@ import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCommunicator {
 	
 	private final HsmsSsCommunicatorConfig config;
-	private Closeable serverChannel;
+	private Closeable refServerChannel;
 	
 	public AbstractHsmsSsPassiveCommunicator(HsmsSsCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
 		this.config = config;
-		this.serverChannel = null;
+		this.refServerChannel = null;
 	}
 	
 	@Override
@@ -73,8 +76,8 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		}
 		
 		try {
-			if ( this.serverChannel != null ) {
-				this.serverChannel.close();
+			if ( this.refServerChannel != null ) {
+				this.refServerChannel.close();
 			}
 		}
 		catch ( IOException e ) {
@@ -88,61 +91,46 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 	
 	private void openPassive() throws IOException {
 		
-		ReadOnlyTimeProperty tp = config.rebindIfPassive();
-		
-		if ( tp.gtZero() ) {
+		this.executorService().execute(() -> {
 			
-			this.executorService().execute(() -> {
+			try {
 				
-				try {
+				final ReadOnlyTimeProperty tp = config.rebindIfPassive();
+				
+				while ( ! this.isClosed() ) {
 					
-					while ( ! this.isClosed() ) {
+					try (
+							AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
+							) {
 						
-						try (
-								AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
-								) {
-							
-							this.serverChannel = server;
-							
-							passiveAccepting(server);
-							
-							synchronized ( server ) {
-								server.wait();
-							}
-						}
-						catch ( IOException e ) {
-							this.notifyLog(e);
-						}
+						this.refServerChannel = server;
 						
-						if ( ! this.isClosed() ) {
-							if ( tp.gtZero() ) {
-								tp.sleep();
-							} else {
-								return;
-							}
+						passiveAccepting(server);
+						
+						synchronized ( server ) {
+							server.wait();
+						}
+					}
+					catch ( IOException e ) {
+						this.notifyLog(e);
+					}
+					
+					if ( ! this.isClosed() ) {
+						if ( tp.gtZero() ) {
+							tp.sleep();
+						} else {
+							return;
 						}
 					}
 				}
-				catch ( InterruptedException ignore ) {
-				}
-			});
-			
-		} else {
-			
-			try (
-					AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
-					) {
-				
-				this.serverChannel = server;
-				
-				passiveAccepting(server);
 			}
-			catch ( InterruptedException giveup ) {
+			catch ( InterruptedException ignore ) {
 			}
-		}
+		});
 	}
 	
-	private void passiveAccepting(AsynchronousServerSocketChannel server) throws IOException, InterruptedException {
+	private void passiveAccepting(AsynchronousServerSocketChannel server)
+			throws IOException, InterruptedException {
 		
 		final SocketAddress addr = config.socketAddress().getSocketAddress();
 		
@@ -153,7 +141,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		this.notifyLog(HsmsSsPassiveBindLog.binded(addr));
 		
 		server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
-
+			
 			@Override
 			public void completed(AsynchronousSocketChannel channel, Void attachment) {
 				
@@ -222,7 +210,6 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				}
 			}
 		});
-		
 	}
 	
 	private void completionAction(AsynchronousSocketChannel channel) throws InterruptedException {
@@ -232,10 +219,12 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		final Collection<Callable<Void>> tasks = Arrays.asList(
 				() -> {
 					try {
-						asyncChannel.reading();
-					}
-					catch ( HsmsException e ) {
-						this.notifyLog(e);
+						try {
+							asyncChannel.reading();
+						}
+						catch ( HsmsException e ) {
+							this.notifyLog(e);
+						}
 					}
 					catch ( InterruptedException ignore ) {
 					}
@@ -244,10 +233,12 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				},
 				() -> {
 					try {
-						mainTask(asyncChannel);
-					}
-					catch ( HsmsException e ) {
-						this.notifyLog(e);
+						try {
+							mainTask(asyncChannel);
+						}
+						catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException e ) {
+							this.notifyLog(e);
+						}
 					}
 					catch ( InterruptedException ignore ) {
 					}
@@ -284,271 +275,140 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			}
 		});
 		
-		{
-			final HsmsMessage msg = config.timeout().t7().poll(queue);
-			
-			if ( msg == null ) {
-				throw new HsmsT7TimeoutException();
-			}
-			
-			switch ( msg.messageType() ) {
-			case SELECT_REQ: {
-				
-				if ( this.getSession().setAsyncSocketChannel(asyncChannel) ) {
-					
-					//TOOD
-					
-					break;	/* success */
-					
-				} else {
-					
-					//TODO
-					
-					return;
-				}
-				
-				/* break; */
-			}
-			default: {
-				return;
-			}
-			}
+		final HsmsMessage msg = config.timeout().t7().poll(queue);
+		
+		if ( msg == null ) {
+			throw new HsmsT7TimeoutException();
 		}
 		
-		try {
+		switch ( msg.messageType() ) {
+		case SELECT_REQ: {
 			
-			//TODO
+			if ( this.getSession().setAsyncSocketChannel(asyncChannel) ) {
+				
+				try {
+					asyncChannel.sendSelectResponse(msg, HsmsMessageSelectStatus.SUCCESS);
+					this.mainSelectedTask(asyncChannel, queue);
+				}
+				finally {
+					this.getSession().unsetAsyncSocketChannel();
+				}
+				
+			} else {
+				
+				asyncChannel.sendSelectResponse(msg, HsmsMessageSelectStatus.ALREADY_USED);
+			}
 			
+			break;
 		}
-		finally {
-			this.getSession().unsetAsyncSocketChannel();
+		default: {
+			
+			throw new HsmsSsPassiveRecieveNotSelectRequestException();
+		}
 		}
 	}
 	
-	
-//	protected class PassiveInnerConnection extends AbstractInnerConnection {
-//
-//		protected PassiveInnerConnection(AsynchronousSocketChannel channel) {
-//			super(channel);
-//		}
-//		
-//		protected void mainTask() throws InterruptedException {
-//			
-//			try {
-//				
-//				{
-//					final Collection<Callable<Boolean>> tasks = Arrays.asList(
-//							() -> {
-//								try {
-//									return connectTask();
-//								}
-//								catch ( InterruptedException ignore ) {
-//								}
-//								
-//								return Boolean.FALSE;
-//							}
-//							);
-//					
-//					try {
-//						boolean f = executeInvokeAny(
-//								tasks,
-//								hsmsSsConfig().timeout().t7()
-//								).booleanValue();
-//						
-//						if ( f ) {
-//							
-//							/* SELECTED */
-//							notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.SELECTED);
-//							
-//						} else {
-//							
-//							return;
-//						}
-//					}
-//					catch ( TimeoutException e ) {
-//						notifyLog(new HsmsSsTimeoutT7Exception(e));
-//						return;
-//					}
-//					catch ( ExecutionException e ) {
-//						
-//						Throwable t = e.getCause();
-//						
-//						if ( t instanceof RuntimeException ) {
-//							throw (RuntimeException)t;
-//						}
-//						
-//						notifyLog(t);
-//						return;
-//					}
-//				}
-//				
-//				{
-//					final Collection<Callable<Void>> tasks = Arrays.asList(
-//							() -> {
-//								try {
-//									selectedTask();
-//								}
-//								catch ( InterruptedException ignore ) {
-//								}
-//								catch ( SecsException e ) {
-//									notifyLog(e);
-//								}
-//								return null;
-//							},
-//							() -> {
-//								try {
-//									linktesting();
-//								}
-//								catch ( InterruptedException ignore ) {
-//								}
-//								return null;
-//							}
-//							);
-//					
-//					try {
-//						executeInvokeAny(tasks);
-//					}
-//					catch ( ExecutionException e ) {
-//						
-//						Throwable t = e.getCause();
-//						
-//						if ( t instanceof RuntimeException ) {
-//							throw (RuntimeException)t;
-//						}
-//						
-//						notifyLog(t);
-//					}
-//				}
-//			}
-//			finally {
-//				notifyHsmsSsCommunicateStateChange(HsmsSsCommunicateState.NOT_CONNECTED);
-//				removeSelectedConnection(this);
-//			}
-//		}
-//		
-//		protected Boolean connectTask() throws InterruptedException, SecsException {
-//			
-//			for ( ;; ) {
-//				
-//				final HsmsSsMessage msg = this.takeReceiveMessage();
-//				
-//				switch ( HsmsSsMessageType.get(msg) ) {
-//				case DATA: {
-//					
-//					send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SELECTED));
-//					return Boolean.FALSE;
-//					/* break; */
-//				}
-//				case SELECT_REQ: {
-//					
-//					boolean f = addSelectedConnection(this);
-//					
-//					if ( f /* success */) {
-//						
-//						send(createSelectResponse(msg, HsmsSsMessageSelectStatus.SUCCESS));
-//						
-//						return Boolean.TRUE;
-//						
-//					} else {
-//						
-//						send(createSelectResponse(msg, HsmsSsMessageSelectStatus.ALREADY_USED));
-//					}
-//					
-//					break;
-//				}
-//				case LINKTEST_REQ: {
-//					
-//					send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SELECTED));
-//					return Boolean.FALSE;
-//					/* break; */
-//				}
-//				case SEPARATE_REQ: {
-//					
-//					return Boolean.FALSE;
-//					/* break; */
-//				}
-//				case SELECT_RSP:
-//				case LINKTEST_RSP:
-//				case REJECT_REQ: {
-//					
-//					send(createRejectRequest(msg, HsmsSsMessageRejectReason.TRANSACTION_NOT_OPEN));
-//					return Boolean.FALSE;
-//					/* break; */
-//				}
-//				default: {
-//					
-//					if ( HsmsSsMessageType.supportSType(msg) ) {
-//						
-//						if ( ! HsmsSsMessageType.supportPType(msg) ) {
-//							
-//							send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P));
-//							return Boolean.FALSE;
-//						}
-//						
-//					} else {
-//						
-//						send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
-//						return Boolean.FALSE;
-//					}
-//				}
-//				}
-//			}
-//		}
-//		
-//		protected void selectedTask() throws InterruptedException, SecsException {
-//			
-//			for ( ;; ) {
-//				
-//				final HsmsSsMessage msg = this.takeReceiveMessage();
-//				
-//				switch ( HsmsSsMessageType.get(msg) ) {
-//				case DATA: {
-//					
-//					notifyReceiveMessage(msg);
-//					break;
-//				}
-//				case SELECT_REQ: {
-//					
-//					send(createSelectResponse(msg, HsmsSsMessageSelectStatus.ACTIVED));
-//					break;
-//				}
-//				case LINKTEST_REQ: {
-//					
-//					send(createLinktestResponse(msg));
-//					break;
-//				}
-//				case SEPARATE_REQ: {
-//					
-//					return;
-//					/* break; */
-//				}
-//				case SELECT_RSP:
-//				case LINKTEST_RSP:
-//				case REJECT_REQ: {
-//					
-//					send(createRejectRequest(msg, HsmsSsMessageRejectReason.TRANSACTION_NOT_OPEN));
-//					return;
-//					/* break; */
-//				}
-//				default: {
-//					
-//					if ( HsmsSsMessageType.supportSType(msg) ) {
-//						
-//						if ( ! HsmsSsMessageType.supportPType(msg) ) {
-//							
-//							send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_P));
-//							return;
-//						}
-//						
-//					} else {
-//						
-//						send(createRejectRequest(msg, HsmsSsMessageRejectReason.NOT_SUPPORT_TYPE_S));
-//						return;
-//					}
-//				}
-//				}
-//			}
-//		}
-//	}
+	private void mainSelectedTask(
+			AbstractHsmsAsyncSocketChannel asyncChannel,
+			BlockingQueue<HsmsMessage> queue)
+					throws InterruptedException {
+		
+		final Collection<Callable<Void>> tasks = Arrays.asList(
+				() -> {
+					try {
+						try {
+							
+							for ( ;; ) {
+								final HsmsMessage msg = queue.take();
+								
+								switch ( msg.messageType() ) {
+								case DATA: {
+									this.notifyReceiveMessage(msg);
+									break;
+								}
+								case SELECT_REQ: {
+									asyncChannel.sendSelectResponse(msg, HsmsMessageSelectStatus.ACTIVED);
+									break;
+								}
+								case DESELECT_REQ:
+								case DESELECT_RSP: {
+									asyncChannel.sendRejectRequest(msg, HsmsMessageRejectReason.NOT_SUPPORT_TYPE_S);
+									break;
+								}
+								case LINKTEST_REQ: {
+									asyncChannel.sendLinktestResponse(msg);
+									break;
+								}
+								case SEPARATE_REQ: {
+									return null;
+									/* break; */
+								}
+								case REJECT_REQ: {
+									return null;
+									/* break; */
+								}
+								case SELECT_RSP:
+								case LINKTEST_RSP: {
+									asyncChannel.sendRejectRequest(msg, HsmsMessageRejectReason.TRANSACTION_NOT_OPEN);
+									return null;
+									/* break; */
+								}
+								default: {
+									
+									if ( HsmsMessageType.supportSType(msg) ) {
+										
+										if ( ! HsmsMessageType.supportPType(msg) ) {
+											asyncChannel.sendRejectRequest(msg, HsmsMessageRejectReason.NOT_SUPPORT_TYPE_P);
+										}
+										
+									} else {
+										
+										asyncChannel.sendRejectRequest(msg, HsmsMessageRejectReason.NOT_SUPPORT_TYPE_S);
+									}
+									
+									return null;
+								}
+								}
+							}
+						}
+						catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException e ) {
+							this.notifyLog(e);
+						}
+					}
+					catch ( InterruptedException ignore ) {
+					}
+					
+					return null;
+				},
+				() -> {
+					try {
+						try {
+							asyncChannel.linktesting();
+						}
+						catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException e ) {
+							this.notifyLog(e);
+						}
+					}
+					catch ( InterruptedException ignore ) {
+					}
+					
+					return null;
+				}
+				);
+		
+		try {
+			this.executeInvokeAny(tasks);
+		}
+		catch ( ExecutionException e ) {
+			Throwable t = e.getCause();
+			
+			if ( t instanceof RuntimeException ) {
+				throw (RuntimeException)t;
+			}
+			
+			this.notifyLog(t);
+		}
+		
+	}
 	
 }

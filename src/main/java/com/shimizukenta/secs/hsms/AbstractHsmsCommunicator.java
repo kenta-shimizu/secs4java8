@@ -32,6 +32,11 @@ public abstract class AbstractHsmsCommunicator extends AbstractSecsCommunicator 
 	}
 	
 	@Override
+	public void close() throws IOException {
+		super.close();
+	}
+	
+	@Override
 	public boolean addHsmsCommunicateStateChangeListener(HsmsCommunicateStateChangeListener listener) {
 		return this.hsmsCommState.addChangeListener(listener::changed);
 	}

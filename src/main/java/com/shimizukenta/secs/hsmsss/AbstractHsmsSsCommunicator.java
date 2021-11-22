@@ -52,7 +52,12 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 			super(config);
 			this.sessionId = sessionId;
 		}
-
+		
+		@Override
+		public int deviceId() {
+			return this.sessionId;
+		}
+		
 		@Override
 		public int sessionId() {
 			return this.sessionId;
@@ -70,6 +75,16 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 			
 			return false;
 		}
+	}
+	
+	@Override
+	public int deviceId() {
+		return this.getSession().deviceId();
+	}
+	
+	@Override
+	public int sessionId() {
+		return this.getSession().sessionId();
 	}
 	
 	@Override
@@ -114,6 +129,16 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 					InterruptedException {
 		
 		return this.getSession().send(primaryMsg, strm, func, wbit, secs2);
+	}
+	
+	@Override
+	public Optional<HsmsMessage> send(HsmsMessage msg)
+			throws HsmsSendMessageException,
+			HsmsWaitReplyMessageException,
+			HsmsException,
+			InterruptedException {
+		
+		return this.getSession().send(msg);
 	}
 	
 	protected AbstractHsmsSession getSession() {

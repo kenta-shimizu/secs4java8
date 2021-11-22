@@ -330,7 +330,6 @@ public class PairSecs1 {
 		echo("Throwables: " + tt.size());
 		
 		echo("elapsed: " + (end - start) + " milli-sec.");
-		
 	}
 	
 	private static synchronized void echo(Object o) {

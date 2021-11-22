@@ -54,6 +54,16 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	}
 	
 	@Override
+	public int deviceId() {
+		return this.secs1Config.deviceId().intValue();
+	}
+	
+	@Override
+	public int sessionId() {
+		return -1;
+	}
+	
+	@Override
 	public void open() throws IOException {
 		super.open();
 		

@@ -57,11 +57,7 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		return gem;
 	}
 	
-//	@Override
-//	public int deviceId() {
-//		return config.deviceId().intValue();
-//	}
-	
+	@Override
 	public boolean isEquip() {
 		return config.isEquip().booleanValue();
 	}

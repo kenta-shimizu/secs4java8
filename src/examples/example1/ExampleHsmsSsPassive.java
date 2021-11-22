@@ -11,14 +11,14 @@ import com.shimizukenta.secs.gem.CMDA;
 import com.shimizukenta.secs.gem.COMMACK;
 import com.shimizukenta.secs.gem.ONLACK;
 import com.shimizukenta.secs.gem.TIACK;
+import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
-import com.shimizukenta.secs.hsmsss.HsmsSsProtocol;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 /**
- * Example-1.
+ * Example-1.ØØØØ
  * 
  * <p>
  * This example is HSMS-SS Passive Equipment.<br />
@@ -39,7 +39,7 @@ public class ExampleHsmsSsPassive {
 		HsmsSsCommunicatorConfig config = new HsmsSsCommunicatorConfig();
 		
 		config.socketAddress(new InetSocketAddress("127.0.0.1", 5000));
-		config.protocol(HsmsSsProtocol.PASSIVE);
+		config.connectionMode(HsmsConnectionMode.PASSIVE);
 		config.sessionId(10);
 		config.isEquip(true);
 		config.notLinktest();

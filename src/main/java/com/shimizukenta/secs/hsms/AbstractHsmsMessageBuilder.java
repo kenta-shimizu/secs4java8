@@ -198,6 +198,10 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 				sysbytes[3]
 		};
 		
+		if ( wbit ) {
+			header[2] |= (byte)0x80;
+		}
+		
 		return this.buildHsmsDataMessage(header, body);
 	}
 	
@@ -235,7 +239,7 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	public AbstractHsmsMessage fromBytes(byte[] header, List<byte[]> bodies)  throws Secs2BytesParseException {
 		
 		Secs2 s2b = Secs2BytesParser.getInstance().parse(bodies);
-		
+		 
 		if ( HsmsMessageType.get(header[4], header[5]) == HsmsMessageType.DATA ) {
 			return this.buildHsmsDataMessage(header, s2b);
 		} else {
