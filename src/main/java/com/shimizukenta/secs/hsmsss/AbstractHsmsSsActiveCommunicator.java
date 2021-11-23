@@ -202,33 +202,44 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 			}
 		});
 		
-		try {
+		this.notifyHsmsCommunicateState(HsmsCommunicateState.NOT_SELECTED);
+		
+		HsmsMessageSelectStatus selectStatus = asyncChannel.sendSelectRequest(this.getSession())
+				.map(HsmsMessageSelectStatus::get)
+				.orElse(HsmsMessageSelectStatus.NOT_SELECT_RSP);
+		
+		switch ( selectStatus ) {
+		case SUCCESS:
+		case ACTIVED: {
 			
-			this.notifyHsmsCommunicateState(HsmsCommunicateState.NOT_SELECTED);
-			
-			HsmsMessageSelectStatus selectStatus = asyncChannel.sendSelectRequest(this.getSession())
-					.map(HsmsMessageSelectStatus::get)
-					.orElse(HsmsMessageSelectStatus.NOT_SELECT_RSP);
-			
-			switch ( selectStatus ) {
-			case SUCCESS:
-			case ACTIVED: {
+			if ( this.getSession().setAsyncSocketChannel(asyncChannel) ) {
 				
-				if ( ! this.getSession().setAsyncSocketChannel(asyncChannel) ) {
-					return;
+				try {
+					this.notifyHsmsCommunicateState(HsmsCommunicateState.SELECTED);
+					
+					this.mainSelectedTask(asyncChannel, queue);
 				}
-				
-				break; /* success */
-			}
-			default: {
-				return;
-			}
+				finally {
+					this.getSession().unsetAsyncSocketChannel();
+				}
 			}
 			
-			this.notifyHsmsCommunicateState(HsmsCommunicateState.SELECTED);
-			
-			final Collection<Callable<Void>> tasks = Arrays.asList(
-					() -> {
+			break;
+		}
+		default: {
+			/* Nothing */
+		}
+		}
+	}
+	
+	private void mainSelectedTask(
+			AbstractHsmsAsyncSocketChannel asyncChannel,
+			BlockingQueue<HsmsMessage> queue)
+					throws InterruptedException {
+		
+		final Collection<Callable<Void>> tasks = Arrays.asList(
+				() -> {
+					try {
 						try {
 							for ( ;; ) {
 								HsmsMessage msg = queue.take();
@@ -268,41 +279,40 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 						catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException e ) {
 							this.notifyLog(e);
 						}
-						catch ( InterruptedException ignore ) {
-						}
-						
-						return null;
-					},
-					() -> {
+					}
+					catch ( InterruptedException ignore ) {
+					}
+					
+					return null;
+				},
+				() -> {
+					try {
 						try {
 							asyncChannel.linktesting();
 						}
 						catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException e ) {
 							this.notifyLog(e);
 						}
-						catch ( InterruptedException ignore ) {
-						}
-						
-						return null;
 					}
-					);
-			
-			try {
-				this.executeInvokeAny(tasks);
-			}
-			catch ( ExecutionException e ) {
-				
-				Throwable t = e.getCause();
-				
-				if ( t instanceof RuntimeException ) {
-					throw (RuntimeException)t;
+					catch ( InterruptedException ignore ) {
+					}
+					
+					return null;
 				}
-				
-				this.notifyLog(t);
-			}
+				);
+		
+		try {
+			this.executeInvokeAny(tasks);
 		}
-		finally {
-			this.getSession().unsetAsyncSocketChannel();
+		catch ( ExecutionException e ) {
+			
+			Throwable t = e.getCause();
+			
+			if ( t instanceof RuntimeException ) {
+				throw (RuntimeException)t;
+			}
+			
+			this.notifyLog(t);
 		}
 	}
 	

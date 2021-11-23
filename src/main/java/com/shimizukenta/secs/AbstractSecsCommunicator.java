@@ -203,7 +203,7 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		this.logQueue.put(log);
 	}
 	
-	protected void notifyLog(Throwable t) throws InterruptedException {
+	public void notifyLog(Throwable t) throws InterruptedException {
 		
 		this.notifyLog(new AbstractSecsThrowableLog(t) {
 			

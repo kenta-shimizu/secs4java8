@@ -33,7 +33,7 @@ public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator imple
 				return false;
 			} else {
 				this.channel = null;
-				return false;
+				return true;
 			}
 		}
 	}

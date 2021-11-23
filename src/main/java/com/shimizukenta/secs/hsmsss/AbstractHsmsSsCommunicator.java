@@ -92,9 +92,36 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 		super.open();
 	}
 	
+	private final Object syncClosed = new Object();
+	
 	@Override
 	public void close() throws IOException {
-		super.close();
+		
+		synchronized ( this.syncClosed ) {
+			
+			if ( this.isClosed() ) {
+				return;
+			}
+			
+			IOException ioExcept = null;
+			try {
+				super.close();
+			}
+			catch ( IOException e ) {
+				ioExcept = e;
+			}
+			
+			try {
+				this.getSession().close();
+			}
+			catch ( IOException e ) {
+				ioExcept = e;
+			}
+			
+			if ( ioExcept != null ) {
+				throw ioExcept;
+			}
+		}
 	}
 	
 	@Override

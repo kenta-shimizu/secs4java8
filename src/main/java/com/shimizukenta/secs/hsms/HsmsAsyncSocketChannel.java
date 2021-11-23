@@ -10,7 +10,7 @@ import com.shimizukenta.secs.secs2.Secs2;
 /**
  * Inner interface.
  * 
- * @author 1000210
+ * @author kenta-shimizu
  *
  */
 public interface HsmsAsyncSocketChannel {

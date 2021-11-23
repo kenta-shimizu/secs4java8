@@ -87,8 +87,8 @@ public class HsmsSsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	 * @param id
 	 */
 	public void sessionId(int id) {
-		if ( id < 0 || id > 0xFFFF ) {
-			throw new IllegalArgumentException("Session-ID is in 0 - 65535, id=" + id);
+		if ( id < 0 || id > 0x7FFF ) {
+			throw new IllegalArgumentException("Session-ID is in 0 - 32767, id=" + id);
 		}
 		this.sessionId.set(id);
 	}

@@ -3,6 +3,7 @@ package com.shimizukenta.secs.hsmsss;
 import java.io.IOException;
 
 import com.shimizukenta.secs.hsms.HsmsCommunicator;
+import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 
 /**
  * This interface is implementation of HSMS-SS (SEMI-E37.1).
@@ -25,19 +26,20 @@ public interface HsmsSsCommunicator extends HsmsCommunicator {
 	 */
 	public static HsmsSsCommunicator newInstance(HsmsSsCommunicatorConfig config) {
 		
-		switch ( config.connectionMode().get() ) {
+		final HsmsConnectionMode mode = config.connectionMode().get();
+		
+		switch ( mode ) {
 		case PASSIVE: {
 			return new AbstractHsmsSsPassiveCommunicator(config) {};
 			/* break; */
 		}
 		case ACTIVE: {
-			
 			return new AbstractHsmsSsActiveCommunicator(config) {};
 			/* break; */
 		}
 		default: {
 			
-			throw new IllegalStateException("undefined connecton-mode: " + config.connectionMode());
+			throw new IllegalStateException("undefined connecton-mode: " + mode);
 		}
 		}
 	}

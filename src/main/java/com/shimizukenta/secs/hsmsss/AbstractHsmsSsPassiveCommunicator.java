@@ -59,33 +59,38 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		this.openPassive();
 	}
 	
+	private final Object syncClosed = new Object();
+	
 	@Override
 	public void close() throws IOException {
 		
-		if ( this.isClosed() ) {
-			return;
-		}
-		
-		IOException ioExcept = null;
-		
-		try {
-			super.close();
-		}
-		catch ( IOException e ) {
-			ioExcept = e;
-		}
-		
-		try {
-			if ( this.refServerChannel != null ) {
-				this.refServerChannel.close();
+		synchronized ( syncClosed ) {
+			
+			if ( this.isClosed() ) {
+				return;
 			}
-		}
-		catch ( IOException e ) {
-			ioExcept = e;
-		}
-		
-		if ( ioExcept != null ) {
-			throw ioExcept;
+			
+			IOException ioExcept = null;
+			
+			try {
+				super.close();
+			}
+			catch ( IOException e ) {
+				ioExcept = e;
+			}
+			
+			try {
+				if ( this.refServerChannel != null ) {
+					this.refServerChannel.close();
+				}
+			}
+			catch ( IOException e ) {
+				ioExcept = e;
+			}
+			
+			if ( ioExcept != null ) {
+				throw ioExcept;
+			}
 		}
 	}
 	

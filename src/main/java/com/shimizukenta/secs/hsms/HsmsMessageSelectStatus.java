@@ -9,8 +9,9 @@ public enum HsmsMessageSelectStatus {
 	ACTIVED((byte)1),
 	NOT_READY((byte)2),
 	ALREADY_USED((byte)3),
-	
-	//TODO
+	ENTITY_UNKNOWN((byte)4),
+	ENTITY_ALREADY_USED((byte)5),
+	ENTITY_ACTIVED((byte)6),
 	
 	;
 	

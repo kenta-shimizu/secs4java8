@@ -60,7 +60,7 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 		return this.value == null ? Optional.empty() : Optional.of(this.value);
 	}
 	
-	protected void subjectHeader(CharSequence header) {
+	public void subjectHeader(CharSequence header) {
 		synchronized ( this ) {
 			this.subjectHeader = Objects.requireNonNull(header).toString();
 			this.cacheToString = null;
