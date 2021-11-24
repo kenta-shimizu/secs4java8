@@ -38,13 +38,15 @@ public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator imple
 		}
 	}
 	
-	protected AbstractHsmsAsyncSocketChannel asyncSocketChannel() throws HsmsSessionNotSelectedException {
+	protected Optional<AbstractHsmsAsyncSocketChannel> optionalAsyncSocketChannel() {
 		synchronized ( this.syncChannel ) {
-			if ( this.channel == null ) {
-				throw new HsmsSessionNotSelectedException();
-			}
-			return this.channel;
+			return this.channel == null ? Optional.empty() : Optional.of(this.channel);
 		}
+	}
+	
+	protected AbstractHsmsAsyncSocketChannel asyncSocketChannel() throws HsmsSessionNotSelectedException {
+		return this.optionalAsyncSocketChannel()
+				.orElseThrow(HsmsSessionNotSelectedException::new);
 	}
 	
 	@Override
@@ -69,6 +71,96 @@ public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator imple
 			InterruptedException {
 		
 		return this.asyncSocketChannel().sendHsmsMessage(msg);
+	}
+	
+	@Override
+	public boolean linktest() throws InterruptedException {
+		
+		try {
+			Optional<HsmsMessage> op = this.asyncSocketChannel().sendLinktestRequest(this);
+			boolean f = op.isPresent();
+			if ( f ) {
+				return true;
+			}
+		}
+		catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException giveup ) {
+		}
+		
+		this.optionalAsyncSocketChannel().ifPresent(AbstractHsmsAsyncSocketChannel::shutdown);
+		
+		return false;
+	}
+	
+	@Override
+	public boolean select() throws InterruptedException {
+		
+		try {
+			return this.asyncSocketChannel().sendSelectRequest(this)
+					.map(HsmsMessageSelectStatus::get)
+					.filter(status -> {
+						switch ( status ) {
+						case SUCCESS:
+						case ACTIVED:
+						case ENTITY_ACTIVED: {
+							return true;
+							/* break; */
+						}
+						default: {
+							return false;
+						}
+						}
+					})
+					.isPresent();
+		}
+		catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException giveup ) {
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public boolean deselect() throws InterruptedException {
+		
+		try {
+			boolean f = this.asyncSocketChannel().sendDeselectRequest(this)
+					.map(HsmsMessageDeselectStatus::get)
+					.filter(status -> {
+						switch ( status ) {
+						case SUCCESS:
+						case NO_SELECTED: {
+							return true;
+							/* break; */
+						}
+						default: {
+							return false;
+						}
+						}
+					})
+					.isPresent();
+			
+			if ( f ) {
+				this.optionalAsyncSocketChannel().ifPresent(AbstractHsmsAsyncSocketChannel::shutdown);
+				return true;
+			}
+		}
+		catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException giveup ) {
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public boolean separate() throws InterruptedException {
+		
+		try {
+			this.asyncSocketChannel().sendSeparateRequest(this);
+			this.optionalAsyncSocketChannel().ifPresent(AbstractHsmsAsyncSocketChannel::shutdown);
+			return true;
+		}
+		catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException giveup ) {
+		}
+		
+		return false;
 	}
 	
 	@Override

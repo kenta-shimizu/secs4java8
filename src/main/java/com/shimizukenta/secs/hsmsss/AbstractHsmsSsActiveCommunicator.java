@@ -161,6 +161,15 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 					},
 					() -> {
 						try {
+							asyncChannel.waitingUntilShutdown();
+						}
+						catch ( InterruptedException ignore ) {
+						}
+						
+						return null;
+					},
+					() -> {
+						try {
 							try {
 								this.mainTask(asyncChannel);
 							}
@@ -172,7 +181,8 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 						}
 						
 						return null;
-					});
+					}
+					);
 			
 			this.executeInvokeAny(tasks);
 		}

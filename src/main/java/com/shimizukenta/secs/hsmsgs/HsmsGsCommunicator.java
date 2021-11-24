@@ -19,30 +19,35 @@ import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.sml.SmlMessage;
 
 /**
+ * This interface is implementation of HSMS-GS (SEMI-E37.1).
  * 
+ * <p>
+ * To create newInstance, {@link #newInstance(HsmsGsCommunicatorConfig)}<br />
+ * To create newInstance and open, {@link #open(HsmsGsCommunicatorConfig)}<br />
+ * </p>
  * 
  * @author kenta-shimizu
  *
  */
 public interface HsmsGsCommunicator extends OpenAndCloseable {
 	
+	/**
+	 * create new HSMS-GS-Communicator instance.
+	 * 
+	 * @param config
+	 * @return new HSMS-GS-Communicator instance
+	 */
 	public static HsmsGsCommunicator newInstance(HsmsGsCommunicatorConfig config) {
 		
 		final HsmsConnectionMode mode = config.connectionMode().get();
 		
 		switch (mode) {
 		case PASSIVE: {
-			
-			//TODO
-			
-			return null;
+			return new AbstractHsmsGsPassiveCommunicator(config) {};
 			/* break; */
 		}
 		case ACTIVE: {
-			
-			//TODO
-			
-			return null;
+			return new AbstractHsmsGsActiveCommunicator(config) {};
 			/* break; */
 		}
 		default: {
@@ -52,6 +57,13 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 		}
 	}
 	
+	/**
+	 * Create new HSMS-GS-Communicator instance and {@link #open()}.
+	 * 
+	 * @param config
+	 * @return new HSMS-GS-Communicator instance
+	 * @throws IOException
+	 */
 	public static HsmsGsCommunicator open(HsmsGsCommunicatorConfig config) throws IOException {
 		
 		final HsmsGsCommunicator inst = newInstance(config);

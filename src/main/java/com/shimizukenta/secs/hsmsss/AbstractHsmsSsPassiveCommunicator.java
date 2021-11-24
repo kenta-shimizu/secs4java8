@@ -1,6 +1,5 @@
 package com.shimizukenta.secs.hsmsss;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.AsynchronousServerSocketChannel;
@@ -40,12 +39,10 @@ import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCommunicator {
 	
 	private final HsmsSsCommunicatorConfig config;
-	private Closeable refServerChannel;
 	
 	public AbstractHsmsSsPassiveCommunicator(HsmsSsCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
 		this.config = config;
-		this.refServerChannel = null;
 	}
 	
 	@Override
@@ -59,42 +56,12 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		this.openPassive();
 	}
 	
-	private final Object syncClosed = new Object();
-	
 	@Override
 	public void close() throws IOException {
-		
-		synchronized ( syncClosed ) {
-			
-			if ( this.isClosed() ) {
-				return;
-			}
-			
-			IOException ioExcept = null;
-			
-			try {
-				super.close();
-			}
-			catch ( IOException e ) {
-				ioExcept = e;
-			}
-			
-			try {
-				if ( this.refServerChannel != null ) {
-					this.refServerChannel.close();
-				}
-			}
-			catch ( IOException e ) {
-				ioExcept = e;
-			}
-			
-			if ( ioExcept != null ) {
-				throw ioExcept;
-			}
-		}
+		super.close();
 	}
 	
-	private void openPassive() throws IOException {
+	private void openPassive() {
 		
 		this.executorService().execute(() -> {
 			
@@ -107,8 +74,6 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 					try (
 							AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
 							) {
-						
-						this.refServerChannel = server;
 						
 						passiveAccepting(server);
 						
@@ -230,6 +195,15 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 						catch ( HsmsException e ) {
 							this.notifyLog(e);
 						}
+					}
+					catch ( InterruptedException ignore ) {
+					}
+					
+					return null;
+				},
+				() -> {
+					try {
+						asyncChannel.waitingUntilShutdown();
 					}
 					catch ( InterruptedException ignore ) {
 					}

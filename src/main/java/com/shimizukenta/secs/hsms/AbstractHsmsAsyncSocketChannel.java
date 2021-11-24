@@ -177,6 +177,8 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 				throw new HsmsDetectTerminateException();
 			}
 			
+			this.resetLinktestTimer();
+
 			return r;
 		}
 		catch ( InterruptedException e ) {
@@ -198,6 +200,8 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 				throw new HsmsDetectTerminateException();
 			}
 			
+			this.resetLinktestTimer();
+			
 			return r;
 		}
 		catch ( TimeoutException e ) {
@@ -207,6 +211,22 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 		catch ( InterruptedException e ) {
 			f.cancel(true);
 			throw e;
+		}
+	}
+	
+	private final Object syncShutdown = new Object();
+	
+	@Override
+	public void shutdown() {
+		synchronized ( this.syncShutdown ) {
+			this.syncShutdown.notifyAll();
+		}
+	}
+	
+	@Override
+	public void waitingUntilShutdown() throws InterruptedException {
+		synchronized ( this.syncShutdown ) {
+			this.syncShutdown.wait();
 		}
 	}
 	
@@ -281,6 +301,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 	abstract protected ReadOnlyTimeProperty timeoutT3();
 	abstract protected ReadOnlyTimeProperty timeoutT6();
 	abstract protected ReadOnlyTimeProperty timeoutT8();
+	abstract protected void resetLinktestTimer();
 	
 	@Override
 	public Optional<HsmsMessage> sendSelectRequest(
@@ -658,6 +679,8 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 				throw new HsmsSendMessageException(msg, t);
 			}
 		}
+		
+		this.resetLinktestTimer();
 	}
 	
 }

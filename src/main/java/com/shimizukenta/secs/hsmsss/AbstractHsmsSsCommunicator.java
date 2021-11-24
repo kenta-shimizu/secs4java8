@@ -62,19 +62,7 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 		public int sessionId() {
 			return this.sessionId;
 		}
-
-		@Override
-		public boolean linktest() throws InterruptedException {
-			
-			try {
-				Optional<HsmsMessage> op = this.asyncSocketChannel().sendLinktestRequest(this);
-				return op.isPresent();
-			}
-			catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException giveup ) {
-			}
-			
-			return false;
-		}
+		
 	}
 	
 	@Override
@@ -240,6 +228,11 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 		@Override
 		protected ReadOnlyTimeProperty timeoutT8() {
 			return AbstractHsmsSsCommunicator.this.config.timeout().t8();
+		}
+		
+		@Override
+		protected void resetLinktestTimer() {
+			this.linktest.resetTimer();
 		}
 	}
 	

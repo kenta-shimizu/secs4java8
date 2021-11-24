@@ -18,6 +18,9 @@ public interface HsmsAsyncSocketChannel {
 	public void reading() throws HsmsException, InterruptedException;
 	public void linktesting() throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException, InterruptedException;
 	
+	public void shutdown();
+	public void waitingUntilShutdown() throws InterruptedException;
+	
 	public boolean addHsmsMessageReceiveListener(HsmsMessageReceiveListener l);
 	public boolean removeHsmsMessageReceiveListener(HsmsMessageReceiveListener l);
 	

@@ -13,7 +13,7 @@ public abstract class AbstractBaseCommunicator implements OpenAndCloseable {
 	
 	private final ExecutorService execServ = Executors.newCachedThreadPool(r -> {
 		Thread th = new Thread(r);
-		th.setDaemon(true);
+		th.setDaemon(false);
 		return th;
 	});
 	

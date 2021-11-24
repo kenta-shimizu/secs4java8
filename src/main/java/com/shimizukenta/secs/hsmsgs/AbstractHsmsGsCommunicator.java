@@ -28,6 +28,7 @@ import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.AbstractHsmsLinktest;
 import com.shimizukenta.secs.hsms.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.AbstractHsmsSession;
+import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsException;
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageBuilder;
@@ -61,19 +62,6 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		}
 		
 		@Override
-		public boolean linktest() throws InterruptedException {
-			
-			try {
-				Optional<HsmsMessage> op = this.asyncSocketChannel().sendLinktestRequest(this);
-				return op.isPresent();
-			}
-			catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException giveup ) {
-			}
-			
-			return false;
-		}
-
-		@Override
 		public int deviceId() {
 			return -1;
 		}
@@ -87,13 +75,21 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		
 		@Override
 		public boolean setAsyncSocketChannel(AbstractHsmsAsyncSocketChannel channel) {
+			
 			synchronized ( this.syncAsyncChannel ) {
+				
 				boolean f = super.setAsyncSocketChannel(channel);
 				
 				if ( f ) {
 					
-					//TODO
-					//log
+					channel.addSecsLogListener(log -> {
+						
+						try {
+							this.notifyLog(log);
+						}
+						catch ( InterruptedException ignore ) {
+						}
+					});
 					
 					channel.addTrySendHsmsMessagePassThroughListener(msg -> {
 						
@@ -105,9 +101,27 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 						}
 					});
 					
-					//TODO
-					//sended
-					//recv
+					channel.addSendedHsmsMessagePassThroughListener(msg -> {
+						
+						try {
+							this.notifySendedHsmsMessagePassThrough(msg);
+							this.notifySendedMessagePassThrough(msg);
+						}
+						catch ( InterruptedException ignore ) {
+						}
+					});
+					
+					channel.addReceiveHsmsMessagePassThroughListener(msg -> {
+						
+						try {
+							this.notifyReceiveHsmsMessagePassThrough(msg);
+							this.notifyReceiveMessagePassThrough(msg);
+						}
+						catch ( InterruptedException ignore ) {
+						}
+					});
+					
+					this.notifyHsmsCommunicateState(HsmsCommunicateState.SELECTED);
 				}
 				
 				return f;
@@ -116,8 +130,14 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		
 		@Override
 		public boolean unsetAsyncSocketChannel() {
+			
 			synchronized ( this.syncAsyncChannel ) {
-				return super.unsetAsyncSocketChannel();
+				
+				boolean f = super.unsetAsyncSocketChannel();
+				
+				this.notifyHsmsCommunicateState(HsmsCommunicateState.NOT_SELECTED);
+				
+				return f;
 			}
 		}
 		
@@ -199,6 +219,13 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 			}
 		}
 		return false;
+	}
+	
+	protected void completionAction(AsynchronousSocketChannel channel)
+			throws InterruptedException {
+		
+		//TODO
+		
 	}
 	
 	@Override
@@ -358,6 +385,11 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		@Override
 		protected ReadOnlyTimeProperty timeoutT8() {
 			return AbstractHsmsGsCommunicator.this.config.timeout().t8();
+		}
+		
+		@Override
+		protected void resetLinktestTimer() {
+			this.linktest.resetTimer();
 		}
 	}
 	
