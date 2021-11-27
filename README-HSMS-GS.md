@@ -5,15 +5,18 @@
 - For use HSMS-GS-Passive example
 
 ```java
-    /* HSMS-SS-Passive open example */
+    /* HSMS-GS-Passive open example */
     HsmsGsCommunicatorConfig config = new HsmsGsCommunicatorConfig();
-    config.connectionMode(HsmsConnectionMode.PASSIVE);
+    config.addSessionId(100);
+    config.addSessionId(200);
+    config.addSessionId(300);
     config.socketAddress(new InetSocketAddress("127.0.0.1", 5000));
-    config.sessionId(10);
     config.isEquip(true);
+    config.connectionMode(HsmsConnectionMode.PASSIVE);
+    config.rebindIfPassive(5.0F);
+    config.isTrySelectRequest(false);
     config.timeout().t3(45.0F);
     config.timeout().t6( 5.0F);
-    config.timeout().t7(10.0F);
     config.timeout().t8( 5.0F);
     config.gem().mdln("MDLN-A");
     config.gem().softrev("000001");
@@ -22,7 +25,42 @@
     HsmsGsCommunicator passive = HsmsGsCommunicator.open(config);
 ```
 
+- For use HSMS-GS-Active example
 
+```java
+    /* HSMS-GS-Active open example */
+    HsmsGsCommunicatorConfig config = new HsmsGsCommunicatorConfig();
+    config.addSessionId(100);
+    config.addSessionId(200);
+    config.addSessionId(300);
+    config.socketAddress(new InetSocketAddress("127.0.0.1", 5000));
+    config.isEquip(false);
+    config.connectionMode(HsmsConnectionMode.ACTIVE);
+    config.isTrySelectRequest(true);
+    config.retrySelectRequestTimeout(5.0F);
+    config.timeout().t3(45.0F);
+    config.timeout().t5(10.0F);
+    config.timeout().t6( 5.0F);
+    config.timeout().t8( 5.0F);
+    config.linktest(180.0F);
+
+    HsmsGsCommunicator active = HsmsGsCommunicator.open(config);
+```
+
+Notice: `HsmsGsCommunicator` is **NOT** instanceof `SecsCommunicator`.
+
+## Get Session instance from HsmsGsCommunicator
+
+`HsmsSession` is instanceof `SecsCommunicator`. `SecsCommunicator` methods are available.
+
+```java
+    /* from Session-ID */
+    HsmsSession session100 = passive.getSession(100);
+
+    /* Session Set */
+    Set<HsmsSession> sessions = passive.getSessions();
+    
+```
 
 ## Send Primary-Message and receive Reply-Message
 
