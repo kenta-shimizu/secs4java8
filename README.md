@@ -1,7 +1,5 @@
 # secs4java8
 
-building...
-
 ## Introduction
 
 This library is SEMI-SECS-communicate implementation on Java8.
@@ -57,7 +55,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
 
 - For Use HSMS-GS
 
-  to Special page. building...
+  to another [README](/README-HSMS-GS.md)
 
 - For use SECS-I (onTcpIp) example
 
@@ -207,7 +205,7 @@ See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/exam
 
 ## Detect Communicatable-state changed
 
-1. Add Listener
+- Add Listener
 
 ```java
     /* Add-Listener example */
@@ -223,6 +221,17 @@ See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/exam
 
 Notice: This listener is blocking-method. pass through quickly.
 
+- Waiting until communicate-state-changed
+
+```java
+    active.waitUntilCommunicatable();
+    active.waitUntilNotCommunicatable();
+
+    /* Open communicator and waiting until communicatable */
+    active.openAndWaitUntilCommunicatable();
+```
+
+Notice: This method is blocking-method.
 
 ## SML
 
