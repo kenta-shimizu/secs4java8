@@ -8,7 +8,9 @@ import com.shimizukenta.secs.CollectionProperty;
 import com.shimizukenta.secs.ReadOnlyBooleanProperty;
 import com.shimizukenta.secs.ReadOnlyCollectionProperty;
 import com.shimizukenta.secs.ReadOnlySocketAddressProperty;
+import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.SocketAddressProperty;
+import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.hsms.AbstractHsmsCommunicatorConfig;
 
 public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
@@ -68,12 +70,35 @@ public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	}
 	
 	/**
-	 * ReadOnlyProperty of is-try-SELECT.REQ getter.
+	 * ReadOnlyBooleanProperty of is-try-SELECT.REQ getter.
 	 * 
 	 * @return ReadOnlyProperty of is-try-SELECT.REQ
 	 */
 	public ReadOnlyBooleanProperty isTrySelectRequest() {
 		return this.isTrySelectRequest;
+	}
+	
+	private final TimeProperty retrySelectRequestTimeout = TimeProperty.newInstance(10.0F);
+	
+	/**
+	 * SELECT.REQ retry-timeout setter.
+	 * 
+	 * @param v > 0.0F
+	 */
+	public void retrySelectRequestTimeout(float v) {
+		if ( v <= 0.0F ) {
+			throw new IllegalArgumentException("retrySelectRequestTimeout value requires 0.0F");
+		}
+		this.retrySelectRequestTimeout.set(v);
+	}
+	
+	/**
+	 * ReadOnlyTimeProperty of SELECT.REQ Timeout getter.
+	 * 
+	 * @return ReadOnlyTimeProperty
+	 */
+	public ReadOnlyTimeProperty retrySelectRequestTimeout() {
+		return this.retrySelectRequestTimeout;
 	}
 	
 }

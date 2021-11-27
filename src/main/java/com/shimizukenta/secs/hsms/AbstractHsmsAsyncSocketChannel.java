@@ -50,6 +50,8 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 				
 				this.readingBufferFirst(lengthBuffer);
 				
+				this.resetLinktestTimer();
+				
 				while ( lengthBuffer.hasRemaining() ) {
 					this.readingBuffer(lengthBuffer);
 				}
@@ -80,6 +82,8 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 					}
 					
 					bodyBuffers.add(bf);
+					
+					this.resetLinktestTimer();
 				}
 				
 				/* build message */
@@ -177,8 +181,6 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 				throw new HsmsDetectTerminateException();
 			}
 			
-			this.resetLinktestTimer();
-
 			return r;
 		}
 		catch ( InterruptedException e ) {
@@ -199,8 +201,6 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 			if ( r < 0 ) {
 				throw new HsmsDetectTerminateException();
 			}
-			
-			this.resetLinktestTimer();
 			
 			return r;
 		}
@@ -529,6 +529,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 		case LINKTEST_REQ: {
 			
 			try {
+				
 				this.transactionManager().enter(msg);
 				
 				this.sendOnlyHsmsMessage(msg);

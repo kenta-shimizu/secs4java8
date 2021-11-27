@@ -212,7 +212,7 @@ public class PairSecs1 {
 			
 			Thread.sleep(100L);
 			
-			equip.openAndWaitUntilCommunicating();
+			equip.openAndWaitUntilCommunicatable();
 			
 			final int m = testCycle;
 			

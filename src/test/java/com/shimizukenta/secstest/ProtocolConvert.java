@@ -236,8 +236,8 @@ public class ProtocolConvert {
 						}
 					});
 					
-					equip.openAndWaitUntilCommunicating();
-					host.openAndWaitUntilCommunicating();
+					equip.openAndWaitUntilCommunicatable();
+					host.openAndWaitUntilCommunicatable();
 					
 					Thread.sleep(500L);
 					

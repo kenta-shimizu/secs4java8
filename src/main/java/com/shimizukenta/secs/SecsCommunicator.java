@@ -68,17 +68,44 @@ public interface SecsCommunicator extends OpenAndCloseable {
 	 */
 	public Gem gem();
 	
+	
 	/**
-	 * Open and wait until communicating.
+	 * Wait until communicatable.
 	 * 
 	 * <p>
 	 * Blocking-method.<br />
+	 * If Already communicatable, do nothing.<br />
+	 * </p>
+	 * 
+	 * @throws InterruptedException
+	 */
+	public void waitUntilCommunicatable() throws InterruptedException;
+	
+	/**
+	 * Wait until <strong>NOT</strong> communicatable.
+	 * 
+	 * <p>
+	 * Blocking-method.<br />
+	 * If Already not communicatable, do nothing.<br />
+	 * </p>
+	 * 
+	 * @throws InterruptedException
+	 */
+	public void waitUntilNotCommunicatable() throws InterruptedException;
+	
+	/**
+	 * Open and wait until communicatable.
+	 * 
+	 * <p>
+	 * Blocking-method.<br />
+	 * If Already opened, do nothing.<br />
+	 * If Already communicatable, do nothing.<br />
 	 * </p>
 	 * 
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public void openAndWaitUntilCommunicating() throws IOException, InterruptedException;
+	public void openAndWaitUntilCommunicatable() throws IOException, InterruptedException;
 	
 	/**
 	 * Is equipment getter.

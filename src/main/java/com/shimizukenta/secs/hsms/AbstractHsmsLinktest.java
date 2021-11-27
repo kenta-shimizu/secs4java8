@@ -35,10 +35,15 @@ public abstract class AbstractHsmsLinktest implements HsmsLinktest {
 				
 				if ( this.timer().gtZero() ) {
 					
-					this.timer().wait(this.sync);
-					
-					if ( this.isResetted() ) {
-						continue;
+					synchronized ( this.sync ) {
+						
+						this.resetted = false;
+						
+						this.timer().wait(this.sync);
+						
+						if ( this.resetted ) {
+							continue;
+						}
 					}
 					
 					if ( ! this.send().isPresent() ) {
@@ -51,6 +56,8 @@ public abstract class AbstractHsmsLinktest implements HsmsLinktest {
 						this.sync.wait();
 					}
 				}
+				
+				this.resetted = false;
 			}
 		}
 		finally {
@@ -63,14 +70,6 @@ public abstract class AbstractHsmsLinktest implements HsmsLinktest {
 		synchronized ( this.sync ) {
 			this.resetted = true;
 			this.sync.notifyAll();
-		}
-	}
-	
-	private boolean isResetted() {
-		synchronized ( this.sync ) {
-			boolean f = this.resetted;
-			this.resetted = false;
-			return f;
 		}
 	}
 	

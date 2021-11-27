@@ -63,7 +63,17 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	}
 	
 	@Override
-	public void openAndWaitUntilCommunicating() throws IOException, InterruptedException {
+	public void waitUntilCommunicatable() throws InterruptedException {
+		this.communicatable.waitUntilTrue();
+	}
+	
+	@Override
+	public void waitUntilNotCommunicatable() throws InterruptedException {
+		this.communicatable.waitUntilFalse();
+	}
+	
+	@Override
+	public void openAndWaitUntilCommunicatable() throws IOException, InterruptedException {
 		
 		synchronized ( this ) {
 			if ( ! isOpen() ) {
@@ -71,7 +81,7 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 			}
 		}
 		
-		communicatable.waitUntilTrue();
+		this.waitUntilCommunicatable();
 	}
 	
 	@Override

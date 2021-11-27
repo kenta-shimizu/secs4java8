@@ -217,8 +217,8 @@ public class BothSecs1 {
 					}
 				});
 				
-				equip.openAndWaitUntilCommunicating();
-				host.openAndWaitUntilCommunicating();
+				equip.openAndWaitUntilCommunicatable();
+				host.openAndWaitUntilCommunicatable();
 				
 				final int m = testCycle;
 				

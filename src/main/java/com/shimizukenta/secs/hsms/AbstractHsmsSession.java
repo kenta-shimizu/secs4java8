@@ -2,24 +2,23 @@ package com.shimizukenta.secs.hsms;
 
 import java.util.Optional;
 
+import com.shimizukenta.secs.Property;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 
 public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator implements HsmsSession {
 	
-	private AbstractHsmsAsyncSocketChannel channel;
-	
 	public AbstractHsmsSession(AbstractHsmsCommunicatorConfig config) {
 		super(config);
-		this.channel = null;
 	}
 	
+	private final Property<AbstractHsmsAsyncSocketChannel> channel = Property.newInstance(null);
 	private final Object syncChannel = new Object();
 	
 	public boolean setAsyncSocketChannel(AbstractHsmsAsyncSocketChannel channel) {
 		synchronized ( this.syncChannel ) {
-			if ( this.channel == null ) {
-				this.channel = channel;
+			if ( this.channel.get() == null ) {
+				this.channel.set(channel);
 				return true;
 			} else {
 				return false;
@@ -29,24 +28,50 @@ public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator imple
 	
 	public boolean unsetAsyncSocketChannel() {
 		synchronized ( this.syncChannel ) {
-			if ( this.channel == null ) {
+			if ( this.channel.get() == null ) {
 				return false;
 			} else {
-				this.channel = null;
+				this.channel.set(null);
 				return true;
 			}
 		}
 	}
 	
+	public boolean equalAsyncSocketChannel(AbstractHsmsAsyncSocketChannel channel) {
+		synchronized ( this.syncChannel ) {
+			final AbstractHsmsAsyncSocketChannel ref = this.channel.get();
+			if ( ref != null ) {
+				return ref == channel;
+			}
+			return false;
+		}
+	}
+	
+	public void waitUntilUnsetAsyncSocketChannel() throws InterruptedException {
+		this.channel.waitUntil(null);
+	}
+	
 	protected Optional<AbstractHsmsAsyncSocketChannel> optionalAsyncSocketChannel() {
 		synchronized ( this.syncChannel ) {
-			return this.channel == null ? Optional.empty() : Optional.of(this.channel);
+			final AbstractHsmsAsyncSocketChannel x = this.channel.get();
+			return x == null ? Optional.empty() : Optional.of(x);
 		}
 	}
 	
 	protected AbstractHsmsAsyncSocketChannel asyncSocketChannel() throws HsmsSessionNotSelectedException {
 		return this.optionalAsyncSocketChannel()
 				.orElseThrow(HsmsSessionNotSelectedException::new);
+	}
+	
+	public boolean notifyReceiveHsmsMessage(HsmsMessage msg) throws InterruptedException {
+		synchronized ( this.syncChannel ) {
+			if ( this.channel == null ) {
+				return false;
+			} else {
+				this.notifyReceiveMessage(msg);
+				return true;
+			}
+		}
 	}
 	
 	@Override

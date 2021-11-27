@@ -211,7 +211,7 @@ public class PairHsmsSs {
 				});
 				
 				
-				host.openAndWaitUntilCommunicating();
+				host.openAndWaitUntilCommunicatable();
 				
 				Thread.sleep(500L);
 				

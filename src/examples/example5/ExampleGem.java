@@ -85,7 +85,7 @@ public class ExampleGem {
 					echo(log);
 				});
 				
-				host.openAndWaitUntilCommunicating();
+				host.openAndWaitUntilCommunicatable();
 				
 				try {
 					
