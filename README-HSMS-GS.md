@@ -1,6 +1,6 @@
 # secs4java8 HSMS-GS
 
-## Create Communicator instance and open
+## Create HSMS-GS-Communicator instance and open
 
 - For use HSMS-GS-Passive example
 
@@ -43,15 +43,16 @@
     config.timeout().t6( 5.0F);
     config.timeout().t8( 5.0F);
     config.linktest(180.0F);
+    config.gem().clockType(ClockType.A16);
 
     HsmsGsCommunicator active = HsmsGsCommunicator.open(config);
 ```
 
-Notice: `HsmsGsCommunicator` is **NOT** instanceof `SecsCommunicator`.
+Notice: `HsmsGsCommunicator` is **NOT** instance of `SecsCommunicator`.
 
 ## Get Session instance from HsmsGsCommunicator
 
-`HsmsSession` is instanceof `SecsCommunicator`. `SecsCommunicator` methods are available.
+`HsmsSession` is instance of `SecsCommunicator`. `SecsCommunicator` methods are available.
 
 ```java
     /* from Session-ID */
@@ -59,13 +60,4 @@ Notice: `HsmsGsCommunicator` is **NOT** instanceof `SecsCommunicator`.
 
     /* Session Set */
     Set<HsmsSession> sessions = passive.getSessions();
-    
 ```
-
-## Send Primary-Message and receive Reply-Message
-
-## Received Primary-Message, parse, and send Reply-Message
-
-## Detect Communicatable-state changed
-
-See also ["/src/examples/example5/ExampleGem.java"](/src/examples/example5/ExampleGem.java)  

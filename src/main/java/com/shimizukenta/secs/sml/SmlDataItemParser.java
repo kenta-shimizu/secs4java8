@@ -20,6 +20,8 @@ import com.shimizukenta.secs.secs2.Secs2Item;
  * To parse SML, {@link #parse(CharSequence)}
  * </p>
  * 
+ * @author kenta-shimizu
+ *
  */
 public class SmlDataItemParser {
 

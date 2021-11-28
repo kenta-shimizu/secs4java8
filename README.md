@@ -55,7 +55,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
 
 - For Use HSMS-GS
 
-  to another [README](/README-HSMS-GS.md)
+  to [HSMS-GS README](/README-HSMS-GS.md)
 
 - For use SECS-I (onTcpIp) example
 

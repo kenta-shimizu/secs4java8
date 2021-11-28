@@ -47,6 +47,8 @@ import com.shimizukenta.secs.sml.SmlMessage;
  * <p>
  * To get communicate-state-changed,
  * {@link #addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener)}<br />
+ * To wait until communicatable, {@link #waitUntilCommunicatable()}<br />
+ * To wait until not communicatable, {@link #waitUntilNotCommunicatable()}<br />
  * </p>
  * <p>
  * To access GEM-interface, {@link #gem()}<br />
@@ -438,5 +440,5 @@ public interface SecsCommunicator extends OpenAndCloseable {
 	 * @return {@code true} if remove success
 	 */
 	public boolean removeReceiveMessagePassThroughListener(SecsMessagePassThroughListener lstnr);
-
+	
 }

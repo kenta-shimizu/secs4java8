@@ -5,6 +5,12 @@ import java.util.Optional;
 import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
 
+/**
+ * 
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public interface HsmsCommunicator extends SecsCommunicator {
 
 	/**

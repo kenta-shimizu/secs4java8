@@ -19,7 +19,7 @@ import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.sml.SmlMessage;
 
 /**
- * This interface is implementation of HSMS-GS (SEMI-E37.1).
+ * This interface is implementation of HSMS-GS (SEMI-E37.2).
  * 
  * <p>
  * To create newInstance, {@link #newInstance(HsmsGsCommunicatorConfig)}<br />
@@ -85,12 +85,43 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 		return inst;
 	}
 	
+	/**
+	 * Returns Sessions.
+	 * 
+	 * @return sessions
+	 */
 	public Set<HsmsSession> getSessions();
 	
+	/**
+	 * Return Session by Id.
+	 * 
+	 * @param sessionId
+	 * @return Session
+	 * @throws HsmsGsUnknownSessionIdException
+	 */
 	public HsmsSession getSession(int sessionId) throws HsmsGsUnknownSessionIdException;
 	
+	/**
+	 * Returns true if exist.
+	 * 
+	 * @param sessionId
+	 * @return true if exist.
+	 */
 	public boolean existSession(int sessionId);
 	
+	/**
+	 * send shortcut.
+	 * 
+	 * @param sessionId
+	 * @param strm
+	 * @param func
+	 * @param wbit
+	 * @return Reply-Message if exist
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
 	public Optional<SecsMessage> send(
 			int sessionId,
 			int strm,
@@ -101,6 +132,20 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 					SecsException,
 					InterruptedException;
 	
+	/**
+	 * send shortcut
+	 * 
+	 * @param sessionId
+	 * @param strm
+	 * @param func
+	 * @param wbit
+	 * @param secs2
+	 * @return Reply-Message if exist
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
 	public Optional<SecsMessage> send(
 			int sessionId,
 			int strm,
@@ -112,6 +157,19 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 					SecsException,
 					InterruptedException;
 	
+	/**
+	 * send 
+	 * @param sessionId
+	 * @param primaryMsg
+	 * @param strm
+	 * @param func
+	 * @param wbit
+	 * @return Reply-Message if exist
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
 	public Optional<SecsMessage> send(
 			int sessionId,
 			SecsMessage primaryMsg,
@@ -123,6 +181,21 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 					SecsException,
 					InterruptedException;
 	
+	/**
+	 * send shortcut.
+	 * 
+	 * @param sessionId
+	 * @param primaryMsg
+	 * @param strm
+	 * @param func
+	 * @param wbit
+	 * @param secs2
+	 * @return Reply-Message if exist
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
 	public Optional<SecsMessage> send(
 			int sessionId,
 			SecsMessage primaryMsg,
@@ -135,6 +208,17 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 					SecsException,
 					InterruptedException;
 	
+	/**
+	 * send shortcut
+	 * 
+	 * @param sessionId
+	 * @param sml
+	 * @return Reply-Message if exist
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
 	public Optional<SecsMessage> send(
 			int sessionId,
 			SmlMessage sml)
@@ -143,6 +227,18 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 					SecsException,
 					InterruptedException;
 	
+	/**
+	 * send shortcut.
+	 * 
+	 * @param sessionId
+	 * @param primaryMsg
+	 * @param sml
+	 * @return Reply-Message if exist
+	 * @throws SecsSendMessageException
+	 * @throws SecsWaitReplyMessageException
+	 * @throws SecsException
+	 * @throws InterruptedException
+	 */
 	public Optional<? extends SecsMessage> send(
 			int sessionId,
 			SecsMessage primaryMsg,
@@ -209,14 +305,52 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	 */
 	public boolean removeSecsLogListener(SecsLogListener lstnr);
 	
-	
+	/**
+	 * Add Listener to get SecsMesssage before sending.
+	 * 
+	 * @param lstnr Not accept {@code null}
+	 * @return {@code true} if add success.
+	 */
 	public boolean addTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param lstnr Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
 	public boolean removeTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);	
 	
+	/**
+	 * Add Listener to get sended SecsMesssage.
+	 * 
+	 * @param lstnr Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
 	public boolean addSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param lstnr Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
 	public boolean removeSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);	
 	
+	/**
+	 * Add Listener to receive both Primary and Reply Message.
+	 * 
+	 * @param lstnr Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
 	public boolean addReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param lstnr Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
 	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
 	
 }

@@ -15,6 +15,7 @@ import com.shimizukenta.secs.secs2.Secs2;
  * To get SECS-II-Data, {@link #secs2()}<br />
  * To get Header-10-bytes, {@link #header10Bytes()}<br />
  * To get Message-Device-ID, {@link #deviceId()}<br />
+ * To get Message-Session-ID, {@link #sessionId()}<br />
  * </p>
  * <p>
  * Instances of this class are immutable.<br />
