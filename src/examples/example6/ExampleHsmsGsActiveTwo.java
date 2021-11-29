@@ -26,9 +26,9 @@ import com.shimizukenta.secs.hsmsgs.HsmsGsCommunicatorConfig;
  * @author kenta-shimizu
  *
  */
-public class Example5HsmsGsActiveTwo {
+public class ExampleHsmsGsActiveTwo {
 
-	public Example5HsmsGsActiveTwo() {
+	public ExampleHsmsGsActiveTwo() {
 		/* Nothing */
 	}
 
