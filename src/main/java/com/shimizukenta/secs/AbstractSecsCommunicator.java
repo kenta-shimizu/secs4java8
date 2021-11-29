@@ -63,6 +63,11 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	}
 	
 	@Override
+	public boolean isCommunicatable() {
+		return this.communicatable.booleanValue();
+	}
+	
+	@Override
 	public void waitUntilCommunicatable() throws InterruptedException {
 		this.communicatable.waitUntilTrue();
 	}

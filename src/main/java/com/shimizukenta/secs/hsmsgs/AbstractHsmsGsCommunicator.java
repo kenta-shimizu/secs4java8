@@ -186,6 +186,19 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 				return;
 			}
 			
+			try {
+				
+				for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
+					if ( s.isCommunicatable() ) {
+						if ( ! s.deselect() ) {
+							s.separate();
+						}
+					}
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+			
 			IOException ioExcept = null;
 			
 			try {

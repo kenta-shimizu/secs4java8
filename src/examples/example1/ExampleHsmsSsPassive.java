@@ -18,7 +18,7 @@ import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
 /**
- * Example-1.ØØØØ
+ * Example-1
  * 
  * <p>
  * This example is HSMS-SS Passive Equipment.<br />

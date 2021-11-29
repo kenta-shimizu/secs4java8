@@ -72,6 +72,17 @@ public interface SecsCommunicator extends OpenAndCloseable {
 	
 	
 	/**
+	 * Returns true if communicatable.
+	 * 
+	 * <p>
+	 * Communicatable is send and receive message.
+	 * </p>
+	 * 
+	 * @return true if communicatable
+	 */
+	public boolean isCommunicatable();
+	
+	/**
 	 * Wait until communicatable.
 	 * 
 	 * <p>
