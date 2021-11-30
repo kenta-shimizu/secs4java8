@@ -10,11 +10,11 @@ public class Secs1ReceiveMessageLog extends AbstractSecsReceiveMessageLog {
 	
 	private static final String commonSubject = "Receive SECS1-Message";
 	
-	public Secs1ReceiveMessageLog(Secs1Message message, LocalDateTime timestamp) {
+	public Secs1ReceiveMessageLog(AbstractSecs1Message message, LocalDateTime timestamp) {
 		super(message, timestamp);
 	}
 
-	public Secs1ReceiveMessageLog(Secs1Message message) {
+	public Secs1ReceiveMessageLog(AbstractSecs1Message message) {
 		super(message);
 	}
 	

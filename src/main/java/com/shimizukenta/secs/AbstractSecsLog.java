@@ -111,4 +111,8 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 		return value().map(Object::toString);
 	}
 	
+	public Optional<AbstractSecsMessage> optionalAbstractSecsMessage() {
+		return Optional.empty();
+	}
+	
 }

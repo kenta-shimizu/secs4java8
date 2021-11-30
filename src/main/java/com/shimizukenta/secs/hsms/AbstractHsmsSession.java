@@ -63,7 +63,7 @@ public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator imple
 				.orElseThrow(HsmsSessionNotSelectedException::new);
 	}
 	
-	public boolean notifyReceiveHsmsMessage(HsmsMessage msg) throws InterruptedException {
+	public boolean notifyReceiveHsmsMessage(AbstractHsmsMessage msg) throws InterruptedException {
 		synchronized ( this.syncChannel ) {
 			if ( this.channel == null ) {
 				return false;

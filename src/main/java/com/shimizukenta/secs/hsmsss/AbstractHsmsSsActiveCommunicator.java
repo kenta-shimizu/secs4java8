@@ -14,10 +14,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
+import com.shimizukenta.secs.hsms.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsException;
-import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
 import com.shimizukenta.secs.hsms.HsmsMessageSelectStatus;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
@@ -202,7 +202,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException {
 		
-		final BlockingQueue<HsmsMessage> queue = new LinkedBlockingQueue<>();
+		final BlockingQueue<AbstractHsmsMessage> queue = new LinkedBlockingQueue<>();
 		
 		asyncChannel.addHsmsMessageReceiveListener(msg -> {
 			try {
@@ -244,7 +244,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 	
 	private void mainSelectedTask(
 			AbstractHsmsAsyncSocketChannel asyncChannel,
-			BlockingQueue<HsmsMessage> queue)
+			BlockingQueue<AbstractHsmsMessage> queue)
 					throws InterruptedException {
 		
 		final Collection<Callable<Void>> tasks = Arrays.asList(
@@ -252,7 +252,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 					try {
 						try {
 							for ( ;; ) {
-								HsmsMessage msg = queue.take();
+								final AbstractHsmsMessage msg = queue.take();
 								
 								switch ( msg.messageType() ) {
 								case DATA: {

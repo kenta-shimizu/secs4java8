@@ -161,7 +161,7 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		});
 	}
 	
-	public void notifyReceiveMessage(SecsMessage msg) throws InterruptedException {
+	public void notifyReceiveMessage(AbstractSecsMessage msg) throws InterruptedException {
 		msgRecvQueue.put(msg);
 	}
 	
@@ -179,7 +179,7 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		return logListeners.remove(Objects.requireNonNull(l));
 	}
 	
-	private final BlockingQueue<SecsLog> logQueue = new LinkedBlockingQueue<>();
+	private final BlockingQueue<AbstractSecsLog> logQueue = new LinkedBlockingQueue<>();
 	
 	private void executeLogQueueTask() {
 		
@@ -187,7 +187,7 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 			
 			try {
 				for ( ;; ) {
-					final SecsLog log = this.logQueue.take();
+					final AbstractSecsLog log = this.logQueue.take();
 					logListeners.forEach(l -> {
 						l.received(log);
 					});
@@ -199,7 +199,7 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 			try {
 				for ( ;; ) {
 					
-					final SecsLog log = this.logQueue.poll(100L, TimeUnit.MILLISECONDS);
+					final AbstractSecsLog log = this.logQueue.poll(100L, TimeUnit.MILLISECONDS);
 					if ( log == null ) {
 						break;
 					}

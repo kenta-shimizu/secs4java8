@@ -15,9 +15,9 @@ import com.shimizukenta.secs.secs2.Secs2;
 public class PairHsmsGs {
 
 	public PairHsmsGs() {
-		// TODO Auto-generated constructor stub
+		/* Nothing */
 	}
-
+	
 	public static void main(String[] args) {
 		
 		final int session1 = 100;

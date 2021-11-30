@@ -10,11 +10,8 @@ import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 
 public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCommunicator {
 	
-	private final HsmsGsCommunicatorConfig config;
-	
 	public AbstractHsmsGsActiveCommunicator(HsmsGsCommunicatorConfig config) {
 		super(config);
-		this.config = config;
 	}
 	
 	@Override
@@ -23,7 +20,7 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 		
 		this.executeLoopTask(() -> {
 			this.activeCircuit();
-			this.config.timeout().t5().sleep();
+			this.config().timeout().t5().sleep();
 		});
 	}
 	
@@ -33,7 +30,7 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 				AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
 				) {
 			
-			final SocketAddress socketAddr = this.config.socketAddress().getSocketAddress();
+			final SocketAddress socketAddr = this.config().socketAddress().getSocketAddress();
 			
 			notifyLog(HsmsGsConnectionLog.tryConnect(socketAddr));
 

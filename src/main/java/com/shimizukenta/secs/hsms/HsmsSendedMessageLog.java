@@ -10,11 +10,11 @@ public class HsmsSendedMessageLog extends AbstractSecsSendedMessageLog {
 	
 	private static final String commonSubject = "Sended HSMS-Message";
 	
-	public HsmsSendedMessageLog(HsmsMessage message, LocalDateTime timestamp) {
+	public HsmsSendedMessageLog(AbstractHsmsMessage message, LocalDateTime timestamp) {
 		super(message, timestamp);
 	}
 	
-	public HsmsSendedMessageLog(HsmsMessage message) {
+	public HsmsSendedMessageLog(AbstractHsmsMessage message) {
 		super(message);
 	}
 	

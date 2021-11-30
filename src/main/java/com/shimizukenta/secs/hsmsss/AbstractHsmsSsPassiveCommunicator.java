@@ -16,6 +16,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
+import com.shimizukenta.secs.hsms.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsException;
 import com.shimizukenta.secs.hsms.HsmsMessage;
@@ -244,7 +245,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException {
 		
-		final BlockingQueue<HsmsMessage> queue = new LinkedBlockingQueue<>();
+		final BlockingQueue<AbstractHsmsMessage> queue = new LinkedBlockingQueue<>();
 		
 		asyncChannel.addHsmsMessageReceiveListener(msg -> {
 			try {
@@ -289,7 +290,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 	
 	private void mainSelectedTask(
 			AbstractHsmsAsyncSocketChannel asyncChannel,
-			BlockingQueue<HsmsMessage> queue)
+			BlockingQueue<AbstractHsmsMessage> queue)
 					throws InterruptedException {
 		
 		final Collection<Callable<Void>> tasks = Arrays.asList(
@@ -298,7 +299,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 						try {
 							
 							for ( ;; ) {
-								final HsmsMessage msg = queue.take();
+								final AbstractHsmsMessage msg = queue.take();
 								
 								switch ( msg.messageType() ) {
 								case DATA: {

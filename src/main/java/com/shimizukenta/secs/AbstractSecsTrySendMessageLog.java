@@ -2,6 +2,7 @@ package com.shimizukenta.secs;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 
 public abstract class AbstractSecsTrySendMessageLog extends AbstractSecsLog implements SecsTrySendMessageLog {
 	
@@ -9,17 +10,26 @@ public abstract class AbstractSecsTrySendMessageLog extends AbstractSecsLog impl
 	
 	private static final String commonSubject = "Try-Send SECS-Message";
 	
-	public AbstractSecsTrySendMessageLog(SecsMessage message, LocalDateTime timestamp) {
+	private final AbstractSecsMessage msg;
+	
+	public AbstractSecsTrySendMessageLog(AbstractSecsMessage message, LocalDateTime timestamp) {
 		super(commonSubject, timestamp, Objects.requireNonNull(message));
+		this.msg = message;
 	}
 	
-	public AbstractSecsTrySendMessageLog(SecsMessage message) {
+	public AbstractSecsTrySendMessageLog(AbstractSecsMessage message) {
 		super(commonSubject, Objects.requireNonNull(message));
+		this.msg = message;
 	}
 	
 	@Override
 	public String subject() {
 		return commonSubject;
+	}
+	
+	@Override
+	public Optional<AbstractSecsMessage> optionalAbstractSecsMessage() {
+		return Optional.of(this.msg);
 	}
 	
 }

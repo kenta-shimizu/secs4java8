@@ -4,5 +4,5 @@ import java.util.EventListener;
 
 public interface HsmsMessageReceiveListener extends EventListener {
 	
-	public void received(HsmsMessage msg);
+	public void received(AbstractHsmsMessage msg);
 }

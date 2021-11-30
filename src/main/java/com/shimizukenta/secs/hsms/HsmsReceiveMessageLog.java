@@ -10,11 +10,11 @@ public class HsmsReceiveMessageLog extends AbstractSecsReceiveMessageLog {
 	
 	private static final String commonSubject = "Receive HSMS-Message";
 	
-	public HsmsReceiveMessageLog(HsmsMessage message, LocalDateTime timestamp) {
+	public HsmsReceiveMessageLog(AbstractHsmsMessage message, LocalDateTime timestamp) {
 		super(message, timestamp);
 	}
 
-	public HsmsReceiveMessageLog(HsmsMessage message) {
+	public HsmsReceiveMessageLog(AbstractHsmsMessage message) {
 		super(message);
 	}
 	

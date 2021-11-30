@@ -10,11 +10,11 @@ public class HsmsTrySendMessageLog extends AbstractSecsTrySendMessageLog {
 	
 	private static final String commonSubject = "Try-Send HSMS-Message";
 	
-	public HsmsTrySendMessageLog(HsmsMessage message, LocalDateTime timestamp) {
+	public HsmsTrySendMessageLog(AbstractHsmsMessage message, LocalDateTime timestamp) {
 		super(message, timestamp);
 	}
 
-	public HsmsTrySendMessageLog(HsmsMessage message) {
+	public HsmsTrySendMessageLog(AbstractHsmsMessage message) {
 		super(message);
 	}
 	

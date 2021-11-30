@@ -12,11 +12,8 @@ import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 
 public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCommunicator {
 	
-	private final HsmsGsCommunicatorConfig config;
-	
 	public AbstractHsmsGsPassiveCommunicator(HsmsGsCommunicatorConfig config) {
 		super(config);
-		this.config = config;
 	}
 	
 	@Override
@@ -36,7 +33,7 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 			
 			try {
 				
-				final ReadOnlyTimeProperty tp = config.rebindIfPassive();
+				final ReadOnlyTimeProperty tp = this.config().rebindIfPassive();
 				
 				while ( ! this.isClosed() ) {
 					
@@ -81,7 +78,7 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 	private void passiveAccepting(AsynchronousServerSocketChannel server)
 			throws IOException, InterruptedException {
 		
-		final SocketAddress addr = config.socketAddress().getSocketAddress();
+		final SocketAddress addr = this.config().socketAddress().getSocketAddress();
 		
 		this.notifyLog(HsmsGsPassiveBindLog.tryBind(addr));
 		
