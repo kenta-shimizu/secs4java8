@@ -100,7 +100,6 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		this.sendBytes(new byte[] {b});
 	}
 	
-	@Override
 	public Optional<Secs1Message> send(AbstractSecs1Message msg)
 			throws Secs1SendMessageException, Secs1WaitReplyMessageException, Secs1Exception
 			, InterruptedException {
@@ -162,15 +161,15 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		}
 	}
 	
-	@Override
-	public AbstractSecs1Message createSecs1Message(byte[] header) throws Secs1SendMessageException {
-		return Secs1MessageBuilder.getInstance().build(header);
-	}
-	
-	@Override
-	public AbstractSecs1Message createSecs1Message(byte[] header, Secs2 body) throws Secs1SendMessageException {
-		return Secs1MessageBuilder.getInstance().build(header, body);
-	}
+//	@Override
+//	public AbstractSecs1Message createSecs1Message(byte[] header) throws Secs1SendMessageException {
+//		return Secs1MessageBuilder.getInstance().build(header);
+//	}
+//	
+//	@Override
+//	public AbstractSecs1Message createSecs1Message(byte[] header, Secs2 body) throws Secs1SendMessageException {
+//		return Secs1MessageBuilder.getInstance().build(header, body);
+//	}
 	
 	private final AtomicInteger autoNumber = new AtomicInteger();
 	
@@ -206,7 +205,8 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			head[2] |= (byte)0x80;
 		}
 		
-		return send(createSecs1Message(head, secs2)).map(m -> (SecsMessage)m);
+		return send(Secs1MessageBuilder.getInstance().build(head, secs2))
+				.map(m -> (SecsMessage)m);
 	}
 	
 	@Override
@@ -240,7 +240,16 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			head[2] |= (byte)0x80;
 		}
 		
-		return send(createSecs1Message(head, secs2)).map(m -> (SecsMessage)m);
+		return send(Secs1MessageBuilder.getInstance().build(head, secs2))
+				.map(m -> (SecsMessage)m);
+	}
+	
+	@Override
+	public Optional<Secs1Message> send(Secs1Message msg)
+			throws Secs1SendMessageException, Secs1WaitReplyMessageException, Secs1Exception
+			, InterruptedException {
+		
+		return send(Secs1MessageBuilder.getInstance().build(msg.header10Bytes(), msg.secs2()));
 	}
 	
 	private void enterCircuit() throws InterruptedException {

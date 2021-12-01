@@ -6,7 +6,7 @@ import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
 
 /**
- * HsmsCommunicator interface.
+ * This interface is implementation of HSMS (SEMI-E37).
  * 
  * @author kenta-shimizu
  *

@@ -3,7 +3,6 @@ package com.shimizukenta.secs.secs1;
 import java.util.Optional;
 
 import com.shimizukenta.secs.SecsCommunicator;
-import com.shimizukenta.secs.secs2.Secs2;
 
 /**
  * This interface is implementation of SECS-I (SEMI-E4).
@@ -14,29 +13,10 @@ import com.shimizukenta.secs.secs2.Secs2;
 public interface Secs1Communicator extends SecsCommunicator {
 	
 	/**
-	 * Create header-only Sesc1Message.
-	 * 
-	 * @param header header-10-bytes
-	 * @return AbstractSecs1Message
-	 * @throws Secs1SendMessageException
-	 */
-	public AbstractSecs1Message createSecs1Message(byte[] header) throws Secs1SendMessageException;
-	
-	/**
-	 * Create Secs1Message.
-	 * 
-	 * @param header header-10-bytes
-	 * @param body SECS-II data
-	 * @return AbstractSecs1Message
-	 * @throws Secs1SendMessageException
-	 */
-	public AbstractSecs1Message createSecs1Message(byte[] header, Secs2 body) throws Secs1SendMessageException;
-	
-	/**
 	 * Send SECS-I-Message.
 	 * 
 	 * <p>
-	 * Send Primary-Secs1Message,<br />
+	 * Send Secs1Message,<br />
 	 * Blocking-method.<br />
 	 * Wait until sended Primay-Message and Reply-Secs1Message received if exist.
 	 * </p>
@@ -48,7 +28,7 @@ public interface Secs1Communicator extends SecsCommunicator {
 	 * @throws Secs1Exception
 	 * @throws InterruptedException
 	 */
-	public Optional<Secs1Message> send(AbstractSecs1Message msg)
+	public Optional<Secs1Message> send(Secs1Message msg)
 			throws Secs1SendMessageException,
 			Secs1WaitReplyMessageException,
 			Secs1Exception,
