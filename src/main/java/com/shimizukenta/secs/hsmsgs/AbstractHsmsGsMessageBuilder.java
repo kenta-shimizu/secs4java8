@@ -7,7 +7,7 @@ import com.shimizukenta.secs.hsms.AbstractHsmsSession;
 import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.secs2.Secs2;
 
-public class AbstractHsmsGsMessageBuilder extends AbstractHsmsMessageBuilder {
+public abstract class AbstractHsmsGsMessageBuilder extends AbstractHsmsMessageBuilder {
 	
 	public AbstractHsmsGsMessageBuilder() {
 		super();

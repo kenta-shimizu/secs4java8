@@ -28,7 +28,7 @@ public abstract class AbstractHsmsGsSession extends AbstractHsmsSession {
 		return this.sessionId;
 	}
 	
-	private final Consumer<? super AbstractSecsLog> logConsumer = log -> {
+	private final Consumer<AbstractSecsLog> logConsumer = log -> {
 		log.optionalAbstractSecsMessage()
 		.filter(m -> m.sessionId() == this.sessionId())
 		.ifPresent(m -> {

@@ -53,5 +53,53 @@ public interface Secs1Communicator extends SecsCommunicator {
 			Secs1WaitReplyMessageException,
 			Secs1Exception,
 			InterruptedException;
-
+	
+	/**
+	 * Add listener.
+	 * 
+	 * @param lstnr
+	 * @return true if add success
+	 */
+	public boolean addTrySendSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param lstnr
+	 * @return true if remove success
+	 */
+	public boolean removeTrySendSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr);
+	
+	/**
+	 * Add listener.
+	 * 
+	 * @param lstnr
+	 * @return true if add success
+	 */
+	public boolean addSendedSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param lstnr
+	 * @return true if remove success
+	 */
+	public boolean removeSendedSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr);
+	
+	/**
+	 * Add listener.
+	 * 
+	 * @param lstnr
+	 * @return true if add success
+	 */
+	public boolean addReceiveSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param lstnr
+	 * @return true if remove success
+	 */
+	public boolean removeReceiveSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr);
+	
 }

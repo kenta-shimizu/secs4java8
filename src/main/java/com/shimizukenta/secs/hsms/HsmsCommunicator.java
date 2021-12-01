@@ -6,7 +6,7 @@ import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
 
 /**
- * 
+ * HsmsCommunicator interface.
  * 
  * @author kenta-shimizu
  *
@@ -47,13 +47,52 @@ public interface HsmsCommunicator extends SecsCommunicator {
 	 */
 	public boolean linktest() throws InterruptedException;
 	
+	/**
+	 * Add listener.
+	 * 
+	 * @param lstnr
+	 * @return true if add success
+	 */
 	public boolean addTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param lstnr
+	 * @return true if remove success
+	 */
 	public boolean removeTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);	
 	
+	/**
+	 * Add listener.
+	 * 
+	 * @param lstnr
+	 * @return true if add success
+	 */
 	public boolean addSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param lstnr
+	 * @return true if remove success
+	 */
 	public boolean removeSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);	
 	
+	/**
+	 * Add listener.
+	 * 
+	 * @param lstnr
+	 * @return true if add success
+	 */
 	public boolean addReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param lstnr
+	 * @return true if remove success
+	 */
 	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
 	
 	/**

@@ -3,7 +3,7 @@ package com.shimizukenta.secs.hsmsgs;
 import com.shimizukenta.secs.hsms.AbstractHsmsControlMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 
-public class AbstractHsmsGsControlMessage extends AbstractHsmsControlMessage {
+public abstract class AbstractHsmsGsControlMessage extends AbstractHsmsControlMessage {
 	
 	private static final long serialVersionUID = -8930240343771260785L;
 	

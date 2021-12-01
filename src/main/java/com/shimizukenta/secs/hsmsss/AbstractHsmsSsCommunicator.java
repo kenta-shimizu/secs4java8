@@ -4,21 +4,17 @@ import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.Optional;
 
-import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.AbstractHsmsCommunicator;
-import com.shimizukenta.secs.hsms.AbstractHsmsLinktest;
-import com.shimizukenta.secs.hsms.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.AbstractHsmsSession;
 import com.shimizukenta.secs.hsms.HsmsException;
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageBuilder;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
-import com.shimizukenta.secs.hsms.HsmsTransactionManager;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
 
@@ -32,37 +28,17 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 		implements HsmsSsCommunicator {
 	
 	private final HsmsSsCommunicatorConfig config;
-	private final AbstractHsmsSession session;
+	private final AbstractHsmsSsSession session;
 	
 	public AbstractHsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);
 		
 		this.config = config;
 		
-		this.session = new InnerHsmsSsSession(
+		this.session = new AbstractHsmsSsSession(
 				config,
-				config.sessionId().intValue());
-	}
-	
-	private final class InnerHsmsSsSession extends AbstractHsmsSession {
-		
-		private final int sessionId;
-		
-		public InnerHsmsSsSession(HsmsSsCommunicatorConfig config, int sessionId) {
-			super(config);
-			this.sessionId = sessionId;
-		}
-		
-		@Override
-		public int deviceId() {
-			return this.sessionId;
-		}
-		
-		@Override
-		public int sessionId() {
-			return this.sessionId;
-		}
-		
+				config.sessionId().intValue()
+				) {};
 	}
 	
 	@Override
@@ -78,6 +54,16 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 	@Override
 	public void open() throws IOException {
 		super.open();
+	}
+	
+	public HsmsSsCommunicatorConfig config() {
+		return this.config;
+	}
+	
+	private final HsmsMessageBuilder msgBuilder = new AbstractHsmsSsMessageBuilder() {};
+	
+	public HsmsMessageBuilder msgBuilder() {
+		return this.msgBuilder;
 	}
 	
 	private final Object syncClosed = new Object();
@@ -160,85 +146,9 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 		return this.session;
 	}
 	
-	private final HsmsMessageBuilder msgBuilder = new AbstractHsmsSsMessageBuilder() {};
-	
-	private class InnerHsmsSsAsyncSocketChannel extends AbstractHsmsAsyncSocketChannel {
-		
-		public InnerHsmsSsAsyncSocketChannel(AsynchronousSocketChannel channel) {
-			super(channel);
-		}
-		
-		private final class InnerHsmsSsLinktest extends AbstractHsmsLinktest {
-			
-			public InnerHsmsSsLinktest() {
-				super();
-			}
-			
-			@Override
-			protected ReadOnlyTimeProperty timer() {
-				return AbstractHsmsSsCommunicator.this.config.linktest();
-			}
-			
-			@Override
-			protected Optional<HsmsMessage> send()
-					throws HsmsSendMessageException,
-					HsmsWaitReplyMessageException,
-					HsmsException,
-					InterruptedException {
-				
-				return InnerHsmsSsAsyncSocketChannel.this.sendLinktestRequest(
-						AbstractHsmsSsCommunicator.this.getSession());
-			}
-		}
-		
-		private final InnerHsmsSsLinktest linktest = new InnerHsmsSsLinktest();
-		
-		@Override
-		public void linktesting()
-				throws HsmsSendMessageException,
-				HsmsWaitReplyMessageException,
-				HsmsException,
-				InterruptedException {
-			
-			this.linktest.testing();
-		}
-		
-		@Override
-		protected HsmsMessageBuilder messageBuilder() {
-			return AbstractHsmsSsCommunicator.this.msgBuilder;
-		}
-		
-		private final HsmsTransactionManager<AbstractHsmsMessage> transMgr = new HsmsTransactionManager<>();
-		
-		@Override
-		protected HsmsTransactionManager<AbstractHsmsMessage> transactionManager() {
-			return this.transMgr;
-		}
-		
-		@Override
-		protected ReadOnlyTimeProperty timeoutT3() {
-			return AbstractHsmsSsCommunicator.this.config.timeout().t3();
-		}
-		
-		@Override
-		protected ReadOnlyTimeProperty timeoutT6() {
-			return AbstractHsmsSsCommunicator.this.config.timeout().t6();
-		}
-		
-		@Override
-		protected ReadOnlyTimeProperty timeoutT8() {
-			return AbstractHsmsSsCommunicator.this.config.timeout().t8();
-		}
-		
-		@Override
-		protected void resetLinktestTimer() {
-			this.linktest.resetTimer();
-		}
-	}
-	
 	protected AbstractHsmsAsyncSocketChannel buildAsyncSocketChannel(AsynchronousSocketChannel channel) {
 		
-		final AbstractHsmsAsyncSocketChannel x = new InnerHsmsSsAsyncSocketChannel(channel);
+		final AbstractHsmsSsAsyncSocketChannel x = new AbstractHsmsSsAsyncSocketChannel(channel, this) {};
 		
 		x.addSecsLogListener(log -> {
 			try {

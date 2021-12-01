@@ -1,8 +1,12 @@
 package com.shimizukenta.secs.secs1;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.shimizukenta.secs.AbstractSecsCommunicator;
@@ -67,6 +71,10 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	public void open() throws IOException {
 		super.open();
 		
+		this.executeTrySendSecs1MsgPassThroughQueueTask();
+		this.executeSendedSecs1MsgPassThroughQueueTask();
+		this.executeRecvSecs1MsgPassThroughQueueTask();
+		
 		executeLoopTask(() -> {
 			enterCircuit();
 		});
@@ -74,14 +82,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	
 	@Override
 	public void close() throws IOException {
-		
-		synchronized ( this ) {
-			if ( isClosed() ) {
-				return;
-			}
-			
-			super.close();
-		}
+		super.close();
 	}
 	
 	protected void putByte(byte b) throws InterruptedException {
@@ -109,6 +110,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			this.sendMgr.enter(msg);
 			
 			this.notifyTrySendMessagePassThrough(msg);
+			this.notifyTrySendSecs1MessagePassThrough(msg);
 			this.notifyLog(new Secs1TrySendMessageLog(msg));
 			
 			if ( msg.wbit() ) {
@@ -298,6 +300,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 									
 									this.sendMgr.putSended(pack.message());
 									this.notifySendedMessagePassThrough(pack.message());
+									this.notifySendedSecs1MessagePassThrough(pack.message());
 									this.notifyLog(new Secs1SendedMessageLog(pack.message()));
 									
 									return;
@@ -463,6 +466,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 				}
 				
 				this.notifyReceiveMessagePassThrough(s1msg);
+				this.notifyReceiveSecs1MessagePassThrough(s1msg);
 				this.notifyLog(new Secs1ReceiveMessageLog(s1msg));
 			}
 			catch ( Secs2Exception e ) {
@@ -491,6 +495,87 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 				this.notifyLog(Secs1NotReceiveNextBlockEnqCircuitControlLog.newInstance(block, b));
 			}
 		}
+	}
+	
+	private final Collection<Secs1MessagePassThroughListener> trySendSecs1MsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	
+	@Override
+	public boolean addTrySendSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr) {
+		return this.trySendSecs1MsgPassThroughLstnrs.add(lstnr);
+	}
+	
+	@Override
+	public boolean removeTrySendSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr) {
+		return this.trySendSecs1MsgPassThroughLstnrs.remove(lstnr);
+	}
+	
+	private final BlockingQueue<Secs1Message> trySendSecs1MsgPassThroughQueue = new LinkedBlockingQueue<>();
+	
+	public void notifyTrySendSecs1MessagePassThrough(Secs1Message msg) throws InterruptedException {
+		this.trySendSecs1MsgPassThroughQueue.put(msg);
+	}
+	
+	private void executeTrySendSecs1MsgPassThroughQueueTask() {
+		this.executeLoopTask(() -> {
+			final Secs1Message msg = this.trySendSecs1MsgPassThroughQueue.take();
+			this.trySendSecs1MsgPassThroughLstnrs.forEach(l -> {
+				l.passThrough(msg);
+			});
+		});
+	}
+	
+	private final Collection<Secs1MessagePassThroughListener> sendedSecs1MsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	
+	@Override
+	public boolean addSendedSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr) {
+		return this.sendedSecs1MsgPassThroughLstnrs.add(lstnr);
+	}
+	
+	@Override
+	public boolean removeSendedSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr) {
+		return this.sendedSecs1MsgPassThroughLstnrs.remove(lstnr);
+	}
+	
+	private final BlockingQueue<Secs1Message> sendedSecs1MsgPassThroughQueue = new LinkedBlockingQueue<>();
+	
+	public void notifySendedSecs1MessagePassThrough(Secs1Message msg) throws InterruptedException {
+		this.sendedSecs1MsgPassThroughQueue.put(msg);
+	}
+	
+	private void executeSendedSecs1MsgPassThroughQueueTask() {
+		this.executeLoopTask(() -> {
+			final Secs1Message msg = this.sendedSecs1MsgPassThroughQueue.take();
+			this.sendedSecs1MsgPassThroughLstnrs.forEach(l -> {
+				l.passThrough(msg);
+			});
+		});
+	}
+	
+	private final Collection<Secs1MessagePassThroughListener> recvSecs1MsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	
+	@Override
+	public boolean addReceiveSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr) {
+		return this.recvSecs1MsgPassThroughLstnrs.add(lstnr);
+	}
+	
+	@Override
+	public boolean removeReceiveSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr) {
+		return this.recvSecs1MsgPassThroughLstnrs.add(lstnr);
+	}
+	
+	private final BlockingQueue<Secs1Message> recvSecs1MsgPassThroughQueue = new LinkedBlockingQueue<>();
+	
+	public void notifyReceiveSecs1MessagePassThrough(Secs1Message msg) throws InterruptedException {
+		this.recvSecs1MsgPassThroughQueue.put(msg);
+	}
+	
+	private void executeRecvSecs1MsgPassThroughQueueTask() {
+		this.executeLoopTask(() -> {
+			final Secs1Message msg = this.recvSecs1MsgPassThroughQueue.take();
+			this.recvSecs1MsgPassThroughLstnrs.forEach(l -> {
+				l.passThrough(msg);
+			});
+		});
 	}
 	
 }
