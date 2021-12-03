@@ -257,7 +257,7 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 		}
 	}
 	
-	protected AbstractHsmsDataMessage buildHsmsDataMessage(byte[] header, Secs2 body) {
+	public AbstractHsmsDataMessage buildHsmsDataMessage(byte[] header, Secs2 body) {
 		
 		return new AbstractHsmsDataMessage(header, body) {
 			
@@ -265,6 +265,6 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 		};
 	}
 	
-	abstract protected AbstractHsmsControlMessage buildHsmsControlMessage(byte[] header, Secs2 body);
+	abstract public AbstractHsmsControlMessage buildHsmsControlMessage(byte[] header, Secs2 body);
 	
 }

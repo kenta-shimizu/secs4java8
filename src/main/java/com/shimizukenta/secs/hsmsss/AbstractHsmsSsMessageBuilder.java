@@ -76,7 +76,7 @@ public abstract class AbstractHsmsSsMessageBuilder extends AbstractHsmsMessageBu
 	}
 	
 	@Override
-	protected AbstractHsmsSsControlMessage buildHsmsControlMessage(byte[] header, Secs2 body) {
+	public AbstractHsmsSsControlMessage buildHsmsControlMessage(byte[] header, Secs2 body) {
 		
 		return new AbstractHsmsSsControlMessage(header, body) {
 			

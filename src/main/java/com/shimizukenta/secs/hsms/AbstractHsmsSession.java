@@ -37,7 +37,7 @@ public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator imple
 		}
 	}
 	
-	public boolean equalAsyncSocketChannel(AbstractHsmsAsyncSocketChannel channel) {
+	public boolean equalsAsyncSocketChannel(AbstractHsmsAsyncSocketChannel channel) {
 		synchronized ( this.syncChannel ) {
 			final AbstractHsmsAsyncSocketChannel ref = this.channel.get();
 			if ( ref != null ) {

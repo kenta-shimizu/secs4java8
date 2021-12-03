@@ -11,6 +11,7 @@ import com.shimizukenta.secs.hsmsss.AbstractHsmsSsControlMessage;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
 import com.shimizukenta.secs.secs1.Secs1Communicator;
+import com.shimizukenta.secs.secs1.Secs1MessageBuilder;
 import com.shimizukenta.secs.secs1.Secs1TooBigSendMessageException;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicator;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicatorConfig;
@@ -57,10 +58,10 @@ public class Secs1OnTcpIpHsmsSsConverter implements Closeable {
 		
 		secs1.addReceiveMessagePassThroughListener(msg -> {
 			
-			byte[] head = createToHsmsSsHead(msg);
+			byte[] header = createToHsmsSsHead(msg);
 			
 			try {
-				hsmsSs.send(new AbstractHsmsDataMessage(head, msg.secs2()) {
+				hsmsSs.send(new AbstractHsmsDataMessage(header, msg.secs2()) {
 
 					private static final long serialVersionUID = -5692025300162749028L;
 				});
@@ -77,10 +78,10 @@ public class Secs1OnTcpIpHsmsSsConverter implements Closeable {
 				return;
 			}
 			
-			byte[] head = createToSecs1Head(msg);
+			byte[] header = createToSecs1Head(msg);
 			
 			try {
-				secs1.send(secs1.createSecs1Message(head, msg.secs2()));
+				secs1.send(Secs1MessageBuilder.build(header, msg.secs2()));
 			}
 			catch ( InterruptedException ignore ) {
 			}

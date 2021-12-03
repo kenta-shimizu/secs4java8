@@ -54,6 +54,7 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 	@Override
 	public void open() throws IOException {
 		super.open();
+		this.getSession().open();
 	}
 	
 	public HsmsSsCommunicatorConfig config() {
@@ -75,6 +76,12 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 			
 			if ( this.isClosed() ) {
 				return;
+			}
+			
+			try {
+				this.getSession().separate();
+			}
+			catch ( InterruptedException giveup ) {
 			}
 			
 			IOException ioExcept = null;
@@ -147,45 +154,7 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 	}
 	
 	protected AbstractHsmsAsyncSocketChannel buildAsyncSocketChannel(AsynchronousSocketChannel channel) {
-		
-		final AbstractHsmsSsAsyncSocketChannel x = new AbstractHsmsSsAsyncSocketChannel(channel, this) {};
-		
-		x.addSecsLogListener(log -> {
-			try {
-				this.notifyLog(log);
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
-		
-		x.addTrySendHsmsMessagePassThroughListener(msg -> {
-			try {
-				this.notifyTrySendHsmsMessagePassThrough(msg);
-				this.notifyTrySendMessagePassThrough(msg);
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
-		
-		x.addSendedHsmsMessagePassThroughListener(msg -> {
-			try {
-				this.notifySendedHsmsMessagePassThrough(msg);
-				this.notifySendedMessagePassThrough(msg);
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
-		
-		x.addReceiveHsmsMessagePassThroughListener(msg -> {
-			try {
-				this.notifyReceiveHsmsMessagePassThrough(msg);
-				this.notifyReceiveMessagePassThrough(msg);
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
-		
-		return x;
+		return new AbstractHsmsSsAsyncSocketChannel(channel, this) {};
 	}
 	
 }

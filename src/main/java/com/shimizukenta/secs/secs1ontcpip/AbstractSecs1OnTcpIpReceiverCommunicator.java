@@ -235,7 +235,7 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 	}
 	
 	@Override
-	protected void sendBytes(byte[] bs)
+	public void sendBytes(byte[] bs)
 			throws Secs1SendByteException, InterruptedException {
 
 		final AsynchronousSocketChannel channel = getChannel();

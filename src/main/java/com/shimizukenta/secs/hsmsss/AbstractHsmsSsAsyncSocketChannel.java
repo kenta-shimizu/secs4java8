@@ -2,10 +2,12 @@ package com.shimizukenta.secs.hsmsss;
 
 import java.nio.channels.AsynchronousSocketChannel;
 
+import com.shimizukenta.secs.AbstractSecsLog;
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsException;
+import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageBuilder;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsTransactionManager;
@@ -48,6 +50,27 @@ public abstract class AbstractHsmsSsAsyncSocketChannel extends AbstractHsmsAsync
 		return this.transMgr;
 	}
 	
+	@Override
+	protected void notifyLog(AbstractSecsLog log) throws InterruptedException {
+		this.comm.notifyLog(log);
+	}
+	
+	@Override
+	protected void notifyTrySendHsmsMsgPassThrough(HsmsMessage msg) throws InterruptedException {
+		this.comm.notifyTrySendHsmsMessagePassThrough(msg);
+	}
+	
+	@Override
+	protected void notifySendedHsmsMsgPassThrough(HsmsMessage msg) throws InterruptedException {
+		this.comm.notifySendedHsmsMessagePassThrough(msg);
+	}
+	
+	@Override
+	protected void notifyReceiveHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
+		this.comm.notifyReceiveHsmsMessagePassThrough(msg);
+	}
+	
+
 	@Override
 	protected ReadOnlyTimeProperty timeoutT3() {
 		return this.comm.config().timeout().t3();

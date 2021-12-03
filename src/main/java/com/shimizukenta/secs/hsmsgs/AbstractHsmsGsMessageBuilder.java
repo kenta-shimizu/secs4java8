@@ -80,7 +80,7 @@ public abstract class AbstractHsmsGsMessageBuilder extends AbstractHsmsMessageBu
 	}
 	
 	@Override
-	protected AbstractHsmsControlMessage buildHsmsControlMessage(byte[] header, Secs2 body) {
+	public AbstractHsmsControlMessage buildHsmsControlMessage(byte[] header, Secs2 body) {
 		
 		return new AbstractHsmsGsControlMessage(header, body) {
 			

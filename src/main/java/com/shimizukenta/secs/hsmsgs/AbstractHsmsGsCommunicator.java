@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.AbstractBaseCommunicator;
 import com.shimizukenta.secs.AbstractSecsLog;
+import com.shimizukenta.secs.AbstractSecsMessage;
 import com.shimizukenta.secs.AbstractSecsThrowableLog;
 import com.shimizukenta.secs.SecsCommunicatableStateChangeBiListener;
 import com.shimizukenta.secs.SecsException;
@@ -94,10 +95,8 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 			try {
 				
 				for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-					if ( s.isCommunicatable() ) {
-						if ( ! s.deselect() ) {
-							s.separate();
-						}
+					if ( ! s.deselect() ) {
+						s.separate();
 					}
 				}
 			}
@@ -318,7 +317,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 							
 						} else {
 							
-							if ( s.equalAsyncSocketChannel(asyncChannel) ) {
+							if ( s.equalsAsyncSocketChannel(asyncChannel) ) {
 								asyncChannel.sendSelectResponse(msg, HsmsMessageSelectStatus.ENTITY_ACTIVED);
 							} else {
 								asyncChannel.sendSelectResponse(msg, HsmsMessageSelectStatus.ENTITY_ALREADY_USED);
@@ -485,46 +484,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	}
 	
 	protected AbstractHsmsAsyncSocketChannel buildAsyncSocketChannel(AsynchronousSocketChannel channel) {
-		
-		final AbstractHsmsGsAsyncSocketChannel x = new AbstractHsmsGsAsyncSocketChannel(channel, this) {};
-		
-		x.addSecsLogListener(log -> {
-			
-			try {
-				this.notifyLog(log);
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
-		
-		x.addTrySendHsmsMessagePassThroughListener(msg -> {
-			
-			try {
-				this.notifyTrySendHsmsMsgPassThrough(msg);
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
-		
-		x.addSendedHsmsMessagePassThroughListener(msg -> {
-			
-			try {
-				this.notifySendedHsmsMsgPassThrough(msg);
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
-		
-		x.addReceiveHsmsMessagePassThroughListener(msg -> {
-			
-			try {
-				this.notifyRecvHsmsMsgPassThrough(msg);
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
-		
-		return x;
+		return new AbstractHsmsGsAsyncSocketChannel(channel, this) {};
 	}
 	
 	private final Collection<SecsLogListener> logListeners = new CopyOnWriteArrayList<>();
@@ -539,7 +499,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		return logListeners.remove(lstnr);
 	}
 	
-	private final BlockingQueue<SecsLog> logQueue = new LinkedBlockingQueue<>();
+	private final BlockingQueue<AbstractSecsLog> logQueue = new LinkedBlockingQueue<>();
 	
 	private void executeLogQueueTask() {
 		
@@ -574,8 +534,18 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	}
 	
 	public void notifyLog(AbstractSecsLog log) throws InterruptedException {
+		
 		log.subjectHeader(this.config.logSubjectHeader().get());
 		this.logQueue.put(log);
+		
+		final AbstractSecsMessage msg = log.optionalAbstractSecsMessage().orElse(null);
+		if ( msg != null ) {
+			for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
+				if ( s.sessionId() == msg.sessionId() ) {
+					s.notifyLog(log);
+				}
+			}
+		}
 	}
 	
 	public void notifyLog(Throwable t) throws InterruptedException {
@@ -602,13 +572,21 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		
 	private void executeTrySendHsmsMsgPassThroughQueueTask() {
 		this.executeLoopTask(() -> {
-			final HsmsMessage m = this.trySendHsmsMsgPassThroughQueue.take();
-			this.trySendHsmsMsgPassThroughLstnrs.forEach(l -> {l.passThrough(m);});
+			final HsmsMessage msg = this.trySendHsmsMsgPassThroughQueue.take();
+			this.trySendHsmsMsgPassThroughLstnrs.forEach(l -> {
+				l.passThrough(msg);
+			});
 		});
 	}
 	
-	public void notifyTrySendHsmsMsgPassThrough(HsmsMessage msg) throws InterruptedException {
+	public void notifyTrySendHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
 		this.trySendHsmsMsgPassThroughQueue.put(msg);
+		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
+			if ( msg.sessionId() == s.sessionId() ) {
+				s.notifyTrySendHsmsMessagePassThrough(msg);
+				s.notifyTrySendMessagePassThrough(msg);
+			}
+		}
 	}
 	
 	private final Collection<HsmsMessagePassThroughListener> sendedHsmsMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
@@ -627,13 +605,21 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	
 	private void executeSendedHsmsMsgPassThroughQueueTask() {
 		this.executeLoopTask(() -> {
-			final HsmsMessage m = this.sendedHsmsMsgPassThroughQueue.take();
-			this.sendedHsmsMsgPassThroughLstnrs.forEach(l -> {l.passThrough(m);});
+			final HsmsMessage msg = this.sendedHsmsMsgPassThroughQueue.take();
+			this.sendedHsmsMsgPassThroughLstnrs.forEach(l -> {
+				l.passThrough(msg);
+			});
 		});
 	}
 	
-	public void notifySendedHsmsMsgPassThrough(HsmsMessage msg) throws InterruptedException {
+	public void notifySendedHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
 		this.sendedHsmsMsgPassThroughQueue.put(msg);
+		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
+			if ( msg.sessionId() == s.sessionId() ) {
+				s.notifySendedHsmsMessagePassThrough(msg);
+				s.notifySendedMessagePassThrough(msg);
+			}
+		}
 	}
 	
 	private final Collection<HsmsMessagePassThroughListener> recvHsmsMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
@@ -652,13 +638,21 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	
 	private void executeRecvHsmsMsgPassThroughQueueTask() {
 		this.executeLoopTask(() -> {
-			final HsmsMessage m = this.recvHsmsMsgPassThroughQueue.take();
-			this.recvHsmsMsgPassThroughLstnrs.forEach(l -> {l.passThrough(m);});
+			final HsmsMessage msg = this.recvHsmsMsgPassThroughQueue.take();
+			this.recvHsmsMsgPassThroughLstnrs.forEach(l -> {
+				l.passThrough(msg);
+			});
 		});
 	}
 	
-	public void notifyRecvHsmsMsgPassThrough(HsmsMessage msg) throws InterruptedException {
+	public void notifyReceiveHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
 		this.recvHsmsMsgPassThroughQueue.put(msg);
+		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
+			if ( msg.sessionId() == s.sessionId() ) {
+				s.notifyReceiveHsmsMessagePassThrough(msg);
+				s.notifyReceiveMessagePassThrough(msg);
+			}
+		}
 	}
 	
 }
