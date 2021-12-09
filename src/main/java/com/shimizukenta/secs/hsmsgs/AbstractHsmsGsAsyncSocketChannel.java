@@ -1,6 +1,7 @@
 package com.shimizukenta.secs.hsmsgs;
 
 import java.nio.channels.AsynchronousSocketChannel;
+import java.util.List;
 
 import com.shimizukenta.secs.AbstractSecsLog;
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
@@ -13,6 +14,7 @@ import com.shimizukenta.secs.hsms.HsmsMessageBuilder;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsTransactionManager;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
+import com.shimizukenta.secs.secs2.Secs2BytesParseException;
 
 public abstract class AbstractHsmsGsAsyncSocketChannel extends AbstractHsmsAsyncSocketChannel {
 
@@ -44,6 +46,16 @@ public abstract class AbstractHsmsGsAsyncSocketChannel extends AbstractHsmsAsync
 	@Override
 	protected HsmsMessageBuilder messageBuilder() {
 		return this.comm.msgBuilder();
+	}
+	
+	@Override
+	protected AbstractHsmsMessage buildMessageFromBytes(byte[] header, List<byte[]> bodies) throws Secs2BytesParseException {
+		return HsmsGsMessageBuilder.fromBytes(header, bodies);
+	}
+	
+	@Override
+	protected AbstractHsmsMessage buildMessageFromMessage(HsmsMessage message) {
+		return HsmsGsMessageBuilder.fromMessage(message);
 	}
 	
 	private final HsmsTransactionManager<AbstractHsmsMessage> transMgr = new HsmsTransactionManager<>();

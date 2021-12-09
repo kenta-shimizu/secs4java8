@@ -99,7 +99,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 						})
 						.collect(Collectors.toList());
 				
-				AbstractHsmsMessage msg = this.messageBuilder().fromBytes(headerBytes, bodyBytes);
+				AbstractHsmsMessage msg = this.buildMessageFromBytes(headerBytes, bodyBytes);
 				
 				HsmsMessageType type = msg.messageType();
 				if ( ! prototypeCheckControlMessageLength(type, msgLength) ) {
@@ -245,6 +245,8 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 	
 	
 	abstract protected HsmsMessageBuilder messageBuilder();
+	abstract protected AbstractHsmsMessage buildMessageFromBytes(byte[] header, List<byte[]> bodies) throws Secs2BytesParseException;
+	abstract protected AbstractHsmsMessage buildMessageFromMessage(HsmsMessage message);
 	abstract protected HsmsTransactionManager<AbstractHsmsMessage> transactionManager();
 	abstract protected ReadOnlyTimeProperty timeoutT3();
 	abstract protected ReadOnlyTimeProperty timeoutT6();
@@ -436,7 +438,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 	public Optional<HsmsMessage> sendHsmsMessage(HsmsMessage msg)
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException, InterruptedException {
 		
-		return this.sendAndReplyHsmsMessage(this.messageBuilder().fromMessage(msg));
+		return this.sendAndReplyHsmsMessage(this.buildMessageFromMessage(msg));
 	}
 	
 	private Optional<HsmsMessage> sendAndReplyHsmsMessage(AbstractHsmsMessage msg)

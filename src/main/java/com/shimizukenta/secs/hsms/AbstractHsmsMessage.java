@@ -14,20 +14,16 @@ public abstract class AbstractHsmsMessage extends AbstractSecsMessage implements
 	private final byte[] header;
 	private final Secs2 body;
 	
-	private int tentativeSessionId;
-	
 	public AbstractHsmsMessage(byte[] header, Secs2 body) {
 		super();
 		this.header = Arrays.copyOf(header, HEADER_SIZE);
 		this.body = body;
-		this.tentativeSessionId = -1;
 	}
 	
 	public AbstractHsmsMessage(byte[] header) {
 		super();
 		this.header = Arrays.copyOf(header, HEADER_SIZE);
 		this.body = Secs2.empty();
-		this.tentativeSessionId = -1;
 	}
 	
 	@Override
@@ -55,20 +51,9 @@ public abstract class AbstractHsmsMessage extends AbstractSecsMessage implements
 		return this.messageType().sType();
 	}
 	
-	private final Object syncTentativeSessionId = new Object();
-	
-	protected int tentativeSessionId() {
-		
-		synchronized ( this.syncTentativeSessionId ) {
-			
-			if ( this.tentativeSessionId < 0 ) {
-				
-				this.tentativeSessionId = (((int)(this.header[0]) << 8) & 0x0000FF00)
-						| ((int)(header[1]) & 0x000000FF);
-			}
-			
-			return this.tentativeSessionId;
-		}
+	protected int getSessionIdFromHeader() {
+		return (((int)(this.header[0]) << 8) & 0x0000FF00)
+		| ((int)(header[1]) & 0x000000FF);
 	}
 	
 	protected String toDataMessageJsonProxy() {

@@ -11,8 +11,8 @@ import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2BytesPackBuilder;
+import com.shimizukenta.secs.secs2.Secs2BytesParseException;
 import com.shimizukenta.secs.secs2.Secs2BytesParser;
-import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder {
 	
@@ -71,7 +71,7 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 			int strm,
 			int func,
 			boolean wbit)
-					throws Secs1SendMessageException {
+					throws Secs1TooBigSendMessageException {
 		
 		return this.build(strm, func, wbit, Secs2.empty());
 	}
@@ -82,7 +82,7 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 			int func,
 			boolean wbit,
 			Secs2 body)
-					throws Secs1SendMessageException {
+					throws Secs1TooBigSendMessageException {
 		
 		byte[] dd = this.getDeviceId2Bytes();
 		byte[] ssss = this.getSystem4Bytes();
@@ -117,7 +117,7 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 			int strm,
 			int func,
 			boolean wbit)
-					throws Secs1SendMessageException {
+					throws Secs1TooBigSendMessageException {
 		
 		return this.build(primaryMsg, strm, func, wbit, Secs2.empty());
 	}
@@ -129,7 +129,7 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 			int func,
 			boolean wbit,
 			Secs2 body)
-					throws Secs1SendMessageException {
+					throws Secs1TooBigSendMessageException {
 		
 		byte[] dd = this.getDeviceId2Bytes();
 		byte[] ppbb = primaryMsg.header10Bytes();
@@ -156,6 +156,12 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 		}
 		
 		return build(header, body);
+	}
+	
+	public static AbstractSecs1Message build(byte[] header)
+			throws Secs1TooBigSendMessageException {
+		
+		return AbstractSecs1MessageBuilder.build(header, Secs2.empty());
 	}
 	
 	public static AbstractSecs1Message build(byte[] header, Secs2 body)
@@ -244,10 +250,9 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 		};
 	}
 	
-	@Override
-	public AbstractSecs1Message fromBlocks(
+	public static AbstractSecs1Message fromBlocks(
 			List<? extends AbstractSecs1MessageBlock> blocks)
-					throws Secs2Exception {
+					throws Secs2BytesParseException {
 		
 		final List<AbstractSecs1MessageBlock> refs = new ArrayList<>(blocks);
 		
@@ -271,8 +276,7 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 		};
 	}
 	
-	@Override
-	public AbstractSecs1Message fromMessage(Secs1Message msg) throws Secs1SendMessageException {
+	public static AbstractSecs1Message fromMessage(Secs1Message msg) throws Secs1TooBigSendMessageException {
 		if ( msg instanceof AbstractSecs1Message ) {
 			return (AbstractSecs1Message)msg;
 		} else {

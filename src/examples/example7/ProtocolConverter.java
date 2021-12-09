@@ -1,5 +1,6 @@
-package com.shimizukenta.secstest;
+package example7;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -8,6 +9,8 @@ import java.net.SocketAddress;
 
 import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
+import com.shimizukenta.secs.SecsLogListener;
+import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessageReceiveBiListener;
 import com.shimizukenta.secs.gem.ACKC5;
 import com.shimizukenta.secs.gem.ACKC6;
@@ -16,26 +19,301 @@ import com.shimizukenta.secs.gem.ClockType;
 import com.shimizukenta.secs.gem.ONLACK;
 import com.shimizukenta.secs.gem.TIACK;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
+import com.shimizukenta.secs.hsms.HsmsMessage;
+import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
+import com.shimizukenta.secs.hsmsss.HsmsSsMessageBuilder;
+import com.shimizukenta.secs.secs1.Secs1Message;
+import com.shimizukenta.secs.secs1.Secs1MessageBuilder;
+import com.shimizukenta.secs.secs1.Secs1TooBigSendMessageException;
+import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicator;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicatorConfig;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpReceiverCommunicator;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpReceiverCommunicatorConfig;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
-import com.shimizukenta.secstestutil.Secs1OnTcpIpHsmsSsConverter;
 
-public class ProtocolConvert {
+/**
+ * HSMS-SS <-> SECS-I convert example, like SH-2000.<br/>
+ * 
+ * <p>
+ * Connection diagram<br />
+ * HSMS-SS-ACTIVE <-> HSMS-SS-PASSIVE <-> SECS-I-on-TCP/IP <-> SECS-I-on-TCP/IP-Receiver<br />
+ * (HOST)             (Convert-SIDE-A)    (Convert-SIDE-B)     (EQUIP)<br />
+ * </p>
+ * <p>
+ * This example is<br />
+ * <br />
+ * From HOST to EQUIP via Protocol-converter.<br />
+ * send S1F13, receive S1F14<br />
+ * send S1F17, receive S1F18<br />
+ * send S2F31, receive S2F32<br />
+ * <br />
+ * From EQUIP to HOST via Protocol-converter.<br />
+ * receive S5F1, reply S5F2<br />
+ * <br />
+ * From HOST to EQUIP via Protocol-converter.<br />
+ * send S1F15, receive S1F16<br />
+ * </p>
+ * 
+ * @author kenta-shimizu
+ *
+ */
+public class ProtocolConverter implements Closeable {
+	
+	public static final byte REJECT_BY_OVERFLOW = (byte)0x80;
+	public static final byte REJECT_BY_NOT_CONNECT = (byte)0x81;
+	
+	private final HsmsSsCommunicator hsmsSsComm;
+	private final Secs1OnTcpIpCommunicator secs1Comm;
+	private boolean opened;
+	private boolean closed;
+	
+	public ProtocolConverter(
+			Secs1OnTcpIpCommunicatorConfig secs1Config,
+			HsmsSsCommunicatorConfig hsmsSsConfig
+			) {
+		
+		this.opened = false;
+		this.closed = false;
+		
+		this.secs1Comm = Secs1OnTcpIpCommunicator.newInstance(secs1Config);
+		this.hsmsSsComm = HsmsSsCommunicator.newInstance(hsmsSsConfig);
+		
+		this.secs1Comm.addSecsMessageReceiveListener(msg -> {
+			
+			try {
+				
+				try {
+					
+					this.hsmsSsComm.send(this.toHsmsMessageFromSecs1Message(msg))
+					.filter(r -> r.isDataMessage())
+					.ifPresent(r -> {
+						
+						try {
+							try {
+								this.secs1Comm.send(this.toSecs1MessageFromHsmsMessage(r));
+							}
+							catch ( SecsException nothing ) {
+							}
+						}
+						catch ( InterruptedException ignore ) {
+						}
+					});
+				}
+				catch ( SecsException nothing ) {
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		});
+		
+		this.hsmsSsComm.addSecsMessageReceiveListener(msg -> {
+			
+			try {
+				
+				try {
+					
+					this.secs1Comm.send(this.toSecs1MessageFromHsmsMessage(msg))
+					.ifPresent(r -> {
+						
+						try {
+							try {
+								this.hsmsSsComm.send(this.toHsmsMessageFromSecs1Message(r));
+							}
+							catch ( SecsException nothing ) {
+							}
+						}
+						catch (InterruptedException ignore ) {
+						}
+						
+					});
+				}
+				catch ( Secs1TooBigSendMessageException e ) {
+					
+					try {
+						this.hsmsSsComm.send(this.toHsmsRejectMessage(msg, REJECT_BY_OVERFLOW));
+					}
+					catch ( SecsException giveup ) {
+					}
+				}
+				catch ( SecsException e ) {
+					
+					try {
+						this.hsmsSsComm.send(this.toHsmsRejectMessage(msg, REJECT_BY_NOT_CONNECT));
+					}
+					catch ( SecsException giveup ) {
+					}
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		});
+	}
 
-	public ProtocolConvert() {
-		/* Nothing */
+	public void open() throws IOException {
+		
+		synchronized ( this ) {
+			if ( this.closed ) {
+				throw new IOException("Already closed");
+			}
+			if ( this.opened ) {
+				throw new IOException("Already opened");
+			}
+			this.opened = true;
+		}
+		
+		this.secs1Comm.open();
+		this.hsmsSsComm.open();
 	}
 	
-	private static final int deviceId = 10;
-	private static final SocketAddress secs1Addr = new InetSocketAddress("127.0.0.1", 23000);
-	private static final SocketAddress hsmsSsAddr = new InetSocketAddress("127.0.0.1", 5000);
+	@Override
+	public void close() throws IOException {
+		
+		synchronized ( this ) {
+			if ( this.closed ) {
+				return;
+			}
+			this.closed = true;
+		}
+		
+		IOException ioExcept = null;
+		
+		try {
+			this.secs1Comm.close();
+		}
+		catch ( IOException e ) {
+			ioExcept = e;
+		}
+		
+		try {
+			this.hsmsSsComm.close();
+		}
+		catch ( IOException e ) {
+			ioExcept = e;
+		}
+		
+		if ( ioExcept != null ) {
+			throw ioExcept;
+		}
+	}
+	
+	private HsmsMessage toHsmsMessageFromSecs1Message(SecsMessage msg) {
+		
+		byte[] bs = msg.header10Bytes();
+		
+		byte[] header = new byte[] {
+				(byte)((int)(bs[0]) & 0x7F),
+				bs[1],
+				bs[2],
+				bs[3],
+				(byte)0,
+				(byte)0,
+				bs[6],
+				bs[7],
+				bs[8],
+				bs[9]
+		};
+		
+		return HsmsSsMessageBuilder.build(header, msg.secs2());
+	}
+	
+	private Secs1Message toSecs1MessageFromHsmsMessage(SecsMessage msg)
+			throws Secs1TooBigSendMessageException {
+		
+		byte[] bs = msg.header10Bytes();
+		
+		byte[] header = new byte[] {
+				bs[0],
+				bs[1],
+				bs[2],
+				bs[3],
+				(byte)0,
+				(byte)0,
+				bs[6],
+				bs[7],
+				bs[8],
+				bs[9]
+		};
+		
+		if ( this.secs1Comm.isEquip() ) {
+			header[0] |= (byte)0x80;
+		} else {
+			header[0] &= (byte)0x7F;
+		}
+		
+		return Secs1MessageBuilder.build(header, msg.secs2());
+	}
+	
+	private HsmsMessage toHsmsRejectMessage(SecsMessage ref, byte reason) {
+		
+		byte[] bs = ref.header10Bytes();
+		
+		byte[] header = new byte[] {
+				bs[0],
+				bs[1],
+				(byte)0x0,
+				reason,
+				HsmsMessageType.REJECT_REQ.pType(),
+				HsmsMessageType.REJECT_REQ.sType(),
+				bs[6],
+				bs[7],
+				bs[8],
+				bs[9]
+		};
+		
+		return HsmsSsMessageBuilder.build(header);
+	}
+	
+	public boolean addSecsLogListener(SecsLogListener l) {
+		boolean a = this.secs1Comm.addSecsLogListener(l);
+		boolean b = this.hsmsSsComm.addSecsLogListener(l);
+		return a && b;
+	}
+	
+	public boolean removeSecsLogListener(SecsLogListener l) {
+		boolean a = this.secs1Comm.removeSecsLogListener(l);
+		boolean b = this.hsmsSsComm.removeSecsLogListener(l);
+		return a || b;
+	}
+	
+	public static ProtocolConverter newInstance(
+			Secs1OnTcpIpCommunicatorConfig secs1Config,
+			HsmsSsCommunicatorConfig hsmsSsConfig) {
+		
+		return new ProtocolConverter(secs1Config, hsmsSsConfig);
+	}
+	
+	public static ProtocolConverter open(
+			Secs1OnTcpIpCommunicatorConfig secs1Config,
+			HsmsSsCommunicatorConfig hsmsSsConfig)
+					throws IOException {
+		
+		final ProtocolConverter inst = newInstance(secs1Config, hsmsSsConfig);
+		
+		try {
+			inst.open();
+		}
+		catch ( IOException e ) {
+			
+			try {
+				inst.close();
+			}
+			catch ( IOException giveup ) {
+			}
+			
+			throw e;
+		}
+		
+		return inst;
+	}
 	
 	public static void main(String[] args) {
+
+		final int deviceId = 10;
+		final SocketAddress secs1Addr = new InetSocketAddress("127.0.0.1", 23000);
+		final SocketAddress hsmsSsAddr = new InetSocketAddress("127.0.0.1", 5000);
 		
 		try {
 			
@@ -99,10 +377,10 @@ public class ProtocolConvert {
 			hostConfig.name("host");
 			
 			try (
-					Secs1OnTcpIpHsmsSsConverter converter = Secs1OnTcpIpHsmsSsConverter.newInstance(secs1Side, hsmsSsSide);
+					ProtocolConverter converter = ProtocolConverter.newInstance(secs1Side, hsmsSsSide);
 					) {
 				
-//				converter.addSecsLogListener(ProtocolConvert::echo);
+//				converter.addSecsLogListener(ProtocolConverter::echo);
 				
 				converter.open();
 				
@@ -110,7 +388,7 @@ public class ProtocolConvert {
 						SecsCommunicator equip = Secs1OnTcpIpReceiverCommunicator.newInstance(equipConfig);
 						) {
 					
-					equip.addSecsLogListener(ProtocolConvert::echo);
+					equip.addSecsLogListener(ProtocolConverter::echo);
 					equip.addSecsMessageReceiveListener(equipRecvListener());
 					
 					equip.open();
@@ -119,7 +397,7 @@ public class ProtocolConvert {
 							SecsCommunicator host = HsmsSsCommunicator.newInstance(hostConfig);
 							) {
 						
-						host.addSecsLogListener(ProtocolConvert::echo);
+						host.addSecsLogListener(ProtocolConverter::echo);
 						host.addSecsMessageReceiveListener(hostRecvListener());
 						
 						host.open();

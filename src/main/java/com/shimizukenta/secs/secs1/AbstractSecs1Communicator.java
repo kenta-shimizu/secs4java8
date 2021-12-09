@@ -90,7 +90,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			throws Secs1SendMessageException, Secs1WaitReplyMessageException, Secs1Exception,
 			InterruptedException {
 		
-		return this.circuit.send(this.messageBuilder().fromMessage(msg));
+		return this.circuit.send(Secs1MessageBuilder.fromMessage(msg));
 	}
 	
 	protected void putByte(byte b) throws InterruptedException {

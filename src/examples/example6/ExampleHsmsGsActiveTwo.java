@@ -15,7 +15,7 @@ import com.shimizukenta.secs.hsmsgs.HsmsGsCommunicatorConfig;
  * Example-6.
  * 
  * <p>
- * Use 'example6/ExampleHsmsGsPassive.java' with this, too.
+ * Run 'example6/ExampleHsmsGsPassive.java' with this, too.
  * </p>
  * <p>
  * This example is HSMS-GS Active Host.<br />

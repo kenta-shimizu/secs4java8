@@ -1,12 +1,9 @@
 package com.shimizukenta.secs.hsms;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
-import com.shimizukenta.secs.secs2.Secs2BytesParseException;
-import com.shimizukenta.secs.secs2.Secs2BytesParser;
 
 public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	
@@ -59,7 +56,7 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildSelectResponse(HsmsMessage primaryMsg, HsmsMessageSelectStatus status) {
+	public AbstractHsmsControlMessage buildSelectResponse(HsmsMessage primaryMsg, HsmsMessageSelectStatus status) {
 		
 		byte[] bs = primaryMsg.header10Bytes();
 		
@@ -80,7 +77,7 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildDeselectResponse(HsmsMessage primaryMsg, HsmsMessageDeselectStatus status) {
+	public AbstractHsmsControlMessage buildDeselectResponse(HsmsMessage primaryMsg, HsmsMessageDeselectStatus status) {
 		
 		byte[] bs = primaryMsg.header10Bytes();
 		
@@ -101,7 +98,7 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildLinktestRequest(AbstractHsmsSession session) {
+	public AbstractHsmsControlMessage buildLinktestRequest(AbstractHsmsSession session) {
 		
 		byte[] sysbytes = this.getSystem4Bytes(session);
 		
@@ -122,7 +119,7 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildLinktestResponse(HsmsMessage primaryMsg) {
+	public AbstractHsmsControlMessage buildLinktestResponse(HsmsMessage primaryMsg) {
 		
 		byte[] bs = primaryMsg.header10Bytes();
 		
@@ -143,7 +140,7 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildRejectRequest(HsmsMessage referenceMsg, HsmsMessageRejectReason reason) {
+	public AbstractHsmsControlMessage buildRejectRequest(HsmsMessage referenceMsg, HsmsMessageRejectReason reason) {
 		
 		byte[] bs = referenceMsg.header10Bytes();
 		
@@ -175,12 +172,12 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildDataMessage(AbstractHsmsSession session, int strm, int func, boolean wbit) {
+	public AbstractHsmsDataMessage buildDataMessage(AbstractHsmsSession session, int strm, int func, boolean wbit) {
 		return buildDataMessage(session, strm, func, wbit, Secs2.empty());
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildDataMessage(AbstractHsmsSession session, int strm, int func, boolean wbit, Secs2 body) {
+	public AbstractHsmsDataMessage buildDataMessage(AbstractHsmsSession session, int strm, int func, boolean wbit, Secs2 body) {
 		
 		byte[] sessionId2Bytes = this.getSessionId2Bytes(session);
 		byte[] sysbytes = this.getSystem4Bytes(session);
@@ -206,12 +203,12 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildDataMessage(SecsMessage primaryMsg, int strm, int func, boolean wbit) {
+	public AbstractHsmsDataMessage buildDataMessage(SecsMessage primaryMsg, int strm, int func, boolean wbit) {
 		return buildDataMessage(primaryMsg, strm, func, wbit, Secs2.empty());
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildDataMessage(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 body) {
+	public AbstractHsmsDataMessage buildDataMessage(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 body) {
 		
 		byte[] bs = primaryMsg.header10Bytes();
 		
@@ -235,36 +232,7 @@ public abstract class AbstractHsmsMessageBuilder implements HsmsMessageBuilder {
 		return this.buildHsmsDataMessage(header, body);
 	}
 	
-	@Override
-	public AbstractHsmsMessage fromBytes(byte[] header, List<byte[]> bodies)  throws Secs2BytesParseException {
-		
-		Secs2 s2b = Secs2BytesParser.getInstance().parse(bodies);
-		 
-		if ( HsmsMessageType.get(header[4], header[5]) == HsmsMessageType.DATA ) {
-			return this.buildHsmsDataMessage(header, s2b);
-		} else {
-			return this.buildHsmsControlMessage(header, s2b);
-		}
-	}
-	
-	@Override
-	public AbstractHsmsMessage fromMessage(HsmsMessage msg) {
-		
-		if ( msg.isDataMessage() ) {
-			return this.buildHsmsDataMessage(msg.header10Bytes(), msg.secs2());
-		} else {
-			return this.buildHsmsControlMessage(msg.header10Bytes(), msg.secs2());
-		}
-	}
-	
-	public AbstractHsmsDataMessage buildHsmsDataMessage(byte[] header, Secs2 body) {
-		
-		return new AbstractHsmsDataMessage(header, body) {
-			
-			private static final long serialVersionUID = 3392473904493672566L;
-		};
-	}
-	
-	abstract public AbstractHsmsControlMessage buildHsmsControlMessage(byte[] header, Secs2 body);
+	abstract protected AbstractHsmsControlMessage buildHsmsControlMessage(byte[] header, Secs2 body);
+	abstract protected AbstractHsmsDataMessage buildHsmsDataMessage(byte[] header, Secs2 body);
 	
 }

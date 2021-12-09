@@ -27,7 +27,7 @@ public abstract class AbstractHsmsGsControlMessage extends AbstractHsmsControlMe
 		}
 		default: {
 			
-			return this.tentativeSessionId();
+			return this.getSessionIdFromHeader();
 		}
 		}
 	}

@@ -283,7 +283,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		}
 		default: {
 			
-			throw new HsmsSsPassiveRecieveNotSelectRequestException();
+			throw new HsmsSsPassiveReceiveNotSelectRequestException();
 		}
 		}
 	}

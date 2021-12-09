@@ -41,7 +41,7 @@ public abstract class AbstractHsmsDataMessage extends AbstractHsmsMessage {
 	
 	@Override
 	public int sessionId() {
-		return this.tentativeSessionId();
+		return this.getSessionIdFromHeader();
 	}
 
 	@Override
