@@ -159,8 +159,18 @@ public interface Secs2 extends Iterable<Secs2> {
 	 * @return (double)value
 	 * @throws Secs2Exception if parse failed
 	 */
-	public double getDouble( int... indices1 ) throws Secs2Exception;
+	public double getDouble( int... indices ) throws Secs2Exception;
 
+	/**
+	 * Returns nested Numeric-value by indices,
+	 * Available if type is "I1","I2","I4","I8","F4","F8","U1","U2","U4","U8"
+	 * 
+	 * @param indices
+	 * @return (Number)value
+	 * @throws Secs2Exception if parse failed
+	 */
+	public Number getNumber( int... indices ) throws Secs2Exception;
+	
 	
 	/* builder */
 	

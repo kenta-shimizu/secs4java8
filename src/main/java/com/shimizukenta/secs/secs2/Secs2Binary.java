@@ -45,13 +45,7 @@ public class Secs2Binary extends Secs2Number<Byte> {
 	
 	@Override
 	protected byte getByte(int index) throws Secs2Exception {
-		
-		try {
-			return values().get(index).byteValue();
-		}
-		catch ( IndexOutOfBoundsException e ) {
-			throw new Secs2IndexOutOfBoundsException(e);
-		}
+		return this.getNumber(index).byteValue();
 	}
 	
 	@Override
@@ -62,7 +56,7 @@ public class Secs2Binary extends Secs2Number<Byte> {
 	@Override
 	protected String toStringValue() {
 		try {
-			return values().stream()
+			return this.values().stream()
 					.map(b -> String.format("%02X", b))
 					.map(s -> ("0x" + s))
 					.collect(Collectors.joining(" "));

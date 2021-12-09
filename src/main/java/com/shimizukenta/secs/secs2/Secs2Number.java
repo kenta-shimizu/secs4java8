@@ -82,53 +82,39 @@ abstract public class Secs2Number<T extends Number> extends AbstractSecs2 {
 
 	@Override
 	protected int getInt(int index) throws Secs2Exception {
-		
-		try {
-			return values().get(index).intValue();
-		}
-		catch ( IndexOutOfBoundsException e ) {
-			throw new Secs2IndexOutOfBoundsException(e);
-		}
+		return getNumber(index).intValue();
 	}
 	
 	@Override
 	protected long getLong(int index) throws Secs2Exception {
-		
-		try {
-			return values().get(index).longValue();
-		}
-		catch ( IndexOutOfBoundsException e ) {
-			throw new Secs2IndexOutOfBoundsException(e);
-		}
+		return getNumber(index).longValue();
 	}
 	
 	@Override
 	protected float getFloat(int index) throws Secs2Exception {
-		
-		try {
-			return values().get(index).floatValue();
-		}
-		catch ( IndexOutOfBoundsException e ) {
-			throw new Secs2IndexOutOfBoundsException(e);
-		}
+		return getNumber(index).floatValue();
 	}
 	
 	@Override
 	protected double getDouble(int index) throws Secs2Exception {
-		
+		return getNumber(index).doubleValue();
+	}
+	
+	@Override
+	protected Number getNumber(int index) throws Secs2Exception {
 		try {
-			return values().get(index).doubleValue();
+			return this.values().get(index);
 		}
 		catch ( IndexOutOfBoundsException e ) {
 			throw new Secs2IndexOutOfBoundsException(e);
 		}
 	}
-	
+
 	@Override
 	protected String toJsonValue() {
 		
 		try {
-			return values().stream()
+			return this.values().stream()
 					.map(Number::toString)
 					.collect(Collectors.joining(",", "[", "]"));
 		}
@@ -140,7 +126,7 @@ abstract public class Secs2Number<T extends Number> extends AbstractSecs2 {
 	@Override
 	protected String toStringValue() {
 		try {
-			return values().stream()
+			return this.values().stream()
 					.map(Number::toString)
 					.collect(Collectors.joining(" "));
 		}

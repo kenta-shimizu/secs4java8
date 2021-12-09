@@ -184,6 +184,17 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	}
 	
 	@Override
+	public Number getNumber( int... indices ) throws Secs2Exception {
+		LinkedList<Integer> list = createLinkedList(indices);
+		int lastIndex = list.removeLast();
+		return get(list).getNumber(lastIndex);
+	}
+	
+	protected Number getNumber(int index) throws Secs2Exception {
+		throw new Secs2IrregalDataFormatException("Not Secs2Number");
+	}
+	
+	@Override
 	public String toString() {
 		
 		return new StringBuilder("<")
