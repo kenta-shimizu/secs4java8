@@ -22,23 +22,24 @@ public class ExampleGetSecs2Value {
 	public static void main(String[] args) {
 
 		Secs2 ss = Secs2.list(
-				Secs2.binary((byte)1)	/* 0 */
-				, Secs2.ascii("MESSAGE-1")	/* 1 */
-				, Secs2.bool(true)	/* 2 */
-				, Secs2.list(	/* 3 */
+				Secs2.binary((byte)1),	/* 0 */
+				Secs2.ascii("MESSAGE-1"),	/* 1 */
+				Secs2.bool(true),	/* 2 */
+				Secs2.list(	/* 3 */
 						Secs2.list(	/* 3,0 */
-								Secs2.ascii("KEY-1")	/* 3,0,0 */
-								, Secs2.int4(100, 101, 102)	/* 3,0,1 */
+								Secs2.ascii("KEY-1"),	/* 3,0,0 */
+								Secs2.int4(100, 101, 102)	/* 3,0,1 */
+								),
+						Secs2.list(	/* 3,1 */
+								Secs2.ascii("KEY-2"),	/* 3,1,0 */
+								Secs2.int4(200, 201, 202)	/* 3,1,1 */
+								),
+						Secs2.list(	/* 3,2 */
+								Secs2.ascii("KEY-3"),	/* 3,2,0 */
+								Secs2.int4(300, 301, 302)	/* 3,2,1 */
 								)
-						, Secs2.list(	/* 3,1 */
-								Secs2.ascii("KEY-2")	/* 3,1,0 */
-								, Secs2.int4(200, 201, 202)	/* 3,1,1 */
-								)
-						, Secs2.list(	/* 3,2 */
-								Secs2.ascii("KEY-3")	/* 3,2,0 */
-								, Secs2.int4(300, 301, 302)	/* 3,2,1 */
-								)
-						)
+						),
+				Secs2.float4(400.0F)
 				);
 		
 		System.out.println("# Example-SECS2");
@@ -57,6 +58,7 @@ public class ExampleGetSecs2Value {
 			System.out.println("getInt(3, 0, 1, 2):\t" + ss.getInt(3, 0 , 1, 2));	/* 102 */
 			System.out.println("getInt(3, 1, 1, 0):\t" + ss.getInt(3, 1 , 1, 0));	/* 200 */
 			System.out.println("getInt(3, 2, 1, 0):\t" + ss.getInt(3, 2 , 1, 0));	/* 300 */
+			System.out.println("getFloat(4, 0):\t" + ss.getFloat(4, 0));	/* 400.0F */
 			System.out.println("get(3):\t" + ss.get(3));	/* <L[3] ...> */
 			System.out.println();
 			
@@ -67,6 +69,7 @@ public class ExampleGetSecs2Value {
 			System.out.println("get(2) item-type:\t" + ss.get(2).secs2Item());	/* BOOLEAN */
 			System.out.println("get(3) item-type:\t" + ss.get(3).secs2Item());	/* LIST */
 			System.out.println("get(3, 0, 1) item-type:\t" + ss.get(3, 0, 1).secs2Item());	/* INT4 */
+			System.out.println("get(4) item-type:\t" + ss.get(4).secs2Item());	/* FLOAT4 */
 			System.out.println();
 			
 			System.out.println("# Get Size");
@@ -76,6 +79,7 @@ public class ExampleGetSecs2Value {
 			System.out.println("get(2) size:\t" + ss.get(2).size());	/* 1 */
 			System.out.println("get(3) size:\t" + ss.get(3).size());	/* 3 */
 			System.out.println("get(3, 0, 1) size:\t" + ss.get(3, 0, 1).size());	/* 3 */
+			System.out.println("get(4) size:\t" + ss.get(4).size());	/* 1 */
 			System.out.println();
 			
 			{

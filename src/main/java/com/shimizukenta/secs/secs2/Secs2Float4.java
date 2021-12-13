@@ -1,5 +1,6 @@
 package com.shimizukenta.secs.secs2;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +60,11 @@ public class Secs2Float4 extends Secs2Number<Float> {
 	@Override
 	public Secs2Item secs2Item() {
 		return secs2Item;
+	}
+	
+	@Override
+	protected BigInteger getBigInteger(int index) throws Secs2Exception {
+		return BigInteger.valueOf(this.getNumber(index).longValue());
 	}
 	
 }
