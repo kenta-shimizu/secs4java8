@@ -40,11 +40,11 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		
 		super.open();
 		
-		executeLogQueueTask();
-		executeMsgRecvQueueTask();
-		executeTrySendMsgPassThroughQueueTask();
-		executeSendedMsgPassThroughQueueTask();
-		executeRecvMsgPassThroughQueueTask();
+		this.executeLogQueueTask();
+		this.executeMsgRecvQueueTask();
+		this.executeTrySendMsgPassThroughQueueTask();
+		this.executeSendedMsgPassThroughQueueTask();
+		this.executeRecvMsgPassThroughQueueTask();
 	}
 	
 	@Override
@@ -275,25 +275,25 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	
 	@Override
 	public boolean addTrySendMessagePassThroughListener(SecsMessagePassThroughListener l) {
-		return trySendMsgPassThroughListeners.add(Objects.requireNonNull(l));
+		return this.trySendMsgPassThroughListeners.add(Objects.requireNonNull(l));
 	}
 	
 	@Override
 	public boolean removeTrySendMessagePassThroughListener(SecsMessagePassThroughListener l) {
-		return trySendMsgPassThroughListeners.remove(Objects.requireNonNull(l));
+		return this.trySendMsgPassThroughListeners.remove(Objects.requireNonNull(l));
 	}
 	
 	private BlockingQueue<SecsMessage> trySendMsgPassThroughQueue = new LinkedBlockingQueue<>();
 	
 	private void executeTrySendMsgPassThroughQueueTask() {
 		executeLoopTask(() -> {
-			SecsMessage msg = trySendMsgPassThroughQueue.take();
-			trySendMsgPassThroughListeners.forEach(l -> {l.passThrough(msg);});
+			SecsMessage msg = this.trySendMsgPassThroughQueue.take();
+			this.trySendMsgPassThroughListeners.forEach(l -> {l.passThrough(msg);});
 		});
 	}
 	
 	public void notifyTrySendMessagePassThrough(SecsMessage msg) throws InterruptedException {
-		trySendMsgPassThroughQueue.put(msg);
+		this.trySendMsgPassThroughQueue.put(msg);
 	}
 	
 	
@@ -302,25 +302,25 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	
 	@Override
 	public boolean addSendedMessagePassThroughListener(SecsMessagePassThroughListener l) {
-		return sendedMsgPassThroughListeners.add(Objects.requireNonNull(l));
+		return this.sendedMsgPassThroughListeners.add(Objects.requireNonNull(l));
 	}
 	
 	@Override
 	public boolean removeSendedMessagePassThroughListener(SecsMessagePassThroughListener l) {
-		return sendedMsgPassThroughListeners.remove(Objects.requireNonNull(l));
+		return this.sendedMsgPassThroughListeners.remove(Objects.requireNonNull(l));
 	}
 	
 	private final BlockingQueue<SecsMessage> sendedMsgPassThroughQueue = new LinkedBlockingQueue<>();
 	
 	private void executeSendedMsgPassThroughQueueTask() {
 		executeLoopTask(() -> {
-			SecsMessage msg = sendedMsgPassThroughQueue.take();
-			sendedMsgPassThroughListeners.forEach(l -> {l.passThrough(msg);});
+			SecsMessage msg = this.sendedMsgPassThroughQueue.take();
+			this.sendedMsgPassThroughListeners.forEach(l -> {l.passThrough(msg);});
 		});
 	}
 	
 	public void notifySendedMessagePassThrough(SecsMessage msg) throws InterruptedException {
-		sendedMsgPassThroughQueue.put(msg);
+		this.sendedMsgPassThroughQueue.put(msg);
 	}
 	
 	/* Receive Secs-Message Pass-through Listener */
@@ -328,25 +328,25 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	
 	@Override
 	public boolean addReceiveMessagePassThroughListener(SecsMessagePassThroughListener l) {
-		return recvMsgPassThroughListeners.add(Objects.requireNonNull(l));
+		return this.recvMsgPassThroughListeners.add(Objects.requireNonNull(l));
 	}
 	
 	@Override
 	public boolean removeReceiveMessagePassThroughListener(SecsMessagePassThroughListener l) {
-		return recvMsgPassThroughListeners.remove(Objects.requireNonNull(l));
+		return this.recvMsgPassThroughListeners.remove(Objects.requireNonNull(l));
 	}
 	
 	private final BlockingQueue<SecsMessage> recvMsgPassThroughQueue = new LinkedBlockingQueue<>();
 	
 	private void executeRecvMsgPassThroughQueueTask() {
 		executeLoopTask(() -> {
-			SecsMessage msg = recvMsgPassThroughQueue.take();
-			recvMsgPassThroughListeners.forEach(l -> {l.passThrough(msg);});
+			SecsMessage msg = this.recvMsgPassThroughQueue.take();
+			this.recvMsgPassThroughListeners.forEach(l -> {l.passThrough(msg);});
 		});
 	}
 	
 	public void notifyReceiveMessagePassThrough(SecsMessage msg) throws InterruptedException {
-		recvMsgPassThroughQueue.put(msg);
+		this.recvMsgPassThroughQueue.put(msg);
 	}
 	
 }

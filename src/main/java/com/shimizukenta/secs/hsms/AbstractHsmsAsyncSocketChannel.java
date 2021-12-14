@@ -186,7 +186,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 	}
 	
 	private int readingBuffer(ByteBuffer buffer)
-			throws HsmsT8TimeoutException, HsmsDetectTerminateException,
+			throws HsmsTimeoutT8Exception, HsmsDetectTerminateException,
 			ExecutionException, InterruptedException {
 		
 		final Future<Integer> f = this.channel.read(buffer);
@@ -202,7 +202,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 		}
 		catch ( TimeoutException e ) {
 			f.cancel(true);
-			throw new HsmsT8TimeoutException(e);
+			throw new HsmsTimeoutT8Exception(e);
 		}
 		catch ( InterruptedException e ) {
 			f.cancel(true);
@@ -457,7 +457,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 					AbstractHsmsMessage r = this.transactionManager().reply(msg, this.timeoutT3());
 					
 					if ( r == null ) {
-						throw new HsmsT3TimeoutException(msg);
+						throw new HsmsTimeoutT3Exception(msg);
 					} else {
 						return Optional.of((HsmsMessage)r);
 					}
@@ -487,7 +487,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 				AbstractHsmsMessage r = this.transactionManager().reply(msg, this.timeoutT6());
 				
 				if ( r == null ) {
-					throw new HsmsT6TimeoutException(msg);
+					throw new HsmsTimeoutT6Exception(msg);
 				} else {
 					return Optional.of((HsmsMessage)r);
 				}

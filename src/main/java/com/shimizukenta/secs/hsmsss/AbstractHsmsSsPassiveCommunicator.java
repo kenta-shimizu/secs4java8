@@ -24,7 +24,7 @@ import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
 import com.shimizukenta.secs.hsms.HsmsMessageSelectStatus;
 import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
-import com.shimizukenta.secs.hsms.HsmsT7TimeoutException;
+import com.shimizukenta.secs.hsms.HsmsTimeoutT7Exception;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 
 /**
@@ -258,7 +258,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		final HsmsMessage msg = config.timeout().t7().poll(queue);
 		
 		if ( msg == null ) {
-			throw new HsmsT7TimeoutException();
+			throw new HsmsTimeoutT7Exception();
 		}
 		
 		switch ( msg.messageType() ) {
