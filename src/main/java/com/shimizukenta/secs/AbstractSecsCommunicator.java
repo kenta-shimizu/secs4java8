@@ -89,12 +89,26 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		this.waitUntilCommunicatable();
 	}
 	
+	abstract public Optional<SecsMessage> templateSend(int strm, int func, boolean wbit, Secs2 secs2)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException;
+	
+	abstract public Optional<SecsMessage> templateSend(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException;
+	
 	@Override
 	public Optional<SecsMessage> send(int strm, int func, boolean wbit)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
-		return send(strm, func, wbit, Secs2.empty());
+		return templateSend(strm, func, wbit, Secs2.empty());
+	}
+	
+	@Override
+	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+			, InterruptedException {
+		
+		return templateSend(strm, func, wbit, secs2);
 	}
 	
 	@Override
@@ -102,7 +116,15 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
-		return send(primaryMsg, strm, func, wbit, Secs2.empty());
+		return templateSend(primaryMsg, strm, func, wbit, Secs2.empty());
+	}
+	
+	@Override
+	public Optional<SecsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+			, InterruptedException {
+		
+		return templateSend(primaryMsg, strm, func, wbit, secs2);
 	}
 	
 	@Override
@@ -110,7 +132,7 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
-		return send(sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
+		return templateSend(sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
 	}
 	
 	@Override
@@ -118,7 +140,7 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
 		
-		return send(primaryMsg, sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
+		return templateSend(primaryMsg, sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
 	}
 	
 	

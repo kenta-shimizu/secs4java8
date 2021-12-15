@@ -31,7 +31,8 @@ This library is SEMI-SECS-communicate implementation on Java8.
     config.gem().softrev("000001");
     config.gem().clockType(ClockType.A16);
 
-    SecsCommunicator passive = HsmsSsCommunicator.open(config);
+    SecsCommunicator passive = HsmsSsCommunicator.newInstance(config);
+    passive.open();
 ```
 
 - For use HSMS-SS-Active example
@@ -50,7 +51,8 @@ This library is SEMI-SECS-communicate implementation on Java8.
     config.linktest(120.0F);
     config.gem().clockType(ClockType.A16);
 
-    SecsCommunicator active = HsmsSsCommunicator.open(config);
+    SecsCommunicator active = HsmsSsCommunicator.newInstance(config);
+    active.open();
 ```
 
 - For Use HSMS-GS
@@ -77,7 +79,8 @@ This library is SEMI-SECS-communicate implementation on Java8.
     config.retry(3);
     config.gem().clockType(ClockType.A16);
 
-    SecsCommunicator secs1 = Secs1OnTcpIpCommunicator.open(config);
+    SecsCommunicator secs1 = Secs1OnTcpIpCommunicator.newInstance(config);
+    secs1.open();
 ```
 
 - For use SECS-I (onTcpIp) Receiver example
@@ -100,7 +103,8 @@ This library is SEMI-SECS-communicate implementation on Java8.
     config.retry(3);
     config.gem().clockType(ClockType.A16);
 
-    SecsCommunicator secs1r = Secs1OnTcpIpReceiverCommunicator.open(config);
+    SecsCommunicator secs1r = Secs1OnTcpIpReceiverCommunicator.newInstance(config);
+    secs1r.open();
 ```
 
 How to convert TCP/IP <-> RS232C

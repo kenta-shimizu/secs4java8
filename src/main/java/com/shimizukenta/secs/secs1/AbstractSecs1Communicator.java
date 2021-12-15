@@ -68,20 +68,18 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException,
-			InterruptedException {
+	public Optional<SecsMessage> templateSend(int strm, int func, boolean wbit, Secs2 secs2)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
 		return this.circuit.send(this.messageBuilder().build(strm, func, wbit, secs2))
 				.map(m -> (SecsMessage)m);
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(SecsMessage primary, int strm, int func, boolean wbit, Secs2 secs2)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException,
-			InterruptedException {
+	public Optional<SecsMessage> templateSend(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
-		return this.circuit.send(this.messageBuilder().build(primary, strm, func, wbit, secs2))
+		return this.circuit.send(this.messageBuilder().build(primaryMsg, strm, func, wbit, secs2))
 				.map(m -> (SecsMessage)m);
 	}
 	

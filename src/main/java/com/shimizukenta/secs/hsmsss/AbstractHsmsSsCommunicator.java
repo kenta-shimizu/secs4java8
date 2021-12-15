@@ -111,32 +111,17 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(
-			int strm,
-			int func,
-			boolean wbit,
-			Secs2 secs2)
-					throws SecsSendMessageException,
-					SecsWaitReplyMessageException,
-					SecsException,
-					InterruptedException {
+	public Optional<SecsMessage> templateSend(int strm, int func, boolean wbit, Secs2 secs2)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
-		return this.getSession().send(strm, func, wbit, secs2);
+		return this.getSession().templateSend(strm, func, wbit, secs2);
 	}
-
+	
 	@Override
-	public Optional<SecsMessage> send(
-			SecsMessage primaryMsg,
-			int strm,
-			int func,
-			boolean wbit,
-			Secs2 secs2)
-					throws SecsSendMessageException,
-					SecsWaitReplyMessageException,
-					SecsException,
-					InterruptedException {
+	public Optional<SecsMessage> templateSend(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
-		return this.getSession().send(primaryMsg, strm, func, wbit, secs2);
+		return this.getSession().templateSend(primaryMsg, strm, func, wbit, secs2);
 	}
 	
 	@Override

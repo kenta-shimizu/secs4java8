@@ -25,12 +25,39 @@ public interface EntityEventAdapter extends SecsCommunicatableStateChangeBiListe
 	 */
 	public void setReplyS9Fy(boolean doReply);
 	
+	/**
+	 * Add Communicate-state-change-listner.
+	 * 
+	 * @param listener
+	 * @return {@code true} if add success.
+	 */
 	public boolean addCommunicatableStateChangeListener(EntityCommunicatableStateChangeListener listener);
 	
+	/**
+	 * Remove Communicate-state-change-listner.
+	 * 
+	 * @param listener
+	 * @return {@code true} if remove success.
+	 */
 	public boolean removeCommunicatableStateChangeListener(EntityCommunicatableStateChangeListener listener);
 	
+	/**
+	 * Add Message-Receive-Listener with Stream-Number and Function-Number.
+	 * 
+	 * @param strm
+	 * @param func
+	 * @param listener
+	 * @return {@code true} if add success.
+	 */
 	public boolean addMessageReceiveListener(int strm, int func, EntityMessageReceiveListener listener);
 	
+	/**
+	 * Remove listener by Stream-Number and Function-Number.
+	 * 
+	 * @param strm
+	 * @param func
+	 * @return {@code true} if remove success.
+	 */
 	public boolean removeMessageReceiveListener(int strm, int func);
 	
 	/**

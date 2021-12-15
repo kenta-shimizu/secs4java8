@@ -3,7 +3,10 @@ package com.shimizukenta.secs.hsms;
 import java.util.Optional;
 
 import com.shimizukenta.secs.Property;
+import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
+import com.shimizukenta.secs.SecsSendMessageException;
+import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
 
 public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator implements HsmsSession {
@@ -75,17 +78,15 @@ public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator imple
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
-			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
-			InterruptedException {
+	public Optional<SecsMessage> templateSend(int strm, int func, boolean wbit, Secs2 secs2)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
 		return this.asyncSocketChannel().send(this, strm, func, wbit, secs2).map(m -> (SecsMessage)m);
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
-			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
-			InterruptedException {
+	public Optional<SecsMessage> templateSend(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
+			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
 		return this.asyncSocketChannel().send(primaryMsg, strm, func, wbit, secs2).map(m -> (SecsMessage)m);
 	}

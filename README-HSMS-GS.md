@@ -22,7 +22,8 @@
     config.gem().softrev("000001");
     config.gem().clockType(ClockType.A16);
 
-    HsmsGsCommunicator passive = HsmsGsCommunicator.open(config);
+    HsmsGsCommunicator passive = HsmsGsCommunicator.newInstance(config);
+    passive.open();
 ```
 
 - For use HSMS-GS-Active example
@@ -45,7 +46,8 @@
     config.linktest(180.0F);
     config.gem().clockType(ClockType.A16);
 
-    HsmsGsCommunicator active = HsmsGsCommunicator.open(config);
+    HsmsGsCommunicator active = HsmsGsCommunicator.newInstance(config);
+    active.open();
 ```
 
 Notice: `HsmsGsCommunicator` is **NOT** instance of `SecsCommunicator`.
