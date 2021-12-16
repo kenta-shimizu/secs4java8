@@ -27,7 +27,7 @@ import com.shimizukenta.secs.util.AbstractSecsCommunicatorEntity;
 import com.shimizukenta.secs.util.SecsCommunicatorEntity;
 
 /**
- * 
+ * SecsCommunicatorEntity example.
  * 
  * @author kenta-shimizu
  *
