@@ -13,5 +13,5 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
  */
 public interface EntityMessageReceiveListener extends EventListener {
 	
-	public void received(SecsMessage msg, SecsCommunicator comm) throws Secs2Exception;
+	public void received(SecsMessage msg, SecsCommunicator comm) throws Secs2Exception, InterruptedException;
 }
