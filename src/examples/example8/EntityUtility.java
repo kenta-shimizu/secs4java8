@@ -29,6 +29,19 @@ import com.shimizukenta.secs.util.SecsCommunicatorEntity;
 /**
  * SecsCommunicatorEntity example.
  * 
+ * <p>
+ * Equip Entity example is create-instance and add-listeners.<br />
+ * Host Entity example is extend `AbstractSecsCommunicatorEntity` class.<br />
+ * </p>
+ * <p>
+ * Host entity sequence.<br />
+ * <ol>
+ * <li>Trigger COMMUNICATED, Send S1F17 to try-online.</li>
+ * <li>Triggee ONLINED, Send S2F21 to START.</li>
+ * <li>Trigger ENDED, Send S1F15 to try-offline.</li>
+ * </ol>
+ * </p>
+ * 
  * @author kenta-shimizu
  *
  */
@@ -85,7 +98,8 @@ public class EntityUtility {
 						EntityUtility.class.wait();
 					}
 				}
-				
+				catch ( InterruptedException ignore ) {
+				}
 			}
 		}
 		catch ( Throwable t ) {

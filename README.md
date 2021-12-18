@@ -9,7 +9,7 @@ This library is SEMI-SECS-communicate implementation on Java8.
 - SECS-I (SEMI-E4)
 - SECS-II (SEMI-E5)
 - GEM (SEMI-E30, partially)
-- HSMS (SEMI-E37, SEMI-E37.1, SEMI-E37.2)
+- HSMS(SEMI-E37), HSMS-SS(SEMI-E37.1), HSMS-GS(SEMI-E37.2)
 - [SML (PEER Group)](https://www.peergroup.com/expertise/resources/secs-message-language/)
 
 ## Create Communicator instance and open

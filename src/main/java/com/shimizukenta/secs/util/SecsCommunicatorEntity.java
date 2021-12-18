@@ -25,7 +25,17 @@ import com.shimizukenta.secs.gem.Gem;
  */
 public interface SecsCommunicatorEntity extends Closeable, SecsMessageSendable {
 	
+	/**
+	 * Open also SecsCommunicator.
+	 * 
+	 * @throws IOException
+	 */
 	public void open() throws IOException;
+	
+	/**
+	 * Close also SecsCommunicaotor.
+	 */
+	public void close() throws IOException;
 	
 	/**
 	 * Reply SxF0 if set {@code true} and not exist match SxFy.
