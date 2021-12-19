@@ -56,7 +56,7 @@ public class EntityUtility {
 	
 	private static final ExecutorService execServ = Executors.newCachedThreadPool(r -> {
 		Thread th = new Thread(r);
-		th.setDaemon(true);
+		th.setDaemon(false);
 		return th;
 	});
 	
@@ -88,25 +88,35 @@ public class EntityUtility {
 			
 			try (
 					SecsCommunicator equipComm = HsmsSsCommunicator.newInstance(equipConfig);
-					SecsCommunicator hostComm = HsmsSsCommunicator.newInstance(hostConfig);
 					) {
 				
-				equipComm.addSecsLogListener(log -> {echo(log);});
-				hostComm.addSecsLogListener(log -> {echo(log);});
+				equipComm.addSecsLogListener(EntityUtility::echo);
 				
 				try (
 						SecsCommunicatorEntity equipEntity = buildEquipEntity(equipComm);
-						SecsCommunicatorEntity hostEntity = new HostSecsCommunicatorEntity(hostComm);
 						) {
 					
 					equipEntity.open();
-					hostEntity.open();
 					
-					synchronized ( EntityUtility.class ) {
-						EntityUtility.class.wait();
+					try (
+							SecsCommunicator hostComm = HsmsSsCommunicator.newInstance(hostConfig);
+							) {
+						
+						hostComm.addSecsLogListener(EntityUtility::echo);
+						
+						try (
+								SecsCommunicatorEntity hostEntity = new HostSecsCommunicatorEntity(hostComm);
+								) {
+							
+							hostEntity.open();
+							
+							synchronized ( EntityUtility.class ) {
+								EntityUtility.class.wait();
+							}
+						}
+						catch ( InterruptedException ignore ) {
+						}
 					}
-				}
-				catch ( InterruptedException ignore ) {
 				}
 			}
 		}

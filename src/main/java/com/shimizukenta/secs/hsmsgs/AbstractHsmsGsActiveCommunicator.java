@@ -18,9 +18,19 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 	public void open() throws IOException {
 		super.open();
 		
-		this.executeLoopTask(() -> {
-			this.activeCircuit();
-			this.config().timeout().t5().sleep();
+		this.executorService().execute(() -> {
+			
+			try {
+				while ( ! this.isClosed() ) {
+					this.activeCircuit();
+					if ( this.isClosed() ) {
+						return;
+					}
+					this.config().timeout().t5().sleep();
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
 		});
 	}
 	

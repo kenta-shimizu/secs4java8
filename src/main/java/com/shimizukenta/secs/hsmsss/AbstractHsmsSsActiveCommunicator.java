@@ -41,9 +41,18 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 		
 		super.open();
 		
-		executeLoopTask(() -> {
-			activeCircuit();
-			this.config.timeout().t5().sleep();
+		this.executorService().execute(() -> {
+			try {
+				while ( ! this.isClosed() ) {
+					activeCircuit();
+					if ( this.isClosed() ) {
+						return;
+					}
+					this.config.timeout().t5().sleep();
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
 		});
 	}
 	
