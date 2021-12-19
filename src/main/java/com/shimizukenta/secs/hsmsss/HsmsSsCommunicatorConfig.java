@@ -14,11 +14,10 @@ import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 /**
  * This class is config of HSMS-SS-Communicator.
  * 
- * <p>
- * To set Active or Passive protocol, {@link #protocol(HsmsSsProtocol)}<br />
- * To set Connect or Bind SocketAddress, {@link #socketAddress(SocketAddress)}<br />
- * To set Session-ID, {@link #sessionId(int)}<br />
- * </p>
+ * <ul>
+ * <li>To set Session-ID, {@link #sessionId(int)}</li>
+ * <li>To set Connect or Bind SocketAddress, {@link #socketAddress(SocketAddress)}</li>
+ * </ul>
  * 
  * @author kenta-shimizu
  *
@@ -88,7 +87,7 @@ public class HsmsSsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	 */
 	public void sessionId(int id) {
 		if ( id < 0 || id > 0x7FFF ) {
-			throw new IllegalArgumentException("Session-ID is in 0 - 32767, id=" + id);
+			throw new SessionIdIllegalArgumentException(id);
 		}
 		this.sessionId.set(id);
 	}
@@ -100,6 +99,15 @@ public class HsmsSsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	 */
 	public ReadOnlyNumberProperty sessionId() {
 		return this.sessionId;
+	}
+	
+	private static class SessionIdIllegalArgumentException extends IllegalArgumentException {
+		
+		private static final long serialVersionUID = -5233865584009807866L;
+		
+		public SessionIdIllegalArgumentException(int id) {
+			super("SESSION-ID is in 0 - 32767, id=" + id);
+		}
 	}
 	
 }

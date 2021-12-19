@@ -13,6 +13,18 @@ import com.shimizukenta.secs.SocketAddressProperty;
 import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.hsms.AbstractHsmsCommunicatorConfig;
 
+/**
+ * This class is config of HSMS-GS-Communicator.
+ * 
+ * <ul>
+ * <li>To add SESSION-ID, {@link #addSessionId(int)}</li>
+ * <li>To set Connect or Bind SocketAddress, {@link #socketAddress(SocketAddress)}}</li>
+ * <li>To set try-SELECT.REQ communicator, {@link #isTrySelectRequest(boolean)}</li>
+ * </ul>
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	
 	private static final long serialVersionUID = -5254158215625876513L;
@@ -25,7 +37,7 @@ public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	
 	public boolean addSessionId(int id) {
 		if ( id < 0 || id > 0xFFFF ) {
-			throw new IllegalArgumentException("Session-ID is in 0 - 65535, id=" + id);
+			throw new AddSessionIdIllegalArgumentException(id);
 		}
 		return this.sessionIds.add(Integer.valueOf(id));
 	}
@@ -87,7 +99,7 @@ public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	 */
 	public void retrySelectRequestTimeout(float v) {
 		if ( v <= 0.0F ) {
-			throw new IllegalArgumentException("retrySelectRequestTimeout value requires 0.0F");
+			throw new RetrySelectRequestTimeoutIllegalArgumentException(v);
 		}
 		this.retrySelectRequestTimeout.set(v);
 	}
@@ -99,6 +111,24 @@ public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	 */
 	public ReadOnlyTimeProperty retrySelectRequestTimeout() {
 		return this.retrySelectRequestTimeout;
+	}
+	
+	private static class AddSessionIdIllegalArgumentException extends IllegalArgumentException {
+		
+		private static final long serialVersionUID = -9211783480973747830L;
+		
+		public AddSessionIdIllegalArgumentException(int id) {
+			super("Session-ID is in 0 - 65535, id=" + id);
+		}
+	}
+	
+	private static class RetrySelectRequestTimeoutIllegalArgumentException extends IllegalArgumentException {
+		
+		private static final long serialVersionUID = -2444363506021169418L;
+		
+		public RetrySelectRequestTimeoutIllegalArgumentException(float value) {
+			super("retrySelectRequestTimeout value requires 0.0F, value=" + value);
+		}
 	}
 	
 }

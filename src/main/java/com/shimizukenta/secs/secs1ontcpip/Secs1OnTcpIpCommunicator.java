@@ -7,10 +7,10 @@ import com.shimizukenta.secs.secs1.Secs1Communicator;
 /**
  * This instance is implementation of SECS-I (SEMI-E4) on TCP/IP.
  * 
- * <p>
- * To create new instance, {@link #newInstance(Secs1OnTcpIpCommunicatorConfig)}<br />
- * To create new instance and open, {@link #open(Secs1OnTcpIpCommunicatorConfig)}<br />
- * </p>
+ * <ul>
+ * <li>To create new instance, {@link #newInstance(Secs1OnTcpIpCommunicatorConfig)}</li>
+ * <li>To create new instance and open, {@link #open(Secs1OnTcpIpCommunicatorConfig)}</li>
+ * </ul>
  * 
  * @author kenta-shimizu
  *

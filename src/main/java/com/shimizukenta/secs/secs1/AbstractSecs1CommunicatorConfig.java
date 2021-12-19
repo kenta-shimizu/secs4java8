@@ -7,12 +7,13 @@ import com.shimizukenta.secs.ReadOnlyBooleanProperty;
 import com.shimizukenta.secs.ReadOnlyNumberProperty;
 
 /**
- * This class is SECS-I-Communicator config.
+ * This class is config of SECS-I-Communicator.
  * 
- * <p>
- * To set Master-Mode, {@link #isMaster(boolean)}<br />
- * To set Retry, {@link #retry(int)}
- * </p>
+ * <ul>
+ * <li>To set Device-ID, {@link #deviceId(int)}</i>
+ * <li>To set Master-Mode, {@link #isMaster(boolean)}</li>
+ * <li>To set Retry, {@link #retry(int)}</li>
+ * </ul>
  * 
  * @author kenta-shimizu
  *
@@ -36,7 +37,7 @@ public abstract class AbstractSecs1CommunicatorConfig extends AbstractSecsCommun
 	 */
 	public void deviceId(int id) {
 		if ( id < 0 || id > 0x7FFF ) {
-			throw new IllegalArgumentException("Device-ID is in 0 - 32767, id=" + id);
+			throw new DeviceIdIllegalArgumentException(id);
 		}
 		this.deviceId.set(id);
 	}
@@ -75,7 +76,7 @@ public abstract class AbstractSecs1CommunicatorConfig extends AbstractSecsCommun
 	 */
 	public void retry(int retryCount) {
 		if ( retryCount < 0 ) {
-			throw new IllegalArgumentException("retry is >= 0");
+			throw new RetryCountIllegalArgumentException(retryCount);
 		}
 		this.retry.set(retryCount);
 	}
@@ -87,6 +88,24 @@ public abstract class AbstractSecs1CommunicatorConfig extends AbstractSecsCommun
 	 */
 	public ReadOnlyNumberProperty retry() {
 		return retry;
+	}
+	
+	private static final class DeviceIdIllegalArgumentException extends IllegalArgumentException {
+		
+		private static final long serialVersionUID = 6679136614355645926L;
+		
+		public DeviceIdIllegalArgumentException(int id) {
+			super("Device-ID is in 0 - 32767, id=" + id);
+		}
+	}
+	
+	private static final class RetryCountIllegalArgumentException extends IllegalArgumentException {
+		
+		private static final long serialVersionUID = 2911974034453457076L;
+		
+		public RetryCountIllegalArgumentException(int retryCount) {
+			super("retry is >= 0, count=" + retryCount);
+		}
 	}
 	
 }

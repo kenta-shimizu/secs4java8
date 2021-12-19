@@ -69,6 +69,10 @@ public class EntityUtility {
 			equipConfig.isEquip(true);
 			equipConfig.sessionId(sessionId);
 			equipConfig.socketAddress(addr);
+			equipConfig.timeout().t3(45.0F);
+			equipConfig.timeout().t6( 5.0F);
+			equipConfig.timeout().t7(10.0F);
+			equipConfig.timeout().t8( 5.0F);
 			equipConfig.logSubjectHeader("Equip: ");
 			
 			HsmsSsCommunicatorConfig hostConfig = new HsmsSsCommunicatorConfig();
@@ -76,6 +80,10 @@ public class EntityUtility {
 			hostConfig.isEquip(false);
 			hostConfig.sessionId(sessionId);
 			hostConfig.socketAddress(addr);
+			hostConfig.timeout().t3(45.0F);
+			hostConfig.timeout().t5(10.0F);
+			hostConfig.timeout().t6( 5.0F);
+			hostConfig.timeout().t8( 5.0F);
 			hostConfig.logSubjectHeader("Host: ");
 			
 			try (

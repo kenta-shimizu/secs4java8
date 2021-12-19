@@ -9,11 +9,13 @@ import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.TimeProperty;
 
 /**
- * This class is config of HSMS-SS-Communicator.
+ * This class is config of HSMS-Communicator.
  * 
- * <p>
- * To set Active or Passive mode, {@link #connectionMode(HsmsConnectionMode)}<br />
- * </p>
+ * <ul>
+ * <li>To set Active or Passive mode, {@link #connectionMode(HsmsConnectionMode)}</li>
+ * <li>To set linktest-cycle-time. {@link #linktest(float)}</li>
+ * <li>To set <strong>NOT</strong> linktest, {@link #notLinktest()}</li>
+ * </ul>
  * 
  * @author kenta-shimizu
  *
@@ -63,7 +65,7 @@ public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommuni
 	 */
 	public void linktest(float v) {
 		if ( v < 0.0F ) {
-			throw new IllegalArgumentException("linktest value is >= 0.0F");
+			throw new LinktestIllegalArgumentException(v);
 		}
 		this.linktest.set(v);
 	}
@@ -92,7 +94,7 @@ public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommuni
 	 */
 	public void rebindIfPassive(float v) {
 		if ( v < 0.0F ) {
-			throw new IllegalArgumentException("rebindIfPassive value is >= 0.0F");
+			throw new RebindIfPassiveIllegalArgumentException(v);
 		}
 		this.rebindIfPassive.set(v);
 	}
@@ -104,6 +106,24 @@ public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommuni
 	 */
 	public ReadOnlyTimeProperty rebindIfPassive() {
 		return rebindIfPassive;
+	}
+	
+	private static class LinktestIllegalArgumentException extends IllegalArgumentException {
+		
+		private static final long serialVersionUID = 2792082412684754490L;
+		
+		public LinktestIllegalArgumentException(float value) {
+			super("linktest value is >= 0.0F, value=" + value);
+		}
+	}
+	
+	private static class RebindIfPassiveIllegalArgumentException extends IllegalArgumentException {
+		
+		private static final long serialVersionUID = -7951027764805326813L;
+		
+		public RebindIfPassiveIllegalArgumentException(float value) {
+			super("rebindIfPassive value is >= 0.0F, value=" + value);
+		}
 	}
 	
 }

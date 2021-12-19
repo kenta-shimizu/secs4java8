@@ -8,20 +8,20 @@ import com.shimizukenta.secs.sml.SmlMessage;
 /**
  * This interface is implementation of send SECS-Message.
  * 
- * <p>
- * To send Primary-Message and receive Reply-Message, 
- * {@link #send(int, int, boolean, Secs2)}<br />
- * To send Primary-(Header-only)-Message and receive Reply-Message,
- * {@link #send(int, int, boolean)}<br />
- * To send Primary-Message by SML and receive Reply-Message,
- * {@link #send(SmlMessage)}<br />
- * To send Reply-Message,
- * {@link #send(SecsMessage, int, int, boolean, Secs2)}<br />
- * To send Reply-(Header-only)-Message,
- * {@link #send(SecsMessage, int, int, boolean)}<br />
- * To send Reply-Message by SML,
- * {@link #send(SecsMessage, SmlMessage)}<br />
- * </p>
+ * <ul>
+ * <li>To send Primary-Message and receive Reply-Message, 
+ * {@link #send(int, int, boolean, Secs2)}</li>
+ * <li>To send Primary-(Header-only)-Message and receive Reply-Message,
+ * {@link #send(int, int, boolean)}</li>
+ * <li>To send Primary-Message by SML and receive Reply-Message,
+ * {@link #send(SmlMessage)}</li>
+ * <li>To send Reply-Message,
+ * {@link #send(SecsMessage, int, int, boolean, Secs2)}</li>
+ * <li>To send Reply-(Header-only)-Message,
+ * {@link #send(SecsMessage, int, int, boolean)}</li>
+ * <li>To send Reply-Message by SML,
+ * {@link #send(SecsMessage, SmlMessage)}</li>
+ * </ul>
  * 
  * @author kenta-shimizu
  *

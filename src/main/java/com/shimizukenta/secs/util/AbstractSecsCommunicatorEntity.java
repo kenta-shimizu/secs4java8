@@ -35,6 +35,16 @@ public abstract class AbstractSecsCommunicatorEntity implements SecsCommunicator
 	}
 	
 	@Override
+	public boolean isOpen() {
+		return this.comm.isOpen();
+	}
+	
+	@Override
+	public boolean isClosed() {
+		return this.comm.isClosed();
+	}
+	
+	@Override
 	public void setReplySxF0(boolean doReply) {
 		this.eventAdapter.setReplySxF0(doReply);
 	}

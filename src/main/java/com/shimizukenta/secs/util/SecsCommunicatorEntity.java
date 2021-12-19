@@ -1,9 +1,9 @@
 package com.shimizukenta.secs.util;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.Optional;
 
+import com.shimizukenta.secs.OpenAndCloseable;
 import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
@@ -15,15 +15,19 @@ import com.shimizukenta.secs.gem.Gem;
 /**
  * SecsCommunicator-Entity utility. open/close, receive/send message, detect communicate-state-change.
  * 
- * <p>
- * To reply SxF0 if has wbit and not exist SxFy, {@link #setReplySxF0(boolean)}.<br />
- * To send S9Fy if not exist SxFy, {@link #setSendS9Fy(boolean)}.<bbr />
- * </p>
+ * <ul>
+ * <li>To reply SxF0 if has wbit and undefined-SxFy message, {@link #setReplySxF0(boolean)}.</li>
+ * <li>To send S9Fy if any failed, {@link #setSendS9Fy(boolean)}.</li>
+ * </ul>
+ * <ul>
+ * <li>To detect communicatable-state-changed, {@link #addCommunicatableStateChangeListener(EntityCommunicatableStateChangeListener)}</li>
+ * <li>To receive Primary-Message, {@link #addMessageReceiveListener(int, int, EntityMessageReceiveListener)}</li>
+ * </ul>
  * 
  * @author kenta-shimizu
  *
  */
-public interface SecsCommunicatorEntity extends Closeable, SecsMessageSendable {
+public interface SecsCommunicatorEntity extends OpenAndCloseable, SecsMessageSendable {
 	
 	/**
 	 * Open also SecsCommunicator.

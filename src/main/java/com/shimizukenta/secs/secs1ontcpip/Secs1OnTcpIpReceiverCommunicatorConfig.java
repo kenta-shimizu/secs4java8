@@ -10,11 +10,11 @@ import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.secs1.AbstractSecs1CommunicatorConfig;
 
 /**
- * This class is SECS-I-on-TCP/IP-Receiver-Communicator config.
+ * This class is config of SECS-I-on-TCP/IP-Receiver-Communicator.
  * 
- * <p>
- * To set Bind SocketAddress, {@link #socketAddress(SocketAddress)}<br />
- * </p>
+ * <ul>
+ * <li>To set Bind SocketAddress, {@link #socketAddress(SocketAddress)}</li>
+ * </ul>
  * 
  * @author kenta-shimizu
  *

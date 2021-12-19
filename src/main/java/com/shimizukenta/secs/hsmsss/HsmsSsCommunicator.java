@@ -8,10 +8,10 @@ import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 /**
  * This interface is implementation of HSMS-SS (SEMI-E37.1).
  * 
- * <p>
- * To create newInstance, {@link #newInstance(HsmsSsCommunicatorConfig)}<br />
- * To create newInstance and open, {@link #open(HsmsSsCommunicatorConfig)}<br />
- * </p>
+ * <ul>
+ * <li>To create newInstance, {@link #newInstance(HsmsSsCommunicatorConfig)}</li>
+ * <li>To create newInstance and open, {@link #open(HsmsSsCommunicatorConfig)}</li>
+ * </ul>
  * 
  * @author kenta-shimizu
  *

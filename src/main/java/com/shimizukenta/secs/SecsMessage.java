@@ -8,15 +8,15 @@ import com.shimizukenta.secs.secs2.Secs2;
  * <p>
  * SecsMessage contains Stream, Function, WBit, Datta<br />
  * </p>
- * <p>
- * To get SECS-II-Stream-Number, {@link #getStream()}<br />
- * To get SECS-II-Function-Number, {@link #getFunction()}<br />
- * To get SECS-II-WBit, {@link #wbit()}<br />
- * To get SECS-II-Data, {@link #secs2()}<br />
- * To get Header-10-bytes, {@link #header10Bytes()}<br />
- * To get Message-Device-ID, {@link #deviceId()}<br />
- * To get Message-Session-ID, {@link #sessionId()}<br />
- * </p>
+ * <ul>
+ * <li>To get SECS-II-Stream-Number, {@link #getStream()}</li>
+ * <li>To get SECS-II-Function-Number, {@link #getFunction()}</li>
+ * <li>To get SECS-II-WBit, {@link #wbit()}</li>
+ * <li>To get SECS-II-Data, {@link #secs2()}</li>
+ * <li>To get Header-10-bytes, {@link #header10Bytes()}</li>
+ * <li>To get Message-Device-ID, {@link #deviceId()}</li>
+ * <li>To get Message-Session-ID, {@link #sessionId()}</li>
+ * </ul>
  * <p>
  * Instances of this class are immutable.<br />
  * </p>

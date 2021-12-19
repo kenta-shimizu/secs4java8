@@ -21,10 +21,17 @@ import com.shimizukenta.secs.sml.SmlMessage;
 /**
  * This interface is implementation of HSMS-GS (SEMI-E37.2).
  * 
- * <p>
- * To create newInstance, {@link #newInstance(HsmsGsCommunicatorConfig)}<br />
- * To create newInstance and open, {@link #open(HsmsGsCommunicatorConfig)}<br />
- * </p>
+ * <ul>
+ * <li>To create newInstance, {@link #newInstance(HsmsGsCommunicatorConfig)}</li>
+ * <li>To create newInstance and open, {@link #open(HsmsGsCommunicatorConfig)}</li>
+ * </ul>
+ * <ul>
+ * <li>To get all sessions, {@link #getSessions()}</li>
+ * <li>To get session by id, {@link #getSession(int)}</li>
+ * </ul>
+ * <ul>
+ * <li>To log communicating, {@link #addSecsLogListener(SecsLogListener)}</li>
+ * </ul>
  * 
  * @author kenta-shimizu
  *

@@ -44,17 +44,22 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
  * </p>
  * <p>
  * This example is<br />
- * <br />
- * From HOST to EQUIP via Protocol-converter.<br />
- * send S1F13, receive S1F14<br />
- * send S1F17, receive S1F18<br />
- * send S2F31, receive S2F32<br />
- * <br />
- * From EQUIP to HOST via Protocol-converter.<br />
- * receive S5F1, reply S5F2<br />
- * <br />
- * From HOST to EQUIP via Protocol-converter.<br />
- * send S1F15, receive S1F16<br />
+ * <ol>
+ * <li>From HOST to EQUIP via Protocol-converter.</li>
+ * <ol>
+ * <li>send S1F13, receive S1F14</li>
+ * <li>send S1F17, receive S1F18</li>
+ * <li>send S2F31, receive S2F32</li>
+ * </ol>
+ * <li>From EQUIP to HOST via Protocol-converter.</li>
+ * <ol>
+ * <li>receive S5F1, reply S5F2</li>
+ * </ol>
+ * <li>From HOST to EQUIP via Protocol-converter.</li>
+ * <ol>
+ * <li>send S1F15, receive S1F16</li>
+ * </ol>
+ * </ol>
  * </p>
  * 
  * @author kenta-shimizu

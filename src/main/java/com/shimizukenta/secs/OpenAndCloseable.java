@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
+ * This interface has Open/Close and isOpen/isClosed methods.
  * 
  * @author kenta-shimizu
  *

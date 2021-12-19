@@ -8,13 +8,12 @@ import com.shimizukenta.secs.gem.AbstractGemConfig;
 /**
  * This abstract class is implementation of communicate config.
  * 
- * <p>
- * To set device-id, {@link #deviceId(int)}<br />
- * To set is-equip, {@link #isEquip(boolean)}<br />
- * To set timeouts, {@link #timeout()}<br />
- * To set gem config, {@link #gem()}<br />
- * To set log-subject-header, {@link #logSubjectHeader(CharSequence)}
- * </p>
+ * <ul>
+ * <li>To set is-equip, {@link #isEquip(boolean)}</li>
+ * <li>To set timeouts, {@link #timeout()}</li>
+ * <li>To set gem config, {@link #gem()}</li>
+ * <li>To set log-subject-header, {@link #logSubjectHeader(CharSequence)}</li>
+ * </ul>
  * 
  * @author kenta-shimizu
  *
