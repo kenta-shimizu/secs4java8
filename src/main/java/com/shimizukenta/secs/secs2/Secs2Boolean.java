@@ -47,7 +47,7 @@ public class Secs2Boolean extends AbstractSecs2 {
 		this.bytes = null;
 	}
 	
-	protected Secs2Boolean(byte[] bs) {
+	public Secs2Boolean(byte[] bs) {
 		super();
 		
 		Objects.requireNonNull(bs);

@@ -142,7 +142,7 @@ public class ExampleBuildSecs2 {
 		
 		{
 			try {
-				SmlDataItemParser parser = SmlDataItemParser.getInstance();
+				final SmlDataItemParser parser = SmlDataItemParser.newInstance();
 				
 				Secs2 ss = parser.parse("<L <B 0x81><I4 1001><A \"ON FIRE\">>");
 				

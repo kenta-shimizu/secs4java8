@@ -11,7 +11,7 @@ public class Secs2Unicode extends AbstractSecs2 {
 	
 	private byte[] bytes;
 	
-	protected Secs2Unicode(byte[] bs) {
+	public Secs2Unicode(byte[] bs) {
 		super();
 		
 		Objects.requireNonNull(bs);

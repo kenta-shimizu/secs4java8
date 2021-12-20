@@ -30,7 +30,7 @@ public class Secs2Int1 extends Secs2BigInteger {
 		super(values);
 	}
 	
-	protected Secs2Int1(byte[] bs) {
+	public Secs2Int1(byte[] bs) {
 		super(bs);
 	}
 

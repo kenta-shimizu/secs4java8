@@ -17,14 +17,14 @@ public class Secs2Ascii extends AbstractSecs2 {
 	private String ascii;
 	private byte[] bytes;
 	
-	protected Secs2Ascii(CharSequence cs) {
+	public Secs2Ascii(CharSequence cs) {
 		super();
 		
 		this.ascii = Objects.requireNonNull(cs).toString();
 		this.bytes = null;
 	}
 	
-	protected Secs2Ascii(byte[] bs) {
+	public Secs2Ascii(byte[] bs) {
 		super();
 		
 		Objects.requireNonNull(bs);

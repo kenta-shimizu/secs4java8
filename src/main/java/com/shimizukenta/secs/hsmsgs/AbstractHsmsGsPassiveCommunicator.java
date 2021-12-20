@@ -9,6 +9,8 @@ import java.nio.channels.CompletionHandler;
 
 import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
+import com.shimizukenta.secs.hsms.HsmsConnectionMode;
+import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
 
 public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCommunicator {
 	
@@ -18,8 +20,31 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 	
 	@Override
 	public void open() throws IOException {
+		
+		if ( this.config().connectionMode().get() != HsmsConnectionMode.PASSIVE ) {
+			throw new HsmsConnectionModeIllegalStateException("NOT PASSIVE");
+		}
+		
 		super.open();
-		openPassive();
+		
+		this.executorService().execute(() -> {
+			try {
+				final ReadOnlyTimeProperty tp = this.config().rebindIfPassive();
+				while ( ! this.isClosed() ) {
+					this.openPassive();
+					if ( this.isClosed() ) {
+						return;
+					}
+					if ( tp.gtZero() ) {
+						tp.sleep();
+					} else {
+						return;
+					}
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		});
 	}
 	
 	@Override
@@ -27,52 +52,31 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 		super.close();
 	}
 	
-	private void openPassive() {
+	private void openPassive() throws InterruptedException {
 		
-		this.executorService().execute(() -> {
+		try (
+				AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
+				) {
 			
-			try {
-				
-				final ReadOnlyTimeProperty tp = this.config().rebindIfPassive();
-				
-				while ( ! this.isClosed() ) {
-					
-					try (
-							AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
-							) {
-						
-						this.getAbstractHsmsSessions().forEach(s -> {
-							s.notifyHsmsCommunicateState(HsmsCommunicateState.NOT_CONNECTED);
-						});
-						
-						passiveAccepting(server);
-						
-						synchronized ( server ) {
-							server.wait();
-						}
-					}
-					catch ( IOException e ) {
-						this.notifyLog(e);
-					}
-					finally {
-						
-						this.getAbstractHsmsSessions().forEach(s -> {
-							s.notifyHsmsCommunicateState(HsmsCommunicateState.NOT_CONNECTED);
-						});
-					}
-					
-					if ( ! this.isClosed() ) {
-						if ( tp.gtZero() ) {
-							tp.sleep();
-						} else {
-							return;
-						}
-					}
-				}
+			this.getAbstractHsmsSessions().forEach(s -> {
+				s.notifyHsmsCommunicateState(HsmsCommunicateState.NOT_CONNECTED);
+			});
+			
+			passiveAccepting(server);
+			
+			synchronized ( server ) {
+				server.wait();
 			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
+		}
+		catch ( IOException e ) {
+			this.notifyLog(e);
+		}
+		finally {
+			
+			this.getAbstractHsmsSessions().forEach(s -> {
+				s.notifyHsmsCommunicateState(HsmsCommunicateState.NOT_CONNECTED);
+			});
+		}
 	}
 	
 	private void passiveAccepting(AsynchronousServerSocketChannel server)
@@ -93,22 +97,22 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 				
 				server.accept(attachment, this);
 				
-				SocketAddress local = null;
-				SocketAddress remote = null;
+				SocketAddress pLocal = null;
+				SocketAddress pRemote = null;
 				
 				try {
 					
 					try {
 						
-						local = channel.getLocalAddress();
-						remote = channel.getRemoteAddress();
+						pLocal = channel.getLocalAddress();
+						pRemote = channel.getRemoteAddress();
 					}
 					catch ( IOException e ) {
 						AbstractHsmsGsPassiveCommunicator.this.notifyLog(e);
 						return;
 					}
 					
-					AbstractHsmsGsPassiveCommunicator.this.notifyLog(HsmsGsConnectionLog.accepted(local, remote));
+					AbstractHsmsGsPassiveCommunicator.this.notifyLog(HsmsGsConnectionLog.accepted(pLocal, pRemote));
 					
 					AbstractHsmsGsPassiveCommunicator.this.completionAction(channel);
 				}
@@ -129,7 +133,7 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 					}
 					
 					try {
-						AbstractHsmsGsPassiveCommunicator.this.notifyLog(HsmsGsConnectionLog.closed(local, remote));
+						AbstractHsmsGsPassiveCommunicator.this.notifyLog(HsmsGsConnectionLog.closed(pLocal, pRemote));
 					}
 					catch ( InterruptedException ignore ) {
 					}

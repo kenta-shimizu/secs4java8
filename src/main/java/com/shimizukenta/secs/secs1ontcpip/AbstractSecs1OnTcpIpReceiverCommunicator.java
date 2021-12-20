@@ -35,9 +35,18 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 	public void open() throws IOException {
 		super.open();
 		
-		this.executeLoopTask(() -> {
-			bind();
-			config.rebindSeconds().sleep();
+		this.executorService().execute(() -> {
+			try {
+				while ( ! this.isClosed() ) {
+					this.bind();
+					if ( this.isClosed() ) {
+						return;
+					}
+					config.rebindSeconds().sleep();
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
 		});
 	}
 	
@@ -70,17 +79,17 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 					server.accept(attachment, this);
 					
 					SocketAddress pLocal = null;
-					SocketAddress remote = null;
+					SocketAddress pRemote = null;
 					
 					try {
 						
 						try {
 							pLocal = channel.getLocalAddress();
-							remote = channel.getRemoteAddress();
+							pRemote = channel.getRemoteAddress();
 	
 							addChannel(channel);
 							
-							notifyLog(Secs1OnTcpIpReceiverConnectionLog.accepted(pLocal, remote));
+							notifyLog(Secs1OnTcpIpReceiverConnectionLog.accepted(pLocal, pRemote));
 							
 							final Collection<Callable<Void>> tasks = Arrays.asList(
 									() -> {
@@ -121,7 +130,7 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 							}
 							
 							try {
-								notifyLog(Secs1OnTcpIpReceiverConnectionLog.channelClosed(pLocal, remote));
+								notifyLog(Secs1OnTcpIpReceiverConnectionLog.channelClosed(pLocal, pRemote));
 							}
 							catch ( InterruptedException ignore ) {
 							}

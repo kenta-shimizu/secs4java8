@@ -41,9 +41,18 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 	public void open() throws IOException {
 		super.open();
 		
-		this.executeLoopTask(() -> {
-			connect();
-			secs1OnTcpIpConfig.reconnectSeconds().sleep();
+		this.executorService().execute(() -> {
+			try {
+				while ( ! this.isClosed() ) {
+					this.connect();
+					if ( this.isClosed() ) {
+						return;
+					}
+					secs1OnTcpIpConfig.reconnectSeconds().sleep();
+				}
+			}
+			catch ( InterruptedException ignore ) {
+			}
 		});
 	}
 	
@@ -67,18 +76,18 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 				@Override
 				public void completed(Void none, Void attachment) {
 					
-					SocketAddress local = null;
-					SocketAddress remote = null;
+					SocketAddress pLocal = null;
+					SocketAddress pRemote = null;
 					
 					try {
 						try {
 							
-							local = channel.getLocalAddress();
-							remote = channel.getRemoteAddress();
+							pLocal = channel.getLocalAddress();
+							pRemote = channel.getRemoteAddress();
 							
 							addChannel(channel);
 							
-							notifyLog(Secs1OnTcpIpConnectionLog.connected(local, remote));
+							notifyLog(Secs1OnTcpIpConnectionLog.connected(pLocal, pRemote));
 							
 							final Collection<Callable<Void>> tasks = Arrays.asList(
 									() -> {
@@ -113,7 +122,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 							}
 							
 							try {
-								notifyLog(Secs1OnTcpIpConnectionLog.disconnected(local, remote));
+								notifyLog(Secs1OnTcpIpConnectionLog.disconnected(pLocal, pRemote));
 							}
 							catch ( InterruptedException ignore ) {
 							}

@@ -58,7 +58,7 @@ abstract public class Secs2BigInteger extends Secs2Number<BigInteger> {
 				.collect(Collectors.toList());
 	}
 	
-	protected Secs2BigInteger(byte[] bs) {
+	public Secs2BigInteger(byte[] bs) {
 		super();
 		
 		Objects.requireNonNull(bs);

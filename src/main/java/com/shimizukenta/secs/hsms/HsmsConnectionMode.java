@@ -4,7 +4,6 @@ public enum HsmsConnectionMode {
 	
 	PASSIVE,
 	ACTIVE,
-	
 	;
-
+	
 }

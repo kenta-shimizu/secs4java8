@@ -17,6 +17,7 @@ import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
+import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
 import com.shimizukenta.secs.hsms.HsmsException;
 import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
 import com.shimizukenta.secs.hsms.HsmsMessageSelectStatus;
@@ -25,18 +26,15 @@ import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 
 public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCommunicator {
 
-	private final HsmsSsCommunicatorConfig config;
-	
 	public AbstractHsmsSsActiveCommunicator(HsmsSsCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
-		this.config = config;
 	}
 	
 	@Override
 	public void open() throws IOException {
 		
-		if ( this.config.connectionMode().get() != HsmsConnectionMode.ACTIVE ) {
-			throw new IOException("HsmsSsCommunicatorConfig#connectionMode is not ACTIVE");
+		if ( this.config().connectionMode().get() != HsmsConnectionMode.ACTIVE ) {
+			throw new HsmsConnectionModeIllegalStateException("NOT ACTIVE");
 		}
 		
 		super.open();
@@ -48,7 +46,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 					if ( this.isClosed() ) {
 						return;
 					}
-					this.config.timeout().t5().sleep();
+					this.config().timeout().t5().sleep();
 				}
 			}
 			catch ( InterruptedException ignore ) {
@@ -67,7 +65,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 				AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
 				) {
 			
-			final SocketAddress socketAddr = this.config.socketAddress().getSocketAddress();
+			final SocketAddress socketAddr = this.config().socketAddress().getSocketAddress();
 			
 			try {
 				notifyLog(HsmsSsConnectionLog.tryConnect(socketAddr));
@@ -77,16 +75,16 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 					@Override
 					public void completed(Void none, Void attachment) {
 						
-						SocketAddress local = null;
-						SocketAddress remote = null;
+						SocketAddress pLocal = null;
+						SocketAddress pRemote = null;
 						
 						try {
 							
 							try {
-								local = channel.getLocalAddress();
-								remote = channel.getRemoteAddress();
+								pLocal = channel.getLocalAddress();
+								pRemote = channel.getRemoteAddress();
 								
-								notifyLog(HsmsSsConnectionLog.connected(local, remote));
+								notifyLog(HsmsSsConnectionLog.connected(pLocal, pRemote));
 								
 								completionAction(channel);
 							}
@@ -109,7 +107,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 							}
 							
 							try {
-								notifyLog(HsmsSsConnectionLog.closed(local, remote));
+								notifyLog(HsmsSsConnectionLog.closed(pLocal, pRemote));
 							}
 							catch ( InterruptedException ignore ) {
 							}

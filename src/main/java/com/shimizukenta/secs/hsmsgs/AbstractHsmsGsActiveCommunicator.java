@@ -7,6 +7,8 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
+import com.shimizukenta.secs.hsms.HsmsConnectionMode;
+import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
 
 public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCommunicator {
 	
@@ -16,6 +18,11 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 	
 	@Override
 	public void open() throws IOException {
+		
+		if ( this.config().connectionMode().get() != HsmsConnectionMode.ACTIVE ) {
+			throw new HsmsConnectionModeIllegalStateException("NOT ACTIVE");
+		}
+		
 		super.open();
 		
 		this.executorService().execute(() -> {
@@ -49,16 +56,16 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 				@Override
 				public void completed(Void none, Void attachment) {
 					
-					SocketAddress local = null;
-					SocketAddress remote = null;
+					SocketAddress pLocal = null;
+					SocketAddress pRemote = null;
 					
 					try {
 						
 						try {
-							local = channel.getLocalAddress();
-							remote = channel.getRemoteAddress();
+							pLocal = channel.getLocalAddress();
+							pRemote = channel.getRemoteAddress();
 							
-							AbstractHsmsGsActiveCommunicator.this.notifyLog(HsmsGsConnectionLog.connected(local, remote));
+							AbstractHsmsGsActiveCommunicator.this.notifyLog(HsmsGsConnectionLog.connected(pLocal, pRemote));
 							
 							try {
 								
@@ -94,7 +101,7 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 						}
 						
 						try {
-							AbstractHsmsGsActiveCommunicator.this.notifyLog(HsmsGsConnectionLog.closed(local, remote));
+							AbstractHsmsGsActiveCommunicator.this.notifyLog(HsmsGsConnectionLog.closed(pLocal, pRemote));
 						}
 						catch ( InterruptedException ignore ) {
 						}

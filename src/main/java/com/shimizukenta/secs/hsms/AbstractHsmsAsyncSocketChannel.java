@@ -272,7 +272,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 		}
 		
 		if ( type != HsmsMessageType.SELECT_RSP ) {
-			throw new HsmsIllegalTypeReplyMessageException(msg);
+			throw new HsmsNotExpectControlTypeReplyMessageException(msg);
 		}
 		
 		return r;
@@ -309,7 +309,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 		}
 		
 		if ( type != HsmsMessageType.DESELECT_RSP ) {
-			throw new HsmsIllegalTypeReplyMessageException(msg);
+			throw new HsmsNotExpectControlTypeReplyMessageException(msg);
 		}
 		
 		return r;
@@ -346,7 +346,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 		}
 		
 		if ( type != HsmsMessageType.LINKTEST_RSP ) {
-			throw new HsmsIllegalTypeReplyMessageException(msg);
+			throw new HsmsNotExpectControlTypeReplyMessageException(msg);
 		}
 		
 		return r;
@@ -427,7 +427,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 			}
 			
 			if ( type != HsmsMessageType.DATA ) {
-				throw new HsmsIllegalTypeReplyMessageException(msg);
+				throw new HsmsNotExpectControlTypeReplyMessageException(msg);
 			}
 		}
 		

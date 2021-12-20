@@ -8,11 +8,11 @@ public class Secs2RawBytes extends AbstractSecs2 {
 	
 	private final byte[] bs;
 	
-	protected Secs2RawBytes() {
+	public Secs2RawBytes() {
 		this.bs = new byte[]{};
 	}
 	
-	protected Secs2RawBytes(byte[] bs) {
+	public Secs2RawBytes(byte[] bs) {
 		this.bs = Arrays.copyOf(bs, bs.length);
 	}
 	

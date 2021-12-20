@@ -39,7 +39,7 @@ public class Secs2Float4 extends Secs2Number<Float> {
 				.collect(Collectors.toList());
 	}
 	
-	protected Secs2Float4(byte[] bs) {
+	public Secs2Float4(byte[] bs) {
 		super();
 		
 		Objects.requireNonNull(bs);

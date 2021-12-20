@@ -18,6 +18,7 @@ import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
+import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
 import com.shimizukenta.secs.hsms.HsmsException;
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
@@ -39,59 +40,31 @@ import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
  */
 public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCommunicator {
 	
-	private final HsmsSsCommunicatorConfig config;
-	
 	public AbstractHsmsSsPassiveCommunicator(HsmsSsCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
-		this.config = config;
 	}
 	
 	@Override
 	public void open() throws IOException {
 		
-		if ( this.config.connectionMode().get() != HsmsConnectionMode.PASSIVE ) {
-			throw new IOException("HsmsSsCommunicatorConfig#connectionMode is not PASSIVE");
+		if ( this.config().connectionMode().get() != HsmsConnectionMode.PASSIVE ) {
+			throw new HsmsConnectionModeIllegalStateException("NOT PASSIVE");
 		}
 		
 		super.open();
-		this.openPassive();
-	}
-	
-	@Override
-	public void close() throws IOException {
-		super.close();
-	}
-	
-	private void openPassive() {
 		
 		this.executorService().execute(() -> {
-			
 			try {
-				
-				final ReadOnlyTimeProperty tp = config.rebindIfPassive();
-				
+				final ReadOnlyTimeProperty tp = this.config().rebindIfPassive();
 				while ( ! this.isClosed() ) {
-					
-					try (
-							AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
-							) {
-						
-						passiveAccepting(server);
-						
-						synchronized ( server ) {
-							server.wait();
-						}
+					this.openPassive();
+					if ( this.isClosed() ) {
+						return;
 					}
-					catch ( IOException e ) {
-						this.notifyLog(e);
-					}
-					
-					if ( ! this.isClosed() ) {
-						if ( tp.gtZero() ) {
-							tp.sleep();
-						} else {
-							return;
-						}
+					if ( tp.gtZero() ) {
+						tp.sleep();
+					} else {
+						return;
 					}
 				}
 			}
@@ -100,10 +73,31 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		});
 	}
 	
+	@Override
+	public void close() throws IOException {
+		super.close();
+	}
+	
+	private void openPassive() throws InterruptedException {
+		try (
+				AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
+				) {
+			
+			passiveAccepting(server);
+			
+			synchronized ( server ) {
+				server.wait();
+			}
+		}
+		catch ( IOException e ) {
+			this.notifyLog(e);
+		}
+	}
+	
 	private void passiveAccepting(AsynchronousServerSocketChannel server)
 			throws IOException, InterruptedException {
 		
-		final SocketAddress addr = config.socketAddress().getSocketAddress();
+		final SocketAddress addr = this.config().socketAddress().getSocketAddress();
 		
 		this.notifyLog(HsmsSsPassiveBindLog.tryBind(addr));
 		
@@ -118,22 +112,22 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				
 				server.accept(attachment, this);
 				
-				SocketAddress local = null;
-				SocketAddress remote = null;
+				SocketAddress pLocal = null;
+				SocketAddress pRemote = null;
 				
 				try {
 					
 					try {
 						
-						local = channel.getLocalAddress();
-						remote = channel.getRemoteAddress();
+						pLocal = channel.getLocalAddress();
+						pRemote = channel.getRemoteAddress();
 					}
 					catch ( IOException e ) {
 						AbstractHsmsSsPassiveCommunicator.this.notifyLog(e);
 						return;
 					}
 					
-					AbstractHsmsSsPassiveCommunicator.this.notifyLog(HsmsSsConnectionLog.accepted(local, remote));
+					AbstractHsmsSsPassiveCommunicator.this.notifyLog(HsmsSsConnectionLog.accepted(pLocal, pRemote));
 					
 					AbstractHsmsSsPassiveCommunicator.this.completionAction(channel);
 				}
@@ -154,7 +148,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 					}
 					
 					try {
-						AbstractHsmsSsPassiveCommunicator.this.notifyLog(HsmsSsConnectionLog.closed(local, remote));
+						AbstractHsmsSsPassiveCommunicator.this.notifyLog(HsmsSsConnectionLog.closed(pLocal, pRemote));
 					}
 					catch ( InterruptedException ignore ) {
 					}
@@ -255,7 +249,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			}
 		});
 		
-		final HsmsMessage msg = config.timeout().t7().poll(queue);
+		final HsmsMessage msg = this.config().timeout().t7().poll(queue);
 		
 		if ( msg == null ) {
 			throw new HsmsTimeoutT7Exception();
