@@ -35,10 +35,14 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		this.gem = Gem.newInstance(this, config.gem());
 	}
 	
+	private final Object syncOpen = new Object();
+	
 	@Override
 	public void open() throws IOException {
 		
-		super.open();
+		synchronized ( this.syncOpen ) {
+			super.open();
+		}
 		
 		this.executeLogQueueTask();
 		this.executeMsgRecvQueueTask();
@@ -76,8 +80,6 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	public void waitUntilNotCommunicatable() throws InterruptedException {
 		this.communicatable.waitUntilFalse();
 	}
-	
-	private final Object syncOpen = new Object();
 	
 	@Override
 	public void openAndWaitUntilCommunicatable() throws IOException, InterruptedException {

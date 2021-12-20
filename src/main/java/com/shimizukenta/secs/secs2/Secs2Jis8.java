@@ -11,7 +11,7 @@ public class Secs2Jis8 extends AbstractSecs2 {
 	
 	private byte[] bytes;
 	
-	protected Secs2Jis8(byte[] bs) {
+	public Secs2Jis8(byte[] bs) {
 		super();
 		
 		Objects.requireNonNull(bs);
