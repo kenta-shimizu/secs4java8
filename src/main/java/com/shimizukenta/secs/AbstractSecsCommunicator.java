@@ -77,12 +77,14 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		this.communicatable.waitUntilFalse();
 	}
 	
+	private final Object syncOpen = new Object();
+	
 	@Override
 	public void openAndWaitUntilCommunicatable() throws IOException, InterruptedException {
 		
-		synchronized ( this ) {
-			if ( ! isOpen() ) {
-				open();
+		synchronized ( this.syncOpen ) {
+			if ( ! this.isOpen() ) {
+				this.open();
 			}
 		}
 		
