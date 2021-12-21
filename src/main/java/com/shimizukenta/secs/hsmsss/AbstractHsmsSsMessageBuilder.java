@@ -11,7 +11,7 @@ import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
-import com.shimizukenta.secs.secs2.Secs2BytesParser;
+import com.shimizukenta.secs.secs2.Secs2BytesParsers;
 
 public abstract class AbstractHsmsSsMessageBuilder extends AbstractHsmsMessageBuilder implements HsmsSsMessageBuilder {
 	
@@ -121,7 +121,7 @@ public abstract class AbstractHsmsSsMessageBuilder extends AbstractHsmsMessageBu
 	}
 	
 	public static AbstractHsmsMessage fromBytes(byte[] header, List<byte[]> bodies) throws Secs2BytesParseException {
-		return AbstractHsmsSsMessageBuilder.build(header, Secs2BytesParser.getInstance().parse(bodies));
+		return AbstractHsmsSsMessageBuilder.build(header, Secs2BytesParsers.parse(bodies));
 	}
 	
 	public static AbstractHsmsMessage fromMessage(HsmsMessage message) {

@@ -92,7 +92,7 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 		if ( list.isEmpty() ) {
 			return this;
 		} else {
-			throw new Secs2IrregalDataFormatException("Not Secs2List");
+			throw new Secs2IllegalDataFormatException("Not Secs2List");
 		}
 	}
 	
@@ -103,7 +103,7 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	
 	@Override
 	public String getAscii() throws Secs2Exception {
-		throw new Secs2IrregalDataFormatException("Not Secs2Ascii");
+		throw new Secs2IllegalDataFormatException("Not Secs2Ascii");
 	}
 	
 	@Override
@@ -114,7 +114,7 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	}
 	
 	protected byte getByte(int index) throws Secs2Exception {
-		throw new Secs2IrregalDataFormatException("Not Secs2Byte");
+		throw new Secs2IllegalDataFormatException("Not Secs2Byte");
 	}
 	
 	@Override
@@ -125,7 +125,7 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	}
 	
 	protected boolean getBoolean(int index) throws Secs2Exception {
-		throw new Secs2IrregalDataFormatException("Not Secs2Boolean");
+		throw new Secs2IllegalDataFormatException("Not Secs2Boolean");
 	}
 	
 	@Override
@@ -136,7 +136,7 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	}
 	
 	protected int getInt(int index) throws Secs2Exception {
-		throw new Secs2IrregalDataFormatException("Not Secs2Number");
+		throw new Secs2IllegalDataFormatException("Not Secs2Number");
 	}
 	
 	@Override
@@ -147,7 +147,7 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	}
 	
 	protected long getLong(int index) throws Secs2Exception {
-		throw new Secs2IrregalDataFormatException("Not Secs2Number");
+		throw new Secs2IllegalDataFormatException("Not Secs2Number");
 	}
 	
 	@Override
@@ -158,7 +158,7 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	}
 	
 	protected BigInteger getBigInteger(int index) throws Secs2Exception {
-		throw new Secs2IrregalDataFormatException("Not Secs2Number");
+		throw new Secs2IllegalDataFormatException("Not Secs2Number");
 	}
 	
 	@Override
@@ -169,7 +169,7 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	}
 	
 	protected float getFloat(int index) throws Secs2Exception {
-		throw new Secs2IrregalDataFormatException("Not Secs2Float");
+		throw new Secs2IllegalDataFormatException("Not Secs2Float");
 	}
 	
 	@Override
@@ -180,7 +180,7 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	}
 	
 	protected double getDouble(int index) throws Secs2Exception {
-		throw new Secs2IrregalDataFormatException("Not Secs2Double");
+		throw new Secs2IllegalDataFormatException("Not Secs2Double");
 	}
 	
 	@Override
@@ -191,7 +191,7 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	}
 	
 	protected Number getNumber(int index) throws Secs2Exception {
-		throw new Secs2IrregalDataFormatException("Not Secs2Number");
+		throw new Secs2IllegalDataFormatException("Not Secs2Number");
 	}
 	
 	@Override

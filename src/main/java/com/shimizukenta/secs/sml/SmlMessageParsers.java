@@ -20,4 +20,8 @@ public final class SmlMessageParsers {
 		return SingletonHolder.inst;
 	}
 	
+	public static SmlMessage parse(CharSequence cs) throws SmlParseException {
+		return getInstance().parse(cs);
+	}
+	
 }

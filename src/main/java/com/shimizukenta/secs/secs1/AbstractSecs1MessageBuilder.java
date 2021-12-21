@@ -12,7 +12,7 @@ import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2BytesPackBuilder;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
-import com.shimizukenta.secs.secs2.Secs2BytesParser;
+import com.shimizukenta.secs.secs2.Secs2BytesParsers;
 
 public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder {
 	
@@ -263,7 +263,7 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 				.map(bs -> Arrays.copyOfRange(bs, 11, bs.length - 2))
 				.collect(Collectors.toList());
 		
-		Secs2 body = Secs2BytesParser.getInstance().parse(bss);
+		Secs2 body = Secs2BytesParsers.parse(bss);
 		
 		return new AbstractSecs1Message(header, body) {
 			

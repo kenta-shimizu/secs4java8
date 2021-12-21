@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
-import com.shimizukenta.secs.secs2.Secs2IrregalDataFormatException;
+import com.shimizukenta.secs.secs2.Secs2IllegalDataFormatException;
 import com.shimizukenta.secs.secs2.Secs2Item;
 
 public enum CEED {
@@ -35,7 +35,7 @@ public enum CEED {
 			
 		} else {
 			
-			throw new Secs2IrregalDataFormatException("CEED require BOOLEAN");
+			throw new Secs2IllegalDataFormatException("CEED require BOOLEAN");
 		}
 	}
 }
