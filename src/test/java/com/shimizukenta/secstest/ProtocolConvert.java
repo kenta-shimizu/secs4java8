@@ -26,7 +26,9 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
 import com.shimizukenta.secstestutil.Secs1OnTcpIpHsmsSsConverter;
 
 public class ProtocolConvert {
-
+	
+	private static final int count = 1000;
+	
 	public ProtocolConvert() {
 		/* Nothing */
 	}
@@ -145,32 +147,33 @@ public class ProtocolConvert {
 					throws SecsException, Secs2Exception,
 					IOException, InterruptedException {
 		
-		Thread.sleep(500L);
-		
 		echo("start");
-		Thread.sleep(500L);
+		Thread.sleep(1L);
 		
-		host.gem().s1f13();
-		Thread.sleep(200L);
-		
-		host.gem().s1f17();
-		Thread.sleep(200L);
-		
-		host.gem().s2f31Now();
-		Thread.sleep(200L);
-		
-		equip.send(
-				5, 1, true,
-				Secs2.list(
-						Secs2.binary((byte)0x81),
-						Secs2.uint2(1001),
-						Secs2.ascii("ON FIRE")
-						)
-				);
-		Thread.sleep(200L);
-		
-		host.gem().s1f15();
-		Thread.sleep(200L);
+		for ( int i = 0; i < count; ++i ) {
+			
+			host.gem().s1f13();
+			Thread.sleep(1L);
+			
+			host.gem().s1f17();
+			Thread.sleep(1L);
+			
+			host.gem().s2f31Now();
+			Thread.sleep(1L);
+			
+			equip.send(
+					5, 1, true,
+					Secs2.list(
+							Secs2.binary((byte)0x81),
+							Secs2.uint2(1001),
+							Secs2.ascii("ON FIRE")
+							)
+					);
+			Thread.sleep(1L);
+			
+			host.gem().s1f15();
+			Thread.sleep(1L);
+		}
 		
 		echo("end");
 		Thread.sleep(500L);
