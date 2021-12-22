@@ -6,6 +6,11 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -68,7 +73,7 @@ public abstract class AbstractCollectionProperty<T>
 			notifyChanged();
 		}
 	}
-
+	
 	@Override
 	public void waitUntil(Collection<T> v) throws InterruptedException {
 		synchronized ( sync ) {
@@ -80,7 +85,19 @@ public abstract class AbstractCollectionProperty<T>
 			}
 		}
 	}
-
+	
+	@Override
+	public void waitUntil(Collection<T> v, long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+		this.waitWithTimeout(() -> {
+			this.waitUntil(v);
+		}, timeout, unit);
+	}
+	
+	@Override
+	public void waitUntil(Collection<T> v, ReadOnlyTimeProperty tp) throws InterruptedException, TimeoutException {
+		this.waitUntil(v, tp.getMilliSeconds(), TimeUnit.MILLISECONDS);
+	}
+	
 	@Override
 	public void waitUntilNot(Collection<T> v) throws InterruptedException {
 		synchronized ( sync ) {
@@ -93,7 +110,48 @@ public abstract class AbstractCollectionProperty<T>
 		}
 	}
 	
+	@Override
+	public void waitUntilNot(Collection<T> v, long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+		this.waitWithTimeout(() -> {
+			this.waitUntilNot(v);
+		}, timeout, unit);
+	}
 	
+	@Override
+	public void waitUntilNot(Collection<T> v, ReadOnlyTimeProperty tp) throws InterruptedException, TimeoutException {
+		this.waitUntilNot(v, tp.getMilliSeconds(), TimeUnit.MILLISECONDS);
+	}
+	
+	private void waitWithTimeout(InterruptableRunnable r, long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+		
+		final Future<T> f = new FutureTask<>(() -> {
+			try {
+				r.run();
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		}, null);
+		
+		try {
+			f.get(timeout, unit);
+		}
+		catch ( InterruptedException e ) {
+			f.cancel(true);
+			throw e;
+		}
+		catch ( TimeoutException e ) {
+			f.cancel(true);
+			throw e;
+		}
+		catch ( ExecutionException e ) {
+			Throwable t = e.getCause();
+			if ( t instanceof RuntimeException ) {
+				throw (RuntimeException)t;
+			} else {
+				throw new RuntimeException(t);
+			}
+		}
+	}
 	
 	@Override
 	public int size() {

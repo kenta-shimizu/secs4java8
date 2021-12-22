@@ -4,6 +4,11 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Value Getter, Setter, Value-Change-Observer<br />
@@ -83,6 +88,18 @@ public abstract class AbstractProperty<T> implements Property<T>, Serializable {
 	}
 	
 	@Override
+	public void waitUntil(T v, long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+		this.waitWithTimeout(() -> {
+			this.waitUntil(v);
+		}, timeout, unit);
+	}
+	
+	@Override
+	public void waitUntil(T v, ReadOnlyTimeProperty tp) throws InterruptedException, TimeoutException {
+		this.waitUntil(v, tp.getMilliSeconds(), TimeUnit.MILLISECONDS);
+	}
+	
+	@Override
 	public void waitUntilNot(T v) throws InterruptedException {
 		synchronized ( sync ) {
 			for ( ;; ) {
@@ -95,9 +112,51 @@ public abstract class AbstractProperty<T> implements Property<T>, Serializable {
 	}
 	
 	@Override
+	public void waitUntilNot(T v, long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+		this.waitWithTimeout(() -> {
+			this.waitUntilNot(v);
+		}, timeout, unit);
+	}
+	
+	@Override
+	public void waitUntilNot(T v, ReadOnlyTimeProperty tp) throws InterruptedException, TimeoutException {
+		this.waitUntilNot(v, tp.getMilliSeconds(), TimeUnit.MILLISECONDS);
+	}
+	
+	private void waitWithTimeout(InterruptableRunnable r, long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+		
+		final Future<T> f = new FutureTask<>(() -> {
+			try {
+				r.run();
+			}
+			catch ( InterruptedException ignore ) {
+			}
+		}, null);
+		
+		try {
+			f.get(timeout, unit);
+		}
+		catch ( InterruptedException e ) {
+			f.cancel(true);
+			throw e;
+		}
+		catch ( TimeoutException e ) {
+			f.cancel(true);
+			throw e;
+		}
+		catch ( ExecutionException e ) {
+			Throwable t = e.getCause();
+			if ( t instanceof RuntimeException ) {
+				throw (RuntimeException)t;
+			} else {
+				throw new RuntimeException(t);
+			}
+		}
+	}
+	
+	@Override
 	public String toString() {
 		return Objects.toString(get());
 	}
-	
 	
 }

@@ -1,6 +1,8 @@
 package com.shimizukenta.secs;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Boolean value Getter, Setter, Value-Change-Observer.
@@ -33,17 +35,37 @@ public abstract class AbstractBooleanProperty extends AbstractProperty<Boolean>
 
 	@Override
 	public boolean booleanValue() {
-		return get().booleanValue();
+		return this.get().booleanValue();
 	}
-
+	
 	@Override
 	public void waitUntilTrue() throws InterruptedException {
-		waitUntil(Boolean.TRUE);
+		this.waitUntil(Boolean.TRUE);
 	}
-
+	
+	@Override
+	public void waitUntilTrue(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+		this.waitUntil(Boolean.TRUE, timeout, unit);
+	}
+	
+	@Override
+	public void waitUntilTrue(ReadOnlyTimeProperty tp) throws InterruptedException, TimeoutException {
+		this.waitUntil(Boolean.TRUE, tp);
+	}
+	
 	@Override
 	public void waitUntilFalse() throws InterruptedException {
-		waitUntil(Boolean.FALSE);
+		this.waitUntil(Boolean.FALSE);
 	}
-
+	
+	@Override
+	public void waitUntilFalse(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+		this.waitUntil(Boolean.FALSE, timeout, unit);
+	}
+	
+	@Override
+	public void waitUntilFalse(ReadOnlyTimeProperty tp) throws InterruptedException, TimeoutException {
+		this.waitUntil(Boolean.FALSE, tp);
+	}
+	
 }

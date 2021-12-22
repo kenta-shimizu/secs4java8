@@ -10,6 +10,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.gem.Gem;
 import com.shimizukenta.secs.secs2.Secs2;
@@ -77,20 +78,54 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	}
 	
 	@Override
+	public void waitUntilCommunicatable(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+		this.communicatable.waitUntilTrue(timeout, unit);
+	}
+	
+	@Override
+	public void waitUntilCommunicatable(ReadOnlyTimeProperty tp) throws InterruptedException, TimeoutException {
+		this.communicatable.waitUntilTrue(tp);
+	}
+	
+	@Override
 	public void waitUntilNotCommunicatable() throws InterruptedException {
 		this.communicatable.waitUntilFalse();
 	}
 	
 	@Override
+	public void waitUntilNotCommunicatable(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+		this.communicatable.waitUntilFalse(timeout, unit);
+	}
+	
+	@Override
+	public void waitUntilNotCommunicatable(ReadOnlyTimeProperty tp) throws InterruptedException, TimeoutException {
+		this.communicatable.waitUntilFalse(tp);
+	}
+	
+	@Override
 	public void openAndWaitUntilCommunicatable() throws IOException, InterruptedException {
-		
+		this.openIfNotOpen();
+		this.waitUntilCommunicatable();
+	}
+	
+	@Override
+	public void openAndWaitUntilCommunicatable(long timeout, TimeUnit unit) throws IOException, InterruptedException, TimeoutException {
+		this.openIfNotOpen();
+		this.waitUntilCommunicatable(timeout, unit);
+	}
+	
+	@Override
+	public void openAndWaitUntilCommunicatable(ReadOnlyTimeProperty tp) throws IOException, InterruptedException, TimeoutException {
+		this.openIfNotOpen();
+		this.waitUntilCommunicatable(tp);
+	}
+	
+	private void openIfNotOpen() throws IOException {
 		synchronized ( this.syncOpen ) {
 			if ( ! this.isOpen() ) {
 				this.open();
 			}
 		}
-		
-		this.waitUntilCommunicatable();
 	}
 	
 	abstract public Optional<SecsMessage> templateSend(int strm, int func, boolean wbit, Secs2 secs2)
