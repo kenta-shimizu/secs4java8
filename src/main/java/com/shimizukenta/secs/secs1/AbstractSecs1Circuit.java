@@ -288,8 +288,10 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 		
 		this.comm.notifyLog(new Secs1ReceiveMessageBlockLog(block));
 		
-		if (block.deviceId() != this.comm.config().deviceId().intValue()) {
-			return;
+		if (this.comm.config().isCheckMessageBlockDeviceId().booleanValue()) {
+			if (block.deviceId() != this.comm.config().deviceId().intValue()) {
+				return;
+			}
 		}
 		
 		if ( this.cacheBlocks.isEmpty() ) {

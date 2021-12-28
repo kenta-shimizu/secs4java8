@@ -25,6 +25,7 @@ public abstract class AbstractSecs1CommunicatorConfig extends AbstractSecsCommun
 	private final NumberProperty deviceId = NumberProperty.newInstance(10);
 	private final BooleanProperty isMaster = BooleanProperty.newInstance(true);
 	private final NumberProperty retry = NumberProperty.newInstance(3);
+	private final BooleanProperty isCheckMessageBlockDeviceId = BooleanProperty.newInstance(true);
 	
 	public AbstractSecs1CommunicatorConfig() {
 		super();
@@ -88,6 +89,24 @@ public abstract class AbstractSecs1CommunicatorConfig extends AbstractSecsCommun
 	 */
 	public ReadOnlyNumberProperty retry() {
 		return retry;
+	}
+	
+	/**
+	 * Check Message-Block Device-ID, Not receive block if settrue.
+	 * 
+	 * @param doCheck
+	 */
+	public void isCheckMessageBlockDeviceId(boolean doCheck) {
+		this.isCheckMessageBlockDeviceId.set(doCheck);
+	}
+	
+	/**
+	 * isCheckMessageBlockDeviceId getter.
+	 * 
+	 * @return property
+	 */
+	public ReadOnlyBooleanProperty isCheckMessageBlockDeviceId() {
+		return this.isCheckMessageBlockDeviceId;
 	}
 	
 	private static final class DeviceIdIllegalArgumentException extends IllegalArgumentException {
