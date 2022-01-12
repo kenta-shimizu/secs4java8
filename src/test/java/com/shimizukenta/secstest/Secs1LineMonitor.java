@@ -217,7 +217,12 @@ public class Secs1LineMonitor implements Closeable {
 						
 						final Collection<Callable<Void>> tasks = Arrays.asList(
 								() -> {
-									reading(ch);
+									try {
+										reading(ch);
+									}
+									catch ( InterruptedException ignore ) {
+									}
+									
 									return null;
 									}
 								);
