@@ -1,13 +1,20 @@
 package com.shimizukenta.secs.sml;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Path;
+
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
  * This interface is implementation of SML (Peer-Group).
  * 
- * <p>
- * This instance is creatad from {@link SmlMessageParser#parse(CharSequence)}<br />
- * </p>
+ * <ul>
+ * <li>This instance get from {@link SmlMessage#from(CharSequence)}</li>
+ * <li>This instance get from {@link SmlMessage#from(java.io.Reader)}</li>
+ * <li>This instance get from {@link SmlMessage#from(java.nio.file.Path)}</li>
+ * <li>This instance get from {@link SmlMessageParser#parse(CharSequence)}</li>
+ * </ul>
  * <ul>
  * <li>To get SECS-II-Stream-Number, {@link #getStream()}</li>
  * <li>To get SECS-II-Function-Number, {@link #getFunction()}</li>
@@ -62,4 +69,28 @@ public interface SmlMessage {
 		return SmlMessageParser.getInstance().parse(cs);
 	}
 	
+	/**
+	 * Returns SmlMessage instance from Reader.
+	 * 
+	 * @param reader
+	 * @return SmlMessage
+	 * @throws SmlParseException
+	 * @throws IOException
+	 */
+	public static SmlMessage from(Reader reader) throws SmlParseException, IOException {
+		return SmlMessageParser.getInstance().parse(reader);
+	}
+	
+	/**
+	 * Returns SmlMessage instance from File-path.
+	 * 
+	 * @param path
+	 * @return SmlMessage
+	 * @throws SmlParseException
+	 * @throws IOException
+	 */
+	public static SmlMessage from(Path path) throws SmlParseException, IOException {
+		return SmlMessageParser.getInstance().parse(path);
+	}
+
 }

@@ -1,5 +1,9 @@
 package com.shimizukenta.secs.sml;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Path;
+
 /**
  * SmlMessageParser Singleton-pattern getInstance.
  * 
@@ -22,6 +26,14 @@ public final class SmlMessageParsers {
 	
 	public static SmlMessage parse(CharSequence cs) throws SmlParseException {
 		return getInstance().parse(cs);
+	}
+	
+	public static SmlMessage parse(Reader reader) throws SmlParseException, IOException {
+		return getInstance().parse(reader);
+	}
+	
+	public static SmlMessage parse(Path path) throws SmlParseException, IOException {
+		return getInstance().parse(path);
 	}
 	
 }

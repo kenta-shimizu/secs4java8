@@ -240,28 +240,22 @@ Notice: This method is blocking-method.
 
 ## SML
 
-1. Get SML-Parser instance
-
-```java
-    SmlMessageParser parser = SmlMessageParser.getInstance();
-```
-
-2. Send Primary-Message
+- Send Primary-Message case
 
 ```java
     /* Send S1F1 W. example */
-    SmlMessage primarySml = parser.parse(
+    SmlMessage primarySml = SmlMessage.from(
         "S1F1 W."
     );
 
     active.send(primarySml);
 ```
 
-3. Send Reply-Message
+- Send Reply-Message case
 
 ```java
     /* Send S1F2. example */
-    SmlMessage replySml = parser.parse(
+    SmlMessage replySml = SmlMessage.from(
         "S1F2             " +
         "<L               " +
         "   <A \"MDLN-A\">" +
@@ -271,6 +265,8 @@ Notice: This method is blocking-method.
 
     passive.send(primaryMsg, replySml);
 ```
+
+Notes: SmlMessage can get also from `SmlMessage#from(java.io.Reader reader)`, `SmlMessage#from(java.nio.file.Path path)`, `SmlMessageParser.getInstance().parse(CharSequence cs)`, ...
 
 ## GEM
 
