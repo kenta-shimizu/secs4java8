@@ -28,27 +28,38 @@ public interface SmlMessage {
 	 * 
 	 * @return stream-number
 	 */
-	int getStream();
+	public int getStream();
 
 	/**
 	 * Returns SML SECS-II-Function-Number.
 	 * 
 	 * @return function-number
 	 */
-	int getFunction();
+	public int getFunction();
 
 	/**
 	 * Returns SML SECS-II-WBit.
 	 * 
 	 * @return {@code true} if Wbit is {@code 1}
 	 */
-	boolean wbit();
+	public boolean wbit();
 
 	/**
 	 * Returns SML SECS-II-Data.
 	 * 
 	 * @return SECS-II-Data
 	 */
-	Secs2 secs2();
-
+	public Secs2 secs2();
+	
+	/**
+	 * Returns SmlMessage instance from character sequence.
+	 * 
+	 * @param cs
+	 * @return SML-Message instance.
+	 * @throws SmlParseException
+	 */
+	public static SmlMessage from(CharSequence cs) throws SmlParseException {
+		return SmlMessageParser.getInstance().parse(cs);
+	}
+	
 }
