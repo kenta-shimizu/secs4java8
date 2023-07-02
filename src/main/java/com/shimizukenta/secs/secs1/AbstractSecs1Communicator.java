@@ -7,11 +7,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.shimizukenta.secs.AbstractSecsCommunicator;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
+import com.shimizukenta.secs.impl.AbstractSecsCommunicator;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**

@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.shimizukenta.secs.AbstractSecsCommunicator;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
+import com.shimizukenta.secs.impl.AbstractSecsCommunicator;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 import com.shimizukenta.secs.secs2.Secs2Item;
@@ -125,8 +125,8 @@ public abstract class AbstractGem implements Gem {
 		if ( comm.isEquip() ) {
 			
 			ss = Secs2.list(
-					Secs2.ascii(config.mdln().get())
-					, Secs2.ascii(config.softrev().get())
+					Secs2.ascii(config.mdln().toString())
+					, Secs2.ascii(config.softrev().toString())
 					);
 			
 		} else {
@@ -150,8 +150,8 @@ public abstract class AbstractGem implements Gem {
 		if ( comm.isEquip() ) {
 			
 			ss = Secs2.list(
-					Secs2.ascii(config.mdln().get())
-					, Secs2.ascii(config.softrev().get())
+					Secs2.ascii(config.mdln().toString())
+					, Secs2.ascii(config.softrev().toString())
 					);
 			
 		} else {
@@ -184,8 +184,8 @@ public abstract class AbstractGem implements Gem {
 		if ( comm.isEquip() ) {
 			
 			ss = Secs2.list(
-					Secs2.ascii(config.mdln().get())
-					, Secs2.ascii(config.softrev().get())
+					Secs2.ascii(config.mdln().toString())
+					, Secs2.ascii(config.softrev().toString())
 					);
 			
 		} else {

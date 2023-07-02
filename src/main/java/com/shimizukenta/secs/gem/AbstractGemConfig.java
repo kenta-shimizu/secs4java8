@@ -3,10 +3,9 @@ package com.shimizukenta.secs.gem;
 import java.io.Serializable;
 import java.util.Objects;
 
-import com.shimizukenta.secs.AbstractProperty;
-import com.shimizukenta.secs.Property;
-import com.shimizukenta.secs.ReadOnlyProperty;
-import com.shimizukenta.secs.StringProperty;
+import com.shimizukenta.secs.local.property.ObjectProperty;
+import com.shimizukenta.secs.local.property.StringProperty;
+import com.shimizukenta.secs.local.property.impl.AbstractObjectProperty;
 import com.shimizukenta.secs.secs2.Secs2Item;
 
 /**
@@ -23,11 +22,12 @@ import com.shimizukenta.secs.secs2.Secs2Item;
  */
 public abstract class AbstractGemConfig implements Serializable {
 	
-	private static final long serialVersionUID = 1130854092113358850L;
+	private static final long serialVersionUID = -4167459257695681133L;
 	
-	protected class Secs2NumberItemProperty extends AbstractProperty<Secs2Item> {
+	//TODO
+	protected class Secs2NumberItemProperty extends AbstractObjectProperty<Secs2Item> {
 		
-		private static final long serialVersionUID = 3803548762155640142L;
+		private static final long serialVersionUID = -8262831237036363794L;
 		
 		public Secs2NumberItemProperty(Secs2Item initial) {
 			super(Objects.requireNonNull(initial));
@@ -60,11 +60,14 @@ public abstract class AbstractGemConfig implements Serializable {
 	
 	private final StringProperty mdln = StringProperty.newInstance("      ");
 	private final StringProperty softrev = StringProperty.newInstance("      ");
-	private final Property<ClockType> clockType = Property.newInstance(ClockType.A16);
-	private final Secs2NumberItemProperty dataIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
-	private final Secs2NumberItemProperty vIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
-	private final Secs2NumberItemProperty reportIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
-	private final Secs2NumberItemProperty collectionEventIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
+	
+	private final ObjectProperty<ClockType> clockType = ObjectProperty.newInstance(ClockType.A16);
+	
+	//TODO
+	private final ObjectProperty<Secs2Item> dataIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
+	private final ObjectProperty<Secs2Item> vIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
+	private final ObjectProperty<Secs2Item> reportIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
+	private final ObjectProperty<Secs2Item> collectionEventIdSecs2Item = new Secs2NumberItemProperty(Secs2Item.UINT4);
 	
 	public AbstractGemConfig() {
 		/* Nothing */
@@ -80,15 +83,15 @@ public abstract class AbstractGemConfig implements Serializable {
 	 * @param cs MODEL-NUMBER
 	 */
 	public void mdln(CharSequence cs) {
-		this.mdln.set(Objects.requireNonNull(cs));
+		this.mdln.set(Objects.requireNonNull(cs).toString());
 	}
 	
 	/**
-	 * Model-Number getter.
+	 * Returns Model-Number Property.
 	 * 
-	 * @return Model-Number
+	 * @return Model-Number Property
 	 */
-	public ReadOnlyProperty<String> mdln() {
+	public StringProperty mdln() {
 		return mdln;
 	}
 	
@@ -102,15 +105,15 @@ public abstract class AbstractGemConfig implements Serializable {
 	 * @param cs SOFTWARE-RESION
 	 */
 	public void softrev(CharSequence cs) {
-		this.softrev.set(Objects.requireNonNull(cs));
+		this.softrev.set(Objects.requireNonNull(cs).toString());
 	}
 	
 	/**
-	 * Software-Revision getter.
+	 * Returns Software-Revision Property.
 	 * 
-	 * @return Software-Revision
+	 * @return Software-Revision-property
 	 */
-	public ReadOnlyProperty<String> softrev() {
+	public StringProperty softrev() {
 		return softrev;
 	}
 	
@@ -128,11 +131,11 @@ public abstract class AbstractGemConfig implements Serializable {
 	}
 	
 	/**
-	 * Clock-type getter.
+	 * Returns Clock-type property.
 	 * 
-	 * @return Clock-type
+	 * @return Clock-type-property
 	 */
-	public ReadOnlyProperty<ClockType> clockType() {
+	public ObjectProperty<ClockType> clockType() {
 		return this.clockType;
 	}
 	
@@ -150,11 +153,11 @@ public abstract class AbstractGemConfig implements Serializable {
 	}
 	
 	/**
-	 * DATA-ID Secs2Item type getter.
+	 * Returns DATA-ID Secs2Item type property.
 	 * 
-	 * @return Secs2Item
+	 * @return Secs2Item property
 	 */
-	public ReadOnlyProperty<Secs2Item> dataIdSecs2Item() {
+	public ObjectProperty<Secs2Item> dataIdSecs2Item() {
 		return this.dataIdSecs2Item;
 	}
 	
@@ -172,11 +175,11 @@ public abstract class AbstractGemConfig implements Serializable {
 	}
 	
 	/**
-	 * V-ID Secs2Item type getter.
+	 * Returns V-ID Secs2Item type property.
 	 * 
-	 * @return Secs2Item
+	 * @return Secs2Item property
 	 */
-	public ReadOnlyProperty<Secs2Item> vIdSecs2Item() {
+	public ObjectProperty<Secs2Item> vIdSecs2Item() {
 		return this.vIdSecs2Item;
 	}
 	
@@ -194,11 +197,11 @@ public abstract class AbstractGemConfig implements Serializable {
 	}
 	
 	/**
-	 * REPORT-ID Secs2Item type getter.
+	 * Returns REPORT-ID Secs2Item type property
 	 * 
-	 * @return Secs2Item
+	 * @return Secs2Item property
 	 */
-	public ReadOnlyProperty<Secs2Item> reportIdSecs2Item() {
+	public ObjectProperty<Secs2Item> reportIdSecs2Item() {
 		return this.reportIdSecs2Item;
 	}
 
@@ -216,11 +219,11 @@ public abstract class AbstractGemConfig implements Serializable {
 	}
 	
 	/**
-	 * COLLECTION-EVENT-ID Secs2Item type getter.
+	 * Returns COLLECTION-EVENT-ID Secs2Item type property.
 	 * 
-	 * @return Secs2Item
+	 * @return Secs2Item property
 	 */
-	public ReadOnlyProperty<Secs2Item> collectionEventIdSecs2Item() {
+	public ObjectProperty<Secs2Item> collectionEventIdSecs2Item() {
 		return this.collectionEventIdSecs2Item;
 	}
 	

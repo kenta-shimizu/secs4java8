@@ -6,7 +6,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import com.shimizukenta.secs.ReadOnlyTimeProperty;
+import com.shimizukenta.secs.local.property.TimeoutAndUnit;
+import com.shimizukenta.secs.local.property.TimeoutGettable;
 
 public final class ByteAndSecs1MessageQueue {
 	
@@ -77,8 +78,8 @@ public final class ByteAndSecs1MessageQueue {
 		return bb.poll(timeout, unit);
 	}
 	
-	public Byte pollByte(ReadOnlyTimeProperty v) throws InterruptedException {
-		return v.poll(bb);
+	public Byte pollByte(TimeoutGettable timeout) throws InterruptedException {
+		return timeout.blockingQueuePoll(bb);
 	}
 	
 	/**
@@ -125,8 +126,11 @@ public final class ByteAndSecs1MessageQueue {
 	 * @return size of inputs
 	 * @throws InterruptedException
 	 */
-	public int pollBytes(byte[] bs, int pos, int len, ReadOnlyTimeProperty timeout) throws InterruptedException {
-		return pollBytes(bs, pos, len, timeout.getMilliSeconds(), TimeUnit.MILLISECONDS);
+	public int pollBytes(byte[] bs, int pos, int len, TimeoutGettable timeout) throws InterruptedException {
+		
+		//TODO
+		TimeoutAndUnit a = timeout.get();
+		return pollBytes(bs, pos, len, a.timeout(), a.unit());
 	}
 	
 	public void garbageBytes(long timeout, TimeUnit unit) throws InterruptedException {
@@ -139,8 +143,11 @@ public final class ByteAndSecs1MessageQueue {
 		}
 	}
 	
-	public void garbageBytes(ReadOnlyTimeProperty timeout) throws InterruptedException {
-		this.garbageBytes(timeout.getMilliSeconds(), TimeUnit.MILLISECONDS);
+	public void garbageBytes(TimeoutGettable timeout) throws InterruptedException {
+		
+		//TODO
+		TimeoutAndUnit a = timeout.get();
+		this.garbageBytes(a.timeout(), a.unit());
 	}
 	
 }

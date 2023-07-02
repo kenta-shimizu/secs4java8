@@ -14,7 +14,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.shimizukenta.secs.ReadOnlyTimeProperty;
+import com.shimizukenta.secs.UnsetSocketAddressException;
 import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
@@ -27,6 +27,7 @@ import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsTimeoutT7Exception;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
+import com.shimizukenta.secs.local.property.TimeoutProperty;
 
 /**
  * This abstract class is implementation of HSMS-SS-Passive Communicator(SEMI-E37.1).
@@ -55,13 +56,15 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		
 		this.executorService().execute(() -> {
 			try {
-				final ReadOnlyTimeProperty tp = this.config().rebindIfPassive();
+				
+				final TimeoutProperty tp = this.config().rebindIfPassiveTime();
+				
 				while ( ! this.isClosed() ) {
 					this.openPassive();
 					if ( this.isClosed() ) {
 						return;
 					}
-					if ( tp.gtZero() ) {
+					if ( this.config().doRebindIfPassive().booleanValue() ) {
 						tp.sleep();
 					} else {
 						return;
@@ -97,7 +100,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 	private void passiveAccepting(AsynchronousServerSocketChannel server)
 			throws IOException, InterruptedException {
 		
-		final SocketAddress addr = this.config().socketAddress().getSocketAddress();
+		final SocketAddress addr = this.config().socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
 		
 		this.notifyLog(HsmsSsPassiveBindLog.tryBind(addr));
 		
@@ -249,7 +252,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			}
 		});
 		
-		final HsmsMessage msg = this.config().timeout().t7().poll(queue);
+		final HsmsMessage msg = this.config().timeout().t7().blockingQueuePoll(queue);
 		
 		if ( msg == null ) {
 			throw new HsmsTimeoutT7Exception();

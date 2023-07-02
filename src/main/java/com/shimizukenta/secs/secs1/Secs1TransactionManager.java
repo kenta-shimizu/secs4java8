@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.shimizukenta.secs.ReadOnlyTimeProperty;
+import com.shimizukenta.secs.local.property.TimeoutAndUnit;
+import com.shimizukenta.secs.local.property.TimeoutProperty;
 
 public class Secs1TransactionManager<T extends AbstractSecs1Message, U extends AbstractSecs1MessageBlock> {
 	
@@ -42,8 +43,11 @@ public class Secs1TransactionManager<T extends AbstractSecs1Message, U extends A
 		return this.getPack(msg.systemBytesKey());
 	}
 	
-	public T waitReply(T msg, ReadOnlyTimeProperty timeout) throws InterruptedException {
-		return waitReply(msg, timeout.getMilliSeconds(), TimeUnit.MILLISECONDS);
+	public T waitReply(T msg, TimeoutProperty timeout) throws InterruptedException {
+		
+		//TODO
+		TimeoutAndUnit a = timeout.get();
+		return waitReply(msg, a.timeout(), a.unit());
 	}
 	
 	public T waitReply(T msg, long timeout, TimeUnit unit) throws InterruptedException {

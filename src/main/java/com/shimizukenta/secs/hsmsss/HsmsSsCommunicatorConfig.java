@@ -3,13 +3,9 @@ package com.shimizukenta.secs.hsmsss;
 import java.net.SocketAddress;
 import java.util.Objects;
 
-import com.shimizukenta.secs.NumberProperty;
-import com.shimizukenta.secs.ReadOnlyNumberProperty;
-import com.shimizukenta.secs.ReadOnlyProperty;
-import com.shimizukenta.secs.ReadOnlySocketAddressProperty;
-import com.shimizukenta.secs.SocketAddressProperty;
 import com.shimizukenta.secs.hsms.AbstractHsmsCommunicatorConfig;
-import com.shimizukenta.secs.hsms.HsmsConnectionMode;
+import com.shimizukenta.secs.local.property.IntegerProperty;
+import com.shimizukenta.secs.local.property.ObjectProperty;
 
 /**
  * This class is config of HSMS-SS-Communicator.
@@ -26,40 +22,11 @@ public class HsmsSsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	
 	private static final long serialVersionUID = 71663164318605890L;
 	
-	private final NumberProperty sessionId = NumberProperty.newInstance(10);
-	private final SocketAddressProperty socketAddr = SocketAddressProperty.newInstance(null);
+	private final IntegerProperty sessionId = IntegerProperty.newInstance(10);
+	private final ObjectProperty<SocketAddress> socketAddr = ObjectProperty.newInstance(null);
 	
 	public HsmsSsCommunicatorConfig() {
 		super();
-	}
-	
-	/**
-	 * ACTIVE or PASSIVE protocol setter
-	 * 
-	 * @param protocol
-	 */
-	@Deprecated
-	public void protocol(HsmsSsProtocol protocol) {
-		switch ( protocol ) {
-		case PASSIVE: {
-			this.connectionMode(HsmsConnectionMode.PASSIVE);
-			break;
-		}
-		case ACTIVE: {
-			this.connectionMode(HsmsConnectionMode.ACTIVE);
-			break;
-		}
-		}
-	}
-	
-	/**
-	 * Protocol getter
-	 * 
-	 * @return protocol
-	 */
-	@Deprecated
-	public ReadOnlyProperty<HsmsConnectionMode> protocol() {
-		return this.connectionMode();
 	}
 	
 	/**
@@ -76,7 +43,7 @@ public class HsmsSsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	 * 
 	 * @return socketAddress of PASSIVE/ACTIVE
 	 */
-	public ReadOnlySocketAddressProperty socketAddress() {
+	public ObjectProperty<SocketAddress> socketAddress() {
 		return socketAddr;
 	}
 	
@@ -97,7 +64,7 @@ public class HsmsSsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	 * 
 	 * @return session-id
 	 */
-	public ReadOnlyNumberProperty sessionId() {
+	public IntegerProperty sessionId() {
 		return this.sessionId;
 	}
 	

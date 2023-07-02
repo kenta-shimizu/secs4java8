@@ -14,9 +14,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import com.shimizukenta.secs.AbstractSecsLog;
-import com.shimizukenta.secs.ReadOnlyTimeProperty;
+import com.shimizukenta.secs.local.property.TimeoutProperty;
 import com.shimizukenta.secs.SecsMessage;
+import com.shimizukenta.secs.impl.AbstractSecsLog;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2BytesPack;
@@ -192,7 +192,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 		final Future<Integer> f = this.channel.read(buffer);
 		
 		try {
-			int r = timeoutT8().future(f).intValue();
+			int r = timeoutT8().futureGet(f).intValue();
 			
 			if ( r < 0 ) {
 				throw new HsmsDetectTerminateException();
@@ -248,9 +248,9 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 	abstract protected AbstractHsmsMessage buildMessageFromBytes(byte[] header, List<byte[]> bodies) throws Secs2BytesParseException;
 	abstract protected AbstractHsmsMessage buildMessageFromMessage(HsmsMessage message);
 	abstract protected HsmsTransactionManager<AbstractHsmsMessage> transactionManager();
-	abstract protected ReadOnlyTimeProperty timeoutT3();
-	abstract protected ReadOnlyTimeProperty timeoutT6();
-	abstract protected ReadOnlyTimeProperty timeoutT8();
+	abstract protected TimeoutProperty timeoutT3();
+	abstract protected TimeoutProperty timeoutT6();
+	abstract protected TimeoutProperty timeoutT8();
 	abstract protected void resetLinktestTimer();
 	
 	@Override

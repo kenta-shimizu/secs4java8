@@ -59,12 +59,48 @@ public interface SmlMessage {
 	public Secs2 secs2();
 	
 	/**
+	 * Returns SmlMessage instance of character sequence.
+	 * 
+	 * @param cs
+	 * @return SML-Message instance.
+	 * @throws SmlParseException
+	 */
+	public static SmlMessage of(CharSequence cs) throws SmlParseException {
+		return SmlMessageParser.getInstance().parse(cs);
+	}
+	
+	/**
+	 * Returns SmlMessage instance of Reader.
+	 * 
+	 * @param reader
+	 * @return SmlMessage
+	 * @throws SmlParseException
+	 * @throws IOException
+	 */
+	public static SmlMessage of(Reader reader) throws SmlParseException, IOException {
+		return SmlMessageParser.getInstance().parse(reader);
+	}
+	
+	/**
+	 * Returns SmlMessage instance of File-path.
+	 * 
+	 * @param path
+	 * @return SmlMessage
+	 * @throws SmlParseException
+	 * @throws IOException
+	 */
+	public static SmlMessage of(Path path) throws SmlParseException, IOException {
+		return SmlMessageParser.getInstance().parse(path);
+	}
+
+	/**
 	 * Returns SmlMessage instance from character sequence.
 	 * 
 	 * @param cs
 	 * @return SML-Message instance.
 	 * @throws SmlParseException
 	 */
+	@Deprecated
 	public static SmlMessage from(CharSequence cs) throws SmlParseException {
 		return SmlMessageParser.getInstance().parse(cs);
 	}
@@ -77,6 +113,7 @@ public interface SmlMessage {
 	 * @throws SmlParseException
 	 * @throws IOException
 	 */
+	@Deprecated
 	public static SmlMessage from(Reader reader) throws SmlParseException, IOException {
 		return SmlMessageParser.getInstance().parse(reader);
 	}
@@ -89,6 +126,7 @@ public interface SmlMessage {
 	 * @throws SmlParseException
 	 * @throws IOException
 	 */
+	@Deprecated
 	public static SmlMessage from(Path path) throws SmlParseException, IOException {
 		return SmlMessageParser.getInstance().parse(path);
 	}

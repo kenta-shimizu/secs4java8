@@ -22,7 +22,7 @@ public interface SecsMessageReceiveBiListener extends EventListener {
 	 * </p>
 	 * 
 	 * @param message only Primary-Message
-	 * @param communicator
+	 * @param communicator the communicator
 	 */
 	public void received(SecsMessage message, SecsCommunicator communicator);
 

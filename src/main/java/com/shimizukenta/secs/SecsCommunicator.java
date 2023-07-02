@@ -11,7 +11,7 @@ import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicator;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicatorConfig;
 
 /**
- * This interface is implementation of SECS-Communicating, open/close communicating, receive/send SECS-Message.<br />
+ * This interface is implementation of SECS-Communicating, open/close communicating, receive/send SECS-Message.
  * 
  * <ul>
  * <li>To create HSMS-SS-Communicator instance,
@@ -77,7 +77,7 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsMessageSendable 
 	 * If Already communicatable, do nothing.<br />
 	 * </p>
 	 * 
-	 * @throws InterruptedException
+	 * @throws InterruptedException if interrupted
 	 */
 	public void waitUntilCommunicatable() throws InterruptedException;
 	
@@ -89,26 +89,12 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsMessageSendable 
 	 * If Already communicatable, do nothing.<br />
 	 * </p>
 	 * 
-	 * @param timeout
-	 * @param unit
-	 * @throws InterruptedException
-	 * @throws TimeoutException
+	 * @param timeout the timeout value
+	 * @param unit the timeout unit
+	 * @throws InterruptedException if interrupted
+	 * @throws TimeoutException if timeout
 	 */
 	public void waitUntilCommunicatable(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException;
-	
-	/**
-	 * Wait until communicatable.
-	 * 
-	 * <p>
-	 * Blocking-method.<br />
-	 * If Already communicatable, do nothing.<br />
-	 * </p>
-	 * 
-	 * @param tp
-	 * @throws InterruptedException
-	 * @throws TimeoutException
-	 */
-	public void waitUntilCommunicatable(ReadOnlyTimeProperty tp) throws InterruptedException, TimeoutException;
 	
 	/**
 	 * Wait until <strong>NOT</strong> communicatable.
@@ -118,7 +104,7 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsMessageSendable 
 	 * If Already not communicatable, do nothing.<br />
 	 * </p>
 	 * 
-	 * @throws InterruptedException
+	 * @throws InterruptedException if interrupted
 	 */
 	public void waitUntilNotCommunicatable() throws InterruptedException;
 	
@@ -130,26 +116,12 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsMessageSendable 
 	 * If Already not communicatable, do nothing.<br />
 	 * </p>
 	 * 
-	 * @param timeout
-	 * @param unit
-	 * @throws InterruptedException
-	 * @throws TimeoutException
+	 * @param timeout the timeout value
+	 * @param unit the timeout unit
+	 * @throws InterruptedException if interrupted
+	 * @throws TimeoutException if timeout
 	 */
 	public void waitUntilNotCommunicatable(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException;
-	
-	/**
-	 * Wait until <strong>NOT</strong> communicatable.
-	 * 
-	 * <p>
-	 * Blocking-method.<br />
-	 * If Already not communicatable, do nothing.<br />
-	 * </p>
-	 * 
-	 * @param tp
-	 * @throws InterruptedException
-	 * @throws TimeoutException
-	 */
-	public void waitUntilNotCommunicatable(ReadOnlyTimeProperty tp) throws InterruptedException, TimeoutException;
 	
 	/**
 	 * Open and wait until communicatable.
@@ -160,8 +132,8 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsMessageSendable 
 	 * If Already communicatable, do nothing.<br />
 	 * </p>
 	 * 
-	 * @throws IOException
-	 * @throws InterruptedException
+	 * @throws IOException if open failed
+	 * @throws InterruptedException if interrupted
 	 */
 	public void openAndWaitUntilCommunicatable() throws IOException, InterruptedException;
 	
@@ -174,29 +146,13 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsMessageSendable 
 	 * If Already communicatable, do nothing.<br />
 	 * </p>
 	 * 
-	 * @param timeout
-	 * @param unit
-	 * @throws IOException
-	 * @throws InterruptedException
-	 * @throws TimeoutException
+	 * @param timeout the timeout value
+	 * @param unit the timeout unit
+	 * @throws IOException if open failed
+	 * @throws InterruptedException if interrupted
+	 * @throws TimeoutException if timeout
 	 */
 	public void openAndWaitUntilCommunicatable(long timeout, TimeUnit unit) throws IOException, InterruptedException, TimeoutException;
-	
-	/**
-	 * Open and wait until communicatable.
-	 * 
-	 * <p>
-	 * Blocking-method.<br />
-	 * If Already opened, do nothing.<br />
-	 * If Already communicatable, do nothing.<br />
-	 * </p>
-	 * 
-	 * @param tp
-	 * @throws IOException
-	 * @throws InterruptedException
-	 * @throws TimeoutException
-	 */
-	public void openAndWaitUntilCommunicatable(ReadOnlyTimeProperty tp) throws IOException, InterruptedException, TimeoutException;
 	
 	/**
 	 * Is equipment getter.

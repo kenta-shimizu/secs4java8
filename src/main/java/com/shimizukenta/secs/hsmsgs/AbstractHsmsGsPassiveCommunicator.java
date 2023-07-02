@@ -7,10 +7,11 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 
-import com.shimizukenta.secs.ReadOnlyTimeProperty;
+import com.shimizukenta.secs.UnsetSocketAddressException;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
+import com.shimizukenta.secs.local.property.TimeoutProperty;
 
 public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCommunicator {
 	
@@ -29,13 +30,14 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 		
 		this.executorService().execute(() -> {
 			try {
-				final ReadOnlyTimeProperty tp = this.config().rebindIfPassive();
+				final TimeoutProperty tp = this.config().rebindIfPassiveTime();
+				
 				while ( ! this.isClosed() ) {
 					this.openPassive();
 					if ( this.isClosed() ) {
 						return;
 					}
-					if ( tp.gtZero() ) {
+					if ( this.config().doRebindIfPassive().booleanValue() ) {
 						tp.sleep();
 					} else {
 						return;
@@ -82,7 +84,7 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 	private void passiveAccepting(AsynchronousServerSocketChannel server)
 			throws IOException, InterruptedException {
 		
-		final SocketAddress addr = this.config().socketAddress().getSocketAddress();
+		final SocketAddress addr = this.config().socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
 		
 		this.notifyLog(HsmsGsPassiveBindLog.tryBind(addr));
 		

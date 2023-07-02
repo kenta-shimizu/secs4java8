@@ -6,6 +6,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 
+import com.shimizukenta.secs.UnsetSocketAddressException;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
@@ -47,7 +48,7 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 				AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
 				) {
 			
-			final SocketAddress socketAddr = this.config().socketAddress().getSocketAddress();
+			final SocketAddress socketAddr = this.config().socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
 			
 			notifyLog(HsmsGsConnectionLog.tryConnect(socketAddr));
 

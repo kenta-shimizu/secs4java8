@@ -24,12 +24,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import com.shimizukenta.secs.AbstractSecsLog;
 import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsLog;
 import com.shimizukenta.secs.gem.COMMACK;
 import com.shimizukenta.secs.gem.ONLACK;
+import com.shimizukenta.secs.impl.AbstractSecsLog;
 import com.shimizukenta.secs.secs1.Secs1Communicator;
 import com.shimizukenta.secs.secs1.Secs1Message;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicator;

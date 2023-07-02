@@ -2,7 +2,6 @@ package com.shimizukenta.secs.hsmsgs;
 
 import java.util.Optional;
 
-import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.AbstractHsmsLinktest;
 import com.shimizukenta.secs.hsms.AbstractHsmsSession;
@@ -10,6 +9,8 @@ import com.shimizukenta.secs.hsms.HsmsException;
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
+import com.shimizukenta.secs.local.property.BooleanProperty;
+import com.shimizukenta.secs.local.property.TimeoutProperty;
 
 public abstract class AbstractHsmsGsLinktest extends AbstractHsmsLinktest {
 	
@@ -27,8 +28,13 @@ public abstract class AbstractHsmsGsLinktest extends AbstractHsmsLinktest {
 	}
 	
 	@Override
-	protected ReadOnlyTimeProperty timer() {
-		return this.comm.config().linktest();
+	protected TimeoutProperty timer() {
+		return this.comm.config().linktestTime();
+	}
+	
+	@Override
+	protected BooleanProperty doLinktest() {
+		return this.comm.config().doLinkTest();
 	}
 	
 	@Override

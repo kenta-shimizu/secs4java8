@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.shimizukenta.secs.ReadOnlyTimeProperty;
+import com.shimizukenta.secs.local.property.TimeoutProperty;
 
 public class HsmsTransactionManager<T extends AbstractHsmsMessage> {
 	
@@ -65,8 +65,8 @@ public class HsmsTransactionManager<T extends AbstractHsmsMessage> {
 		}
 	}
 	
-	public T reply(T msg, ReadOnlyTimeProperty timeout) throws InterruptedException {
-		return reply(msg, timeout.getMilliSeconds(), TimeUnit.MILLISECONDS);
+	public T reply(T msg, TimeoutProperty tp) throws InterruptedException {
+		return reply(msg, tp.getTimeout(), tp.getTimeUnit());
 	}
 	
 	public T put(T msg) {

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.shimizukenta.secs.AbstractSecsLog;
+import com.shimizukenta.secs.impl.AbstractSecsLog;
 
 public final class HsmsSsPassiveBindLog extends AbstractSecsLog {
 	

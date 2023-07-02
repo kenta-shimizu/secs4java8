@@ -2,11 +2,11 @@ package com.shimizukenta.secs.hsms;
 
 import java.util.Optional;
 
-import com.shimizukenta.secs.Property;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
+import com.shimizukenta.secs.local.property.ObjectProperty;
 import com.shimizukenta.secs.secs2.Secs2;
 
 public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator implements HsmsSession {
@@ -15,7 +15,7 @@ public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator imple
 		super(config);
 	}
 	
-	private final Property<AbstractHsmsAsyncSocketChannel> channel = Property.newInstance(null);
+	private final ObjectProperty<AbstractHsmsAsyncSocketChannel> channel = ObjectProperty.newInstance(null);
 	private final Object syncChannel = new Object();
 	
 	public boolean setAsyncSocketChannel(AbstractHsmsAsyncSocketChannel channel) {
@@ -51,7 +51,7 @@ public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator imple
 	}
 	
 	public void waitUntilUnsetAsyncSocketChannel() throws InterruptedException {
-		this.channel.waitUntil(null);
+		this.channel.waitUntilNull();
 	}
 	
 	protected Optional<AbstractHsmsAsyncSocketChannel> optionalAsyncSocketChannel() {

@@ -21,7 +21,7 @@ public interface SecsLogListener extends EventListener {
 	 * Not accept {@code null}
 	 * </p>
 	 * 
-	 * @param log
+	 * @param log the SecsLog
 	 */
 	public void received(SecsLog log);
 	

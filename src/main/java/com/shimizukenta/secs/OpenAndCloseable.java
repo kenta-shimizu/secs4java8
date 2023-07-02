@@ -14,21 +14,21 @@ public interface OpenAndCloseable extends Closeable {
 	/**
 	 * open.
 	 * 
-	 * @throws IOException
+	 * @throws IOException if open failed
 	 */
 	public void open() throws IOException;
 	
 	/**
-	 * Returns is-open.
+	 * Return true if opened and not closed, otherwise false.
 	 * 
-	 * @return {@code true} if opened and not closed
+	 * @return true if opened and not closed, otherwise false
 	 */
 	public boolean isOpen();
 	
 	/**
-	 * Returns is-closed.
+	 * Return true if closed, otherwise false.
 	 * 
-	 * @return {@code true} if closed
+	 * @return true if closed, otherwise false
 	 */
 	public boolean isClosed();
 }

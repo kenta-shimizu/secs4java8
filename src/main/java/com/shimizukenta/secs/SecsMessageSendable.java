@@ -42,8 +42,8 @@ public interface SecsMessageSendable {
 	 * @return Reply-Message if exist
 	 * @throws SecsSendMessageException if send failed
 	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @throws SecsException if SECS failed
+	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(int strm, int func, boolean wbit)
 			throws SecsSendMessageException
@@ -66,8 +66,8 @@ public interface SecsMessageSendable {
 	 * @return Reply-Message if exist
 	 * @throws SecsSendMessageException if send failed
 	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @throws SecsException if SECS failed
+	 * @throws InterruptedException the interrupted
 	 */
 	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException
@@ -90,8 +90,8 @@ public interface SecsMessageSendable {
 	 * @return {@code Optional.empty()}
 	 * @throws SecsSendMessageException if send failed
 	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @throws SecsException if SECS failed
+	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit)
 			throws SecsSendMessageException
@@ -115,8 +115,8 @@ public interface SecsMessageSendable {
 	 * @return {@code Optional.empty()}
 	 * @throws SecsSendMessageException if send failed
 	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @throws SecsException if SECS failed
+	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException
@@ -132,12 +132,12 @@ public interface SecsMessageSendable {
 	 * Wait until sended Primay-Message and received Reply-Message if exist.<br />
 	 * </p>
 	 * 
-	 * @param sml
+	 * @param sml the SML-Message
 	 * @return Reply-Message if exist
 	 * @throws SecsSendMessageException if send failed
 	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @throws SecsException if SECS failed
+	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(SmlMessage sml)
 			throws SecsSendMessageException
@@ -154,12 +154,12 @@ public interface SecsMessageSendable {
 	 * </p>
 	 * 
 	 * @param primaryMsg Primary-Message.
-	 * @param sml
+	 * @param sml the SML-Message
 	 * @return {@code Optional.empty()}
 	 * @throws SecsSendMessageException if send failed
 	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @throws SecsException if SECS failed
+	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(SecsMessage primaryMsg, SmlMessage sml)
 			throws SecsSendMessageException

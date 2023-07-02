@@ -2,7 +2,7 @@ package com.shimizukenta.secs.hsms;
 
 import java.time.LocalDateTime;
 
-import com.shimizukenta.secs.AbstractSecsSendedMessageLog;
+import com.shimizukenta.secs.impl.AbstractSecsSendedMessageLog;
 
 public class HsmsSendedMessageLog extends AbstractSecsSendedMessageLog {
 	

@@ -1,12 +1,9 @@
 package com.shimizukenta.secs.secs1ontcpip;
 
 import java.net.SocketAddress;
-import java.util.Objects;
 
-import com.shimizukenta.secs.ReadOnlySocketAddressProperty;
-import com.shimizukenta.secs.ReadOnlyTimeProperty;
-import com.shimizukenta.secs.SocketAddressProperty;
-import com.shimizukenta.secs.TimeProperty;
+import com.shimizukenta.secs.local.property.ObjectProperty;
+import com.shimizukenta.secs.local.property.TimeoutProperty;
 import com.shimizukenta.secs.secs1.AbstractSecs1CommunicatorConfig;
 
 /**
@@ -23,8 +20,8 @@ public class Secs1OnTcpIpReceiverCommunicatorConfig extends AbstractSecs1Communi
 	
 	private static final long serialVersionUID = 6842392464950831424L;
 	
-	private SocketAddressProperty socketAddr = SocketAddressProperty.newInstance(null);
-	private TimeProperty rebindSeconds = TimeProperty.newInstance(5.0F);
+	private ObjectProperty<SocketAddress> socketAddr = ObjectProperty.newInstance(null);
+	private TimeoutProperty rebindSeconds = TimeoutProperty.newInstance(5.0F);
 	
 	public Secs1OnTcpIpReceiverCommunicatorConfig() {
 		super();
@@ -40,7 +37,7 @@ public class Secs1OnTcpIpReceiverCommunicatorConfig extends AbstractSecs1Communi
 	 * @param socketAddress
 	 */
 	public void socketAddress(SocketAddress socketAddress) {
-		this.socketAddr.set(Objects.requireNonNull(socketAddress));
+		this.socketAddr.set(socketAddress);
 	}
 	
 	/**
@@ -48,7 +45,7 @@ public class Secs1OnTcpIpReceiverCommunicatorConfig extends AbstractSecs1Communi
 	 * 
 	 * @return Connect SocketAddress
 	 */
-	public ReadOnlySocketAddressProperty socketAddress() {
+	public ObjectProperty<SocketAddress> socketAddress() {
 		return this.socketAddr;
 	}
 	
@@ -66,7 +63,7 @@ public class Secs1OnTcpIpReceiverCommunicatorConfig extends AbstractSecs1Communi
 	 * 
 	 * @return Rebind-Seconds
 	 */
-	public ReadOnlyTimeProperty rebindSeconds() {
+	public TimeoutProperty rebindSeconds() {
 		return this.rebindSeconds;
 	}
 	

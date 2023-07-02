@@ -6,20 +6,18 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.shimizukenta.secs.AbstractSecsCommunicator;
-import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
-import com.shimizukenta.secs.Property;
+import com.shimizukenta.secs.impl.AbstractSecsCommunicator;
+import com.shimizukenta.secs.impl.AbstractSecsCommunicatorConfig;
+import com.shimizukenta.secs.local.property.ObjectProperty;
 
 public abstract class AbstractHsmsCommunicator extends AbstractSecsCommunicator implements HsmsCommunicator {
 
-	private final Property<HsmsCommunicateState> hsmsCommState = Property.newInstance(HsmsCommunicateState.NOT_CONNECTED);
+	private final ObjectProperty<HsmsCommunicateState> hsmsCommState = ObjectProperty.newInstance(HsmsCommunicateState.NOT_CONNECTED);
 	
 	public AbstractHsmsCommunicator(AbstractSecsCommunicatorConfig config) {
 		super(config);
 		
-		this.hsmsCommState.addChangeListener(state -> {
-			this.notifyCommunicatableStateChange(state == HsmsCommunicateState.SELECTED);
-		});
+		this.hsmsCommState.computeIsEqualTo(HsmsCommunicateState.SELECTED).addChangeListener(this::notifyCommunicatableStateChange);
 	}
 	
 	@Override

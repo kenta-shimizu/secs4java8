@@ -3,8 +3,6 @@ package com.shimizukenta.secs.hsmsgs;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.List;
 
-import com.shimizukenta.secs.AbstractSecsLog;
-import com.shimizukenta.secs.ReadOnlyTimeProperty;
 import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.AbstractHsmsLinktest;
 import com.shimizukenta.secs.hsms.AbstractHsmsMessage;
@@ -14,6 +12,8 @@ import com.shimizukenta.secs.hsms.HsmsMessageBuilder;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsTransactionManager;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
+import com.shimizukenta.secs.impl.AbstractSecsLog;
+import com.shimizukenta.secs.local.property.TimeoutProperty;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
 
 public abstract class AbstractHsmsGsAsyncSocketChannel extends AbstractHsmsAsyncSocketChannel {
@@ -86,17 +86,17 @@ public abstract class AbstractHsmsGsAsyncSocketChannel extends AbstractHsmsAsync
 	}
 	
 	@Override
-	protected ReadOnlyTimeProperty timeoutT3() {
+	protected TimeoutProperty timeoutT3() {
 		return this.comm.config().timeout().t3();
 	}
 	
 	@Override
-	protected ReadOnlyTimeProperty timeoutT6() {
+	protected TimeoutProperty timeoutT6() {
 		return this.comm.config().timeout().t6();
 	}
 	
 	@Override
-	protected ReadOnlyTimeProperty timeoutT8() {
+	protected TimeoutProperty timeoutT8() {
 		return this.comm.config().timeout().t8();
 	}
 	

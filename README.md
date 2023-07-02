@@ -4,6 +4,8 @@
 
 This library is SEMI-SECS-communicate implementation on Java8.
 
+[Javadoc](https://kenta-shimizu.github.io/secs4java8/index.html)
+
 ## Supports
 
 - SECS-I (SEMI-E4)
@@ -244,7 +246,7 @@ Notice: This method is blocking-method.
 
 ```java
     /* Send S1F1 W. example */
-    SmlMessage primarySml = SmlMessage.from(
+    SmlMessage primarySml = SmlMessage.of(
         "S1F1 W."
     );
 
@@ -255,7 +257,7 @@ Notice: This method is blocking-method.
 
 ```java
     /* Send S1F2. example */
-    SmlMessage replySml = SmlMessage.from(
+    SmlMessage replySml = SmlMessage.of(
         "S1F2             " +
         "<L               " +
         "   <A \"MDLN-A\">" +

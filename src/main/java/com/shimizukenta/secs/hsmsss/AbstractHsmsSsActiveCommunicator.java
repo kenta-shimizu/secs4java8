@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.shimizukenta.secs.UnsetSocketAddressException;
 import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
@@ -65,7 +66,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 				AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
 				) {
 			
-			final SocketAddress socketAddr = this.config().socketAddress().getSocketAddress();
+			final SocketAddress socketAddr = this.config().socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
 			
 			try {
 				notifyLog(HsmsSsConnectionLog.tryConnect(socketAddr));

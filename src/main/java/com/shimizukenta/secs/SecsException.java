@@ -16,33 +16,67 @@ public class SecsException extends Exception {
 	
 	private static final long serialVersionUID = -3938886949828082098L;
 	
+	/**
+	 * Reference SECS-Message.
+	 */
 	private final SecsMessage secsMsg;
 	
+	/**
+	 * Constructor.
+	 * 
+	 */
 	public SecsException() {
 		super();
 		secsMsg = null;
 	}
-
+	
+	/**
+	 * COnstructor.
+	 * 
+	 * @param message the message
+	 */
 	public SecsException(String message) {
 		super(message);
 		secsMsg = null;
 	}
-
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param cause the cause
+	 */
 	public SecsException(Throwable cause) {
 		super(cause);
 		secsMsg = null;
 	}
-
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param message the message
+	 * @param cause the cause
+	 */
 	public SecsException(String message, Throwable cause) {
 		super(message, cause);
 		secsMsg = null;
 	}
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param secsMessage the reference-secs-message
+	 */
 	public SecsException(SecsMessage secsMessage) {
 		super(createMessage(secsMessage));
 		this.secsMsg = secsMessage;
 	}
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param secsMessage the reference-secs-message
+	 * @param cause the cause
+	 */
 	public SecsException(SecsMessage secsMessage, Throwable cause) {
 		super(createMessage(secsMessage), cause);
 		this.secsMsg = secsMessage;
@@ -64,6 +98,11 @@ public class SecsException extends Exception {
 		return String.format("%02X", b);
 	}
 	
+	/**
+	 * Returns reference SECS-Message.
+	 * 
+	 * @return reference SECS-Message
+	 */
 	public Optional<SecsMessage> secsMessage() {
 		return secsMsg == null ? Optional.empty() : Optional.of(secsMsg);
 	}
