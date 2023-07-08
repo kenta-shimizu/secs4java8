@@ -1,8 +1,9 @@
-package com.shimizukenta.secs.sml;
+package com.shimizukenta.secs.sml.impl;
 
 import java.io.Serializable;
 
 import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.sml.SmlMessage;
 
 abstract public class AbstractSmlMessage implements SmlMessage, Serializable {
 	

@@ -6,6 +6,8 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.shimizukenta.secs.sml.impl.SmlMessageParsers;
+
 /**
  * This instance is implementation of SML-Parse.
  * 
@@ -24,7 +26,7 @@ public interface SmlMessageParser {
 	 * 
 	 * @param cs SML-Format-Character-Sequence
 	 * @return SmlMessage
-	 * @throws SmlParseException
+	 * @throws SmlParseException if parse failed
 	 */
 	public SmlMessage parse(CharSequence cs) throws SmlParseException;
 	
@@ -33,8 +35,8 @@ public interface SmlMessageParser {
 	 * 
 	 * @param reader SML-Format-Reader
 	 * @return SMLMessage
-	 * @throws SmlParseException
-	 * @throws IOException
+	 * @throws SmlParseException if parse failed
+	 * @throws IOException if IO failed
 	 */
 	default public SmlMessage parse(Reader reader) throws SmlParseException, IOException {
 		try (
@@ -58,8 +60,8 @@ public interface SmlMessageParser {
 	 * 
 	 * @param path SML-Format-File-Path
 	 * @return SmlMessage
-	 * @throws SmlParseException
-	 * @throws IOException
+	 * @throws SmlParseException if parse failed
+	 * @throws IOException if IO failed
 	 */
 	default public SmlMessage parse(Path path) throws SmlParseException, IOException {
 		try (

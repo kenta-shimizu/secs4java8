@@ -1,7 +1,7 @@
 #!/bin/sh
 
 packages="com.shimizukenta.secs com.shimizukenta.secs.local.property 
-com.shimizukenta.secs.secs2"
+com.shimizukenta.secs.secs2 com.shimizukenta.secs.sml"
 path_src="./src/main/java/"
 path_docs="./docs"
 

@@ -10,9 +10,9 @@ import com.shimizukenta.secs.secs2.Secs2;
  * This interface is implementation of SML (Peer-Group).
  * 
  * <ul>
- * <li>This instance get from {@link SmlMessage#from(CharSequence)}</li>
- * <li>This instance get from {@link SmlMessage#from(java.io.Reader)}</li>
- * <li>This instance get from {@link SmlMessage#from(java.nio.file.Path)}</li>
+ * <li>This instance get from {@link SmlMessage#of(CharSequence)}</li>
+ * <li>This instance get from {@link SmlMessage#of(java.io.Reader)}</li>
+ * <li>This instance get from {@link SmlMessage#of(java.nio.file.Path)}</li>
  * <li>This instance get from {@link SmlMessageParser#parse(CharSequence)}</li>
  * </ul>
  * <ul>
@@ -61,9 +61,9 @@ public interface SmlMessage {
 	/**
 	 * Returns SmlMessage instance of character sequence.
 	 * 
-	 * @param cs
+	 * @param cs the SML character sequence
 	 * @return SML-Message instance.
-	 * @throws SmlParseException
+	 * @throws SmlParseException if parse failed
 	 */
 	public static SmlMessage of(CharSequence cs) throws SmlParseException {
 		return SmlMessageParser.getInstance().parse(cs);
@@ -72,10 +72,10 @@ public interface SmlMessage {
 	/**
 	 * Returns SmlMessage instance of Reader.
 	 * 
-	 * @param reader
+	 * @param reader the reader
 	 * @return SmlMessage
-	 * @throws SmlParseException
-	 * @throws IOException
+	 * @throws SmlParseException if parse failed
+	 * @throws IOException if IO failed
 	 */
 	public static SmlMessage of(Reader reader) throws SmlParseException, IOException {
 		return SmlMessageParser.getInstance().parse(reader);
@@ -84,10 +84,10 @@ public interface SmlMessage {
 	/**
 	 * Returns SmlMessage instance of File-path.
 	 * 
-	 * @param path
+	 * @param path SML file path
 	 * @return SmlMessage
-	 * @throws SmlParseException
-	 * @throws IOException
+	 * @throws SmlParseException if parse failed
+	 * @throws IOException if IO failed
 	 */
 	public static SmlMessage of(Path path) throws SmlParseException, IOException {
 		return SmlMessageParser.getInstance().parse(path);
@@ -96,9 +96,9 @@ public interface SmlMessage {
 	/**
 	 * Returns SmlMessage instance from character sequence.
 	 * 
-	 * @param cs
+	 * @param cs the SML character sequence
 	 * @return SML-Message instance.
-	 * @throws SmlParseException
+	 * @throws SmlParseException if parse failed
 	 */
 	@Deprecated
 	public static SmlMessage from(CharSequence cs) throws SmlParseException {
@@ -108,10 +108,10 @@ public interface SmlMessage {
 	/**
 	 * Returns SmlMessage instance from Reader.
 	 * 
-	 * @param reader
+	 * @param reader the reader
 	 * @return SmlMessage
-	 * @throws SmlParseException
-	 * @throws IOException
+	 * @throws SmlParseException if parse failed
+	 * @throws IOException if IO failed
 	 */
 	@Deprecated
 	public static SmlMessage from(Reader reader) throws SmlParseException, IOException {
@@ -121,10 +121,10 @@ public interface SmlMessage {
 	/**
 	 * Returns SmlMessage instance from File-path.
 	 * 
-	 * @param path
+	 * @param path the SMl file path
 	 * @return SmlMessage
-	 * @throws SmlParseException
-	 * @throws IOException
+	 * @throws SmlParseException if parse failed
+	 * @throws IOException if IO failed
 	 */
 	@Deprecated
 	public static SmlMessage from(Path path) throws SmlParseException, IOException {
