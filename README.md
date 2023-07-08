@@ -268,7 +268,7 @@ Notice: This method is blocking-method.
     passive.send(primaryMsg, replySml);
 ```
 
-Notes: SmlMessage can get also from `SmlMessage#from(java.io.Reader reader)`, `SmlMessage#from(java.nio.file.Path path)`, `SmlMessageParser.getInstance().parse(CharSequence cs)`, ...
+Notes: SmlMessage can get also `SmlMessage#of(java.io.Reader reader)`, `SmlMessage#of(java.nio.file.Path path)`, `SmlMessageParser.getInstance().parse(CharSequence cs)`, ...
 
 ## GEM
 

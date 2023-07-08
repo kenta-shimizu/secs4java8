@@ -2,7 +2,7 @@ package com.shimizukenta.secs.hsms;
 
 import java.util.Objects;
 
-import com.shimizukenta.secs.impl.AbstractSecsCommunicatorConfig;
+import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 import com.shimizukenta.secs.local.property.BooleanProperty;
 import com.shimizukenta.secs.local.property.ObjectProperty;
 import com.shimizukenta.secs.local.property.TimeoutProperty;

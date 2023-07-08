@@ -11,7 +11,7 @@ import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
-import com.shimizukenta.secs.secs2.Secs2BytesParsers;
+import com.shimizukenta.secs.secs2.impl.Secs2BytesParsers;
 
 public abstract class AbstractHsmsGsMessageBuilder extends AbstractHsmsMessageBuilder implements HsmsGsMessageBuilder {
 	

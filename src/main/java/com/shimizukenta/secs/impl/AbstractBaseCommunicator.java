@@ -15,7 +15,7 @@ import com.shimizukenta.secs.ExecutorServiceShutdownFailedException;
 import com.shimizukenta.secs.OpenAndCloseable;
 import com.shimizukenta.secs.local.property.BooleanCompution;
 import com.shimizukenta.secs.local.property.BooleanProperty;
-import com.shimizukenta.secs.local.property.TimeoutProperty;
+import com.shimizukenta.secs.local.property.TimeoutGettable;
 
 public abstract class AbstractBaseCommunicator implements OpenAndCloseable {
 	
@@ -55,7 +55,7 @@ public abstract class AbstractBaseCommunicator implements OpenAndCloseable {
 		return execServ.invokeAny(tasks);
 	}
 	
-	public <T> T executeInvokeAny(Collection<? extends Callable<T>> tasks, TimeoutProperty tp)
+	public <T> T executeInvokeAny(Collection<? extends Callable<T>> tasks, TimeoutGettable tp)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		return tp.invokeAny(execServ, tasks);
 	}
@@ -65,7 +65,7 @@ public abstract class AbstractBaseCommunicator implements OpenAndCloseable {
 	private final BooleanProperty closed = BooleanProperty.newInstance(false);
 	private final BooleanCompution isOpen = this.opened.and(this.closed.not());
 	
-	public AbstractBaseCommunicator() {
+	protected AbstractBaseCommunicator() {
 		/* Nothing */
 	}
 	

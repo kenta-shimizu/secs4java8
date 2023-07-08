@@ -1,6 +1,6 @@
 package com.shimizukenta.secs.secs1;
 
-import com.shimizukenta.secs.impl.AbstractSecsCommunicatorConfig;
+import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 import com.shimizukenta.secs.local.property.BooleanProperty;
 import com.shimizukenta.secs.local.property.IntegerProperty;
 

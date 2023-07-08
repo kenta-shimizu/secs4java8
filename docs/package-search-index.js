@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"com.shimizukenta.secs"},{"l":"com.shimizukenta.secs.local.property"},{"l":"すべてのパッケージ","u":"allpackages-index.html"}];updateSearchResults();
+packageSearchIndex = [{"l":"com.shimizukenta.secs"},{"l":"com.shimizukenta.secs.local.property"},{"l":"com.shimizukenta.secs.secs2"},{"l":"すべてのパッケージ","u":"allpackages-index.html"}];updateSearchResults();

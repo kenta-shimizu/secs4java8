@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BuildException;
-import com.shimizukenta.secs.secs2.Secs2BytesPackBuilder;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
-import com.shimizukenta.secs.secs2.Secs2BytesParsers;
+import com.shimizukenta.secs.secs2.impl.Secs2BytesPackBuilder;
+import com.shimizukenta.secs.secs2.impl.Secs2BytesParsers;
 
 public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder {
 	

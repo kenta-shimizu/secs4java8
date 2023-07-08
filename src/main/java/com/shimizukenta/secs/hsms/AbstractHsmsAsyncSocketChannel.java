@@ -19,9 +19,9 @@ import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.impl.AbstractSecsLog;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BuildException;
-import com.shimizukenta.secs.secs2.Secs2BytesPack;
-import com.shimizukenta.secs.secs2.Secs2BytesPackBuilder;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
+import com.shimizukenta.secs.secs2.impl.Secs2BytesPack;
+import com.shimizukenta.secs.secs2.impl.Secs2BytesPackBuilder;
 
 public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketChannel {
 	

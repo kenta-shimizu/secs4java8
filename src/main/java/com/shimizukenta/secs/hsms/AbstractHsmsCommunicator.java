@@ -6,8 +6,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 import com.shimizukenta.secs.impl.AbstractSecsCommunicator;
-import com.shimizukenta.secs.impl.AbstractSecsCommunicatorConfig;
 import com.shimizukenta.secs.local.property.ObjectProperty;
 
 public abstract class AbstractHsmsCommunicator extends AbstractSecsCommunicator implements HsmsCommunicator {
