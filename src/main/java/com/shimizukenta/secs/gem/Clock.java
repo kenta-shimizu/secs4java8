@@ -2,6 +2,7 @@ package com.shimizukenta.secs.gem;
 
 import java.time.LocalDateTime;
 
+import com.shimizukenta.secs.gem.impl.AbstractClock;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
@@ -46,9 +47,9 @@ public interface Clock {
 	 * use for Secs2 of S2F18, S2F31<br />
 	 * </p>
 	 * 
-	 * @param secs2
+	 * @param secs2 the Secs2
 	 * @return Clock
-	 * @throws Secs2Exception
+	 * @throws Secs2Exception if parse failed
 	 */
 	public static Clock from(Secs2 secs2) throws Secs2Exception {
 		return AbstractClock.from(secs2);

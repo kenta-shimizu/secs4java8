@@ -3,10 +3,9 @@ package com.shimizukenta.secs.hsms;
 import java.util.Objects;
 
 import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
-import com.shimizukenta.secs.Property;
-import com.shimizukenta.secs.ReadOnlyProperty;
-import com.shimizukenta.secs.ReadOnlyTimeProperty;
-import com.shimizukenta.secs.TimeProperty;
+import com.shimizukenta.secs.local.property.BooleanProperty;
+import com.shimizukenta.secs.local.property.ObjectProperty;
+import com.shimizukenta.secs.local.property.TimeoutProperty;
 
 /**
  * This class is config of HSMS-Communicator.
@@ -22,11 +21,15 @@ import com.shimizukenta.secs.TimeProperty;
  */
 public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommunicatorConfig {
 	
-	private static final long serialVersionUID = 3767856791428188426L;
+	private static final long serialVersionUID = 2402150927485521447L;
 	
-	private final Property<HsmsConnectionMode> connectionMode = Property.newInstance(HsmsConnectionMode.PASSIVE);
-	private final TimeProperty linktest = TimeProperty.newInstance(-1.0F);
-	private final TimeProperty rebindIfPassive = TimeProperty.newInstance(10.0F);
+	private final Object sync = new Object();
+	
+	private final ObjectProperty<HsmsConnectionMode> connectionMode = ObjectProperty.newInstance(HsmsConnectionMode.PASSIVE);
+	private final TimeoutProperty linktestTime = TimeoutProperty.newInstance(120.0F);
+	private final BooleanProperty doLinktest = BooleanProperty.newInstance(false);
+	private final TimeoutProperty rebindIfPassiveTime = TimeoutProperty.newInstance(10.0F);
+	private final BooleanProperty doRebindIfPassive = BooleanProperty.newInstance(true);
 	
 	public AbstractHsmsCommunicatorConfig() {
 		super();
@@ -42,11 +45,11 @@ public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommuni
 	}
 	
 	/**
-	 * Connection-Mode getter
+	 * Returns Connection-Mode property.
 	 * 
-	 * @return connection-mode
+	 * @return connection-mode property
 	 */
-	public ReadOnlyProperty<HsmsConnectionMode> connectionMode() {
+	public ObjectProperty<HsmsConnectionMode> connectionMode() {
 		return this.connectionMode;
 	}
 	
@@ -55,28 +58,39 @@ public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommuni
 	 * 
 	 */
 	public void notLinktest() {
-		this.linktest.set(-1.0F);
-	}
-	
-	/**
-	 * Linktest cycle time setter
-	 * 
-	 * @param v linktest-cycle-seconds. value is {@code >= 0}
-	 */
-	public void linktest(float v) {
-		if ( v < 0.0F ) {
-			throw new LinktestIllegalArgumentException(v);
+		synchronized ( this.sync ) {
+			this.doLinktest.setFalse();
 		}
-		this.linktest.set(v);
 	}
 	
 	/**
-	 * Linktest cycle getter
+	 * Linktest cycle time setter.
 	 * 
-	 * @return seconds. Not-linktest if {@code <0}
+	 * @param seconds linktest-cycle-seconds. value is {@code >= 0}
 	 */
-	public ReadOnlyTimeProperty linktest() {
-		return linktest;
+	public void linktest(float seconds) {
+		synchronized ( this.sync ) {
+			this.linktestTime.set(seconds);
+			this.doLinktest.setTrue();
+		}
+	}
+	
+	/**
+	 * Returns Linktest cycle TimeProperty.
+	 * 
+	 * @return Linktest cycle TimeProperty
+	 */
+	public TimeoutProperty linktestTime() {
+		return this.linktestTime;
+	}
+	
+	/**
+	 * Returns do-linktest-property.
+	 * 
+	 * @return do-linktest-property
+	 */
+	public BooleanProperty doLinkTest() {
+		return this.doLinktest;
 	}
 	
 	/**
@@ -84,7 +98,9 @@ public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommuni
 	 * 
 	 */
 	public void notRebindIfPassive() {
-		this.rebindIfPassive.set(-1.0F);
+		synchronized ( this.sync ) {
+			this.doRebindIfPassive.setFalse();
+		}
 	}
 	
 	/**
@@ -92,38 +108,29 @@ public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommuni
 	 * 
 	 * @param v rebind after this time if Passive-protocol. value {@code >=0}
 	 */
-	public void rebindIfPassive(float v) {
-		if ( v < 0.0F ) {
-			throw new RebindIfPassiveIllegalArgumentException(v);
+	public void rebindIfPassive(float seconds) {
+		synchronized ( this.sync ) {
+			this.rebindIfPassiveTime.set(seconds);
+			this.doRebindIfPassive.setTrue();
 		}
-		this.rebindIfPassive.set(v);
 	}
 	
 	/**
-	 * rebind time getter.
+	 * Returns rebind time TimeProperty.
 	 * 
-	 * @return seconds. Not rebind if {@code <0}
+	 * @return Rebind-Time-Property
 	 */
-	public ReadOnlyTimeProperty rebindIfPassive() {
-		return rebindIfPassive;
+	public TimeoutProperty rebindIfPassiveTime() {
+		return this.rebindIfPassiveTime;
 	}
 	
-	private static class LinktestIllegalArgumentException extends IllegalArgumentException {
-		
-		private static final long serialVersionUID = 2792082412684754490L;
-		
-		public LinktestIllegalArgumentException(float value) {
-			super("linktest value is >= 0.0F, value=" + value);
-		}
-	}
-	
-	private static class RebindIfPassiveIllegalArgumentException extends IllegalArgumentException {
-		
-		private static final long serialVersionUID = -7951027764805326813L;
-		
-		public RebindIfPassiveIllegalArgumentException(float value) {
-			super("rebindIfPassive value is >= 0.0F, value=" + value);
-		}
+	/**
+	 * Returns do-rebind-if-passive property.
+	 * 
+	 * @return do-rebind-if-passive property
+	 */
+	public BooleanProperty doRebindIfPassive() {
+		return this.doRebindIfPassive;
 	}
 	
 }

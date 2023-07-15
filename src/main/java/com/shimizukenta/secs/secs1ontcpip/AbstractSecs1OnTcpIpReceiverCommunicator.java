@@ -17,6 +17,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import com.shimizukenta.secs.UnsetSocketAddressException;
 import com.shimizukenta.secs.secs1.AbstractSecs1Communicator;
 import com.shimizukenta.secs.secs1.Secs1SendByteException;
 
@@ -61,7 +62,7 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 				AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
 				) {
 			
-			SocketAddress gLocal = config.socketAddress().getSocketAddress();
+			SocketAddress gLocal = config.socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
 			
 			notifyLog(Secs1OnTcpIpReceiverConnectionLog.tryBInd(gLocal));
 			

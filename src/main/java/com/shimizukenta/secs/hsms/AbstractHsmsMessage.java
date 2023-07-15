@@ -2,7 +2,7 @@ package com.shimizukenta.secs.hsms;
 
 import java.util.Arrays;
 
-import com.shimizukenta.secs.AbstractSecsMessage;
+import com.shimizukenta.secs.impl.AbstractSecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 
 public abstract class AbstractHsmsMessage extends AbstractSecsMessage implements HsmsMessage {

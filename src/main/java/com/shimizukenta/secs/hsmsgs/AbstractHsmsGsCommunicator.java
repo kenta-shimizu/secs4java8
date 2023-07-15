@@ -15,10 +15,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.shimizukenta.secs.AbstractBaseCommunicator;
-import com.shimizukenta.secs.AbstractSecsLog;
-import com.shimizukenta.secs.AbstractSecsMessage;
-import com.shimizukenta.secs.AbstractSecsThrowableLog;
 import com.shimizukenta.secs.SecsCommunicatableStateChangeBiListener;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsLog;
@@ -41,6 +37,10 @@ import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsSession;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
+import com.shimizukenta.secs.impl.AbstractBaseCommunicator;
+import com.shimizukenta.secs.impl.AbstractSecsLog;
+import com.shimizukenta.secs.impl.AbstractSecsMessage;
+import com.shimizukenta.secs.impl.AbstractSecsThrowableLog;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.sml.SmlMessage;
 
@@ -535,7 +535,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	
 	public void notifyLog(AbstractSecsLog log) throws InterruptedException {
 		
-		log.subjectHeader(this.config.logSubjectHeader().get());
+		log.subjectHeader(this.config.logSubjectHeader().toString());
 		this.logQueue.put(log);
 		
 		final AbstractSecsMessage msg = log.optionalAbstractSecsMessage().orElse(null);

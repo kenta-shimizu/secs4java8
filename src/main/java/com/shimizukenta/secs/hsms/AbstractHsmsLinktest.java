@@ -2,14 +2,16 @@ package com.shimizukenta.secs.hsms;
 
 import java.util.Optional;
 
-import com.shimizukenta.secs.PropertyChangeListener;
-import com.shimizukenta.secs.ReadOnlyTimeProperty;
+import com.shimizukenta.secs.local.property.BooleanProperty;
+import com.shimizukenta.secs.local.property.ChangeListener;
+import com.shimizukenta.secs.local.property.TimeoutAndUnit;
+import com.shimizukenta.secs.local.property.TimeoutProperty;
 
 public abstract class AbstractHsmsLinktest implements HsmsLinktest {
 	
 	private final Object sync = new Object();
 	
-	private final PropertyChangeListener<Number> lstnr = n -> {
+	private final ChangeListener<TimeoutAndUnit> lstnr = n -> {
 		synchronized ( this.sync ) {
 			this.sync.notifyAll();
 		}
@@ -33,7 +35,7 @@ public abstract class AbstractHsmsLinktest implements HsmsLinktest {
 			
 			for ( ;; ) {
 				
-				if ( this.timer().gtZero() ) {
+				if ( this.doLinktest().booleanValue() ) {
 					
 					synchronized ( this.sync ) {
 						
@@ -73,7 +75,8 @@ public abstract class AbstractHsmsLinktest implements HsmsLinktest {
 		}
 	}
 	
-	abstract protected ReadOnlyTimeProperty timer();
+	abstract protected TimeoutProperty timer();
+	abstract protected BooleanProperty doLinktest();
 	
 	abstract protected Optional<HsmsMessage> send()
 			throws HsmsSendMessageException,

@@ -3,8 +3,8 @@ package com.shimizukenta.secs.hsmsss;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import com.shimizukenta.secs.AbstractSecsCommunicateStateChangeLog;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
+import com.shimizukenta.secs.impl.AbstractSecsCommunicateStateChangeLog;
 
 public final class HsmsSsCommunicateStateChangeLog extends AbstractSecsCommunicateStateChangeLog {
 	

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.shimizukenta.secs.AbstractSecsMessage;
+import com.shimizukenta.secs.impl.AbstractSecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 
 public abstract class AbstractSecs1Message extends AbstractSecsMessage implements Secs1Message {

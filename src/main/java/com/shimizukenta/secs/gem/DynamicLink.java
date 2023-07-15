@@ -3,6 +3,7 @@ package com.shimizukenta.secs.gem;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.shimizukenta.secs.gem.impl.AbstractDynamicLink;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
@@ -27,8 +28,8 @@ public interface DynamicLink {
 	/**
 	 * Returns new instance
 	 * 
-	 * @param collectionEvent
-	 * @param reportIds
+	 * @param collectionEvent the DynamicCollectionEvent
+	 * @param reportIds the Report IDs
 	 * @return newInstance
 	 */
 	public static DynamicLink newInstance(DynamicCollectionEvent collectionEvent, List<? extends Secs2> reportIds) {
@@ -74,7 +75,7 @@ public interface DynamicLink {
 	/**
 	 * Returns RPTIDs
 	 * 
-	 * @return List<Secs2> of RPTIDs
+	 * @return list of RPTIDs
 	 */
 	public List<Secs2> reportIds();
 	
@@ -95,7 +96,7 @@ public interface DynamicLink {
 	 * 
 	 * @param secs2 S2F35 Secs2 Single-Link
 	 * @return DynamicLink
-	 * @throws Secs2Exception
+	 * @throws Secs2Exception if SECS-II parse failed
 	 */
 	public static DynamicLink fromS2F35Link(Secs2 secs2) throws Secs2Exception {
 		DynamicCollectionEvent ce = DynamicCollectionEvent.newInstance(null, secs2.get(0));

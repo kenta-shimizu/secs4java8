@@ -2,7 +2,7 @@ package com.shimizukenta.secs.secs1;
 
 import java.time.LocalDateTime;
 
-import com.shimizukenta.secs.AbstractSecsLog;
+import com.shimizukenta.secs.impl.AbstractSecsLog;
 
 public abstract class AbstractSecs1CircuitControlLog extends AbstractSecsLog implements Secs1CircuitControlLog {
 	

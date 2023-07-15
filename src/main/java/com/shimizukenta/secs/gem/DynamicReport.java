@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.shimizukenta.secs.gem.impl.AbstractDynamicReport;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
@@ -29,9 +30,9 @@ public interface DynamicReport {
 	/**
 	 * Returns new instance.
 	 * 
-	 * @param reportId
-	 * @param alias
-	 * @param vids
+	 * @param reportId the Report ID
+	 * @param alias the alias name
+	 * @param vids the VIDs
 	 * @return newInstance
 	 */
 	public static DynamicReport newInstance(Secs2 reportId, CharSequence alias, List<? extends Secs2> vids) {
@@ -98,7 +99,7 @@ public interface DynamicReport {
 	 * 
 	 * @param secs2 S2F33-Single-Report
 	 * @return DynamicReport
-	 * @throws Secs2Exception
+	 * @throws Secs2Exception if SECS-II parse failed
 	 */
 	public static DynamicReport fromS2F33Report(Secs2 secs2) throws Secs2Exception {
 		Secs2 rptid = secs2.get(0);

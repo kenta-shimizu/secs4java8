@@ -2,7 +2,7 @@ package com.shimizukenta.secs.secs1;
 
 import java.time.LocalDateTime;
 
-import com.shimizukenta.secs.AbstractSecsSendedMessageLog;
+import com.shimizukenta.secs.impl.AbstractSecsSendedMessageLog;
 
 public class Secs1SendedMessageLog extends AbstractSecsSendedMessageLog {
 	

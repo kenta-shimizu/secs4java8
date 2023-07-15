@@ -2,7 +2,8 @@ package com.shimizukenta.secs.hsmsss;
 
 import java.util.Optional;
 
-import com.shimizukenta.secs.ReadOnlyTimeProperty;
+import com.shimizukenta.secs.local.property.BooleanProperty;
+import com.shimizukenta.secs.local.property.TimeoutProperty;
 import com.shimizukenta.secs.hsms.AbstractHsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.AbstractHsmsLinktest;
 import com.shimizukenta.secs.hsms.HsmsException;
@@ -24,8 +25,13 @@ public abstract class AbstractHsmsSsLinktest extends AbstractHsmsLinktest {
 	}
 	
 	@Override
-	protected ReadOnlyTimeProperty timer() {
-		return this.comm.config().linktest();
+	protected TimeoutProperty timer() {
+		return this.comm.config().linktestTime();
+	}
+	
+	@Override
+	protected BooleanProperty doLinktest() {
+		return this.comm.config().doLinkTest();
 	}
 	
 	@Override
@@ -34,6 +40,7 @@ public abstract class AbstractHsmsSsLinktest extends AbstractHsmsLinktest {
 			HsmsWaitReplyMessageException,
 			HsmsException,
 			InterruptedException {
+		
 		return this.asyncChannel.sendLinktestRequest(this.comm.getSession());
 	}
 	

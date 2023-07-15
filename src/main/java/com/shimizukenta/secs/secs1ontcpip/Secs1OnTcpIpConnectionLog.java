@@ -3,7 +3,7 @@ package com.shimizukenta.secs.secs1ontcpip;
 import java.net.SocketAddress;
 import java.time.LocalDateTime;
 
-import com.shimizukenta.secs.AbstractSecsConnectionLog;
+import com.shimizukenta.secs.impl.AbstractSecsConnectionLog;
 
 public final class Secs1OnTcpIpConnectionLog extends AbstractSecsConnectionLog {
 	

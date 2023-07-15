@@ -1,9 +1,12 @@
 package com.shimizukenta.secs;
 
 import java.io.Serializable;
-import java.util.Objects;
 
-import com.shimizukenta.secs.gem.AbstractGemConfig;
+import com.shimizukenta.secs.gem.GemConfig;
+import com.shimizukenta.secs.gem.impl.AbstractGemConfig;
+import com.shimizukenta.secs.impl.SecsTimeoutImpl;
+import com.shimizukenta.secs.local.property.BooleanProperty;
+import com.shimizukenta.secs.local.property.StringProperty;
 
 /**
  * This abstract class is implementation of communicate config.
@@ -22,18 +25,40 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	
 	private static final long serialVersionUID = -8456991094606676409L;
 	
-	private final SecsTimeout timeout = new SecsTimeout();
+	/**
+	 * Timeout.
+	 */
+	private final SecsTimeout timeout = new SecsTimeoutImpl();
+	
+	/**
+	 * isEquip.
+	 */
 	private final BooleanProperty isEquip = BooleanProperty.newInstance(false);
 	
-	private final AbstractGemConfig gem = new AbstractGemConfig() {
+	/**
+	 * GemCOnfig.
+	 * 
+	 */
+	private final GemConfig gem = new AbstractGemConfig() {
 		
 		private static final long serialVersionUID = -3386783271396322749L;
 	};
 	
+	/**
+	 * name.
+	 */
 	private final StringProperty name = StringProperty.newInstance("");
+	
+	/**
+	 * logSubjectHeader.
+	 */
 	private final StringProperty logSubjectHeader = StringProperty.newInstance("");
 	
-	public AbstractSecsCommunicatorConfig() {
+	/**
+	 * Constructor.
+	 * 
+	 */
+	protected AbstractSecsCommunicatorConfig() {
 		/* Nothing */
 	}
 	
@@ -47,11 +72,11 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	}
 	
 	/**
-	 * getter
+	 * Returns Is-Equipment-Property.
 	 * 
-	 * @return {@code true} if equipment
+	 * @return Is-Equipment-Property
 	 */
-	public ReadOnlyBooleanProperty isEquip() {
+	public BooleanProperty isEquip() {
 		return isEquip;
 	}
 	
@@ -65,11 +90,11 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	}
 	
 	/**
-	 * AbstractGemConfig getter.
+	 * GemConfig getter.
 	 * 
-	 * @return AbstractGemConfig
+	 * @return GemConfig
 	 */
-	public AbstractGemConfig gem() {
+	public GemConfig gem() {
 		return gem;
 	}
 	
@@ -79,15 +104,15 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	 * @param name Communicator Name
 	 */
 	public void name(CharSequence name) {
-		this.name.set(Objects.requireNonNull(name).toString());
+		this.name.set(name);
 	}
 	
 	/**
-	 * Communicaotor-Name getter.
+	 * Returns Communicaotor-Name property.
 	 * 
-	 * @return Communicator-Name
+	 * @return Communicator-Name-Property
 	 */
-	public ReadOnlyProperty<String> name() {
+	public StringProperty name() {
 		return name;
 	}
 	
@@ -97,15 +122,15 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	 * @param header insert header of SecsLog
 	 */
 	public void logSubjectHeader(CharSequence header) {
-		this.logSubjectHeader.set(Objects.requireNonNull(header).toString());
+		this.logSubjectHeader.set(header);
 	}
 	
 	/**
-	 * Log-Subject-Header getter
+	 * Returns Log-Subject-Header getter-property
 	 * 
-	 * @return log-subject-header
+	 * @return log-subject-header-property
 	 */
-	public ReadOnlyProperty<String> logSubjectHeader() {
+	public StringProperty logSubjectHeader() {
 		return logSubjectHeader;
 	}
 	

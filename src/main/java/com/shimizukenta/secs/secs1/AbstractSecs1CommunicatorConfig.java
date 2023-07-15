@@ -1,10 +1,8 @@
 package com.shimizukenta.secs.secs1;
 
 import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
-import com.shimizukenta.secs.BooleanProperty;
-import com.shimizukenta.secs.NumberProperty;
-import com.shimizukenta.secs.ReadOnlyBooleanProperty;
-import com.shimizukenta.secs.ReadOnlyNumberProperty;
+import com.shimizukenta.secs.local.property.BooleanProperty;
+import com.shimizukenta.secs.local.property.IntegerProperty;
 
 /**
  * This class is config of SECS-I-Communicator.
@@ -22,9 +20,9 @@ public abstract class AbstractSecs1CommunicatorConfig extends AbstractSecsCommun
 	
 	private static final long serialVersionUID = 4897063498275749609L;
 	
-	private final NumberProperty deviceId = NumberProperty.newInstance(10);
+	private final IntegerProperty deviceId = IntegerProperty.newInstance(10);
 	private final BooleanProperty isMaster = BooleanProperty.newInstance(true);
-	private final NumberProperty retry = NumberProperty.newInstance(3);
+	private final IntegerProperty retry = IntegerProperty.newInstance(3);
 	private final BooleanProperty isCheckMessageBlockDeviceId = BooleanProperty.newInstance(true);
 	
 	public AbstractSecs1CommunicatorConfig() {
@@ -44,11 +42,11 @@ public abstract class AbstractSecs1CommunicatorConfig extends AbstractSecsCommun
 	}
 	
 	/**
-	 * Device-ID getter
+	 * Returns Device-ID property.
 	 * 
-	 * @return device-id
+	 * @return device-id property
 	 */
-	public ReadOnlyNumberProperty deviceId() {
+	public IntegerProperty deviceId() {
 		return deviceId;
 	}
 
@@ -62,11 +60,11 @@ public abstract class AbstractSecs1CommunicatorConfig extends AbstractSecsCommun
 	}
 	
 	/**
-	 * Master Mode getter.
+	 * Returns Master Mode getter.
 	 * 
-	 * @return {@code true} if Master Mode
+	 * @return {@code true} if Master Mode property
 	 */
-	public ReadOnlyBooleanProperty isMaster() {
+	public BooleanProperty isMaster() {
 		return isMaster;
 	}
 	
@@ -83,11 +81,11 @@ public abstract class AbstractSecs1CommunicatorConfig extends AbstractSecsCommun
 	}
 	
 	/**
-	 * Retry getter.
+	 * Returns Retry property.
 	 * 
-	 * @return retry-count
+	 * @return retry-count-property
 	 */
-	public ReadOnlyNumberProperty retry() {
+	public IntegerProperty retry() {
 		return retry;
 	}
 	
@@ -101,11 +99,11 @@ public abstract class AbstractSecs1CommunicatorConfig extends AbstractSecsCommun
 	}
 	
 	/**
-	 * isCheckMessageBlockDeviceId getter.
+	 * Returns isCheckMessageBlockDeviceId property.
 	 * 
 	 * @return property
 	 */
-	public ReadOnlyBooleanProperty isCheckMessageBlockDeviceId() {
+	public BooleanProperty isCheckMessageBlockDeviceId() {
 		return this.isCheckMessageBlockDeviceId;
 	}
 	

@@ -9,7 +9,7 @@ import java.net.SocketAddress;
  * To get Local-SocketAddress, {@link #local()}.<br />
  * To get Remote-SocketAddress, {@link #remote()}.<br />
  * To get is-connecting, {@link #isConnecting()}.<br />
- * </>
+ * </p>
  * 
  * @author kenta-shimizu
  *

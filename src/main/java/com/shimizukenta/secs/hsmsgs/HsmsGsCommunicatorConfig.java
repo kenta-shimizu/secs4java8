@@ -3,15 +3,11 @@ package com.shimizukenta.secs.hsmsgs;
 import java.net.SocketAddress;
 import java.util.Objects;
 
-import com.shimizukenta.secs.BooleanProperty;
-import com.shimizukenta.secs.CollectionProperty;
-import com.shimizukenta.secs.ReadOnlyBooleanProperty;
-import com.shimizukenta.secs.ReadOnlyCollectionProperty;
-import com.shimizukenta.secs.ReadOnlySocketAddressProperty;
-import com.shimizukenta.secs.ReadOnlyTimeProperty;
-import com.shimizukenta.secs.SocketAddressProperty;
-import com.shimizukenta.secs.TimeProperty;
 import com.shimizukenta.secs.hsms.AbstractHsmsCommunicatorConfig;
+import com.shimizukenta.secs.local.property.BooleanProperty;
+import com.shimizukenta.secs.local.property.ObjectProperty;
+import com.shimizukenta.secs.local.property.SetProperty;
+import com.shimizukenta.secs.local.property.TimeoutProperty;
 
 /**
  * This class is config of HSMS-GS-Communicator.
@@ -33,7 +29,7 @@ public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 		super();
 	}
 	
-	private final CollectionProperty<Integer> sessionIds = CollectionProperty.newSet();
+	private final SetProperty<Integer> sessionIds = SetProperty.newInstance();
 	
 	public boolean addSessionId(int id) {
 		if ( id < 0 || id > 0xFFFF ) {
@@ -46,11 +42,11 @@ public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 		return this.sessionIds.remove(Integer.valueOf(id));
 	}
 	
-	public ReadOnlyCollectionProperty<Integer> sessionIds() {
+	public SetProperty<Integer> sessionIds() {
 		return this.sessionIds;
 	}
 	
-	private final SocketAddressProperty socketAddr = SocketAddressProperty.newInstance(null);
+	private final ObjectProperty<SocketAddress> socketAddr = ObjectProperty.newInstance(null);
 	
 	/**
 	 * Connect or bind SocketAddress setter
@@ -66,7 +62,7 @@ public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	 * 
 	 * @return socketAddress of PASSIVE/ACTIVE
 	 */
-	public ReadOnlySocketAddressProperty socketAddress() {
+	public ObjectProperty<SocketAddress> socketAddress() {
 		return socketAddr;
 	}
 	
@@ -86,11 +82,11 @@ public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	 * 
 	 * @return ReadOnlyProperty of is-try-SELECT.REQ
 	 */
-	public ReadOnlyBooleanProperty isTrySelectRequest() {
+	public BooleanProperty isTrySelectRequest() {
 		return this.isTrySelectRequest;
 	}
 	
-	private final TimeProperty retrySelectRequestTimeout = TimeProperty.newInstance(10.0F);
+	private final TimeoutProperty retrySelectRequestTimeout = TimeoutProperty.newInstance(10.0F);
 	
 	/**
 	 * SELECT.REQ retry-timeout setter.
@@ -109,7 +105,7 @@ public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	 * 
 	 * @return ReadOnlyTimeProperty
 	 */
-	public ReadOnlyTimeProperty retrySelectRequestTimeout() {
+	public TimeoutProperty retrySelectRequestTimeout() {
 		return this.retrySelectRequestTimeout;
 	}
 	
