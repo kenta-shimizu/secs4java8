@@ -2,6 +2,7 @@ package com.shimizukenta.secs.gem;
 
 import java.util.Optional;
 
+import com.shimizukenta.secs.gem.impl.AbstractDynamicCollectionEvent;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
@@ -24,8 +25,8 @@ public interface DynamicCollectionEvent {
 	/**
 	 * Returns new instance.
 	 * 
-	 * @param alias
-	 * @param collectionEventId
+	 * @param alias the alias name
+	 * @param collectionEventId the CollectionsEvent IDs
 	 * @return newInstance
 	 */
 	public static DynamicCollectionEvent newInstance(CharSequence alias, Secs2 collectionEventId) {

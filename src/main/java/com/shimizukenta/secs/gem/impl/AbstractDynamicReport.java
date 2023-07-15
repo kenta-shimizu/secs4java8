@@ -1,4 +1,4 @@
-package com.shimizukenta.secs.gem;
+package com.shimizukenta.secs.gem.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import com.shimizukenta.secs.gem.DynamicReport;
 import com.shimizukenta.secs.secs2.Secs2;
 
 public abstract class AbstractDynamicReport implements DynamicReport, Serializable {

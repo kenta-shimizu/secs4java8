@@ -1,4 +1,4 @@
-package com.shimizukenta.secs.gem;
+package com.shimizukenta.secs.gem.impl;
 
 import java.io.Serializable;
 import java.util.List;
@@ -12,6 +12,16 @@ import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
+import com.shimizukenta.secs.gem.AliasNotFoundDynamicEventReportException;
+import com.shimizukenta.secs.gem.CEED;
+import com.shimizukenta.secs.gem.DRACK;
+import com.shimizukenta.secs.gem.DynamicCollectionEvent;
+import com.shimizukenta.secs.gem.DynamicEventReportConfig;
+import com.shimizukenta.secs.gem.DynamicEventReportException;
+import com.shimizukenta.secs.gem.DynamicLink;
+import com.shimizukenta.secs.gem.DynamicReport;
+import com.shimizukenta.secs.gem.ERACK;
+import com.shimizukenta.secs.gem.LRACK;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 

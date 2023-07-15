@@ -38,28 +38,15 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
 public interface DynamicEventReportConfig {
 	
 	/**
-	 * Returns new instance.
-	 * 
-	 * @param gem
-	 * @return newInstance
-	 */
-	public static DynamicEventReportConfig newInstance(AbstractGem gem) {
-		
-		return new AbstractDynamicEventReportConfig(gem) {
-			private static final long serialVersionUID = -5375563226536904308L;
-		};
-	}
-	
-	/**
 	 * Add Define-Report.
 	 * 
 	 * <p>
 	 * Use for S2F33
 	 * </p>
 	 * 
-	 * @param reportId
+	 * @param reportId the Report ID
 	 * @param alias of use in {@link #getReport(CharSequence)}, {@link #s6f19(CharSequence)}, {@link #s6f21(CharSequence)}
-	 * @param vids
+	 * @param vids the VIDs
 	 * @return DynamicReport
 	 */
 	public DynamicReport addDefineReport(long reportId, CharSequence alias, List<? extends Number> vids);
@@ -71,8 +58,8 @@ public interface DynamicEventReportConfig {
 	 * Use for S2F33
 	 * </p>
 	 * 
-	 * @param reportId
-	 * @param vids
+	 * @param reportId the Report ID
+	 * @param vids the VIDs
 	 * @return DynamicReport
 	 */
 	public DynamicReport addDefineReport(long reportId, List<? extends Number> vids);
@@ -86,7 +73,7 @@ public interface DynamicEventReportConfig {
 	 * </p>
 	 * 
 	 * @param alias of use in {@link #getReport(CharSequence)}, {@link #s6f19(CharSequence)}, {@link #s6f21(CharSequence)}
-	 * @param vids
+	 * @param vids the VIDs
 	 * @return DynamicReport
 	 */
 	public DynamicReport addDefineReport(CharSequence alias, List<? extends Number> vids);
@@ -99,7 +86,7 @@ public interface DynamicEventReportConfig {
 	 * Report-ID is AutoNumber.<br />
 	 * </p>
 	 * 
-	 * @param vids
+	 * @param vids the VIDs
 	 * @return DynamicReport
 	 */
 	public DynamicReport addDefineReport(List<? extends Number> vids);
@@ -107,7 +94,7 @@ public interface DynamicEventReportConfig {
 	/**
 	 * Remove Report
 	 * 
-	 * @param DynamicReport
+	 * @param report the Dynamic Reports
 	 * @return {@code true} if remove success
 	 */
 	public boolean removeReport(DynamicReport report);
@@ -115,7 +102,7 @@ public interface DynamicEventReportConfig {
 	/**
 	 * Seek in Define-Reports by alias.
 	 * 
-	 * @param alias
+	 * @param alias the alias name
 	 * @return DynamicReport if exist
 	 */
 	public Optional<DynamicReport> getReport(CharSequence alias);
@@ -127,7 +114,7 @@ public interface DynamicEventReportConfig {
 	 * Used for S6F11, S6F13, ...
 	 * </p>
 	 * 
-	 * @param reportId
+	 * @param reportId the Report ID
 	 * @return DynamicReport if exist
 	 */
 	public Optional<DynamicReport> getReport(Secs2 reportId);
@@ -136,8 +123,8 @@ public interface DynamicEventReportConfig {
 	 * Add Event-Report-Link.<br />
 	 * Use for S2F35
 	 * 
-	 * @param Collection-Event-ID
-	 * @param Report-IDs
+	 * @param ceid the Collection Event ID
+	 * @param reportIds the Report IDs
 	 * @return DynamicLink
 	 */
 	public DynamicLink addLinkById(long ceid, List<? extends Number> reportIds);
@@ -149,8 +136,8 @@ public interface DynamicEventReportConfig {
 	 * Use for S2F35.
 	 * </p>
 	 * 
-	 * @param ce DynamicCollectionEvent
-	 * @param reportIds Report-IDs
+	 * @param ce the DynamicCollectionEvent
+	 * @param reportIds the Report IDs
 	 * @return DynamicLink
 	 */
 	public DynamicLink addLinkById(DynamicCollectionEvent ce, List<? extends Number> reportIds);
@@ -176,7 +163,7 @@ public interface DynamicEventReportConfig {
 	 * </p>
 	 * 
 	 * @param ce DynamicCollectionEvent
-	 * @param reports DynamicReports
+	 * @param reports the DynamicReports
 	 * @return DynamicLink
 	 */
 	public DynamicLink addLinkByReport(DynamicCollectionEvent ce, List<? extends DynamicReport> reports);
@@ -184,7 +171,7 @@ public interface DynamicEventReportConfig {
 	/**
 	 * Remove Link.
 	 * 
-	 * @param DynamicLink
+	 * @param link the the DynamicLink
 	 * @return {@code true} if remove success
 	 */
 	public boolean removeLink(DynamicLink link);
@@ -196,7 +183,7 @@ public interface DynamicEventReportConfig {
 	 * Use for S2F37.
 	 * </p>
 	 * 
-	 * @param ceid Collection-Event-ID
+	 * @param ceid the Collection Event ID
 	 * @return DynamicCollectionEvent
 	 */
 	public DynamicCollectionEvent addEnableCollectionEvent(long ceid);
@@ -209,7 +196,7 @@ public interface DynamicEventReportConfig {
 	 * </p>
 	 * 
 	 * @param alias of {@link #getCollectionEvent(CharSequence)}, {@link #s6f15(CharSequence)}, {@link #s6f17(CharSequence)}
-	 * @param ceid Collection-Event-ID
+	 * @param ceid the Collection Event ID
 	 * @return DynamicCollectionEvent
 	 */
 	public DynamicCollectionEvent addEnableCollectionEvent(CharSequence alias, long ceid);
@@ -217,7 +204,7 @@ public interface DynamicEventReportConfig {
 	/**
 	 * Remove Enable-Collection-Event.
 	 * 
-	 * @param ce DynamicCollectionEvent
+	 * @param ce the DynamicCollectionEvent
 	 * @return {@code true} if remove success
 	 */
 	public boolean removeEnableCollectionEvent(DynamicCollectionEvent ce);
@@ -225,7 +212,7 @@ public interface DynamicEventReportConfig {
 	/**
 	 * Seek in Enable-Collection-Events by alias.
 	 * 
-	 * @param alias
+	 * @param alias the alias name
 	 * @return DynamicCollectionEvent if exist
 	 */
 	public Optional<DynamicCollectionEvent> getCollectionEvent(CharSequence alias);
@@ -237,7 +224,7 @@ public interface DynamicEventReportConfig {
 	 * Used for S6F11, S6F13,...
 	 * </p>
 	 * 
-	 * @param ceid
+	 * @param ceid the Collection Event ID
 	 * @return DynamicCollectionEvent if exist
 	 */
 	public Optional<DynamicCollectionEvent> getCollectionEvent(Secs2 ceid);
@@ -251,18 +238,18 @@ public interface DynamicEventReportConfig {
 	 * </p>
 	 * 
 	 * @return DRACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws Secs2Exception
-	 * @throws InterruptedException
+	 * @throws SecsSendMessageException if send message failed
+	 * @throws SecsWaitReplyMessageException if repy timeout
+	 * @throws SecsException if SECS communicate failed
+	 * @throws Secs2Exception if SECS-II parse failed
+	 * @throws InterruptedException if Interrupted
 	 */
 	public DRACK s2f33DeleteAll()
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, Secs2Exception
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			Secs2Exception,
+			InterruptedException;
 	
 	/**
 	 * S2F33, Define Report.
@@ -273,18 +260,18 @@ public interface DynamicEventReportConfig {
 	 * </p>
 	 * 
 	 * @return DRACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws Secs2Exception
-	 * @throws InterruptedException
+	 * @throws SecsSendMessageException if send message failed
+	 * @throws SecsWaitReplyMessageException if repy timeout
+	 * @throws SecsException if SECS communicate failed
+	 * @throws Secs2Exception if SECS-II parse failed
+	 * @throws InterruptedException if Interrupted
 	 */
 	public DRACK s2f33Define()
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, Secs2Exception
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			Secs2Exception,
+			InterruptedException;
 	
 	/**
 	 * S2F35, Link Collection Event Report.
@@ -295,18 +282,18 @@ public interface DynamicEventReportConfig {
 	 * </p>
 	 * 
 	 * @return LRACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws Secs2Exception
-	 * @throws InterruptedException
+	 * @throws SecsSendMessageException if send message failed
+	 * @throws SecsWaitReplyMessageException if repy timeout
+	 * @throws SecsException if SECS communicate failed
+	 * @throws Secs2Exception if SECS-II parse failed
+	 * @throws InterruptedException if Interrupted
 	 */
 	public LRACK s2f35()
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, Secs2Exception
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			Secs2Exception,
+			InterruptedException;
 	
 	/**
 	 * S2F37, Disable All Collection-Event-Report.
@@ -316,18 +303,18 @@ public interface DynamicEventReportConfig {
 	 * </p>
 	 * 
 	 * @return ERACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws Secs2Exception
-	 * @throws InterruptedException
+	 * @throws SecsSendMessageException if send message failed
+	 * @throws SecsWaitReplyMessageException if repy timeout
+	 * @throws SecsException if SECS communicate failed
+	 * @throws Secs2Exception if SECS-II parse failed
+	 * @throws InterruptedException if Interrupted
 	 */
 	public ERACK s2f37DisableAll()
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, Secs2Exception
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			Secs2Exception,
+			InterruptedException;
 	
 	/**
 	 * S2F37, Enable All Collection-Event-Report.
@@ -337,18 +324,18 @@ public interface DynamicEventReportConfig {
 	 * </p>
 	 * 
 	 * @return ERACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws Secs2Exception
-	 * @throws InterruptedException
+	 * @throws SecsSendMessageException if send message failed
+	 * @throws SecsWaitReplyMessageException if repy timeout
+	 * @throws SecsException if SECS communicate failed
+	 * @throws Secs2Exception if SECS-II parse failed
+	 * @throws InterruptedException if Interrupted
 	 */
 	public ERACK s2f37EnableAll()
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, Secs2Exception
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			Secs2Exception,
+			InterruptedException;
 	
 	/**
 	 * S2F37, Enable Collection-Event-Report.
@@ -358,18 +345,18 @@ public interface DynamicEventReportConfig {
 	 * </p>
 	 * 
 	 * @return ERACK
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws Secs2Exception
-	 * @throws InterruptedException
+	 * @throws SecsSendMessageException if send message failed
+	 * @throws SecsWaitReplyMessageException if repy timeout
+	 * @throws SecsException if SECS communicate failed
+	 * @throws Secs2Exception if SECS-II parse failed
+	 * @throws InterruptedException if Interrupted
 	 */
 	public ERACK s2f37Enable()
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, Secs2Exception
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			Secs2Exception,
+			InterruptedException;
 	
 	/**
 	 * S6F15, Event Report Request.
@@ -378,18 +365,18 @@ public interface DynamicEventReportConfig {
 	 * blocking-method
 	 * </p>
 	 * 
-	 * @param ce DynamicCollectionEvent
-	 * @return reply-message
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @param ce the DynamicCollectionEvent
+	 * @return reply message
+	 * @throws SecsSendMessageException if send message failed
+	 * @throws SecsWaitReplyMessageException if repy timeout
+	 * @throws SecsException if SECS communicate failed
+	 * @throws InterruptedException if Interrupted
 	 */
 	public Optional<? extends SecsMessage> s6f15(DynamicCollectionEvent ce)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			InterruptedException;
 	
 	/**
 	 * S6F15, Event Report Request.
@@ -401,20 +388,20 @@ public interface DynamicEventReportConfig {
 	 * If alias not found, throw AliasNotFoundDynamicEventReportException.<br />
 	 * </p>
 	 * 
-	 * @param alias of Enable-Collection-Event
-	 * @return reply-message
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws DynamicEventReportException
-	 * @throws InterruptedException
+	 * @param alias the alias name
+	 * @return reply message
+	 * @throws SecsSendMessageException if send message failed
+	 * @throws SecsWaitReplyMessageException if repy timeout
+	 * @throws SecsException if SECS communicate failed
+	 * @throws DynamicEventReportException if find alias failed
+	 * @throws InterruptedException if Interrupted
 	 */
 	public Optional<? extends SecsMessage> s6f15(CharSequence alias)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, DynamicEventReportException
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			DynamicEventReportException,
+			InterruptedException;
 	
 	/**
 	 * S6F17, Annotated Event Report Request.
@@ -423,18 +410,18 @@ public interface DynamicEventReportConfig {
 	 * blocking-method
 	 * </p>
 	 * 
-	 * @param ce DynamicCollectionEvent
-	 * @return reply-message
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @param ce the DynamicCollectionEvent
+	 * @return reply message
+	 * @throws SecsSendMessageException if send message failed
+	 * @throws SecsWaitReplyMessageException if repy timeout
+	 * @throws SecsException if SECS communicate failed
+	 * @throws InterruptedException if Interrupted
 	 */
 	public Optional<? extends SecsMessage> s6f17(DynamicCollectionEvent ce)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			InterruptedException;
 	
 	/**
 	 * S6F17, Annotated Event Report Request.
@@ -446,13 +433,13 @@ public interface DynamicEventReportConfig {
 	 * If alias not found, throw AliasNotFoundDynamicEventReportException.
 	 * </p>
 	 * 
-	 * @param alias of Enable-Collection-Event
-	 * @return reply-message
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws DynamicEventReportException
-	 * @throws InterruptedException
+	 * @param alias the alias name
+	 * @return reply message
+	 * @throws SecsSendMessageException if send message failed
+	 * @throws SecsWaitReplyMessageException if repy timeout
+	 * @throws SecsException if SECS communicate failed
+	 * @throws DynamicEventReportException if find alias failed
+	 * @throws InterruptedException if Interrupted
 	 */
 	public Optional<? extends SecsMessage> s6f17(CharSequence alias)
 			throws SecsSendMessageException
@@ -468,18 +455,18 @@ public interface DynamicEventReportConfig {
 	 * blocking-method
 	 * </p>
 	 * 
-	 * @param report DynamicReport
-	 * @return reply-message
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @param report the DynamicReport
+	 * @return reply message
+	 * @throws SecsSendMessageException if send message failed
+	 * @throws SecsWaitReplyMessageException if repy timeout
+	 * @throws SecsException if SECS communicate failed
+	 * @throws InterruptedException if Interrupted
 	 */
 	public Optional<? extends SecsMessage> s6f19(DynamicReport report)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			InterruptedException;
 	
 	/**
 	 * S6F19, Individual Report Request.
@@ -491,13 +478,13 @@ public interface DynamicEventReportConfig {
 	 * If alias not found, throw AliasNotFoundDynamicEventReportException.<br />
 	 * </p>
 	 * 
-	 * @param alias of Define-Report
-	 * @return reply-message
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws DynamicEventReportException
-	 * @throws InterruptedException
+	 * @param alias the alias name
+	 * @return reply message
+	 * @throws SecsSendMessageException if send message failed
+	 * @throws SecsWaitReplyMessageException if repy timeout
+	 * @throws SecsException if SECS communicate failed
+	 * @throws DynamicEventReportException if find alias failed
+	 * @throws InterruptedException if Interrupted
 	 */
 	public Optional<? extends SecsMessage> s6f19(CharSequence alias)
 			throws SecsSendMessageException
@@ -513,18 +500,18 @@ public interface DynamicEventReportConfig {
 	 * blocking-method
 	 * </p>
 	 * 
-	 * @param report DynamicReport
-	 * @return reply-message
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @param report the DynamicReport
+	 * @return reply message
+	 * @throws SecsSendMessageException if send message failed
+	 * @throws SecsWaitReplyMessageException if repy timeout
+	 * @throws SecsException if SECS communicate failed
+	 * @throws InterruptedException if Interrupted
 	 */
 	public Optional<? extends SecsMessage> s6f21(DynamicReport report)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			InterruptedException;
 	
 	/**
 	 * S6F21, Annotated Individual Report Request.
@@ -536,19 +523,19 @@ public interface DynamicEventReportConfig {
 	 * If alias not found, throw AliasNotFoundDynamicEventReportException.<br />
 	 * </p>
 	 * 
-	 * @param alias of Define-Report
-	 * @return reply-message
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws DynamicEventReportException
-	 * @throws InterruptedException
+	 * @param alias the alias name
+	 * @return reply message
+	 * @throws SecsSendMessageException if send message failed
+	 * @throws SecsWaitReplyMessageException if repy timeout
+	 * @throws SecsException if SECS communicate failed
+	 * @throws DynamicEventReportException if find alias failed
+	 * @throws InterruptedException if Interrupted
 	 */
 	public Optional<? extends SecsMessage> s6f21(CharSequence alias)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, DynamicEventReportException
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			DynamicEventReportException,
+			InterruptedException;
 
 }

@@ -25,6 +25,7 @@ import com.shimizukenta.secs.SecsMessageReceiveListener;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.gem.Gem;
+import com.shimizukenta.secs.gem.impl.AbstractGem;
 import com.shimizukenta.secs.local.property.BooleanProperty;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.sml.SmlMessage;
@@ -46,7 +47,7 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		super();
 		
 		this.config = config;
-		this.gem = Gem.newInstance(this, config.gem());
+		this.gem = new AbstractGem(this, config.gem()) {};
 	}
 	
 	@Override

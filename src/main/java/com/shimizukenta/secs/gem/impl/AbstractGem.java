@@ -1,4 +1,4 @@
-package com.shimizukenta.secs.gem;
+package com.shimizukenta.secs.gem.impl;
 
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +9,27 @@ import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
+import com.shimizukenta.secs.gem.ACKC10;
+import com.shimizukenta.secs.gem.ACKC5;
+import com.shimizukenta.secs.gem.ACKC6;
+import com.shimizukenta.secs.gem.ACKC7;
+import com.shimizukenta.secs.gem.CEED;
+import com.shimizukenta.secs.gem.CMDA;
+import com.shimizukenta.secs.gem.COMMACK;
+import com.shimizukenta.secs.gem.Clock;
+import com.shimizukenta.secs.gem.DRACK;
+import com.shimizukenta.secs.gem.DynamicCollectionEvent;
+import com.shimizukenta.secs.gem.DynamicEventReportConfig;
+import com.shimizukenta.secs.gem.DynamicReport;
+import com.shimizukenta.secs.gem.ERACK;
+import com.shimizukenta.secs.gem.GRANT;
+import com.shimizukenta.secs.gem.GRANT6;
+import com.shimizukenta.secs.gem.Gem;
+import com.shimizukenta.secs.gem.GemConfig;
+import com.shimizukenta.secs.gem.LRACK;
+import com.shimizukenta.secs.gem.OFLACK;
+import com.shimizukenta.secs.gem.ONLACK;
+import com.shimizukenta.secs.gem.TIACK;
 import com.shimizukenta.secs.impl.AbstractSecsCommunicator;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
@@ -17,9 +38,9 @@ import com.shimizukenta.secs.secs2.Secs2Item;
 public abstract class AbstractGem implements Gem {
 
 	private final AbstractSecsCommunicator comm;
-	private final AbstractGemConfig config;
+	private final GemConfig config;
 	
-	public AbstractGem(AbstractSecsCommunicator communicator, AbstractGemConfig config) {
+	public AbstractGem(AbstractSecsCommunicator communicator, GemConfig config) {
 		this.comm = communicator;
 		this.config = config;
 	}
@@ -96,7 +117,9 @@ public abstract class AbstractGem implements Gem {
 	
 	@Override
 	public DynamicEventReportConfig newDynamicEventReportConfig() {
-		return DynamicEventReportConfig.newInstance(this);
+		return new AbstractDynamicEventReportConfig(this) {
+			private static final long serialVersionUID = -5375563226536904308L;
+		};
 	}
 	
 	@Override

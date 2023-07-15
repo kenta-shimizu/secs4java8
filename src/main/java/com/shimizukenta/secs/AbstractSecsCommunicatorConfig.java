@@ -2,7 +2,8 @@ package com.shimizukenta.secs;
 
 import java.io.Serializable;
 
-import com.shimizukenta.secs.gem.AbstractGemConfig;
+import com.shimizukenta.secs.gem.GemConfig;
+import com.shimizukenta.secs.gem.impl.AbstractGemConfig;
 import com.shimizukenta.secs.impl.SecsTimeoutImpl;
 import com.shimizukenta.secs.local.property.BooleanProperty;
 import com.shimizukenta.secs.local.property.StringProperty;
@@ -36,8 +37,9 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	
 	/**
 	 * GemCOnfig.
+	 * 
 	 */
-	private final AbstractGemConfig gem = new AbstractGemConfig() {
+	private final GemConfig gem = new AbstractGemConfig() {
 		
 		private static final long serialVersionUID = -3386783271396322749L;
 	};
@@ -88,11 +90,11 @@ public abstract class AbstractSecsCommunicatorConfig implements Serializable {
 	}
 	
 	/**
-	 * AbstractGemConfig getter.
+	 * GemConfig getter.
 	 * 
-	 * @return AbstractGemConfig
+	 * @return GemConfig
 	 */
-	public AbstractGemConfig gem() {
+	public GemConfig gem() {
 		return gem;
 	}
 	

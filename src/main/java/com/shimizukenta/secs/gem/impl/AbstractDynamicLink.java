@@ -1,10 +1,12 @@
-package com.shimizukenta.secs.gem;
+package com.shimizukenta.secs.gem.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.shimizukenta.secs.gem.DynamicCollectionEvent;
+import com.shimizukenta.secs.gem.DynamicLink;
 import com.shimizukenta.secs.secs2.Secs2;
 
 public abstract class AbstractDynamicLink implements DynamicLink, Serializable {

@@ -46,10 +46,10 @@ public interface SecsMessageSendable {
 	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(int strm, int func, boolean wbit)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			InterruptedException;
 	
 	/**
 	 * Send Primary-Message and receive Reply-Message.
@@ -70,10 +70,10 @@ public interface SecsMessageSendable {
 	 * @throws InterruptedException the interrupted
 	 */
 	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			InterruptedException;
 	
 	/**
 	 * Send Reply-(Header-only)-Message.
@@ -94,10 +94,10 @@ public interface SecsMessageSendable {
 	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			InterruptedException;
 	
 	/**
 	 * Send Reply-Message.
@@ -119,10 +119,10 @@ public interface SecsMessageSendable {
 	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			InterruptedException;
 	
 	/**
 	 * Send Primary-Message by SML and receive Reply-Message<br />
@@ -140,10 +140,10 @@ public interface SecsMessageSendable {
 	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(SmlMessage sml)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			InterruptedException;
 	
 	/**
 	 * Send Reply-Message by SML.
@@ -162,9 +162,9 @@ public interface SecsMessageSendable {
 	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(SecsMessage primaryMsg, SmlMessage sml)
-			throws SecsSendMessageException
-			, SecsWaitReplyMessageException
-			, SecsException
-			, InterruptedException;
+			throws SecsSendMessageException,
+			SecsWaitReplyMessageException,
+			SecsException,
+			InterruptedException;
 	
 }

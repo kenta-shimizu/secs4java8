@@ -1,8 +1,9 @@
-package com.shimizukenta.secs.gem;
+package com.shimizukenta.secs.gem.impl;
 
 import java.io.Serializable;
 import java.util.Optional;
 
+import com.shimizukenta.secs.gem.DynamicCollectionEvent;
 import com.shimizukenta.secs.secs2.Secs2;
 
 public abstract class AbstractDynamicCollectionEvent implements DynamicCollectionEvent, Serializable {
