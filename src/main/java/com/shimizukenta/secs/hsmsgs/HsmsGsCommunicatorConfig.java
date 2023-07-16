@@ -13,9 +13,10 @@ import com.shimizukenta.secs.local.property.TimeoutProperty;
  * This class is config of HSMS-GS-Communicator.
  * 
  * <ul>
- * <li>To add SESSION-ID, {@link #addSessionId(int)}</li>
- * <li>To set Connect or Bind SocketAddress, {@link #socketAddress(SocketAddress)}}</li>
- * <li>To set try-SELECT.REQ communicator, {@link #isTrySelectRequest(boolean)}</li>
+ * <li>To add SESSION-ID, {@link #addSessionId(int)}.</li>
+ * <li>To set Connect or Bind SocketAddress, {@link #socketAddress(SocketAddress)}}.</li>
+ * <li>To set not try-SELECT.REQ communicator, {@link #notTrySelectRequest}.</li>
+ * <li>To set retry-SELECT.REQ timeout, {@link #retrySelectRequestTimeout(float)}.</li>
  * </ul>
  * 
  * @author kenta-shimizu
@@ -25,33 +26,62 @@ public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	
 	private static final long serialVersionUID = -5254158215625876513L;
 	
+	/**
+	 * Constructor.
+	 * 
+	 */
 	public HsmsGsCommunicatorConfig() {
 		super();
 	}
 	
+	/**
+	 * SessionIds.
+	 * 
+	 */
 	private final SetProperty<Integer> sessionIds = SetProperty.newInstance();
 	
-	public boolean addSessionId(int id) {
-		if ( id < 0 || id > 0xFFFF ) {
-			throw new AddSessionIdIllegalArgumentException(id);
+	/**
+	 * Returns true if add success, otherwise false.
+	 * 
+	 * @param sessionId Session-ID
+	 * @return true if add success, otherwise false
+	 */
+	public boolean addSessionId(int sessionId) {
+		if ( sessionId < 0 || sessionId > 0xFFFF ) {
+			throw new AddSessionIdIllegalArgumentException(sessionId);
 		}
-		return this.sessionIds.add(Integer.valueOf(id));
+		return this.sessionIds.add(Integer.valueOf(sessionId));
 	}
 	
-	public boolean removeSessionId(int id) {
-		return this.sessionIds.remove(Integer.valueOf(id));
+	/**
+	 * Returns true if remove success, otherwise false.
+	 * 
+	 * @param sessionId Session-ID
+	 * @return true if remove success, otherwise false
+	 */
+	public boolean removeSessionId(int sessionId) {
+		return this.sessionIds.remove(Integer.valueOf(sessionId));
 	}
 	
+	/**
+	 * Returns Session-ID set.
+	 * 
+	 * @return Session-ID set
+	 */
 	public SetProperty<Integer> sessionIds() {
 		return this.sessionIds;
 	}
 	
+	/**
+	 * SocketAddress.
+	 * 
+	 */
 	private final ObjectProperty<SocketAddress> socketAddr = ObjectProperty.newInstance(null);
 	
 	/**
 	 * Connect or bind SocketAddress setter
 	 * 
-	 * @param socketAddress of PASSIVE/ACTIVE
+	 * @param socketAddress PASSIVE/ACTIVE SocketAddress
 	 */
 	public void socketAddress(SocketAddress socketAddress) {
 		this.socketAddr.set(Objects.requireNonNull(socketAddress));
@@ -60,21 +90,38 @@ public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	/**
 	 * Connect or bind SocketAddress getter
 	 * 
-	 * @return socketAddress of PASSIVE/ACTIVE
+	 * @return socketAddress PASSIVE/ACTIVE SocketAddress
 	 */
 	public ObjectProperty<SocketAddress> socketAddress() {
 		return socketAddr;
 	}
 	
+	/**
+	 * Sync-Object TrySelectRequest.
+	 * 
+	 */
+	private final Object syncTrySelectRequest = new Object();
+	
+	/**
+	 * isTrySelectRequest.
+	 * 
+	 */
 	private final BooleanProperty isTrySelectRequest = BooleanProperty.newInstance(false);
 	
 	/**
-	 * Try SELECT.REQ setter.
+	 * retrySelectRequestTimeout.
 	 * 
-	 * @param true if try SELECT.REQ
 	 */
-	public void isTrySelectRequest(boolean f) {
-		this.isTrySelectRequest.set(f);
+	private final TimeoutProperty retrySelectRequestTimeout = TimeoutProperty.newInstance(10.0F);
+	
+	/**
+	 * Set Not Try SELECT.REQ.
+	 * 
+	 */
+	public void notTrySelectRequest() {
+		synchronized ( this.syncTrySelectRequest ) {
+			this.isTrySelectRequest.setFalse();
+		}
 	}
 	
 	/**
@@ -86,18 +133,16 @@ public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 		return this.isTrySelectRequest;
 	}
 	
-	private final TimeoutProperty retrySelectRequestTimeout = TimeoutProperty.newInstance(10.0F);
-	
 	/**
 	 * SELECT.REQ retry-timeout setter.
 	 * 
-	 * @param v > 0.0F
+	 * @param seconds Timeout seconds
 	 */
-	public void retrySelectRequestTimeout(float v) {
-		if ( v <= 0.0F ) {
-			throw new RetrySelectRequestTimeoutIllegalArgumentException(v);
+	public void retrySelectRequestTimeout(float seconds) {
+		synchronized ( this.syncTrySelectRequest ) {
+			this.isTrySelectRequest.setTrue();
+			this.retrySelectRequestTimeout.set(seconds);
 		}
-		this.retrySelectRequestTimeout.set(v);
 	}
 	
 	/**
@@ -107,24 +152,6 @@ public class HsmsGsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	 */
 	public TimeoutProperty retrySelectRequestTimeout() {
 		return this.retrySelectRequestTimeout;
-	}
-	
-	private static class AddSessionIdIllegalArgumentException extends IllegalArgumentException {
-		
-		private static final long serialVersionUID = -9211783480973747830L;
-		
-		public AddSessionIdIllegalArgumentException(int id) {
-			super("Session-ID is in 0 - 65535, id=" + id);
-		}
-	}
-	
-	private static class RetrySelectRequestTimeoutIllegalArgumentException extends IllegalArgumentException {
-		
-		private static final long serialVersionUID = -2444363506021169418L;
-		
-		public RetrySelectRequestTimeoutIllegalArgumentException(float value) {
-			super("retrySelectRequestTimeout value requires 0.0F, value=" + value);
-		}
 	}
 	
 }

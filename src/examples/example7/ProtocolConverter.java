@@ -23,7 +23,7 @@ import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
-import com.shimizukenta.secs.hsmsss.HsmsSsMessageBuilder;
+import com.shimizukenta.secs.hsmsss.impl.HsmsSsMessageBuilder;
 import com.shimizukenta.secs.secs1.Secs1Message;
 import com.shimizukenta.secs.secs1.Secs1MessageBuilder;
 import com.shimizukenta.secs.secs1.Secs1TooBigSendMessageException;

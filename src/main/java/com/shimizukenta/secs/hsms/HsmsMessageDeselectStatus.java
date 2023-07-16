@@ -1,12 +1,41 @@
 package com.shimizukenta.secs.hsms;
 
+/**
+ * HSMS DESELECT staus.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public enum HsmsMessageDeselectStatus {
-
+	
+	/**
+	 * NOT_DESELECT_RSP.
+	 * 
+	 */
 	NOT_DESELECT_RSP((byte)0xFF),
+	
+	/**
+	 * UNKNOWN.
+	 * 
+	 */
 	UNKNOWN((byte)0xFF),
 	
+	/**
+	 * SUCCRSS.
+	 * 
+	 */
 	SUCCESS((byte)0),
+	
+	/**
+	 * NO_SELECTED.
+	 * 
+	 */
 	NO_SELECTED((byte)1),
+	
+	/**
+	 * FAILED.
+	 * 
+	 */
 	FAILED((byte)2),
 	
 	;
@@ -17,10 +46,21 @@ public enum HsmsMessageDeselectStatus {
 		this.status = status;
 	}
 	
+	/**
+	 * Returns byte code.
+	 * 
+	 * @return byte code
+	 */
 	public byte statusCode() {
 		return status;
 	}
 	
+	/**
+	 * Returns DESELECT status from byte code.
+	 * 
+	 * @param b byte code
+	 * @return DESELECT status
+	 */
 	public static HsmsMessageDeselectStatus get(byte b) {
 		
 		for ( HsmsMessageDeselectStatus s : values() ) {
@@ -35,6 +75,12 @@ public enum HsmsMessageDeselectStatus {
 		return UNKNOWN;
 	}
 	
+	/**
+	 * Returns DESELECT status from HSMS Message.
+	 * 
+	 * @param msg the HSMS Message
+	 * @return DESELECT status
+	 */
 	public static HsmsMessageDeselectStatus get(HsmsMessage msg) {
 		
 		HsmsMessageType type = HsmsMessageType.get(msg);

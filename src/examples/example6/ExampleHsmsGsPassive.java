@@ -52,7 +52,7 @@ public class ExampleHsmsGsPassive {
 			config.isEquip(true);
 			config.connectionMode(HsmsConnectionMode.PASSIVE);
 			config.rebindIfPassive(5.0F);
-			config.isTrySelectRequest(false);
+			config.notTrySelectRequest();
 			config.timeout().t3(45.0F);
 			config.timeout().t6( 5.0F);
 			config.timeout().t8( 5.0F);

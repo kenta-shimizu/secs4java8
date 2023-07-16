@@ -3,7 +3,6 @@ package com.shimizukenta.secs.hsms;
 import java.util.Optional;
 
 import com.shimizukenta.secs.SecsCommunicator;
-import com.shimizukenta.secs.SecsException;
 
 /**
  * This interface is implementation of HSMS (SEMI-E37).
@@ -21,7 +20,7 @@ public interface HsmsCommunicator extends SecsCommunicator {
 	 * Pass through quickly.<br />
 	 * </p>
 	 * 
-	 * @param listener
+	 * @param listener the state change listener
 	 * @return true if add success
 	 */
 	public boolean addHsmsCommunicateStateChangeListener(HsmsCommunicateStateChangeListener listener);
@@ -29,7 +28,7 @@ public interface HsmsCommunicator extends SecsCommunicator {
 	/**
 	 * Remove Listener.
 	 * 
-	 * @param listener
+	 * @param listener the state change listener
 	 * @return true if remove success
 	 */
 	public boolean removeHsmsCommunicateStateChangeListener(HsmsCommunicateStateChangeListener listener);
@@ -42,15 +41,14 @@ public interface HsmsCommunicator extends SecsCommunicator {
 	 * </p>
 	 * 
 	 * @return {@code true} if success
-	 * @throws InterruptedException
-	 * @throws SecsException
+	 * @throws InterruptedException if interrupted
 	 */
 	public boolean linktest() throws InterruptedException;
 	
 	/**
 	 * Add listener.
 	 * 
-	 * @param lstnr
+	 * @param lstnr the pass through message listener
 	 * @return true if add success
 	 */
 	public boolean addTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
@@ -58,7 +56,7 @@ public interface HsmsCommunicator extends SecsCommunicator {
 	/**
 	 * Remove listener.
 	 * 
-	 * @param lstnr
+	 * @param lstnr the pass through message listener
 	 * @return true if remove success
 	 */
 	public boolean removeTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);	
@@ -66,7 +64,7 @@ public interface HsmsCommunicator extends SecsCommunicator {
 	/**
 	 * Add listener.
 	 * 
-	 * @param lstnr
+	 * @param lstnr the pass through message listener
 	 * @return true if add success
 	 */
 	public boolean addSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
@@ -74,7 +72,7 @@ public interface HsmsCommunicator extends SecsCommunicator {
 	/**
 	 * Remove listener.
 	 * 
-	 * @param lstnr
+	 * @param lstnr the pass through message listener
 	 * @return true if remove success
 	 */
 	public boolean removeSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);	
@@ -82,7 +80,7 @@ public interface HsmsCommunicator extends SecsCommunicator {
 	/**
 	 * Add listener.
 	 * 
-	 * @param lstnr
+	 * @param lstnr the pass through message listener
 	 * @return true if add success
 	 */
 	public boolean addReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
@@ -90,7 +88,7 @@ public interface HsmsCommunicator extends SecsCommunicator {
 	/**
 	 * Remove listener.
 	 * 
-	 * @param lstnr
+	 * @param lstnr the pass through message listener
 	 * @return true if remove success
 	 */
 	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
@@ -98,12 +96,12 @@ public interface HsmsCommunicator extends SecsCommunicator {
 	/**
 	 * Send HSMS-Message and receive Reply-Message if exist.
 	 * 
-	 * @param msg
+	 * @param msg the HSMS Message
 	 * @return Optional has value if Reply-Message exist
-	 * @throws HsmsSendMessageException
-	 * @throws HsmsWaitReplyMessageException
-	 * @throws HsmsException
-	 * @throws InterruptedException
+	 * @throws HsmsSendMessageException if send message failed
+	 * @throws HsmsWaitReplyMessageException if reply message timeout
+	 * @throws HsmsException if HSMS communicate failed
+	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<HsmsMessage> send(HsmsMessage msg)
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,

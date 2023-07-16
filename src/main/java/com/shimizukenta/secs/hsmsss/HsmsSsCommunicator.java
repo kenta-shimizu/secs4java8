@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import com.shimizukenta.secs.hsms.HsmsCommunicator;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
+import com.shimizukenta.secs.hsmsss.impl.AbstractHsmsSsActiveCommunicator;
+import com.shimizukenta.secs.hsmsss.impl.AbstractHsmsSsPassiveCommunicator;
 
 /**
  * This interface is implementation of HSMS-SS (SEMI-E37.1).
@@ -21,7 +23,7 @@ public interface HsmsSsCommunicator extends HsmsCommunicator {
 	/**
 	 * create new HSMS-SS-Communicator instance.
 	 * 
-	 * @param config
+	 * @param config the HSMS-SS config
 	 * @return new HSMS-SS-Communicator instance
 	 */
 	public static HsmsSsCommunicator newInstance(HsmsSsCommunicatorConfig config) {
@@ -47,9 +49,9 @@ public interface HsmsSsCommunicator extends HsmsCommunicator {
 	/**
 	 * Create new HSMS-SS-Communicator instance and {@link #open()}.
 	 * 
-	 * @param config
+	 * @param config the HSMS-SS config
 	 * @return new HSMS-SS-Communicator instance
-	 * @throws IOException
+	 * @throws IOException if open failed
 	 */
 	public static HsmsSsCommunicator open(HsmsSsCommunicatorConfig config) throws IOException {
 		
