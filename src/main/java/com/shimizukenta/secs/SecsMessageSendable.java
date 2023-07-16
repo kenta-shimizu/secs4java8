@@ -38,7 +38,7 @@ public interface SecsMessageSendable {
 	 * 
 	 * @param strm SECS-II-Stream-Number
 	 * @param func SECS-II-Function-Number
-	 * @param wbit SECS-II-WBit, set {@code true} if w-bit is 1
+	 * @param wbit SECS-II-WBit, set true if w-bit is 1
 	 * @return Reply-Message if exist
 	 * @throws SecsSendMessageException if send failed
 	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
@@ -61,8 +61,8 @@ public interface SecsMessageSendable {
 	 * 
 	 * @param strm SECS-II-Stream-Number
 	 * @param func SECS-II-Function-Number
-	 * @param wbit SECS-II-WBit, set {@code true} if w-bit is 1
-	 * @param secs2 SECS-II-data, Not accept {@code null}
+	 * @param wbit SECS-II-WBit, set true if w-bit is 1
+	 * @param secs2 SECS-II-data, Not accept null
 	 * @return Reply-Message if exist
 	 * @throws SecsSendMessageException if send failed
 	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
@@ -86,7 +86,7 @@ public interface SecsMessageSendable {
 	 * @param primaryMsg Primary-Message
 	 * @param strm SECS-II-Stream-Number
 	 * @param func SECS-II-Function-Number
-	 * @param wbit SECS-II-WBit, set {@code false}
+	 * @param wbit SECS-II-WBit, set true if w-bit is 1
 	 * @return {@code Optional.empty()}
 	 * @throws SecsSendMessageException if send failed
 	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
@@ -110,8 +110,8 @@ public interface SecsMessageSendable {
 	 * @param primaryMsg Primary-Message
 	 * @param strm SECS-II-Stream-Number
 	 * @param func SECS-II-Function-Number
-	 * @param wbit SECS-II-WBit, set {@code false}
-	 * @param secs2 SECS-II-data, Not accept {@code null}
+	 * @param wbit SECS-II-WBit, set true if w-bit is 1
+	 * @param secs2 SECS-II-data, Not accept null
 	 * @return {@code Optional.empty()}
 	 * @throws SecsSendMessageException if send failed
 	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3

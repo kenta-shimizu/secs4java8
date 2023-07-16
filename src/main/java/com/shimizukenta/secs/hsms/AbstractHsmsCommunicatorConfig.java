@@ -23,22 +23,60 @@ public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommuni
 	
 	private static final long serialVersionUID = 2402150927485521447L;
 	
-	private final Object sync = new Object();
-	
+	/**
+	 * Connection Mode.
+	 * 
+	 */
 	private final ObjectProperty<HsmsConnectionMode> connectionMode = ObjectProperty.newInstance(HsmsConnectionMode.PASSIVE);
+	
+	/**
+	 * Sync-Object of linktest.
+	 * 
+	 */
+	private final Object syncLinktest = new Object();
+	
+	/**
+	 * Linktest Timeout.
+	 * 
+	 */
 	private final TimeoutProperty linktestTime = TimeoutProperty.newInstance(120.0F);
+	
+	/**
+	 * doLinktest.
+	 * 
+	 */
 	private final BooleanProperty doLinktest = BooleanProperty.newInstance(false);
+	
+	/**
+	 * Sync-Object of RebindIfPassive.
+	 * 
+	 */
+	private final Object syncRebindIfPassive = new Object();
+	
+	/**
+	 * RebindIfPassive timeout.
+	 * 
+	 */
 	private final TimeoutProperty rebindIfPassiveTime = TimeoutProperty.newInstance(10.0F);
+	
+	/**
+	 * doRebindIfPassive.
+	 * 
+	 */
 	private final BooleanProperty doRebindIfPassive = BooleanProperty.newInstance(true);
 	
-	public AbstractHsmsCommunicatorConfig() {
+	/**
+	 * Constructor.
+	 * 
+	 */
+	protected AbstractHsmsCommunicatorConfig() {
 		super();
 	}
 	
 	/**
 	 * ACTIVE or PASSIVE Connection-Mode setter
 	 * 
-	 * @param mode
+	 * @param mode the HSMS-Connection-Mode
 	 */
 	public void connectionMode(HsmsConnectionMode mode) {
 		this.connectionMode.set(Objects.requireNonNull(mode));
@@ -53,12 +91,12 @@ public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommuni
 		return this.connectionMode;
 	}
 	
-	/*
+	/**
 	 * Set Not-Linktest
 	 * 
 	 */
 	public void notLinktest() {
-		synchronized ( this.sync ) {
+		synchronized ( this.syncLinktest ) {
 			this.doLinktest.setFalse();
 		}
 	}
@@ -69,7 +107,7 @@ public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommuni
 	 * @param seconds linktest-cycle-seconds. value is {@code >= 0}
 	 */
 	public void linktest(float seconds) {
-		synchronized ( this.sync ) {
+		synchronized ( this.syncLinktest ) {
 			this.linktestTime.set(seconds);
 			this.doLinktest.setTrue();
 		}
@@ -98,7 +136,7 @@ public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommuni
 	 * 
 	 */
 	public void notRebindIfPassive() {
-		synchronized ( this.sync ) {
+		synchronized ( this.syncRebindIfPassive ) {
 			this.doRebindIfPassive.setFalse();
 		}
 	}
@@ -106,10 +144,10 @@ public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommuni
 	/**
 	 * Rebind if Passive-Protocol, if bind failed, then rebind after this time.
 	 * 
-	 * @param v rebind after this time if Passive-protocol. value {@code >=0}
+	 * @param seconds rebind after this time if Passive-protocol. value {@code >=0}
 	 */
 	public void rebindIfPassive(float seconds) {
-		synchronized ( this.sync ) {
+		synchronized ( this.syncRebindIfPassive ) {
 			this.rebindIfPassiveTime.set(seconds);
 			this.doRebindIfPassive.setTrue();
 		}

@@ -15,6 +15,8 @@ import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsMessagePassThroughListener;
 import com.shimizukenta.secs.hsms.HsmsSession;
+import com.shimizukenta.secs.hsmsgs.impl.AbstractHsmsGsActiveCommunicator;
+import com.shimizukenta.secs.hsmsgs.impl.AbstractHsmsGsPassiveCommunicator;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.sml.SmlMessage;
 
@@ -41,7 +43,7 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	/**
 	 * create new HSMS-GS-Communicator instance.
 	 * 
-	 * @param config
+	 * @param config the HSMS-GS config
 	 * @return new HSMS-GS-Communicator instance
 	 */
 	public static HsmsGsCommunicator newInstance(HsmsGsCommunicatorConfig config) {
@@ -67,9 +69,9 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	/**
 	 * Create new HSMS-GS-Communicator instance and {@link #open()}.
 	 * 
-	 * @param config
+	 * @param config the HSMS-GS config
 	 * @return new HSMS-GS-Communicator instance
-	 * @throws IOException
+	 * @throws IOException if open failed
 	 */
 	public static HsmsGsCommunicator open(HsmsGsCommunicatorConfig config) throws IOException {
 		
@@ -102,16 +104,16 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	/**
 	 * Return Session by Id.
 	 * 
-	 * @param sessionId
+	 * @param sessionId the Session-ID
 	 * @return Session
-	 * @throws HsmsGsUnknownSessionIdException
+	 * @throws HsmsGsUnknownSessionIdException if Session-ID unknown
 	 */
 	public HsmsSession getSession(int sessionId) throws HsmsGsUnknownSessionIdException;
 	
 	/**
 	 * Returns true if exist.
 	 * 
-	 * @param sessionId
+	 * @param sessionId the Session-ID
 	 * @return true if exist.
 	 */
 	public boolean existSession(int sessionId);
@@ -119,15 +121,15 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	/**
 	 * send shortcut.
 	 * 
-	 * @param sessionId
-	 * @param strm
-	 * @param func
-	 * @param wbit
+	 * @param sessionId the Session-ID
+	 * @param strm SECS-II-Stream-Number
+	 * @param func SECS-II-Function-Number
+	 * @param wbit SECS-II-WBit, set true if w-bit is 1
 	 * @return Reply-Message if exist
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
+	 * @throws SecsException if SECS communicate failed
+	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(
 			int sessionId,
@@ -142,16 +144,16 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	/**
 	 * send shortcut
 	 * 
-	 * @param sessionId
-	 * @param strm
-	 * @param func
-	 * @param wbit
-	 * @param secs2
+	 * @param sessionId the Session-ID
+	 * @param strm SECS-II-Stream-Number
+	 * @param func SECS-II-Function-Number
+	 * @param wbit SECS-II-WBit, set true if w-bit is 1
+	 * @param secs2 SECS-II-data, Not accept null
 	 * @return Reply-Message if exist
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
+	 * @throws SecsException if SECS communicate failed
+	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(
 			int sessionId,
@@ -166,16 +168,16 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	
 	/**
 	 * send 
-	 * @param sessionId
-	 * @param primaryMsg
-	 * @param strm
-	 * @param func
-	 * @param wbit
+	 * @param sessionId the Session-ID
+	 * @param primaryMsg the primary message
+	 * @param strm SECS-II-Stream-Number
+	 * @param func SECS-II-Function-Number
+	 * @param wbit SECS-II-WBit, set true if w-bit is 1
 	 * @return Reply-Message if exist
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
+	 * @throws SecsException if SECS communicate failed
+	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(
 			int sessionId,
@@ -191,17 +193,17 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	/**
 	 * send shortcut.
 	 * 
-	 * @param sessionId
-	 * @param primaryMsg
-	 * @param strm
-	 * @param func
-	 * @param wbit
-	 * @param secs2
+	 * @param sessionId the Session-ID
+	 * @param primaryMsg the primary message
+	 * @param strm SECS-II-Stream-Number
+	 * @param func SECS-II-Function-Number
+	 * @param wbit SECS-II-WBit, set true if w-bit is 1
+	 * @param secs2 SECS-II-data, Not accept null
 	 * @return Reply-Message if exist
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
+	 * @throws SecsException if SECS communicate failed
+	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(
 			int sessionId,
@@ -218,13 +220,13 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	/**
 	 * send shortcut
 	 * 
-	 * @param sessionId
-	 * @param sml
+	 * @param sessionId the Session-ID
+	 * @param sml the SML Message
 	 * @return Reply-Message if exist
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
+	 * @throws SecsException if SECS communicate failed
+	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> send(
 			int sessionId,
@@ -237,14 +239,14 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	/**
 	 * send shortcut.
 	 * 
-	 * @param sessionId
-	 * @param primaryMsg
-	 * @param sml
+	 * @param sessionId the Session-ID
+	 * @param primaryMsg the primary message
+	 * @param sml the SML Message
 	 * @return Reply-Message if exist
-	 * @throws SecsSendMessageException
-	 * @throws SecsWaitReplyMessageException
-	 * @throws SecsException
-	 * @throws InterruptedException
+	 * @throws SecsSendMessageException if send failed
+	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
+	 * @throws SecsException if SECS communicate failed
+	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<? extends SecsMessage> send(
 			int sessionId,

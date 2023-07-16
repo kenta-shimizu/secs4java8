@@ -48,7 +48,6 @@ public class ExampleHsmsGsActiveTwo {
 			config.socketAddress(IPADDR);
 			config.isEquip(false);
 			config.connectionMode(HsmsConnectionMode.ACTIVE);
-			config.isTrySelectRequest(true);
 			config.retrySelectRequestTimeout(5.0F);
 			config.timeout().t3(45.0F);
 			config.timeout().t5(10.0F);

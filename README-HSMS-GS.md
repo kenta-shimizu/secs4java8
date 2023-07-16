@@ -14,7 +14,7 @@
     config.isEquip(true);
     config.connectionMode(HsmsConnectionMode.PASSIVE);
     config.rebindIfPassive(5.0F);
-    config.isTrySelectRequest(false);
+    config.notTrySelectRequest();
     config.timeout().t3(45.0F);
     config.timeout().t6( 5.0F);
     config.timeout().t8( 5.0F);
@@ -37,7 +37,6 @@
     config.socketAddress(new InetSocketAddress("127.0.0.1", 5000));
     config.isEquip(false);
     config.connectionMode(HsmsConnectionMode.ACTIVE);
-    config.isTrySelectRequest(true);
     config.retrySelectRequestTimeout(5.0F);
     config.timeout().t3(45.0F);
     config.timeout().t5(10.0F);

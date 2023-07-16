@@ -1,13 +1,46 @@
 package com.shimizukenta.secs.hsms;
 
+/**
+ * HSMS Message Reject Reason.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public enum HsmsMessageRejectReason {
 	
+	/**
+	 * NOT_REJECT_REQ.
+	 * 
+	 */
 	NOT_REJECT_REQ((byte)0xFF),
+	
+	/**
+	 * UNKNOWN.
+	 * 
+	 */
 	UNKNOWN((byte)0xFF),
 	
+	/**
+	 * NOT_SUPPORT_TYPE_S.
+	 * 
+	 */
 	NOT_SUPPORT_TYPE_S((byte)1),
+	
+	/**
+	 * NOT_SUPPORT_TYPE_P.
+	 */
 	NOT_SUPPORT_TYPE_P((byte)2),
+	
+	/**
+	 * TRANSACTION_NOT_OPEN.
+	 * 
+	 */
 	TRANSACTION_NOT_OPEN((byte)3),
+	
+	/**
+	 * NOT_SELECTED.
+	 * 
+	 */
 	NOT_SELECTED((byte)4),
 	
 	;
@@ -18,10 +51,21 @@ public enum HsmsMessageRejectReason {
 		this.reason = reason;
 	}
 	
+	/**
+	 * Returns reason byte code.
+	 * 
+	 * @return reason byte code
+	 */
 	public byte reasonCode() {
 		return reason;
 	}
 	
+	/**
+	 * Returns HSMS Reject Reason from byte code.
+	 * 
+	 * @param b byte code
+	 * @return HSMS Reject reason
+	 */
 	public static HsmsMessageRejectReason get(byte b) {
 		
 		for ( HsmsMessageRejectReason r : values() ) {
@@ -34,6 +78,12 @@ public enum HsmsMessageRejectReason {
 		return UNKNOWN;
 	}
 	
+	/**
+	 * Returns HSMS Reject reason from HSMS Message.
+	 * 
+	 * @param msg the HSMS Message
+	 * @return HSMS Reject reason
+	 */
 	public static HsmsMessageRejectReason get(HsmsMessage msg) {
 		
 		HsmsMessageType type = HsmsMessageType.get(msg);

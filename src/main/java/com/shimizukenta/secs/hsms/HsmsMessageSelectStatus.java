@@ -1,16 +1,63 @@
 package com.shimizukenta.secs.hsms;
 
+/**
+ * HSMS Message Select status.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public enum HsmsMessageSelectStatus {
 	
+	/**
+	 * NOT_SELECT_RSP.
+	 * 
+	 */
 	NOT_SELECT_RSP((byte)0xFF),
+	
+	/**
+	 * UNKNOWN.
+	 * 
+	 */
 	UNKNOWN((byte)0xFF),
 	
+	/**
+	 * SUCCESS.
+	 * 
+	 */
 	SUCCESS((byte)0),
+	
+	/**
+	 * ACTIVED.
+	 * 
+	 */
 	ACTIVED((byte)1),
+	
+	/**
+	 * NOT_READY.
+	 */
 	NOT_READY((byte)2),
+	
+	/**
+	 * ALREADY_USED.
+	 */
 	ALREADY_USED((byte)3),
+	
+	/**
+	 * ENTITY_UNKNOWN.
+	 * 
+	 */
 	ENTITY_UNKNOWN((byte)4),
+	
+	/**
+	 * ENTITY_ALREADY_USED.
+	 * 
+	 */
 	ENTITY_ALREADY_USED((byte)5),
+	
+	/**
+	 * ENTITY_ACTIVED.
+	 * 
+	 */
 	ENTITY_ACTIVED((byte)6),
 	
 	;
@@ -21,10 +68,21 @@ public enum HsmsMessageSelectStatus {
 		this.status = status;
 	}
 	
+	/**
+	 * Returns Status byte code.
+	 * 
+	 * @return Status byte code
+	 */
 	public byte statusCode() {
 		return status;
 	}
 	
+	/**
+	 * Returns HSMS Message Select Status from byte code.
+	 * 
+	 * @param b byte code
+	 * @return HSMS Message Select Status
+	 */
 	public static HsmsMessageSelectStatus get(byte b) {
 		
 		for ( HsmsMessageSelectStatus s : values() ) {
@@ -39,6 +97,12 @@ public enum HsmsMessageSelectStatus {
 		return UNKNOWN;
 	}
 	
+	/**
+	 * Returns HSMS Message Select Status from HSMS Message.
+	 * 
+	 * @param msg HSMS Message
+	 * @return HSMS Message Select status
+	 */
 	public static HsmsMessageSelectStatus get(HsmsMessage msg) {
 		
 		HsmsMessageType type = HsmsMessageType.get(msg);

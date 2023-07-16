@@ -22,9 +22,21 @@ public class HsmsSsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	
 	private static final long serialVersionUID = 71663164318605890L;
 	
+	/**
+	 * SESSION-ID.
+	 * 
+	 */
 	private final IntegerProperty sessionId = IntegerProperty.newInstance(10);
+	
+	/**
+	 * SocketAddress.
+	 */
 	private final ObjectProperty<SocketAddress> socketAddr = ObjectProperty.newInstance(null);
 	
+	/**
+	 * HSMS-SS Config constructor.
+	 * 
+	 */
 	public HsmsSsCommunicatorConfig() {
 		super();
 	}
@@ -32,7 +44,7 @@ public class HsmsSsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	/**
 	 * Connect or bind SocketAddress setter
 	 * 
-	 * @param socketAddress of PASSIVE/ACTIVE
+	 * @param socketAddress the PASSIVE/ACTIVE SocktAddress
 	 */
 	public void socketAddress(SocketAddress socketAddress) {
 		this.socketAddr.set(Objects.requireNonNull(socketAddress));
@@ -50,7 +62,7 @@ public class HsmsSsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	/**
 	 * Session-ID setter
 	 * 
-	 * @param id
+	 * @param id Session-ID
 	 */
 	public void sessionId(int id) {
 		if ( id < 0 || id > 0x7FFF ) {
@@ -66,15 +78,6 @@ public class HsmsSsCommunicatorConfig extends AbstractHsmsCommunicatorConfig {
 	 */
 	public IntegerProperty sessionId() {
 		return this.sessionId;
-	}
-	
-	private static class SessionIdIllegalArgumentException extends IllegalArgumentException {
-		
-		private static final long serialVersionUID = -5233865584009807866L;
-		
-		public SessionIdIllegalArgumentException(int id) {
-			super("SESSION-ID is in 0 - 32767, id=" + id);
-		}
 	}
 	
 }
