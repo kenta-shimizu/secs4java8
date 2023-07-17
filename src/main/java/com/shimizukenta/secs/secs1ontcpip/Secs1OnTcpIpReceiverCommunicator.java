@@ -3,6 +3,7 @@ package com.shimizukenta.secs.secs1ontcpip;
 import java.io.IOException;
 
 import com.shimizukenta.secs.secs1.Secs1Communicator;
+import com.shimizukenta.secs.secs1ontcpip.impl.AbstractSecs1OnTcpIpReceiverCommunicator;
 
 /**
  * This instance is implementation of SECS-I (SEMI-E4) on TCP/IP-Receiver.
@@ -20,7 +21,7 @@ public interface Secs1OnTcpIpReceiverCommunicator extends Secs1Communicator {
 	/**
 	 * Create SECS-I-on-TCP/IP-Receiver instance.
 	 * 
-	 * @param config
+	 * @param config the SECS-I-on-TCP/IP Receiver config
 	 * @return new Secs1OnTcpIpReceiver instance
 	 */
 	public static Secs1OnTcpIpReceiverCommunicator newInstance(Secs1OnTcpIpReceiverCommunicatorConfig config) {
@@ -30,9 +31,9 @@ public interface Secs1OnTcpIpReceiverCommunicator extends Secs1Communicator {
 	/**
 	 * Create SECS-I-on-Tcp/IP-Receiver instance and {@link #open()}.
 	 * 
-	 * @param config
+	 * @param config the SECS-I-on-TCP/IP Receiver config
 	 * @return new Secs1OnTcpIpReciever instance
-	 * @throws IOException
+	 * @throws IOException if open failed
 	 */
 	public static Secs1OnTcpIpReceiverCommunicator open(Secs1OnTcpIpReceiverCommunicatorConfig config) throws IOException {
 		

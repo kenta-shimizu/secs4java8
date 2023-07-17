@@ -12,8 +12,8 @@ import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
 import com.shimizukenta.secs.hsmsss.impl.HsmsSsMessageBuilder;
 import com.shimizukenta.secs.secs1.Secs1Message;
-import com.shimizukenta.secs.secs1.Secs1MessageBuilder;
 import com.shimizukenta.secs.secs1.Secs1TooBigSendMessageException;
+import com.shimizukenta.secs.secs1.impl.Secs1MessageBuilder;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicator;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicatorConfig;
 
