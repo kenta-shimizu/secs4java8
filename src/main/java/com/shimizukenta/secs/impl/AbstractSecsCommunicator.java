@@ -1,14 +1,9 @@
 package com.shimizukenta.secs.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -45,6 +40,8 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	
 	private final SecsLogQueueObserver logQueuObserver;
 	
+	private final SecsMessageReceiveQueueBiObserver msgRecvQueueObserver;
+	
 	private final SecsMessagePassThroughQueueObserver trySendMsgPassThroughQueueObserver;
 	private final SecsMessagePassThroughQueueObserver sendedMsgPassThroughQueueObserver;
 	private final SecsMessagePassThroughQueueObserver recvMsgPassThroughQueueObserver;
@@ -58,6 +55,8 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		
 		this.logQueuObserver = new SecsLogQueueObserver(this);
 		
+		this.msgRecvQueueObserver = new SecsMessageReceiveQueueBiObserver(this);
+		
 		this.trySendMsgPassThroughQueueObserver = new SecsMessagePassThroughQueueObserver(this);
 		this.sendedMsgPassThroughQueueObserver = new SecsMessagePassThroughQueueObserver(this);
 		this.recvMsgPassThroughQueueObserver = new SecsMessagePassThroughQueueObserver(this);
@@ -69,8 +68,6 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		synchronized ( this.syncOpen ) {
 			super.open();
 		}
-		
-		this.executeMsgRecvQueueTask();
 	}
 	
 	@Override
@@ -191,46 +188,32 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	
 	
 	/* Secs-Message Receive Listener */
-	private final Collection<SecsMessageReceiveListener> msgRecvListeners = new CopyOnWriteArrayList<>();
+//	private final Collection<SecsMessageReceiveListener> msgRecvListeners = new CopyOnWriteArrayList<>();
 	
 	@Override
 	public boolean addSecsMessageReceiveListener(SecsMessageReceiveListener l) {
-		return msgRecvListeners.add(Objects.requireNonNull(l));
+//		return msgRecvListeners.add(Objects.requireNonNull(l));
+		return this.msgRecvQueueObserver.addListener(l);
 	}
 	
 	@Override
 	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveListener l) {
-		return msgRecvListeners.remove(Objects.requireNonNull(l));
+//		return msgRecvListeners.remove(Objects.requireNonNull(l));
+		return this.msgRecvQueueObserver.removeListener(l);
 	}
-	
-	private final Collection<SecsMessageReceiveBiListener> msgRecvBiListeners = new CopyOnWriteArrayList<>();
 	
 	@Override
 	public boolean addSecsMessageReceiveListener(SecsMessageReceiveBiListener l) {
-		return msgRecvBiListeners.add(Objects.requireNonNull(l));
+		return this.msgRecvQueueObserver.addBiListener(l);
 	}
 	
 	@Override
 	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveBiListener l) {
-		return msgRecvBiListeners.remove(Objects.requireNonNull(l));
-	}
-	
-	private final BlockingQueue<SecsMessage> msgRecvQueue = new LinkedBlockingQueue<>();
-	
-	private void executeMsgRecvQueueTask() {
-		executeLoopTask(() -> {
-			SecsMessage msg = msgRecvQueue.take();
-			msgRecvListeners.forEach(l -> {
-				l.received(msg);
-			});
-			msgRecvBiListeners.forEach(l -> {
-				l.received(msg, this);
-			});
-		});
+		return this.msgRecvQueueObserver.removeBiListener(l);
 	}
 	
 	public void notifyReceiveMessage(AbstractSecsMessage msg) throws InterruptedException {
-		msgRecvQueue.put(msg);
+		this.msgRecvQueueObserver.put(msg);
 	}
 	
 	
