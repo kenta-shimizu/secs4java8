@@ -9,15 +9,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.SecsCommunicatableStateChangeBiListener;
 import com.shimizukenta.secs.SecsException;
-import com.shimizukenta.secs.SecsLog;
 import com.shimizukenta.secs.SecsLogListener;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessageReceiveBiListener;
@@ -37,6 +34,7 @@ import com.shimizukenta.secs.hsms.impl.AbstractHsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.impl.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.impl.AbstractHsmsSession;
 import com.shimizukenta.secs.hsms.impl.HsmsMessageBuilder;
+import com.shimizukenta.secs.hsms.impl.HsmsMessagePassThroughQueueObserver;
 import com.shimizukenta.secs.hsmsgs.HsmsGsCommunicator;
 import com.shimizukenta.secs.hsmsgs.HsmsGsCommunicatorConfig;
 import com.shimizukenta.secs.hsmsgs.HsmsGsUnknownSessionIdException;
@@ -44,6 +42,7 @@ import com.shimizukenta.secs.impl.AbstractBaseCommunicator;
 import com.shimizukenta.secs.impl.AbstractSecsLog;
 import com.shimizukenta.secs.impl.AbstractSecsMessage;
 import com.shimizukenta.secs.impl.AbstractSecsThrowableLog;
+import com.shimizukenta.secs.impl.SecsLogQueueObserver;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.sml.SmlMessage;
 
@@ -52,12 +51,24 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	private final HsmsGsCommunicatorConfig config;
 	private final Set<AbstractHsmsSession> sessions;
 	
+	private final SecsLogQueueObserver logQueueObserver;
+	
+	private final HsmsMessagePassThroughQueueObserver trySendHsmsMsgPassThroughQueueObserver;
+	private final HsmsMessagePassThroughQueueObserver sendedHsmsMsgPassThroughQueueObserver;
+	private final HsmsMessagePassThroughQueueObserver recvHsmsMsgPassThroughQueueObserver;
+	
 	public AbstractHsmsGsCommunicator(HsmsGsCommunicatorConfig config) {
 		this.config = config;
 		this.sessions = config.sessionIds().stream()
 				.map(i -> new AbstractHsmsGsSession(config, i.intValue()) {})
 				.collect(Collectors.toSet());
 
+		
+		this.logQueueObserver = new SecsLogQueueObserver(this);
+		
+		this.trySendHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this);
+		this.sendedHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this);
+		this.recvHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this);
 	}
 	
 	public HsmsGsCommunicatorConfig config() {
@@ -73,11 +84,6 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	@Override
 	public void open() throws IOException {
 		super.open();
-		
-		this.executeLogQueueTask();
-		this.executeTrySendHsmsMsgPassThroughQueueTask();
-		this.executeSendedHsmsMsgPassThroughQueueTask();
-		this.executeRecvHsmsMsgPassThroughQueueTask();
 		
 		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 			s.open();
@@ -490,56 +496,22 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		return new AbstractHsmsGsAsyncSocketChannel(channel, this) {};
 	}
 	
-	private final Collection<SecsLogListener> logListeners = new CopyOnWriteArrayList<>();
 	
 	@Override
 	public boolean addSecsLogListener(SecsLogListener lstnr) {
-		return logListeners.add(lstnr);
+		return this.logQueueObserver.addListener(lstnr);
 	}
 	
 	@Override
 	public boolean removeSecsLogListener(SecsLogListener lstnr) {
-		return logListeners.remove(lstnr);
-	}
-	
-	private final BlockingQueue<AbstractSecsLog> logQueue = new LinkedBlockingQueue<>();
-	
-	private void executeLogQueueTask() {
-		
-		this.executorService().execute(() -> {
-			
-			try {
-				for ( ;; ) {
-					final SecsLog log = this.logQueue.take();
-					logListeners.forEach(l -> {
-						l.received(log);
-					});
-				}
-			}
-			catch ( InterruptedException ignore ) {
-			}
-			
-			try {
-				for ( ;; ) {
-					
-					final SecsLog log = this.logQueue.poll(100L, TimeUnit.MILLISECONDS);
-					if ( log == null ) {
-						break;
-					}
-					logListeners.forEach(l -> {
-						l.received(log);
-					});
-				}
-			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
+		return this.logQueueObserver.removeListener(lstnr);
 	}
 	
 	public void notifyLog(AbstractSecsLog log) throws InterruptedException {
 		
 		log.subjectHeader(this.config.logSubjectHeader().toString());
-		this.logQueue.put(log);
+		
+		this.logQueueObserver.put(log);
 		
 		final AbstractSecsMessage msg = log.optionalAbstractSecsMessage().orElse(null);
 		if ( msg != null ) {
@@ -559,31 +531,21 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		});
 	}
 	
-	private final Collection<HsmsMessagePassThroughListener> trySendHsmsMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	
+	/* Try-Send HSMS Message Pass Through */
 	
 	@Override
 	public boolean addTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.trySendHsmsMsgPassThroughLstnrs.add(lstnr);
+		return this.trySendHsmsMsgPassThroughQueueObserver.addListener(lstnr);
 	}
 	
 	@Override
 	public boolean removeTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.trySendHsmsMsgPassThroughLstnrs.remove(lstnr);
-	}
-	
-	private final BlockingQueue<HsmsMessage> trySendHsmsMsgPassThroughQueue = new LinkedBlockingQueue<>();
-		
-	private void executeTrySendHsmsMsgPassThroughQueueTask() {
-		this.executeLoopTask(() -> {
-			final HsmsMessage msg = this.trySendHsmsMsgPassThroughQueue.take();
-			this.trySendHsmsMsgPassThroughLstnrs.forEach(l -> {
-				l.passThrough(msg);
-			});
-		});
+		return this.trySendHsmsMsgPassThroughQueueObserver.removeListener(lstnr);
 	}
 	
 	public void notifyTrySendHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
-		this.trySendHsmsMsgPassThroughQueue.put(msg);
+		this.trySendHsmsMsgPassThroughQueueObserver.put(msg);
 		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 			if ( msg.sessionId() == s.sessionId() ) {
 				s.notifyTrySendHsmsMessagePassThrough(msg);
@@ -592,31 +554,21 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		}
 	}
 	
-	private final Collection<HsmsMessagePassThroughListener> sendedHsmsMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	
+	/* Sended HSMS Message Pass Through */
 	
 	@Override
 	public boolean addSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.sendedHsmsMsgPassThroughLstnrs.add(lstnr);
+		return this.sendedHsmsMsgPassThroughQueueObserver.addListener(lstnr);
 	}
 	
 	@Override
 	public boolean removeSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.sendedHsmsMsgPassThroughLstnrs.remove(lstnr);
-	}
-	
-	private final BlockingQueue<HsmsMessage> sendedHsmsMsgPassThroughQueue = new LinkedBlockingQueue<>();
-	
-	private void executeSendedHsmsMsgPassThroughQueueTask() {
-		this.executeLoopTask(() -> {
-			final HsmsMessage msg = this.sendedHsmsMsgPassThroughQueue.take();
-			this.sendedHsmsMsgPassThroughLstnrs.forEach(l -> {
-				l.passThrough(msg);
-			});
-		});
+		return this.sendedHsmsMsgPassThroughQueueObserver.removeListener(lstnr);
 	}
 	
 	public void notifySendedHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
-		this.sendedHsmsMsgPassThroughQueue.put(msg);
+		this.sendedHsmsMsgPassThroughQueueObserver.put(msg);
 		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 			if ( msg.sessionId() == s.sessionId() ) {
 				s.notifySendedHsmsMessagePassThrough(msg);
@@ -625,31 +577,21 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		}
 	}
 	
-	private final Collection<HsmsMessagePassThroughListener> recvHsmsMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	
+	/* Receive HSMS Message Pass Through */
 	
 	@Override
 	public boolean addReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.recvHsmsMsgPassThroughLstnrs.add(lstnr);
+		return this.recvHsmsMsgPassThroughQueueObserver.addListener(lstnr);
 	}
 	
 	@Override
 	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.recvHsmsMsgPassThroughLstnrs.remove(lstnr);
-	}
-	
-	private final BlockingQueue<HsmsMessage> recvHsmsMsgPassThroughQueue = new LinkedBlockingQueue<>();
-	
-	private void executeRecvHsmsMsgPassThroughQueueTask() {
-		this.executeLoopTask(() -> {
-			final HsmsMessage msg = this.recvHsmsMsgPassThroughQueue.take();
-			this.recvHsmsMsgPassThroughLstnrs.forEach(l -> {
-				l.passThrough(msg);
-			});
-		});
+		return this.recvHsmsMsgPassThroughQueueObserver.removeListener(lstnr);
 	}
 	
 	public void notifyReceiveHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
-		this.recvHsmsMsgPassThroughQueue.put(msg);
+		this.recvHsmsMsgPassThroughQueueObserver.put(msg);
 		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 			if ( msg.sessionId() == s.sessionId() ) {
 				s.notifyReceiveHsmsMessagePassThrough(msg);

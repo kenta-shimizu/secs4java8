@@ -1,10 +1,6 @@
 package com.shimizukenta.secs.hsms.impl;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
@@ -19,19 +15,23 @@ public abstract class AbstractHsmsCommunicator extends AbstractSecsCommunicator 
 
 	private final ObjectProperty<HsmsCommunicateState> hsmsCommState = ObjectProperty.newInstance(HsmsCommunicateState.NOT_CONNECTED);
 	
+	private final HsmsMessagePassThroughQueueObserver trySendHsmsMsgPassThroughQueueObserver;
+	private final HsmsMessagePassThroughQueueObserver sendedHsmsMsgPassThroughQueueObserver;
+	private final HsmsMessagePassThroughQueueObserver recvHsmsMsgPassThroughQueueObserver;
+	
 	public AbstractHsmsCommunicator(AbstractSecsCommunicatorConfig config) {
 		super(config);
 		
 		this.hsmsCommState.computeIsEqualTo(HsmsCommunicateState.SELECTED).addChangeListener(this::notifyCommunicatableStateChange);
+		
+		this.trySendHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this);
+		this.sendedHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this);
+		this.recvHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this);
 	}
 	
 	@Override
 	public void open() throws IOException {
 		super.open();
-		
-		this.executeTrySendHsmsMsgPassThroughQueueTask();
-		this.executeSendedHsmsMsgPassThroughQueueTask();
-		this.executeRecvHsmsMsgPassThroughQueueTask();
 	}
 	
 	@Override
@@ -53,85 +53,49 @@ public abstract class AbstractHsmsCommunicator extends AbstractSecsCommunicator 
 		this.hsmsCommState.set(state);
 	}
 	
-	private final Collection<HsmsMessagePassThroughListener> trySendHsmsMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
 	
 	@Override
 	public boolean addTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.trySendHsmsMsgPassThroughLstnrs.add(lstnr);
+		return this.trySendHsmsMsgPassThroughQueueObserver.addListener(lstnr);
 	}
 	
 	@Override
 	public boolean removeTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.trySendHsmsMsgPassThroughLstnrs.remove(lstnr);
+		return this.trySendHsmsMsgPassThroughQueueObserver.removeListener(lstnr);
 	}
-	
-	private final BlockingQueue<HsmsMessage> trySendHsmsMsgQueue = new LinkedBlockingQueue<>();
 	
 	public void notifyTrySendHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
-		this.trySendHsmsMsgQueue.put(msg);
+		this.trySendHsmsMsgPassThroughQueueObserver.put(msg);
 	}
 	
-	private void executeTrySendHsmsMsgPassThroughQueueTask() {
-		this.executeLoopTask(() -> {
-			final HsmsMessage msg = this.trySendHsmsMsgQueue.take();
-			this.trySendHsmsMsgPassThroughLstnrs.forEach(l -> {
-				l.passThrough(msg);
-			});
-		});
-	}
-	
-	private final Collection<HsmsMessagePassThroughListener> sendedHsmsMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
 	
 	@Override
 	public boolean addSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.sendedHsmsMsgPassThroughLstnrs.add(lstnr);
+		return this.sendedHsmsMsgPassThroughQueueObserver.addListener(lstnr);
 	}
 	
 	@Override
 	public boolean removeSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.sendedHsmsMsgPassThroughLstnrs.remove(lstnr);
+		return this.sendedHsmsMsgPassThroughQueueObserver.removeListener(lstnr);
 	}
-	
-	private final BlockingQueue<HsmsMessage> sendedHsmsMsgQueue = new LinkedBlockingQueue<>();
 	
 	public void notifySendedHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
-		this.sendedHsmsMsgQueue.put(msg);
+		this.sendedHsmsMsgPassThroughQueueObserver.put(msg);
 	}
 	
-	private void executeSendedHsmsMsgPassThroughQueueTask() {
-		this.executeLoopTask(() -> {
-			final HsmsMessage msg = this.sendedHsmsMsgQueue.take();
-			this.sendedHsmsMsgPassThroughLstnrs.forEach(l -> {
-				l.passThrough(msg);
-			});
-		});
-	}
-	
-	private final Collection<HsmsMessagePassThroughListener> recvHsmsMsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
 	
 	@Override
 	public boolean addReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.recvHsmsMsgPassThroughLstnrs.add(lstnr);
+		return this.recvHsmsMsgPassThroughQueueObserver.addListener(lstnr);
 	}
 	
 	@Override
 	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.recvHsmsMsgPassThroughLstnrs.remove(lstnr);
+		return this.recvHsmsMsgPassThroughQueueObserver.removeListener(lstnr);
 	}
-	
-	private final BlockingQueue<HsmsMessage> recvHsmsMsgQueue = new LinkedBlockingQueue<>();
 	
 	public void notifyReceiveHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
-		this.recvHsmsMsgQueue.put(msg);
+		this.recvHsmsMsgPassThroughQueueObserver.put(msg);
 	}
-	
-	private void executeRecvHsmsMsgPassThroughQueueTask() {
-		this.executeLoopTask(() -> {
-			final HsmsMessage msg = this.recvHsmsMsgQueue.take();
-			this.recvHsmsMsgPassThroughLstnrs.forEach(l -> {
-				l.passThrough(msg);
-			});
-		});
-	}	
 	
 }
