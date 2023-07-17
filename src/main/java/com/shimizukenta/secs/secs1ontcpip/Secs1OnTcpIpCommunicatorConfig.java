@@ -21,9 +21,22 @@ public class Secs1OnTcpIpCommunicatorConfig extends AbstractSecs1CommunicatorCon
 	
 	private static final long serialVersionUID = -7468433384957790240L;
 	
+	/**
+	 * SocketAddress.
+	 * 
+	 */
 	private ObjectProperty<SocketAddress> socketAddr = ObjectProperty.newInstance(null);
+	
+	/**
+	 * reconnectSeconds.
+	 * 
+	 */
 	private TimeoutProperty reconnectSeconds = TimeoutProperty.newInstance(5.0F);
 	
+	/**
+	 * Constructor.
+	 * 
+	 */
 	public Secs1OnTcpIpCommunicatorConfig() {
 		super();
 	}
@@ -35,7 +48,7 @@ public class Secs1OnTcpIpCommunicatorConfig extends AbstractSecs1CommunicatorCon
 	 * Not accept {@code null}
 	 * </p>
 	 * 
-	 * @param socketAddress
+	 * @param socketAddress the Connect SocketAddress
 	 */
 	public void socketAddress(SocketAddress socketAddress) {
 		this.socketAddr.set(Objects.requireNonNull(socketAddress));
@@ -53,7 +66,7 @@ public class Secs1OnTcpIpCommunicatorConfig extends AbstractSecs1CommunicatorCon
 	/**
 	 * Reconnect seconds setter.
 	 * 
-	 * @param seconds
+	 * @param seconds the seconds
 	 */
 	public void reconnectSeconds(float seconds) {
 		this.reconnectSeconds.set(seconds);

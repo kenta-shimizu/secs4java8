@@ -4,6 +4,12 @@ import java.util.List;
 
 import com.shimizukenta.secs.SecsMessage;
 
+/**
+ * SECS-I Message.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public interface Secs1Message extends SecsMessage {
 	
 	/**

@@ -1,6 +1,7 @@
 package com.shimizukenta.secs.secs1ontcpip;
 
 import java.net.SocketAddress;
+import java.util.Objects;
 
 import com.shimizukenta.secs.local.property.ObjectProperty;
 import com.shimizukenta.secs.local.property.TimeoutProperty;
@@ -20,9 +21,22 @@ public class Secs1OnTcpIpReceiverCommunicatorConfig extends AbstractSecs1Communi
 	
 	private static final long serialVersionUID = 6842392464950831424L;
 	
+	/**
+	 * SocketAddress.
+	 * 
+	 */
 	private ObjectProperty<SocketAddress> socketAddr = ObjectProperty.newInstance(null);
+	
+	/**
+	 * rebindSeconds.
+	 * 
+	 */
 	private TimeoutProperty rebindSeconds = TimeoutProperty.newInstance(5.0F);
 	
+	/**
+	 * Constructor.
+	 * 
+	 */
 	public Secs1OnTcpIpReceiverCommunicatorConfig() {
 		super();
 	}
@@ -34,10 +48,10 @@ public class Secs1OnTcpIpReceiverCommunicatorConfig extends AbstractSecs1Communi
 	 * Not accept {@code null}
 	 * </p>
 	 * 
-	 * @param socketAddress
+	 * @param socketAddress the Bind SocketAddress
 	 */
 	public void socketAddress(SocketAddress socketAddress) {
-		this.socketAddr.set(socketAddress);
+		this.socketAddr.set(Objects.requireNonNull(socketAddress));
 	}
 	
 	/**
@@ -52,7 +66,7 @@ public class Secs1OnTcpIpReceiverCommunicatorConfig extends AbstractSecs1Communi
 	/**
 	 * Rebind seconds setter.
 	 * 
-	 * @param seconds
+	 * @param seconds the rebind seconds
 	 */
 	public void rebindSeconds(float seconds) {
 		this.rebindSeconds.set(seconds);

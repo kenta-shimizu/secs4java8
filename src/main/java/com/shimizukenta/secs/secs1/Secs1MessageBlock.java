@@ -1,5 +1,11 @@
 package com.shimizukenta.secs.secs1;
 
+/**
+ * SECS-I Message Block.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public interface Secs1MessageBlock {
 	
 	/**
@@ -54,7 +60,7 @@ public interface Secs1MessageBlock {
 	/**
 	 * Returns Block system bytes is equals.
 	 * 
-	 * @param otherBlock
+	 * @param otherBlock the Other SECS-I Message Block
 	 * @return true if system bytes is equals
 	 */
 	public boolean equalsSystemBytes(Secs1MessageBlock otherBlock);
@@ -62,7 +68,7 @@ public interface Secs1MessageBlock {
 	/**
 	 * Returns nextBlock is next block.
 	 * 
-	 * @param nextBlock
+	 * @param nextBlock the next SECS-I Message Block
 	 * @return true if nextBlock is next block.
 	 */
 	public boolean isNextBlock(Secs1MessageBlock nextBlock);
