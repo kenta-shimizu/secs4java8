@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.shimizukenta.secs.hsms.HsmsCommunicator;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
+import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
 import com.shimizukenta.secs.hsmsss.impl.AbstractHsmsSsActiveCommunicator;
 import com.shimizukenta.secs.hsmsss.impl.AbstractHsmsSsPassiveCommunicator;
 
@@ -41,7 +42,7 @@ public interface HsmsSsCommunicator extends HsmsCommunicator {
 		}
 		default: {
 			
-			throw new IllegalStateException("undefined connecton-mode: " + mode);
+			throw new HsmsConnectionModeIllegalStateException("undefined connecton-mode: " + mode);
 		}
 		}
 	}
@@ -73,5 +74,27 @@ public interface HsmsSsCommunicator extends HsmsCommunicator {
 		
 		return inst;
 	}
+	
+	/**
+	 * Add Listener to receive Primary-Message.
+	 * 
+	 * <p>
+	 * This Listener not receive Reply-Message.<br />
+	 * </p>
+	 * 
+	 * @param biListener the HSMS Message ans HSMS-SS communicator listener
+	 * @return {@code true} if add success
+	 * @throws NullPointerException if biListener is null
+	 */
+	public boolean addHsmsMessageReceiveBiListener(HsmsSsMessageReceiveBiListener biListener);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param biListener the HSMS Message ans HSMS-SS communicator listener
+	 * @return {@code true} if remove success
+	 * @throws NullPointerException if biListener is null
+	 */
+	public boolean removeHsmsMessageReceiveBiListener(HsmsSsMessageReceiveBiListener biListener);
 	
 }

@@ -194,18 +194,18 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsMessageSendable 
 	 * This Listener not receive Reply-Message.<br />
 	 * </p>
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if add success
 	 */
-	public boolean addSecsMessageReceiveListener(SecsMessageReceiveListener lstnr);
+	public boolean addSecsMessageReceiveListener(SecsMessageReceiveListener listener);
 	
 	/**
 	 * Remove Listener.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveListener lstnr);
+	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveListener listener);
 	
 	
 	/**
@@ -215,18 +215,44 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsMessageSendable 
 	 * This Listener not receive Reply-Message.<br />
 	 * </p>
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if add success
 	 */
-	public boolean addSecsMessageReceiveListener(SecsMessageReceiveBiListener lstnr);
+	@Deprecated
+	default public boolean addSecsMessageReceiveListener(SecsMessageReceiveBiListener listener) {
+		return this.addSecsMessageReceiveBiListener(listener);
+	}
 	
 	/**
 	 * Remove Listener.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveBiListener lstnr);
+	@Deprecated
+	default public boolean removeSecsMessageReceiveListener(SecsMessageReceiveBiListener listener) {
+		return this.removeSecsMessageReceiveBiListener(listener);
+	}
+	
+	/**
+	 * Add Listener to receive Primary-Message.
+	 * 
+	 * <p>
+	 * This Listener not receive Reply-Message.<br />
+	 * </p>
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addSecsMessageReceiveBiListener(SecsMessageReceiveBiListener biListener);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeSecsMessageReceiveBiListener(SecsMessageReceiveBiListener biListener);
 	
 	
 	/* Secs-Log Receive Listener */
@@ -234,18 +260,18 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsMessageSendable 
 	/**
 	 * Add Listener to log Communicating.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if add success
 	 */
-	public boolean addSecsLogListener(SecsLogListener lstnr);
+	public boolean addSecsLogListener(SecsLogListener listener);
 	
 	/**
 	 * Remove Listener
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeSecsLogListener(SecsLogListener lstnr);
+	public boolean removeSecsLogListener(SecsLogListener listener);
 	
 	
 	/* Secs-Communicatable-State-Changed-Listener */
@@ -258,18 +284,18 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsMessageSendable 
 	 * Pass through quickly.<br />
 	 * </p>
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if add success
 	 */
-	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener lstnr);
+	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener listener);
 	
 	/**
 	 * Remove Listener.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener lstnr);	
+	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener listener);	
 	
 	/**
 	 * Add Listener to get communicate-state-changed.
@@ -279,73 +305,216 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsMessageSendable 
 	 * Pass through quickly.<br />
 	 * </p>
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if add success
 	 */
-	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener lstnr);
+	@Deprecated
+	default public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener listener) {
+		return this.addSecsCommunicatableStateChangeBiListener(listener);
+	}
 	
 	/**
 	 * Remove Listener.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener lstnr);
-
+	@Deprecated
+	default public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener listener) {
+		return this.removeSecsCommunicatableStateChangeBiListener(listener);
+	}
+	
+	/**
+	 * Add Listener to get communicate-state-changed.
+	 * 
+	 * <p>
+	 * Blocking-Listener.<br />
+	 * Pass through quickly.<br />
+	 * </p>
+	 * 
+	 * @param listener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener listener);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param listener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener listener);
+	
+	
 	/* Try-Send Secs-Message Pass-through Listener */
 	
 	/**
 	 * Add Listener to get SecsMesssage before sending.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if add success.
 	 */
-	public boolean addTrySendMessagePassThroughListener(SecsMessagePassThroughListener lstnr);
+	public boolean addTrySendSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);
 	
 	/**
 	 * Remove Listener.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeTrySendMessagePassThroughListener(SecsMessagePassThroughListener lstnr);	
+	public boolean removeTrySendSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);	
 	
+	/**
+	 * Add Listener to get SecsMesssage before sending.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success.
+	 */
+	public boolean addTrySendSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeTrySendSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener);	
+
 	
 	/* Sended Secs-Message Pass-through Listener */
 	
 	/**
 	 * Add Listener to get sended SecsMesssage.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if add success
 	 */
-	public boolean addSendedMessagePassThroughListener(SecsMessagePassThroughListener lstnr);
+	public boolean addSendedSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);
 	
 	/**
 	 * Remove Listener.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeSendedMessagePassThroughListener(SecsMessagePassThroughListener lstnr);	
+	public boolean removeSendedSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);	
 	
+	/**
+	 * Add Listener to get sended SecsMesssage.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addSendedSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeSendedSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener);	
+
 	
 	/* Receive Secs-Message Pass-through Listener */
 	
 	/**
 	 * Add Listener to receive both Primary and Reply Message.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if add success
 	 */
-	public boolean addReceiveMessagePassThroughListener(SecsMessagePassThroughListener lstnr);
+	public boolean addReceiveSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);
+	
+	/**
+	 * Remove BiListener.
+	 * 
+	 * @param listener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeReceiveSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);
+	
+	/**
+	 * Add BiListener to receive both Primary and Reply Message.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addReceiveSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener);
 	
 	/**
 	 * Remove Listener.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param biListener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeReceiveMessagePassThroughListener(SecsMessagePassThroughListener lstnr);
+	public boolean removeReceiveSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener);
+
+	
+	/**
+	 * Add Listener to get SecsMesssage before sending.
+	 * 
+	 * @param listener Not accept {@code null}
+	 * @return {@code true} if add success.
+	 */
+	@Deprecated
+	default public boolean addTrySendMessagePassThroughListener(SecsMessagePassThroughListener listener) {
+		return this.addTrySendSecsMessagePassThroughListener(listener);
+	}
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param listener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	@Deprecated
+	default public boolean removeTrySendMessagePassThroughListener(SecsMessagePassThroughListener listener) {
+		return this.removeTrySendSecsMessagePassThroughListener(listener);
+	}
+	
+	/**
+	 * Add Listener to get sended SecsMesssage.
+	 * 
+	 * @param listener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	@Deprecated
+	default public boolean addSendedMessagePassThroughListener(SecsMessagePassThroughListener listener) {
+		return this.addSendedSecsMessagePassThroughListener(listener);
+	}
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param listener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	@Deprecated
+	default public boolean removeSendedMessagePassThroughListener(SecsMessagePassThroughListener listener) {
+		return this.removeSendedSecsMessagePassThroughListener(listener);
+	}
+	
+	/**
+	 * Add Listener to receive both Primary and Reply Message.
+	 * 
+	 * @param listener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	@Deprecated
+	default public boolean addReceiveMessagePassThroughListener(SecsMessagePassThroughListener listener) {
+		return this.addReceiveSecsMessagePassThroughListener(listener);
+	}
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param listener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	@Deprecated
+	default public boolean removeReceiveMessagePassThroughListener(SecsMessagePassThroughListener listener) {
+		return this.removeReceiveSecsMessagePassThroughListener(listener);
+	}
 	
 }

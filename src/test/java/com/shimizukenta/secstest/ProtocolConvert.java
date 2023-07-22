@@ -111,7 +111,7 @@ public class ProtocolConvert {
 						) {
 					
 					equip.addSecsLogListener(ProtocolConvert::echo);
-					equip.addSecsMessageReceiveListener(equipRecvListener());
+					equip.addSecsMessageReceiveBiListener(equipRecvListener());
 					
 					equip.open();
 					
@@ -120,7 +120,7 @@ public class ProtocolConvert {
 							) {
 						
 						host.addSecsLogListener(ProtocolConvert::echo);
-						host.addSecsMessageReceiveListener(hostRecvListener());
+						host.addSecsMessageReceiveBiListener(hostRecvListener());
 						
 						host.open();
 						

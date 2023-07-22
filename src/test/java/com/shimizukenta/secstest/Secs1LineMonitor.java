@@ -404,7 +404,7 @@ public class Secs1LineMonitor implements Closeable {
 						SecsCommunicator equip = Secs1OnTcpIpReceiverCommunicator.newInstance(equipConf);
 						) {
 					
-					equip.addSecsMessageReceiveListener((msg, comm) -> {
+					equip.addSecsMessageReceiveBiListener((msg, comm) -> {
 						
 						int strm = msg.getStream();
 						int func = msg.getFunction();
@@ -442,7 +442,7 @@ public class Secs1LineMonitor implements Closeable {
 							SecsCommunicator host = Secs1OnTcpIpReceiverCommunicator.newInstance(hostConf);
 							) {
 						
-						host.addSecsMessageReceiveListener((msg, comm) -> {
+						host.addSecsMessageReceiveBiListener((msg, comm) -> {
 							
 							int strm = msg.getStream();
 							int func = msg.getFunction();

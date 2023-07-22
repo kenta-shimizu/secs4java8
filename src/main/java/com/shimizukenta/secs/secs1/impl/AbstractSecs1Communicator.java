@@ -1,11 +1,7 @@
 package com.shimizukenta.secs.secs1.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Optional;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
@@ -17,6 +13,8 @@ import com.shimizukenta.secs.secs1.Secs1Communicator;
 import com.shimizukenta.secs.secs1.Secs1Exception;
 import com.shimizukenta.secs.secs1.Secs1Message;
 import com.shimizukenta.secs.secs1.Secs1MessagePassThroughListener;
+import com.shimizukenta.secs.secs1.Secs1MessageReceiveBiListener;
+import com.shimizukenta.secs.secs1.Secs1MessageReceiveListener;
 import com.shimizukenta.secs.secs1.Secs1SendByteException;
 import com.shimizukenta.secs.secs1.Secs1SendMessageException;
 import com.shimizukenta.secs.secs1.Secs1WaitReplyMessageException;
@@ -34,11 +32,24 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	private final Secs1MessageBuilder msgBuilder;
 	private final AbstractSecs1Circuit circuit;
 	
+	private final Secs1MessageReceiveQueueBiObserver secs1MsgRecvQueueBiObserver;
+	
+	private final Secs1MessagePassThroughQueueBiObserver trySendSecs1MsgPassThroughQueueBiObserver;
+	private final Secs1MessagePassThroughQueueBiObserver sendedSecs1MsgPassThroughQueueBiObserver;
+	private final Secs1MessagePassThroughQueueBiObserver recvSecs1MsgPassThroughQueueBiObserver;
+	
+	
 	public AbstractSecs1Communicator(AbstractSecs1CommunicatorConfig config) {
 		super(config);
 		this.config = config;
 		this.msgBuilder = new AbstractSecs1MessageBuilder(this) {};
 		this.circuit = new AbstractSecs1Circuit(this) {};
+		
+		this.secs1MsgRecvQueueBiObserver = new Secs1MessageReceiveQueueBiObserver(this);
+		
+		this.trySendSecs1MsgPassThroughQueueBiObserver = new Secs1MessagePassThroughQueueBiObserver(this);
+		this.sendedSecs1MsgPassThroughQueueBiObserver = new Secs1MessagePassThroughQueueBiObserver(this);
+		this.recvSecs1MsgPassThroughQueueBiObserver = new Secs1MessagePassThroughQueueBiObserver(this);
 	}
 	
 	public AbstractSecs1CommunicatorConfig config() {
@@ -62,10 +73,6 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	@Override
 	public void open() throws IOException {
 		super.open();
-		
-		this.executeTrySendSecs1MsgPassThroughQueueTask();
-		this.executeSendedSecs1MsgPassThroughQueueTask();
-		this.executeRecvSecs1MsgPassThroughQueueTask();
 		
 		this.executorService().execute(this.circuit);
 	}
@@ -109,86 +116,83 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	
 	abstract public void sendBytes(byte[] bs) throws Secs1SendByteException, InterruptedException;
 	
+	@Override
+	public boolean addSecs1MessageReceiveListener(Secs1MessageReceiveListener listener) {
+		return this.secs1MsgRecvQueueBiObserver.addListener(listener);
+	}
 	
-	private final Collection<Secs1MessagePassThroughListener> trySendSecs1MsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	@Override
+	public boolean removeSecs1MessageReceiveListener(Secs1MessageReceiveListener listener) {
+		return this.secs1MsgRecvQueueBiObserver.removeListener(listener);
+	}
+	
+	@Override
+	public boolean addSecs1MessageReceiveBiListener(Secs1MessageReceiveBiListener biListener) {
+		return this.secs1MsgRecvQueueBiObserver.addBiListener(biListener);
+	}
+	
+	@Override
+	public boolean removeSecs1MessageReceiveBiListener(Secs1MessageReceiveBiListener biListener) {
+		return this.secs1MsgRecvQueueBiObserver.removeBiListener(biListener);
+	}
+	
+	public void notifyReceiveSecs1Message(Secs1Message message) throws InterruptedException {
+		super.notifyReceiveSecsMessage(message);
+		this.secs1MsgRecvQueueBiObserver.put(message);
+	}
+	
+	
+	/* try send SECS-I Message Pass through */
 	
 	@Override
 	public boolean addTrySendSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr) {
-		return this.trySendSecs1MsgPassThroughLstnrs.add(lstnr);
+		return this.trySendSecs1MsgPassThroughQueueBiObserver.addListener(lstnr);
 	}
 	
 	@Override
 	public boolean removeTrySendSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr) {
-		return this.trySendSecs1MsgPassThroughLstnrs.remove(lstnr);
+		return this.trySendSecs1MsgPassThroughQueueBiObserver.removeListener(lstnr);
 	}
 	
-	private final BlockingQueue<Secs1Message> trySendSecs1MsgPassThroughQueue = new LinkedBlockingQueue<>();
-	
-	public void notifyTrySendSecs1MessagePassThrough(Secs1Message msg) throws InterruptedException {
-		this.trySendSecs1MsgPassThroughQueue.put(msg);
+	public void notifyTrySendSecs1MessagePassThrough(Secs1Message message) throws InterruptedException {
+		super.notifyTrySendSecsMessagePassThrough(message);
+		this.trySendSecs1MsgPassThroughQueueBiObserver.put(message);
 	}
 	
-	private void executeTrySendSecs1MsgPassThroughQueueTask() {
-		this.executeLoopTask(() -> {
-			final Secs1Message msg = this.trySendSecs1MsgPassThroughQueue.take();
-			this.trySendSecs1MsgPassThroughLstnrs.forEach(l -> {
-				l.passThrough(msg);
-			});
-		});
-	}
 	
-	private final Collection<Secs1MessagePassThroughListener> sendedSecs1MsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	/* Sended SECS-I Message Pass Throught */
 	
 	@Override
 	public boolean addSendedSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr) {
-		return this.sendedSecs1MsgPassThroughLstnrs.add(lstnr);
+		return this.sendedSecs1MsgPassThroughQueueBiObserver.addListener(lstnr);
 	}
 	
 	@Override
 	public boolean removeSendedSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr) {
-		return this.sendedSecs1MsgPassThroughLstnrs.remove(lstnr);
+		return this.sendedSecs1MsgPassThroughQueueBiObserver.removeListener(lstnr);
 	}
 	
-	private final BlockingQueue<Secs1Message> sendedSecs1MsgPassThroughQueue = new LinkedBlockingQueue<>();
-	
-	public void notifySendedSecs1MessagePassThrough(Secs1Message msg) throws InterruptedException {
-		this.sendedSecs1MsgPassThroughQueue.put(msg);
+	public void notifySendedSecs1MessagePassThrough(Secs1Message message) throws InterruptedException {
+		super.notifySendedSecsMessagePassThrough(message);
+		this.sendedSecs1MsgPassThroughQueueBiObserver.put(message);
 	}
 	
-	private void executeSendedSecs1MsgPassThroughQueueTask() {
-		this.executeLoopTask(() -> {
-			final Secs1Message msg = this.sendedSecs1MsgPassThroughQueue.take();
-			this.sendedSecs1MsgPassThroughLstnrs.forEach(l -> {
-				l.passThrough(msg);
-			});
-		});
-	}
 	
-	private final Collection<Secs1MessagePassThroughListener> recvSecs1MsgPassThroughLstnrs = new CopyOnWriteArrayList<>();
+	/* Receive SECS-I Message Pass Through */
 	
 	@Override
 	public boolean addReceiveSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr) {
-		return this.recvSecs1MsgPassThroughLstnrs.add(lstnr);
+		return this.recvSecs1MsgPassThroughQueueBiObserver.addListener(lstnr);
 	}
 	
 	@Override
 	public boolean removeReceiveSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr) {
-		return this.recvSecs1MsgPassThroughLstnrs.add(lstnr);
+		return this.recvSecs1MsgPassThroughQueueBiObserver.removeListener(lstnr);
 	}
 	
-	private final BlockingQueue<Secs1Message> recvSecs1MsgPassThroughQueue = new LinkedBlockingQueue<>();
-	
-	public void notifyReceiveSecs1MessagePassThrough(Secs1Message msg) throws InterruptedException {
-		this.recvSecs1MsgPassThroughQueue.put(msg);
-	}
-	
-	private void executeRecvSecs1MsgPassThroughQueueTask() {
-		this.executeLoopTask(() -> {
-			final Secs1Message msg = this.recvSecs1MsgPassThroughQueue.take();
-			this.recvSecs1MsgPassThroughLstnrs.forEach(l -> {
-				l.passThrough(msg);
-			});
-		});
+	public void notifyReceiveSecs1MessagePassThrough(Secs1Message message) throws InterruptedException {
+		super.notifyReceiveSecsMessagePassThrough(message);
+		this.recvSecs1MsgPassThroughQueueBiObserver.put(message);
 	}
 	
 }

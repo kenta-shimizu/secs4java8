@@ -80,13 +80,13 @@ public class PairHsmsSs {
 				}
 			});
 			
-			equip.addTrySendMessagePassThroughListener(msg -> {
+			equip.addTrySendSecsMessagePassThroughListener(msg -> {
 				echo("equip-pt-trysnd: strm: " + msg.getStream() + ", func: " + msg.getFunction());
 			});
-			equip.addSendedMessagePassThroughListener(msg -> {
+			equip.addSendedSecsMessagePassThroughListener(msg -> {
 				echo("equip-pt-sended: strm: " + msg.getStream() + ", func: " + msg.getFunction());
 			});
-			equip.addReceiveMessagePassThroughListener(msg -> {
+			equip.addReceiveSecsMessagePassThroughListener(msg -> {
 				echo("equip-pt-recved: strm: " + msg.getStream() + ", func: " + msg.getFunction());
 			});
 			
@@ -153,13 +153,13 @@ public class PairHsmsSs {
 					}
 				});
 				
-				host.addTrySendMessagePassThroughListener(msg -> {
+				host.addTrySendSecsMessagePassThroughListener(msg -> {
 					echo("host-pt-trysnd: strm: " + msg.getStream() + ", func: " + msg.getFunction());
 				});
-				host.addSendedMessagePassThroughListener(msg -> {
+				host.addSendedSecsMessagePassThroughListener(msg -> {
 					echo("host-pt-sended: strm: " + msg.getStream() + ", func: " + msg.getFunction());
 				});
-				host.addReceiveMessagePassThroughListener(msg -> {
+				host.addReceiveSecsMessagePassThroughListener(msg -> {
 					echo("host-pt-recved: strm: " + msg.getStream() + ", func: " + msg.getFunction());
 				});
 				

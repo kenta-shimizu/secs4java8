@@ -394,7 +394,7 @@ public class ProtocolConverter implements Closeable {
 						) {
 					
 					equip.addSecsLogListener(ProtocolConverter::echo);
-					equip.addSecsMessageReceiveListener(equipRecvListener());
+					equip.addSecsMessageReceiveBiListener(equipRecvListener());
 					
 					equip.open();
 					
@@ -403,7 +403,7 @@ public class ProtocolConverter implements Closeable {
 							) {
 						
 						host.addSecsLogListener(ProtocolConverter::echo);
-						host.addSecsMessageReceiveListener(hostRecvListener());
+						host.addSecsMessageReceiveBiListener(hostRecvListener());
 						
 						host.open();
 						

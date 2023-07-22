@@ -32,4 +32,26 @@ public interface HsmsSession extends HsmsCommunicator {
 	 */
 	public boolean separate() throws InterruptedException;
 	
+	/**
+	 * Add Listener to receive Primary-Message.
+	 * 
+	 * <p>
+	 * This Listener not receive Reply-Message.<br />
+	 * </p>
+	 * 
+	 * @param biListener the HSMS Message ans HSMS-Session communicator listener
+	 * @return {@code true} if add success
+	 * @throws NullPointerException if biListener is null
+	 */
+	public boolean addHsmsMessageReceiveBiListener(HsmsSessionMessageReceiveBiListener biListener);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param biListener the HSMS Message ans HSMS-Session communicator listener
+	 * @return {@code true} if remove success
+	 * @throws NullPointerException if biListener is null
+	 */
+	public boolean removeHsmsMessageReceiveBiListener(HsmsSessionMessageReceiveBiListener biListener);
+	
 }

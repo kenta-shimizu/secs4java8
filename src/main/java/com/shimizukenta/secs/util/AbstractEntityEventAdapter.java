@@ -167,8 +167,8 @@ public abstract class AbstractEntityEventAdapter implements EntityEventAdapter {
 	
 	@Override
 	public void adaptToSecsCommunicator(SecsCommunicator comm) {
-		comm.addSecsCommunicatableStateChangeListener(this);
-		comm.addSecsMessageReceiveListener(this);
+		comm.addSecsCommunicatableStateChangeBiListener(this);
+		comm.addSecsMessageReceiveBiListener(this);
 	}
 	
 }

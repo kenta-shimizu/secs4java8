@@ -2,8 +2,6 @@ package com.shimizukenta.secs.hsms;
 
 import java.util.EventListener;
 
-import com.shimizukenta.secs.hsms.impl.AbstractHsmsMessage;
-
 /**
  * HSMS Message receive listener.
  * 
@@ -15,7 +13,8 @@ public interface HsmsMessageReceiveListener extends EventListener {
 	/**
 	 * received.
 	 * 
-	 * @param msg the HSMS Message
+	 * @param message the HSMS Message
 	 */
-	public void received(AbstractHsmsMessage msg);
+	public void received(HsmsMessage message);
+	
 }

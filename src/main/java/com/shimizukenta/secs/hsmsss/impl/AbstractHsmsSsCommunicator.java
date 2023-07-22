@@ -10,6 +10,7 @@ import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.HsmsException;
 import com.shimizukenta.secs.hsms.HsmsMessage;
+import com.shimizukenta.secs.hsms.HsmsMessageReceiveListener;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.impl.AbstractHsmsAsyncSocketChannel;
@@ -18,6 +19,7 @@ import com.shimizukenta.secs.hsms.impl.AbstractHsmsSession;
 import com.shimizukenta.secs.hsms.impl.HsmsMessageBuilder;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
+import com.shimizukenta.secs.hsmsss.HsmsSsMessageReceiveBiListener;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
@@ -31,16 +33,16 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 	
 	private final HsmsSsCommunicatorConfig config;
 	private final AbstractHsmsSsSession session;
+	private final HsmsSsMessageReceiveQueueBiObserver hsmsSsMsgRecvQueueBiObserver;
 	
 	public AbstractHsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);
 		
 		this.config = config;
 		
-		this.session = new AbstractHsmsSsSession(
-				config,
-				config.sessionId().intValue()
-				) {};
+		this.session = new AbstractHsmsSsSession(config) {};
+		
+		this.hsmsSsMsgRecvQueueBiObserver = new HsmsSsMessageReceiveQueueBiObserver(this);
 	}
 	
 	@Override
@@ -142,6 +144,31 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 	
 	protected AbstractHsmsAsyncSocketChannel buildAsyncSocketChannel(AsynchronousSocketChannel channel) {
 		return new AbstractHsmsSsAsyncSocketChannel(channel, this) {};
+	}
+	
+	@Override
+	public boolean addHsmsMessageReceiveListener(HsmsMessageReceiveListener listener) {
+		return this.hsmsSsMsgRecvQueueBiObserver.addListener(listener);
+	}
+	
+	@Override
+	public boolean removeHsmsMessageReceiveListener(HsmsMessageReceiveListener listener) {
+		return this.hsmsSsMsgRecvQueueBiObserver.removeListener(listener);
+	}
+	
+	@Override
+	public boolean addHsmsMessageReceiveBiListener(HsmsSsMessageReceiveBiListener biListener) {
+		return this.hsmsSsMsgRecvQueueBiObserver.addBiListener(biListener);
+	}
+	
+	@Override
+	public boolean removeHsmsMessageReceiveBiListener(HsmsSsMessageReceiveBiListener biListener) {
+		return this.hsmsSsMsgRecvQueueBiObserver.removeBiListener(biListener);
+	}
+	
+	@Override
+	protected void prototypeNotifyReceiveHsmsMessage(HsmsMessage message) throws InterruptedException {
+		this.hsmsSsMsgRecvQueueBiObserver.put(message);
 	}
 	
 }

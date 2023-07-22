@@ -3,6 +3,7 @@ package com.shimizukenta.secs.secs1;
 import java.util.EventListener;
 
 /**
+ * Secs1MessagePassThroughListener.
  * 
  * @author kenta-shimizu
  *
