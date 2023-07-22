@@ -10,11 +10,15 @@ import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsLogListener;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessageReceiveBiListener;
+import com.shimizukenta.secs.SecsMessageReceiveListener;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
+import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
 import com.shimizukenta.secs.hsms.HsmsMessagePassThroughListener;
+import com.shimizukenta.secs.hsms.HsmsMessageReceiveListener;
 import com.shimizukenta.secs.hsms.HsmsSession;
+import com.shimizukenta.secs.hsms.HsmsSessionMessageReceiveBiListener;
 import com.shimizukenta.secs.hsmsgs.impl.AbstractHsmsGsActiveCommunicator;
 import com.shimizukenta.secs.hsmsgs.impl.AbstractHsmsGsPassiveCommunicator;
 import com.shimizukenta.secs.secs2.Secs2;
@@ -61,7 +65,7 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 		}
 		default: {
 			
-			throw new IllegalStateException("undefined connecton-mode: " + mode);
+			throw new HsmsConnectionModeIllegalStateException("undefined connecton-mode: " + mode);
 		}
 		}
 	}
@@ -257,6 +261,7 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 					SecsException,
 					InterruptedException;
 	
+	
 	/**
 	 * Add Listener to receive Primary-Message.
 	 * 
@@ -264,18 +269,86 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	 * This Listener not receive Reply-Message.<br />
 	 * </p>
 	 * 
-	 * @param lstnr Not accept {@code null}
-	 * @return {@code true} if add success in all sessions
+	 * @param listener the Receive SECS-Message listener
+	 * @return {@code true} if add succesw
+	 * @throws NullPointerException if the listener is null
 	 */
-	public boolean addSecsMessageReceiveListener(SecsMessageReceiveBiListener lstnr);
+	public boolean addSecsMessageReceiveListener(SecsMessageReceiveListener listener);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param listener the Receive SECS-Message listener
+	 * @return {@code true} if remove succesw
+	 * @throws NullPointerException if the listener is null
+	 */
+	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveListener listener);
+	
+	/**
+	 * Add Listener to receive Primary-Message.
+	 * 
+	 * <p>
+	 * This Listener not receive Reply-Message.<br />
+	 * </p>
+	 * 
+	 * @param biListener the Receive SECS-Message and SECS-Communicator listener
+	 * @return {@code true} if add success
+	 * @throws NullPointerException if the biListener is null
+	 */
+	public boolean addSecsMessageReceiveBiListener(SecsMessageReceiveBiListener biListener);
 	
 	/**
 	 * Remove Listener.
 	 * 
-	 * @param lstnr Not accept {@code null}
-	 * @return {@code true} if remove success in all sessions
+	 * @param biListener the Receive SECS-Message and SECS-Communicator listener
+	 * @return {@code true} if remove success in
+	 * @throws NullPointerException if the biListener is null
 	 */
-	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveBiListener lstnr);
+	public boolean removeSecsMessageReceiveBiListener(SecsMessageReceiveBiListener biListener);
+	
+	/**
+	 * Add Listener to receive Primary-Message.
+	 * 
+	 * <p>
+	 * This Listener not receive Reply-Message.<br />
+	 * </p>
+	 * 
+	 * @param listener the Receive HSMS-Message listener
+	 * @return {@code true} if add succesw
+	 * @throws NullPointerException if the listener is null
+	 */
+	public boolean addHsmsMessageReceiveListener(HsmsMessageReceiveListener listener);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param listener the Receive HSMS-Message listener
+	 * @return {@code true} if remove succesw
+	 * @throws NullPointerException if the listener is null
+	 */
+	public boolean removeHsmsMessageReceiveListener(HsmsMessageReceiveListener listener);
+	
+	/**
+	 * Add Listener to receive Primary-Message.
+	 * 
+	 * <p>
+	 * This Listener not receive Reply-Message.<br />
+	 * </p>
+	 * 
+	 * @param biListener the Receive HSMS-Message and HSMS-SESSION listener
+	 * @return {@code true} if add success
+	 * @throws NullPointerException if the biListener is null
+	 */
+	public boolean addHsmsMessageReceiveBiListener(HsmsSessionMessageReceiveBiListener biListener);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param biListener the Receive HSMS-Message and HSMS-SESSION listener
+	 * @return {@code true} if remove success
+	 * @throws NullPointerException if the biListener is null
+	 */
+	public boolean removeHsmsMessageReceiveBiListener(HsmsSessionMessageReceiveBiListener biListener);
 	
 	/**
 	 * Add Listener to get communicate-state-changed.

@@ -26,7 +26,6 @@ import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsTimeoutT7Exception;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.impl.AbstractHsmsAsyncSocketChannel;
-import com.shimizukenta.secs.hsms.impl.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
 import com.shimizukenta.secs.hsmsss.HsmsSsPassiveReceiveNotSelectRequestException;
 import com.shimizukenta.secs.local.property.TimeoutProperty;
@@ -244,7 +243,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException {
 		
-		final BlockingQueue<AbstractHsmsMessage> queue = new LinkedBlockingQueue<>();
+		final BlockingQueue<HsmsMessage> queue = new LinkedBlockingQueue<>();
 		
 		asyncChannel.addHsmsMessageReceiveListener(msg -> {
 			try {
@@ -289,7 +288,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 	
 	private void mainSelectedTask(
 			AbstractHsmsAsyncSocketChannel asyncChannel,
-			BlockingQueue<AbstractHsmsMessage> queue)
+			BlockingQueue<HsmsMessage> queue)
 					throws InterruptedException {
 		
 		final Collection<Callable<Void>> tasks = Arrays.asList(
@@ -298,11 +297,11 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 						try {
 							
 							for ( ;; ) {
-								final AbstractHsmsMessage msg = queue.take();
+								final HsmsMessage msg = queue.take();
 								
 								switch ( msg.messageType() ) {
 								case DATA: {
-									this.notifyReceiveMessage(msg);
+									this.notifyReceiveHsmsMessage(msg);
 									break;
 								}
 								case SELECT_REQ: {

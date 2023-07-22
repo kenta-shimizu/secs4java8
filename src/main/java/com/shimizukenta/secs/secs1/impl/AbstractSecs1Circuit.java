@@ -65,7 +65,6 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			
 			this.sendMgr.enter(msg);
 			
-			this.comm.notifyTrySendMessagePassThrough(msg);
 			this.comm.notifyTrySendSecs1MessagePassThrough(msg);
 			this.comm.notifyLog(new Secs1TrySendMessageLog(msg));
 			
@@ -174,7 +173,6 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 								if ( pack.ebit() ) {
 									
 									this.sendMgr.putSended(pack.message());
-									this.comm.notifySendedMessagePassThrough(pack.message());
 									this.comm.notifySendedSecs1MessagePassThrough(pack.message());
 									this.comm.notifyLog(new Secs1SendedMessageLog(pack.message()));
 									
@@ -331,10 +329,9 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 				AbstractSecs1Message m = this.transMgr.put(s1msg);
 				
 				if ( m != null ) {
-					this.comm.notifyReceiveMessage(m);
+					this.comm.notifyReceiveSecs1Message(m);
 				}
 				
-				this.comm.notifyReceiveMessagePassThrough(s1msg);
 				this.comm.notifyReceiveSecs1MessagePassThrough(s1msg);
 				this.comm.notifyLog(new Secs1ReceiveMessageLog(s1msg));
 			}

@@ -13,14 +13,6 @@ public class HsmsConnectionModeIllegalStateException extends IllegalStateExcepti
 	/**
 	 * Constructor.
 	 * 
-	 */
-	public HsmsConnectionModeIllegalStateException() {
-		super();
-	}
-	
-	/**
-	 * Constructor.
-	 * 
 	 * @param message the message
 	 */
 	public HsmsConnectionModeIllegalStateException(String message) {

@@ -35,7 +35,7 @@ public class PairHsmsGs {
 			equipConfig.logSubjectHeader("Equip: ");
 			equipConfig.connectionMode(HsmsConnectionMode.PASSIVE);
 			equipConfig.rebindIfPassive(5.0F);
-			equipConfig.notTrySelectRequest();
+//			equipConfig.notTrySelectRequest();
 			equipConfig.retrySelectRequestTimeout(5.0F);
 			equipConfig.timeout().t3(45.0F);
 			equipConfig.timeout().t6( 5.0F);
@@ -50,6 +50,7 @@ public class PairHsmsGs {
 			hostConfig.isEquip(false);
 			hostConfig.logSubjectHeader("Host: ");
 			hostConfig.connectionMode(HsmsConnectionMode.ACTIVE);
+//			hostConfig.notTrySelectRequest();
 			hostConfig.retrySelectRequestTimeout(5.0F);
 			hostConfig.timeout().t3(45.0F);
 			hostConfig.timeout().t5(10.0F);
@@ -64,7 +65,7 @@ public class PairHsmsGs {
 				
 				equipComm.addSecsLogListener(log -> {echo(log);});
 				
-				equipComm.addSecsMessageReceiveListener((msg, comm) -> {
+				equipComm.addSecsMessageReceiveBiListener((msg, comm) -> {
 					
 					int strm = msg.getStream();
 					int func = msg.getFunction();

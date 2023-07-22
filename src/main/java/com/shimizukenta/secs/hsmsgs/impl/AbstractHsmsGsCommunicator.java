@@ -18,20 +18,22 @@ import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsLogListener;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessageReceiveBiListener;
+import com.shimizukenta.secs.SecsMessageReceiveListener;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.HsmsException;
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageDeselectStatus;
 import com.shimizukenta.secs.hsms.HsmsMessagePassThroughListener;
+import com.shimizukenta.secs.hsms.HsmsMessageReceiveListener;
 import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
 import com.shimizukenta.secs.hsms.HsmsMessageSelectStatus;
 import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsSession;
+import com.shimizukenta.secs.hsms.HsmsSessionMessageReceiveBiListener;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.impl.AbstractHsmsAsyncSocketChannel;
-import com.shimizukenta.secs.hsms.impl.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.impl.AbstractHsmsSession;
 import com.shimizukenta.secs.hsms.impl.HsmsMessageBuilder;
 import com.shimizukenta.secs.hsms.impl.HsmsMessagePassThroughQueueObserver;
@@ -51,6 +53,9 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	private final HsmsGsCommunicatorConfig config;
 	private final Set<AbstractHsmsSession> sessions;
 	
+	private final HsmsGsMessageReceiveBiObserver hsmsMsgRecvBiObserver;
+	private final HsmsSessionMessageReceiveBiListener hsmsMsgRecvBiListener;
+	
 	private final SecsLogQueueObserver logQueueObserver;
 	
 	private final HsmsMessagePassThroughQueueObserver trySendHsmsMsgPassThroughQueueObserver;
@@ -62,7 +67,16 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		this.sessions = config.sessionIds().stream()
 				.map(i -> new AbstractHsmsGsSession(config, i.intValue()) {})
 				.collect(Collectors.toSet());
-
+		
+		this.hsmsMsgRecvBiObserver = new HsmsGsMessageReceiveBiObserver();
+		
+		this.hsmsMsgRecvBiListener = (msg, session) -> {
+			this.hsmsMsgRecvBiObserver.notifyReceiveHsmsMessageAndSession(msg, session);
+		};
+		
+		for (HsmsSession s : this.sessions) {
+			s.addHsmsMessageReceiveBiListener(this.hsmsMsgRecvBiListener);
+		}
 		
 		this.logQueueObserver = new SecsLogQueueObserver(this);
 		
@@ -169,7 +183,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 			throws InterruptedException {
 		
 		final AbstractHsmsAsyncSocketChannel asyncChannel = buildAsyncSocketChannel(channel);
-		final BlockingQueue<AbstractHsmsMessage> queue = new LinkedBlockingQueue<>();
+		final BlockingQueue<HsmsMessage> queue = new LinkedBlockingQueue<>();
 		
 		asyncChannel.addHsmsMessageReceiveListener(msg -> {
 			try {
@@ -278,7 +292,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	
 	private void recvMsgTask(
 			AbstractHsmsAsyncSocketChannel asyncChannel,
-			BlockingQueue<AbstractHsmsMessage> queue)
+			BlockingQueue<HsmsMessage> queue)
 					throws HsmsSendMessageException,
 					HsmsWaitReplyMessageException,
 					HsmsException,
@@ -286,7 +300,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		
 		for ( ;; ) {
 			
-			final AbstractHsmsMessage msg = queue.take();
+			final HsmsMessage msg = queue.take();
 			
 			switch ( msg.messageType() ) {
 			case DATA: {
@@ -298,7 +312,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 				for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 					
 					if ( s.sessionId() == id ) {
-						if ( s.notifyReceiveHsmsMessage(msg) ) {
+						if ( s.putReceiveHsmsMessage(msg) ) {
 							recved = true;
 						}
 						break;
@@ -449,32 +463,51 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	}
 	
 	@Override
-	public boolean addSecsMessageReceiveListener(SecsMessageReceiveBiListener lstnr) {
-		boolean r = true;
-		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-			if ( ! s.addSecsMessageReceiveListener(lstnr) ) {
-				r = false;
-			}
-		}
-		return r;
+	public boolean addSecsMessageReceiveListener(SecsMessageReceiveListener listener) {
+		return this.hsmsMsgRecvBiObserver.addListener(listener);
 	}
 	
 	@Override
-	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveBiListener lstnr) {
-		boolean r = true;
-		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-			if ( ! s.removeSecsMessageReceiveListener(lstnr) ) {
-				r = false;
-			}
-		}
-		return r;
+	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveListener listener) {
+		return this.hsmsMsgRecvBiObserver.removeListener(listener);
 	}
+	
+	@Override
+	public boolean addSecsMessageReceiveBiListener(SecsMessageReceiveBiListener biListener) {
+		return this.hsmsMsgRecvBiObserver.addBiListener(biListener);
+	}
+	
+	@Override
+	public boolean removeSecsMessageReceiveBiListener(SecsMessageReceiveBiListener biListener) {
+		return this.hsmsMsgRecvBiObserver.removeBiListener(biListener);
+	}
+	
+	@Override
+	public boolean addHsmsMessageReceiveListener(HsmsMessageReceiveListener listener) {
+		return this.hsmsMsgRecvBiObserver.addListener(listener);
+	}
+	
+	@Override
+	public boolean removeHsmsMessageReceiveListener(HsmsMessageReceiveListener listener) {
+		return this.hsmsMsgRecvBiObserver.removeListener(listener);
+	}
+	
+	@Override
+	public boolean addHsmsMessageReceiveBiListener(HsmsSessionMessageReceiveBiListener biListener) {
+		return this.hsmsMsgRecvBiObserver.addBiListener(biListener);
+	}
+	
+	@Override
+	public boolean removeHsmsMessageReceiveBiListener(HsmsSessionMessageReceiveBiListener biListener) {
+		return this.hsmsMsgRecvBiObserver.removeBiListener(biListener);
+	}
+	
 	
 	@Override
 	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener lstnr) {
 		boolean r = true;
 		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-			if ( ! s.addSecsCommunicatableStateChangeListener(lstnr) ) {
+			if ( ! s.addSecsCommunicatableStateChangeBiListener(lstnr) ) {
 				r = false;
 			}
 		}
@@ -485,7 +518,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener lstnr) {
 		boolean r = true;
 		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-			if ( ! s.removeSecsCommunicatableStateChangeListener(lstnr) ) {
+			if ( ! s.removeSecsCommunicatableStateChangeBiListener(lstnr) ) {
 				r = false;
 			}
 		}
@@ -549,7 +582,6 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 			if ( msg.sessionId() == s.sessionId() ) {
 				s.notifyTrySendHsmsMessagePassThrough(msg);
-				s.notifyTrySendMessagePassThrough(msg);
 			}
 		}
 	}
@@ -572,7 +604,6 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 			if ( msg.sessionId() == s.sessionId() ) {
 				s.notifySendedHsmsMessagePassThrough(msg);
-				s.notifySendedMessagePassThrough(msg);
 			}
 		}
 	}
@@ -595,7 +626,6 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 			if ( msg.sessionId() == s.sessionId() ) {
 				s.notifyReceiveHsmsMessagePassThrough(msg);
-				s.notifyReceiveMessagePassThrough(msg);
 			}
 		}
 	}

@@ -6,7 +6,7 @@ import java.util.EventListener;
  * SECS-Communicate-State Change Listener.
  * 
  * <p>
- * This interface is called in {@link SecsCommunicator#addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener)}<br />
+ * This interface is called in {@link SecsCommunicator#addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener)}<br />
  * </p>
  * 
  * @author kenta-shimizu

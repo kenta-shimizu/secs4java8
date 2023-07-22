@@ -46,6 +46,27 @@ public interface HsmsCommunicator extends SecsCommunicator {
 	public boolean linktest() throws InterruptedException;
 	
 	/**
+	 * Add Listener to receive Primary-Message.
+	 * 
+	 * <p>
+	 * This Listener not receive Reply-Message.<br />
+	 * </p>
+	 * 
+	 * @param listener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addHsmsMessageReceiveListener(HsmsMessageReceiveListener listener);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param listener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeHsmsMessageReceiveListener(HsmsMessageReceiveListener listener);
+	
+	
+	/**
 	 * Add listener.
 	 * 
 	 * @param lstnr the pass through message listener

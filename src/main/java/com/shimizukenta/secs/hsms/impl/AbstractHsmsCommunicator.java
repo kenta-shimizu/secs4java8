@@ -53,6 +53,13 @@ public abstract class AbstractHsmsCommunicator extends AbstractSecsCommunicator 
 		this.hsmsCommState.set(state);
 	}
 	
+	public final void notifyReceiveHsmsMessage(HsmsMessage message) throws InterruptedException {
+		super.notifyReceiveSecsMessage(message);
+		this.prototypeNotifyReceiveHsmsMessage(message);
+	}
+	
+	abstract protected void prototypeNotifyReceiveHsmsMessage(HsmsMessage message) throws InterruptedException;
+	
 	
 	@Override
 	public boolean addTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
@@ -64,8 +71,9 @@ public abstract class AbstractHsmsCommunicator extends AbstractSecsCommunicator 
 		return this.trySendHsmsMsgPassThroughQueueObserver.removeListener(lstnr);
 	}
 	
-	public void notifyTrySendHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
-		this.trySendHsmsMsgPassThroughQueueObserver.put(msg);
+	public void notifyTrySendHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
+		super.notifyTrySendSecsMessagePassThrough(message);
+		this.trySendHsmsMsgPassThroughQueueObserver.put(message);
 	}
 	
 	
@@ -79,8 +87,9 @@ public abstract class AbstractHsmsCommunicator extends AbstractSecsCommunicator 
 		return this.sendedHsmsMsgPassThroughQueueObserver.removeListener(lstnr);
 	}
 	
-	public void notifySendedHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
-		this.sendedHsmsMsgPassThroughQueueObserver.put(msg);
+	public void notifySendedHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
+		super.notifySendedSecsMessagePassThrough(message);
+		this.sendedHsmsMsgPassThroughQueueObserver.put(message);
 	}
 	
 	
@@ -94,8 +103,9 @@ public abstract class AbstractHsmsCommunicator extends AbstractSecsCommunicator 
 		return this.recvHsmsMsgPassThroughQueueObserver.removeListener(lstnr);
 	}
 	
-	public void notifyReceiveHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
-		this.recvHsmsMsgPassThroughQueueObserver.put(msg);
+	public void notifyReceiveHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
+		super.notifyReceiveSecsMessagePassThrough(message);
+		this.recvHsmsMsgPassThroughQueueObserver.put(message);
 	}
 	
 }

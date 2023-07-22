@@ -18,12 +18,12 @@ import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
 import com.shimizukenta.secs.hsms.HsmsException;
+import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
 import com.shimizukenta.secs.hsms.HsmsMessageSelectStatus;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.impl.AbstractHsmsAsyncSocketChannel;
-import com.shimizukenta.secs.hsms.impl.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
 
 public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCommunicator {
@@ -211,7 +211,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 			throws HsmsSendMessageException, HsmsWaitReplyMessageException, HsmsException,
 			InterruptedException {
 		
-		final BlockingQueue<AbstractHsmsMessage> queue = new LinkedBlockingQueue<>();
+		final BlockingQueue<HsmsMessage> queue = new LinkedBlockingQueue<>();
 		
 		asyncChannel.addHsmsMessageReceiveListener(msg -> {
 			try {
@@ -253,7 +253,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 	
 	private void mainSelectedTask(
 			AbstractHsmsAsyncSocketChannel asyncChannel,
-			BlockingQueue<AbstractHsmsMessage> queue)
+			BlockingQueue<HsmsMessage> queue)
 					throws InterruptedException {
 		
 		final Collection<Callable<Void>> tasks = Arrays.asList(
@@ -261,12 +261,12 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 					try {
 						try {
 							for ( ;; ) {
-								final AbstractHsmsMessage msg = queue.take();
+								final HsmsMessage msg = queue.take();
 								
 								switch ( msg.messageType() ) {
 								case DATA: {
 									
-									this.notifyReceiveMessage(msg);
+									this.notifyReceiveHsmsMessage(msg);
 									break;
 								}
 								case SELECT_REQ:

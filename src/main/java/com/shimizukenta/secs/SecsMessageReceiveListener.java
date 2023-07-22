@@ -7,7 +7,7 @@ import java.util.EventListener;
  * 
  * <p>
  * This interface is used in {@link SecsCommunicator#addSecsMessageReceiveListener(SecsMessageReceiveListener)}<br />
- * Receive-Message is only Primary-Message.<br />
+ * Receive-Message is only Primary-SecsMessage.<br />
  * </p>
  * 
  * @author kenta-shimizu
@@ -15,13 +15,10 @@ import java.util.EventListener;
 public interface SecsMessageReceiveListener extends EventListener {
 	
 	/**
-	 * Putter Received Primary-Message.
+	 * Putter Received Primary-SecsMessage.
 	 * 
-	 * <p>
-	 * Not accept {@code null}.<br />
-	 * </p>
-	 * 
-	 * @param message only Primary-Message
+	 * @param message only Primary-SecsMessage
 	 */
 	public void received(SecsMessage message);
+	
 }
