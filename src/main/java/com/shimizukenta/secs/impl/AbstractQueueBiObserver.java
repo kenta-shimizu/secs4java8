@@ -3,6 +3,7 @@ package com.shimizukenta.secs.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventListener;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -64,25 +65,25 @@ public abstract class AbstractQueueBiObserver<C extends AbstractSecsCommunicator
 	
 	public boolean addListener(M listener) {
 		synchronized ( this.sync ) {
-			return this.lstnrs.add(listener);
+			return this.lstnrs.add(Objects.requireNonNull(listener));
 		}
 	}
 	
 	public boolean removeListener(M listener) {
 		synchronized ( this.sync ) {
-			return this.lstnrs.remove(listener);
+			return this.lstnrs.remove(Objects.requireNonNull(listener));
 		}
 	}
 	
 	public boolean addBiListener(B biListener) {
 		synchronized ( this.sync ) {
-			return this.biLstnrs.add(biListener);
+			return this.biLstnrs.add(Objects.requireNonNull(biListener));
 		}
 	}
 	
 	public boolean removeBiListener(B biListener) {
 		synchronized ( this.sync ) {
-			return this.biLstnrs.remove(biListener);
+			return this.biLstnrs.remove(Objects.requireNonNull(biListener));
 		}
 	}
 	

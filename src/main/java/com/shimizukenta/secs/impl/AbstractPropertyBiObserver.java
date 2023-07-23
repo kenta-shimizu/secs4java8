@@ -2,6 +2,7 @@ package com.shimizukenta.secs.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 import com.shimizukenta.secs.local.property.Observable;
 
@@ -50,7 +51,7 @@ public abstract class AbstractPropertyBiObserver<C extends AbstractSecsCommunica
 	
 	public boolean addListener(M listener) {
 		synchronized ( this.sync ) {
-			boolean f = this.listeners.add(listener);
+			boolean f = this.listeners.add(Objects.requireNonNull(listener));
 			if ( f ) {
 				this.notifyToListener(listener);
 			}
@@ -60,13 +61,13 @@ public abstract class AbstractPropertyBiObserver<C extends AbstractSecsCommunica
 	
 	public boolean removeListener(M listener) {
 		synchronized ( this.sync ) {
-			return this.listeners.remove(listener);
+			return this.listeners.remove(Objects.requireNonNull(listener));
 		}
 	}
 	
 	public boolean addBiListener(B biListener) {
 		synchronized ( this.sync ) {
-			boolean f = this.biListeners.add(biListener);
+			boolean f = this.biListeners.add(Objects.requireNonNull(biListener));
 			if ( f ) {
 				this.notifyToBiListener(biListener);
 			}
@@ -76,7 +77,7 @@ public abstract class AbstractPropertyBiObserver<C extends AbstractSecsCommunica
 	
 	public boolean removeBiListener(B biListener) {
 		synchronized ( this.sync ) {
-			return this.biListeners.remove(biListener);
+			return this.biListeners.remove(Objects.requireNonNull(biListener));
 		}
 	}
 	

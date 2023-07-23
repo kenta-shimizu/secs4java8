@@ -8,6 +8,7 @@ import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
+import com.shimizukenta.secs.hsms.HsmsCommunicateStateChangeListener;
 import com.shimizukenta.secs.hsms.HsmsException;
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageReceiveListener;
@@ -17,6 +18,7 @@ import com.shimizukenta.secs.hsms.impl.AbstractHsmsAsyncSocketChannel;
 import com.shimizukenta.secs.hsms.impl.AbstractHsmsCommunicator;
 import com.shimizukenta.secs.hsms.impl.AbstractHsmsSession;
 import com.shimizukenta.secs.hsms.impl.HsmsMessageBuilder;
+import com.shimizukenta.secs.hsmsss.HsmsSsCommunicateStateChangeBiListener;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
 import com.shimizukenta.secs.hsmsss.HsmsSsMessageReceiveBiListener;
@@ -33,7 +35,9 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 	
 	private final HsmsSsCommunicatorConfig config;
 	private final AbstractHsmsSsSession session;
+	
 	private final HsmsSsMessageReceiveQueueBiObserver hsmsSsMsgRecvQueueBiObserver;
+	private final HsmsSsCommunicateStatePropertyBiObserver commStatePropBiObserver;
 	
 	public AbstractHsmsSsCommunicator(HsmsSsCommunicatorConfig config) {
 		super(config);
@@ -43,6 +47,7 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 		this.session = new AbstractHsmsSsSession(config) {};
 		
 		this.hsmsSsMsgRecvQueueBiObserver = new HsmsSsMessageReceiveQueueBiObserver(this);
+		this.commStatePropBiObserver = new HsmsSsCommunicateStatePropertyBiObserver(this, this.getHsmsCommunicateState());
 	}
 	
 	@Override
@@ -169,6 +174,27 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 	@Override
 	protected void prototypeNotifyReceiveHsmsMessage(HsmsMessage message) throws InterruptedException {
 		this.hsmsSsMsgRecvQueueBiObserver.put(message);
+	}
+	
+	
+	@Override
+	public boolean addHsmsCommunicateStateChangeListener(HsmsCommunicateStateChangeListener listener) {
+		return this.commStatePropBiObserver.addListener(listener);
+	}
+	
+	@Override
+	public boolean removeHsmsCommunicateStateChangeListener(HsmsCommunicateStateChangeListener listener) {
+		return this.commStatePropBiObserver.removeListener(listener);
+	}
+	
+	@Override
+	public boolean addHsmsCommunicateStateChangeBiListener(HsmsSsCommunicateStateChangeBiListener biListener) {
+		return this.commStatePropBiObserver.addBiListener(biListener);
+	}
+	
+	@Override
+	public boolean removeHsmsCommunicateStateChangeBiListener(HsmsSsCommunicateStateChangeBiListener biListener) {
+		return this.commStatePropBiObserver.removeBiListener(biListener);
 	}
 	
 }
