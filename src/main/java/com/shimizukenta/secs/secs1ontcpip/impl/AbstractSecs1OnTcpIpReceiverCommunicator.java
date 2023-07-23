@@ -8,16 +8,15 @@ import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import com.shimizukenta.secs.UnsetSocketAddressException;
+import com.shimizukenta.secs.local.property.ListProperty;
 import com.shimizukenta.secs.secs1.Secs1SendByteException;
 import com.shimizukenta.secs.secs1.impl.AbstractSecs1Communicator;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpDetectTerminateException;
@@ -28,12 +27,15 @@ import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpReceiverCommunicatorConfig
 public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractSecs1Communicator
 		implements Secs1OnTcpIpReceiverCommunicator {
 	
+	private final ListProperty<AsynchronousSocketChannel> channels = ListProperty.newInstance();
+	
 	private final Secs1OnTcpIpReceiverCommunicatorConfig config;
-	private final List<AsynchronousSocketChannel> channels = new ArrayList<>();
 	
 	public AbstractSecs1OnTcpIpReceiverCommunicator(Secs1OnTcpIpReceiverCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
 		this.config = config;
+		
+		channels.computeIsNotEmpty().addChangeListener(this::notifyCommunicatableStateChange);
 	}
 	
 	@Override
@@ -225,17 +227,13 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 	
 	private boolean addChannel(AsynchronousSocketChannel channel) {
 		synchronized ( this.channels ) {
-			boolean f = this.channels.add(channel);
-			this.notifyCommunicatableStateChange( ! this.channels.isEmpty() );
-			return f;
+			return this.channels.add(channel);
 		}
 	}
 	
 	private boolean removeChannel(AsynchronousSocketChannel channel) {
 		synchronized ( this.channels ) {
-			boolean f = this.channels.remove(channel);
-			this.notifyCommunicatableStateChange( ! this.channels.isEmpty() );
-			return f;
+			return this.channels.remove(channel);
 		}
 	}
 	

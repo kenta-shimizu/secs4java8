@@ -53,6 +53,7 @@ public abstract class AbstractHsmsCommunicator extends AbstractSecsCommunicator 
 		this.hsmsCommState.set(state);
 	}
 	
+	
 	public final void notifyReceiveHsmsMessage(HsmsMessage message) throws InterruptedException {
 		super.notifyReceiveSecsMessage(message);
 		this.prototypeNotifyReceiveHsmsMessage(message);

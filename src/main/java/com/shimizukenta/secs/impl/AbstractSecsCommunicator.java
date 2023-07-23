@@ -1,8 +1,6 @@
 package com.shimizukenta.secs.impl;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -39,9 +37,12 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	private final AbstractSecsCommunicatorConfig config;
 	private final Gem gem;
 	
-	private final SecsLogQueueObserver logQueuObserver;
 	
 	private final SecsMessageReceiveQueueBiObserver secsMsgRecvQueueObserver;
+	
+	private final SecsLogQueueObserver logQueuObserver;
+	
+	private final SecsCommunicatableStatePropertyBiObserver communicatableStatePropOberser;
 	
 	private final SecsMessagePassThroughQueueBiObserver trySendSecsMsgPassThroughQueueBiObserver;
 	private final SecsMessagePassThroughQueueBiObserver sendedSecsMsgPassThroughQueueBiObserver;
@@ -54,9 +55,12 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		this.config = config;
 		this.gem = new AbstractGem(this, config.gem()) {};
 		
-		this.logQueuObserver = new SecsLogQueueObserver(this);
 		
 		this.secsMsgRecvQueueObserver = new SecsMessageReceiveQueueBiObserver(this);
+		
+		this.logQueuObserver = new SecsLogQueueObserver(this);
+		
+		this.communicatableStatePropOberser = new SecsCommunicatableStatePropertyBiObserver(this, this.communicatable);
 		
 		this.trySendSecsMsgPassThroughQueueBiObserver = new SecsMessagePassThroughQueueBiObserver(this);
 		this.sendedSecsMsgPassThroughQueueBiObserver = new SecsMessagePassThroughQueueBiObserver(this);
@@ -246,39 +250,23 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	/* Secs-Communicatable-State-Changed-Listener */
 	
 	@Override
-	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener l) {
-		return this.communicatable.addChangeListener(l::changed);
+	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener listener) {
+		return this.communicatableStatePropOberser.addListener(listener);
 	}
 	
 	@Override
-	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener l) {
-		return this.communicatable.removeChangeListener(l::changed);
-	}
-	
-	private final Map<SecsCommunicatableStateChangeBiListener, SecsCommunicatableStateChangeListener> biCommStateMap = new HashMap<>();
-	
-	@Override
-	public boolean addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener l) {
-		
-		final SecsCommunicatableStateChangeListener x = f -> {
-			l.changed(f, this);
-		};
-		
-		synchronized ( this.biCommStateMap ) {
-			this.biCommStateMap.put(l, x);
-			return this.communicatable.addChangeListener(x::changed);
-		}
+	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener listener) {
+		return this.communicatableStatePropOberser.removeListener(listener);
 	}
 	
 	@Override
-	public boolean removeSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener l) {
-		synchronized ( this.biCommStateMap ) {
-			final SecsCommunicatableStateChangeListener x = this.biCommStateMap.remove(l);
-			if ( x != null ) {
-				return this.communicatable.removeChangeListener(x::changed);
-			}
-			return false;
-		}
+	public boolean addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener) {
+		return this.communicatableStatePropOberser.addBiListener(biListener);
+	}
+	
+	@Override
+	public boolean removeSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener) {
+		return this.communicatableStatePropOberser.removeBiListener(biListener);
 	}
 	
 	public void notifyCommunicatableStateChange(boolean f) {

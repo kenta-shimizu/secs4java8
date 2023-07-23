@@ -15,7 +15,7 @@ import java.util.EventListener;
 public interface SecsCommunicatableStateChangeListener extends EventListener {
 	
 	/**
-	 * SECS-Communicate-State Changed
+	 * SECS-Communicate-State Changed.
 	 * 
 	 * <p>
 	 * Blocking-method.<br />
