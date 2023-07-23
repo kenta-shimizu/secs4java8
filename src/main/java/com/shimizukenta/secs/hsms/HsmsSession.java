@@ -54,4 +54,27 @@ public interface HsmsSession extends HsmsCommunicator {
 	 */
 	public boolean removeHsmsMessageReceiveBiListener(HsmsSessionMessageReceiveBiListener biListener);
 	
+	/**
+	 * Add Listener to get communicate-state-changed.
+	 * 
+	 * <p>
+	 * Blocking-Listener.<br />
+	 * Pass through quickly.<br />
+	 * </p>
+	 * 
+	 * @param biListener the state change listener
+	 * @return {@code true} if add success
+	 * @throws NullPointerException if biListener is null
+	 */
+	public boolean addHsmsCommunicateStateChangeBiListener(HsmsSessionCommunicateStateChangeBiListener biListener);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param biListener the state change listener
+	 * @return {@code true} if remove success
+	 * @throws NullPointerException if biListener is null
+	 */
+	public boolean removeHsmsCommunicateStateChangeBiListener(HsmsSessionCommunicateStateChangeBiListener biListener);
+	
 }

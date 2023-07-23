@@ -97,4 +97,27 @@ public interface HsmsSsCommunicator extends HsmsCommunicator {
 	 */
 	public boolean removeHsmsMessageReceiveBiListener(HsmsSsMessageReceiveBiListener biListener);
 	
+	/**
+	 * Add Listener to get communicate-state-changed.
+	 * 
+	 * <p>
+	 * Blocking-Listener.<br />
+	 * Pass through quickly.<br />
+	 * </p>
+	 * 
+	 * @param biListener the state change listener
+	 * @return {@code true} if add success
+	 * @throws NullPointerException if biListener is null
+	 */
+	public boolean addHsmsCommunicateStateChangeBiListener(HsmsSsCommunicateStateChangeBiListener biListener);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param biListener the state change listener
+	 * @return {@code true} if remove success
+	 * @throws NullPointerException if biListener is null
+	 */
+	public boolean removeHsmsCommunicateStateChangeBiListener(HsmsSsCommunicateStateChangeBiListener biListener);
+
 }

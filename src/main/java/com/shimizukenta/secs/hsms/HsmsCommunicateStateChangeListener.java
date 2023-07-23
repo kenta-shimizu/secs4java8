@@ -11,7 +11,7 @@ import java.util.EventListener;
 public interface HsmsCommunicateStateChangeListener extends EventListener {
 	
 	/**
-	 * HSMS-SS Communicate State Changed.
+	 * HSMS Communicate State Changed.
 	 * 
 	 * @param state the HSMS Communicate State
 	 */

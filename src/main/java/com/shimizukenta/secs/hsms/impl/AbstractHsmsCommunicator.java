@@ -4,12 +4,12 @@ import java.io.IOException;
 
 import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
-import com.shimizukenta.secs.hsms.HsmsCommunicateStateChangeListener;
 import com.shimizukenta.secs.hsms.HsmsCommunicator;
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessagePassThroughListener;
 import com.shimizukenta.secs.impl.AbstractSecsCommunicator;
 import com.shimizukenta.secs.local.property.ObjectProperty;
+import com.shimizukenta.secs.local.property.Observable;
 
 public abstract class AbstractHsmsCommunicator extends AbstractSecsCommunicator implements HsmsCommunicator {
 
@@ -39,21 +39,17 @@ public abstract class AbstractHsmsCommunicator extends AbstractSecsCommunicator 
 		super.close();
 	}
 	
-	@Override
-	public boolean addHsmsCommunicateStateChangeListener(HsmsCommunicateStateChangeListener listener) {
-		return this.hsmsCommState.addChangeListener(listener::changed);
-	}
 	
-	@Override
-	public boolean removeHsmsCommunicateStateChangeListener(HsmsCommunicateStateChangeListener listener) {
-		return this.hsmsCommState.removeChangeListener(listener::changed);
+	protected Observable<HsmsCommunicateState> getHsmsCommunicateState() {
+		return this.hsmsCommState;
 	}
 	
 	public void notifyHsmsCommunicateState(HsmsCommunicateState state) {
 		this.hsmsCommState.set(state);
 	}
 	
-	public final void notifyReceiveHsmsMessage(HsmsMessage message) throws InterruptedException {
+	
+	public void notifyReceiveHsmsMessage(HsmsMessage message) throws InterruptedException {
 		super.notifyReceiveSecsMessage(message);
 		this.prototypeNotifyReceiveHsmsMessage(message);
 	}
