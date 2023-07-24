@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2Exception;
@@ -66,6 +67,11 @@ public class Secs2Ascii extends AbstractSecs2 {
 	@Override
 	public String getAscii() throws Secs2Exception {
 		return ascii();
+	}
+	
+	@Override
+	public Optional<String> optionalAscii() {
+		return Optional.of(this.ascii());
 	}
 	
 	@Override

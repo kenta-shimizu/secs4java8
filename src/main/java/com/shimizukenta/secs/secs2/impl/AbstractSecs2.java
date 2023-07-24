@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -124,6 +125,16 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	}
 	
 	@Override
+	public byte[] getBytes(int... indices) throws Secs2Exception {
+		return get(indices).getBytes();
+	}
+	
+	@Override
+	public byte[] getBytes() throws Secs2Exception {
+		throw new Secs2IllegalDataFormatException("Not Secs2Byte");
+	}
+	
+	@Override
 	public final boolean getBoolean(int... indices) throws Secs2Exception {
 		LinkedList<Integer> list = createLinkedList(indices);
 		int lastIndex = list.removeLast();
@@ -199,6 +210,13 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	protected Number getNumber(int index) throws Secs2Exception {
 		throw new Secs2IllegalDataFormatException("Not Secs2Number");
 	}
+	
+	
+	@Override
+	public Optional<String> optionalAscii() {
+		return Optional.empty();
+	}
+	
 	
 	@Override
 	public String toString() {

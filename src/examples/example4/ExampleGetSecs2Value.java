@@ -1,5 +1,7 @@
 package example4;
 
+import java.util.Arrays;
+
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
@@ -50,6 +52,7 @@ public class ExampleGetSecs2Value {
 			
 			System.out.println("# Get value by index");
 			System.out.println("getByte(0, 0):\t" + ss.getByte(0, 0));	/* 1 */
+			System.out.println("getBytes(0):\t" + Arrays.toString(ss.getBytes(0)));	/* 1 */
 			System.out.println("getAscii(1):\t" + ss.getAscii(1));	/* "MESSAGE-1" */
 			System.out.println("getBoolean(2, 0):\t" + ss.getBoolean(2, 0));	/* true */
 			System.out.println("getAscii(3, 0, 0):\t" + ss.getAscii(3, 0, 0));	/* "KEY-1" */
