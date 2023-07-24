@@ -52,6 +52,12 @@ public class Secs2Binary extends Secs2Number<Byte> {
 	}
 	
 	@Override
+	public byte[] getBytes() throws Secs2Exception {
+		byte[] bs = this.bytes();
+		return Arrays.copyOf(bs, bs.length);
+	}
+	
+	@Override
 	public Secs2Item secs2Item() {
 		return secs2Item;
 	}

@@ -2,6 +2,7 @@ package com.shimizukenta.secs.secs2;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.shimizukenta.secs.secs2.impl.Secs2Builders;
@@ -113,6 +114,31 @@ public interface Secs2 extends Iterable<Secs2> {
 	public byte getByte(int... indices) throws Secs2Exception;
 	
 	/**
+	 * Returns nested bytes by indices.
+	 * 
+	 * <p>
+	 * Available if type is "B".
+	 * </p>
+	 * 
+	 * @param indices indices of list
+	 * @return bytes
+	 * @throws Secs2Exception if parse failed
+	 */
+	public byte[] getBytes(int... indices) throws Secs2Exception;
+	
+	/**
+	 * Returns byte array,
+	 * 
+	 * <p>
+	 * Available byte array if type is "B".
+	 * </p>
+	 * 
+	 * @return bytes
+	 * @throws Secs2Exception if not binary
+	 */
+	public byte[] getBytes() throws Secs2Exception;
+	
+	/**
 	 * Returns nested boolean-value by indices,
 	 * 
 	 * <p>
@@ -202,6 +228,16 @@ public interface Secs2 extends Iterable<Secs2> {
 	 * @throws Secs2Exception if parse failed
 	 */
 	public Number getNumber( int... indices ) throws Secs2Exception;
+	
+	
+	/* Optionals */
+	
+	/**
+	 * Optional valuei is present if ASCII, otherwise empty.
+	 * 
+	 * @return Optional
+	 */
+	public Optional<String> optionalAscii();
 	
 	
 	/* builder */
