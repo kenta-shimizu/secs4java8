@@ -3,6 +3,9 @@ package com.shimizukenta.secs.secs2;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.stream.Stream;
 
 import com.shimizukenta.secs.secs2.impl.Secs2Builders;
@@ -66,8 +69,11 @@ public interface Secs2 extends Iterable<Secs2> {
 	public Secs2 get();
 	
 	/**
-	 * Returns nested Secs2 by indices,
-	 * Available if type is "A".
+	 * Returns nested Secs2 by indices.
+	 * 
+	 * <p>
+	 * Available if type is "L".
+	 * </p>
 	 * 
 	 * @param indices indeices of list
 	 * @return Secs2
@@ -82,7 +88,7 @@ public interface Secs2 extends Iterable<Secs2> {
 	 * Available if type is "A".
 	 * </p>
 	 * 
-	 * @param indices indicies of list
+	 * @param indices indices of list
 	 * @return ASCII-String
 	 * @throws Secs2Exception if parse failed
 	 */
@@ -107,7 +113,7 @@ public interface Secs2 extends Iterable<Secs2> {
 	 * Available if type is "B".
 	 * </p>
 	 * 
-	 * @param indices the indicies
+	 * @param indices the indices
 	 * @return byte-value
 	 * @throws Secs2Exception if parse failed
 	 */
@@ -145,7 +151,7 @@ public interface Secs2 extends Iterable<Secs2> {
 	 * Available if type is "BOOLEAN".
 	 * </p>
 	 * 
-	 * @param indices the indicies
+	 * @param indices the indices
 	 * @return boolean-value
 	 * @throws Secs2Exception if parse failed
 	 */
@@ -158,7 +164,7 @@ public interface Secs2 extends Iterable<Secs2> {
 	 * Available if type is "I1","I2","I4","I8","F4","F8","U1","U2","U4","U8"
 	 * </p>
 	 * 
-	 * @param indices the indicies
+	 * @param indices the indices
 	 * @return (int)value
 	 * @throws Secs2Exception if parse failed
 	 */
@@ -171,7 +177,7 @@ public interface Secs2 extends Iterable<Secs2> {
 	 * Available if type is "I1","I2","I4","I8","F4","F8","U1","U2","U4","U8"
 	 * </p>
 	 * 
-	 * @param indices the indicies
+	 * @param indices the indices
 	 * @return (long)value
 	 * @throws Secs2Exception if parse failed
 	 */
@@ -184,7 +190,7 @@ public interface Secs2 extends Iterable<Secs2> {
 	 * Available if type is "I1","I2","I4","I8","F4","F8","U1","U2","U4","U8"
 	 * </p>
 	 * 
-	 * @param indices the indicies
+	 * @param indices the indices
 	 * @return BigInteger.valueOf(value)
 	 * @throws Secs2Exception if parse failed
 	 */
@@ -197,7 +203,7 @@ public interface Secs2 extends Iterable<Secs2> {
 	 * Available if type is "I1","I2","I4","I8","F4","F8","U1","U2","U4","U8"
 	 * </p>
 	 * 
-	 * @param indices the indicies
+	 * @param indices the indices
 	 * @return (float)value
 	 * @throws Secs2Exception if parse failed
 	 */
@@ -210,7 +216,7 @@ public interface Secs2 extends Iterable<Secs2> {
 	 * Available if type is "I1","I2","I4","I8","F4","F8","U1","U2","U4","U8"
 	 * </p>
 	 * 
-	 * @param indices the indicies
+	 * @param indices the indices
 	 * @return (double)value
 	 * @throws Secs2Exception if parse failed
 	 */
@@ -223,7 +229,7 @@ public interface Secs2 extends Iterable<Secs2> {
 	 * Available if type is "I1","I2","I4","I8","F4","F8","U1","U2","U4","U8"
 	 * </p>
 	 * 
-	 * @param indices the indicies
+	 * @param indices the indices
 	 * @return (Number)value
 	 * @throws Secs2Exception if parse failed
 	 */
@@ -233,11 +239,146 @@ public interface Secs2 extends Iterable<Secs2> {
 	/* Optionals */
 	
 	/**
-	 * Optional valuei is present if ASCII, otherwise empty.
+	 * return Optional of this.
 	 * 
-	 * @return Optional
+	 * @return Optional of Secs2
+	 */
+	public Optional<Secs2> optional();
+	
+	/**
+	 * Returns nested of Secs2 by indices.
+	 * 
+	 * <p>
+	 * Available if type is "L".
+	 * </p>
+	 * 
+	 * @param indices indices of list
+	 * @return Optional of Secs2
+	 */
+	public Optional<Secs2> optional(int... indices);
+	
+	/**
+	 * Returns Optional of String, nested Secs2 by indices.
+	 * 
+	 * <p>
+	 * Available if type is "A".
+	 * </p>
+	 * 
+	 * @param indices indicies of list
+	 * @return Optional of String
+	 */
+	public Optional<String> optionalAscii(int... indices);
+	
+	/**
+	 * Returns Optional of String is present if ASCII, otherwise empty.
+	 * 
+	 * @return Optional of String
 	 */
 	public Optional<String> optionalAscii();
+	
+	/**
+	 * Returns Optional of Byte, nested Secs2 by indices.
+	 * 
+	 * <p>
+	 * Available if type is "B".
+	 * </p>
+	 * 
+	 * @param indices indicies of list
+	 * @return Optional of bytes
+	 */
+	public Optional<Byte> optionalByte(int... indices);
+	
+	/**
+	 * Returns Optional of bytes, nested Secs2 by indices.
+	 * 
+	 * <p>
+	 * Available if type is "B".
+	 * </p>
+	 * 
+	 * @param indices indices of list
+	 * @return Optional of bytes
+	 */
+	public Optional<byte[]> optionalBytes(int... indices);
+	
+	/**
+	 * Returns Optional of bytes is present if Binary, otherwise empty.
+	 * 
+	 * @return Optional of bytes
+	 */
+	public Optional<byte[]> optionalBytes();
+	
+	/**
+	 * Returns Optional of Boolean, nested Secs2 by indices.
+	 * 
+	 * <p>
+	 * Available if type is "BOOLEAN".
+	 * </p>
+	 * 
+	 * @param indices indices of list
+	 * @return Optional of Boolean
+	 */
+	public Optional<Boolean> optionalBoolean(int... indices);
+	
+	/**
+	 * Returns OptionalInt, nested Secs2 by indices.
+	 * 
+	 * <p>
+	 * Available if type is "B", "I1", "I2", "I4", "I8", "U1", "U2", "U4", "U8", "F4", "F8".
+	 * </p>
+	 * 
+	 * @param indices indices of list
+	 * @return OptionalInt
+	 */
+	public OptionalInt optionalInt(int... indices);
+	
+	/**
+	 * Returns OptionalLong, nested Secs2 by indices.
+	 * 
+	 * <p>
+	 * Available if type is "B", "I1", "I2", "I4", "I8", "U1", "U2", "U4", "U8", "F4", "F8".
+	 * </p>
+	 * 
+	 * @param indices indices of list
+	 * @return OptionalLong
+	 */
+	public OptionalLong optionalLong(int... indices);
+	
+	
+	/**
+	 * Returns Optional of BigInteger, nested Secs2 by indices.
+	 * 
+	 * <p>
+	 * Available if type is "I1", "I2", "I4", "I8", "U1", "U2", "U4", "U8".
+	 * </p>
+	 * 
+	 * @param indices indices of list
+	 * @return Optional of BigInteger
+	 */
+	public Optional<BigInteger> optionalBigInteger(int... indices);
+	
+	/**
+	 * Returns OptionalDouble, nested Secs2 by indices.
+	 * 
+	 * <p>
+	 * Available if type is "B", "I1", "I2", "I4", "I8", "U1", "U2", "U4", "U8", "F4", "F8".
+	 * </p>
+	 * 
+	 * @param indices indices of list
+	 * @return OptionalDouble
+	 */
+	public OptionalDouble optionalDouble(int... indices);
+	
+	/**
+	 * Returns Optional Number, nested Secs2 by indices.
+	 * 
+	 * <p>
+	 * Available if type is "B", "I1", "I2", "I4", "I8", "U1", "U2", "U4", "U8", "F4", "F8".
+	 * </p>
+	 * 
+	 * @param indices indices of list
+	 * @return Optional of Number
+	 */
+	public Optional<Number> optionalNumber(int... indices);
 	
 	
 	/* builder */

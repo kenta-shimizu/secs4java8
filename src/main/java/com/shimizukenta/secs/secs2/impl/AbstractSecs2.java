@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -115,9 +118,9 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	
 	@Override
 	public final byte getByte(int... indices) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices);
-		int lastIndex = list.removeLast();
-		return get(list).getByte(lastIndex);
+		LinkedList<Integer> ll = createLinkedList(indices);
+		int lastIndex = ll.removeLast();
+		return get(ll).getByte(lastIndex);
 	}
 	
 	protected byte getByte(int index) throws Secs2Exception {
@@ -136,9 +139,9 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	
 	@Override
 	public final boolean getBoolean(int... indices) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices);
-		int lastIndex = list.removeLast();
-		return get(list).getBoolean(lastIndex);
+		LinkedList<Integer> ll = createLinkedList(indices);
+		int lastIndex = ll.removeLast();
+		return get(ll).getBoolean(lastIndex);
 	}
 	
 	protected boolean getBoolean(int index) throws Secs2Exception {
@@ -147,64 +150,40 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	
 	@Override
 	public final int getInt(int... indices) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices);
-		int lastIndex = list.removeLast();
-		return get(list).getInt(lastIndex);
-	}
-	
-	protected int getInt(int index) throws Secs2Exception {
-		throw new Secs2IllegalDataFormatException("Not Secs2Number");
+		return getNumber(indices).intValue();
 	}
 	
 	@Override
 	public final long getLong(int... indices) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices);
-		int lastIndex = list.removeLast();
-		return get(list).getLong(lastIndex);
-	}
-	
-	protected long getLong(int index) throws Secs2Exception {
-		throw new Secs2IllegalDataFormatException("Not Secs2Number");
+		return getNumber(indices).longValue();
 	}
 	
 	@Override
 	public final BigInteger getBigInteger(int... indices) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices);
-		int lastIndex = list.removeLast();
-		return get(list).getBigInteger(lastIndex);
+		LinkedList<Integer> ll = createLinkedList(indices);
+		int lastIndex = ll.removeLast();
+		return get(ll).getBigInteger(lastIndex);
 	}
 	
 	protected BigInteger getBigInteger(int index) throws Secs2Exception {
-		throw new Secs2IllegalDataFormatException("Not Secs2Number");
+		throw new Secs2IllegalDataFormatException("Not Secs2BigInteger");
 	}
 	
 	@Override
 	public final float getFloat(int... indices) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices);
-		int lastIndex = list.removeLast();
-		return get(list).getFloat(lastIndex);
-	}
-	
-	protected float getFloat(int index) throws Secs2Exception {
-		throw new Secs2IllegalDataFormatException("Not Secs2Float");
+		return getNumber(indices).floatValue();
 	}
 	
 	@Override
 	public final double getDouble(int... indices) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices);
-		int lastIndex = list.removeLast();
-		return get(list).getDouble(lastIndex);
-	}
-	
-	protected double getDouble(int index) throws Secs2Exception {
-		throw new Secs2IllegalDataFormatException("Not Secs2Double");
+		return getNumber(indices).doubleValue();
 	}
 	
 	@Override
 	public Number getNumber( int... indices ) throws Secs2Exception {
-		LinkedList<Integer> list = createLinkedList(indices);
-		int lastIndex = list.removeLast();
-		return get(list).getNumber(lastIndex);
+		LinkedList<Integer> ll = createLinkedList(indices);
+		int lastIndex = ll.removeLast();
+		return get(ll).getNumber(lastIndex);
 	}
 	
 	protected Number getNumber(int index) throws Secs2Exception {
@@ -213,10 +192,103 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	
 	
 	@Override
+	public Optional<Secs2> optional() {
+		return Optional.of(this);
+	}
+	
+	public Optional<Secs2> optional(int... indices) {
+		return optional(createLinkedList(indices)).map(x -> (Secs2)x);
+	}
+	
+	protected Optional<AbstractSecs2> optional(LinkedList<Integer> list) {
+		if ( list.isEmpty() ) {
+			return Optional.of(this);
+		} else {
+			return Optional.empty();
+		}
+	}
+	
+	@Override
+	public Optional<String> optionalAscii(int... indices) {
+		return optional(createLinkedList(indices)).flatMap(AbstractSecs2::optionalAscii);
+	}
+	
+	@Override
 	public Optional<String> optionalAscii() {
 		return Optional.empty();
 	}
 	
+	@Override
+	public Optional<Byte> optionalByte(int... indices) {
+		final LinkedList<Integer> ll = createLinkedList(indices);
+		final int lastIndex = ll.removeLast();
+		return optional(ll).flatMap(x -> x.optionalByte(lastIndex));
+	}
+	
+	protected Optional<Byte> optionalByte(int index) {
+		return Optional.empty();
+	}
+	
+	@Override
+	public Optional<byte[]> optionalBytes(int... indices) {
+		return optional(createLinkedList(indices)).flatMap(AbstractSecs2::optionalBytes);
+	}
+	
+	@Override
+	public Optional<byte[]> optionalBytes() {
+		return Optional.empty();
+	}
+	
+	@Override
+	public Optional<Boolean> optionalBoolean(int... indices) {
+		final LinkedList<Integer> ll = createLinkedList(indices);
+		final int lastIndex = ll.removeLast();
+		return optional(ll).flatMap(x -> x.optionalBoolean(lastIndex));
+	}
+	
+	protected Optional<Boolean> optionalBoolean(int index) {
+		return Optional.empty();
+	}
+	
+	@Override
+	public OptionalInt optionalInt(int... indices) {
+		Optional<Number> opNum = this.optionalNumber(indices);
+		return opNum.isPresent() ? OptionalInt.of(opNum.get().intValue()) : OptionalInt.empty();
+	}
+	
+	@Override
+	public OptionalLong optionalLong(int... indices) {
+		Optional<Number> opNum = this.optionalNumber(indices);
+		return opNum.isPresent() ? OptionalLong.of(opNum.get().longValue()) : OptionalLong.empty();
+	}
+	
+	@Override
+	public Optional<BigInteger> optionalBigInteger(int... indices) {
+		final LinkedList<Integer> ll = createLinkedList(indices);
+		final int lastIndex = ll.removeLast();
+		return optional(ll).flatMap(x -> x.optionalBigInteger(lastIndex));
+	}
+	
+	protected Optional<BigInteger> optionalBigInteger(int index) {
+		return Optional.empty();
+	}
+	
+	@Override
+	public OptionalDouble optionalDouble(int... indices) {
+		Optional<Number> opNum = this.optionalNumber(indices);
+		return opNum.isPresent() ? OptionalDouble.of(opNum.get().doubleValue()) : OptionalDouble.empty();
+	}
+	
+	@Override
+	public Optional<Number> optionalNumber(int... indices) {
+		final LinkedList<Integer> ll = createLinkedList(indices);
+		final int lastIndex = ll.removeLast();
+		return optional(ll).flatMap(x -> x.optionalNumber(lastIndex));
+	}
+	
+	protected Optional<Number> optionalNumber(int index) {
+		return Optional.empty();
+	}
 	
 	@Override
 	public String toString() {

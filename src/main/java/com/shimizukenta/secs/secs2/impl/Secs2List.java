@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -86,7 +87,7 @@ public class Secs2List extends AbstractSecs2 {
 	}
 	
 	@Override
-	protected AbstractSecs2 get( LinkedList<Integer> list ) throws Secs2Exception {
+	protected AbstractSecs2 get(LinkedList<Integer> list) throws Secs2Exception {
 		
 		if ( list.isEmpty() ) {
 			
@@ -112,6 +113,32 @@ public class Secs2List extends AbstractSecs2 {
 			}
 		}
 	}
+	
+	@Override
+	protected Optional<AbstractSecs2> optional(LinkedList<Integer> list) {
+		
+		if ( list.isEmpty() ) {
+			
+			return Optional.of(this);
+			
+		} else {
+			
+			int index = list.removeFirst();
+			
+			if ( index >= 0 && index < size() ) {
+				
+				Secs2 ss = values.get(index);
+				
+				if ( ss instanceof AbstractSecs2 ) {
+					
+					return ((AbstractSecs2)ss).optional(list);
+				}
+			}
+			
+			return Optional.empty();
+		}
+	}
+
 
 	@Override
 	public Secs2Item secs2Item() {

@@ -5,6 +5,7 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.secs2.Secs2BuildException;
@@ -85,26 +86,6 @@ abstract public class Secs2Number<T extends Number> extends AbstractSecs2 {
 	}
 
 	@Override
-	protected int getInt(int index) throws Secs2Exception {
-		return getNumber(index).intValue();
-	}
-	
-	@Override
-	protected long getLong(int index) throws Secs2Exception {
-		return getNumber(index).longValue();
-	}
-	
-	@Override
-	protected float getFloat(int index) throws Secs2Exception {
-		return getNumber(index).floatValue();
-	}
-	
-	@Override
-	protected double getDouble(int index) throws Secs2Exception {
-		return getNumber(index).doubleValue();
-	}
-	
-	@Override
 	protected Number getNumber(int index) throws Secs2Exception {
 		try {
 			return this.values().get(index);
@@ -113,7 +94,17 @@ abstract public class Secs2Number<T extends Number> extends AbstractSecs2 {
 			throw new Secs2IndexOutOfBoundsException(e);
 		}
 	}
-
+	
+	@Override
+	protected Optional<Number> optionalNumber(int index) {
+		try {
+			return Optional.of(getNumber(index));
+		}
+		catch ( Secs2Exception giveup ) {
+			return Optional.empty();
+		}
+	}
+	
 	@Override
 	protected String toJsonValue() {
 		
