@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.secs2.Secs2Exception;
@@ -55,6 +56,20 @@ public class Secs2Binary extends Secs2Number<Byte> {
 	public byte[] getBytes() throws Secs2Exception {
 		byte[] bs = this.bytes();
 		return Arrays.copyOf(bs, bs.length);
+	}
+	
+	@Override
+	protected Optional<Byte> optionalByte(int index) {
+		if ( index >= 0 && index < size() ) {
+			return Optional.of(Byte.valueOf(this.bytes()[index]));
+		}
+		return Optional.empty();
+	}
+	
+	@Override
+	public Optional<byte[]> optionalBytes() {
+		byte[] bs = this.bytes();
+		return Optional.of(Arrays.copyOf(bs, bs.length));
 	}
 	
 	@Override

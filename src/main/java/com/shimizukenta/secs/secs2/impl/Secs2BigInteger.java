@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -85,5 +86,15 @@ abstract public class Secs2BigInteger extends Secs2Number<BigInteger> {
 		bf.get(val);
 		return unsigned ? new BigInteger(1, val) : new BigInteger(val);
 	}
-
+	
+	@Override
+	protected Optional<BigInteger> optionalBigInteger(int index) {
+		try {
+			return Optional.of(this.values().get(index));
+		}
+		catch (Secs2Exception giveup) {
+			return Optional.empty();
+		}
+	}
+	
 }

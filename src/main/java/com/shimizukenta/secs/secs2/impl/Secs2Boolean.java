@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.secs2.Secs2BuildException;
@@ -109,6 +110,15 @@ public class Secs2Boolean extends AbstractSecs2 {
 		}
 		catch ( IndexOutOfBoundsException e ) {
 			throw new Secs2IndexOutOfBoundsException(e);
+		}
+	}
+	
+	@Override
+	protected Optional<Boolean> optionalBoolean(int index) {
+		if ( index >= 0 && index < this.size() ) {
+			return Optional.of(this.bools().get(index));
+		} else {
+			return Optional.empty();
 		}
 	}
 	

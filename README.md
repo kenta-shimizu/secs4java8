@@ -179,7 +179,10 @@ See also ["/src/examples/example3/ExampleBuildSecs2.java"](/src/examples/example
     String altx = msg.secs2().getAscii(2);
 ```
 
-### Support parse methods
+### Support parse get methods
+
+✓ is available.  
+(blank) throw Secs2Exception.
 
 | method | B | BOOLEAN | A | I1 | I2 | I4 | I8 | F4 | F8 | U1 | U2 | U4 | U8 |
 |:-|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
@@ -194,6 +197,22 @@ See also ["/src/examples/example3/ExampleBuildSecs2.java"](/src/examples/example
 | getDouble     | ✓ |   |   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | getNumber     | ✓ |   |   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
+### Support parse optional methods
+
+✓ is that Optional is present.  
+(blank) is that Optional is empty.
+
+| method | B | BOOLEAN | A | I1 | I2 | I4 | I8 | F4 | F8 | U1 | U2 | U4 | U8 |
+|:-|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| optionalByte       | ✓ |   |   |   |   |   |   |   |   |   |   |   |   |
+| optionalBytes      | ✓ |   |   |   |   |   |   |   |   |   |   |   |   |
+| optionalBoolean    |   | ✓ |   |   |   |   |   |   |   |   |   |   |   |
+| optionalAscii      |   |   | ✓ |   |   |   |   |   |   |   |   |   |   |
+| optionalInt        | ✓ |   |   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| optionalLong       | ✓ |   |   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| optionalBigInteger |   |   |   | ✓ | ✓ | ✓ | ✓ |   |   | ✓ | ✓ | ✓ | ✓ |
+| optionalDouble     | ✓ |   |   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| optionalNumber     | ✓ |   |   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 See also ["/src/examples/example4/ExampleGetSecs2Value.java"](/src/examples/example4/ExampleGetSecs2Value.java)
 

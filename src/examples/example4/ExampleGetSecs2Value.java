@@ -50,6 +50,8 @@ public class ExampleGetSecs2Value {
 		
 		try {
 			
+			/* get(s) */
+			
 			System.out.println("# Get value by index");
 			System.out.println("getByte(0, 0):\t" + ss.getByte(0, 0));	/* 1 */
 			System.out.println("getBytes(0):\t" + Arrays.toString(ss.getBytes(0)));	/* 1 */
@@ -116,6 +118,28 @@ public class ExampleGetSecs2Value {
 				
 				System.out.println();
 			}
+			
+			
+			/* optional(s) */
+			
+			System.out.println("# optional value by index");
+			System.out.println("optionalByte(0, 0):\t" + ss.optionalByte(0, 0).map(b -> "" + b).orElse("not found"));	/* 1 */
+			System.out.println("optionalBytes(0):\t" + ss.optionalBytes(0).map(Arrays::toString).orElse("not found"));	/* 1 */
+			System.out.println("oprionAscii(1):\t" + ss.optionalAscii(1).orElse("not found"));	/* "MESSAGE-1" */
+			System.out.println("optionalBoolean(2, 0):\t" + ss.optionalBoolean(2, 0).map(String::valueOf).orElse("not found"));	/* true */
+			System.out.println("optionalAscii(3, 0, 0):\t" + ss.optionalAscii(3, 0, 0).orElse("not found"));	/* "KEY-1" */
+			System.out.println("optionalInt(3, 0, 1, 0):\t" + ss.optionalInt(3, 0 , 1, 0).getAsInt());	/* 100 */
+			System.out.println("optionalInt(3, 0, 1, 1):\t" + ss.optionalInt(3, 0 , 1, 1).getAsInt());	/* 101 */
+			System.out.println("optionalInt(3, 0, 1, 2):\t" + ss.optionalInt(3, 0 , 1, 2).getAsInt());	/* 102 */
+			System.out.println("optionalInt(3, 1, 1, 0):\t" + ss.optionalInt(3, 1 , 1, 0).getAsInt());	/* 200 */
+			System.out.println("optionalInt(3, 2, 1, 0):\t" + ss.optionalInt(3, 2 , 1, 0).getAsInt());	/* 300 */
+			System.out.println("optionalDouble(4, 0):\t" + ss.optionalDouble(4, 0).getAsDouble());	/* 400.0F */
+			
+			System.out.println("optional(4):\t" + ss.optional(3).map(Secs2::toString).orElse("not found"));	/* <L[3] ...> */
+			System.out.println();
+
+			System.out.println("optional(99):\t" + ss.optional(99).map(Secs2::toString).orElse("not found"));	/* not found */
+			System.out.println();
 		}
 		catch ( Throwable t ) {
 			t.printStackTrace();
