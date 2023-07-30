@@ -28,5 +28,5 @@ public class Secs1TooBigSendMessageException extends Secs1SendMessageException {
 	public Secs1TooBigSendMessageException(Secs1Message secs1Message, Throwable cause) {
 		super(secs1Message, cause);
 	}
-
+	
 }
