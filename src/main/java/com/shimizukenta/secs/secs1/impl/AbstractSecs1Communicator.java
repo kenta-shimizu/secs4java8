@@ -12,6 +12,7 @@ import com.shimizukenta.secs.secs1.AbstractSecs1CommunicatorConfig;
 import com.shimizukenta.secs.secs1.Secs1Communicator;
 import com.shimizukenta.secs.secs1.Secs1Exception;
 import com.shimizukenta.secs.secs1.Secs1Message;
+import com.shimizukenta.secs.secs1.Secs1MessagePassThroughBiListener;
 import com.shimizukenta.secs.secs1.Secs1MessagePassThroughListener;
 import com.shimizukenta.secs.secs1.Secs1MessageReceiveBiListener;
 import com.shimizukenta.secs.secs1.Secs1MessageReceiveListener;
@@ -154,6 +155,16 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		return this.trySendSecs1MsgPassThroughQueueBiObserver.removeListener(lstnr);
 	}
 	
+	@Override
+	public boolean addTrySendSecs1MessagePassThroughBiListener(Secs1MessagePassThroughBiListener biListener) {
+		return this.trySendSecs1MsgPassThroughQueueBiObserver.addBiListener(biListener);
+	}
+	
+	@Override
+	public boolean removeTrySendSecs1MessagePassThroughBiListener(Secs1MessagePassThroughBiListener biListener) {
+		return this.trySendSecs1MsgPassThroughQueueBiObserver.removeBiListener(biListener);
+	}
+	
 	public void notifyTrySendSecs1MessagePassThrough(Secs1Message message) throws InterruptedException {
 		super.notifyTrySendSecsMessagePassThrough(message);
 		this.trySendSecs1MsgPassThroughQueueBiObserver.put(message);
@@ -172,6 +183,16 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		return this.sendedSecs1MsgPassThroughQueueBiObserver.removeListener(lstnr);
 	}
 	
+	@Override
+	public boolean addSendedSecs1MessagePassThroughBiListener(Secs1MessagePassThroughBiListener biListener) {
+		return this.sendedSecs1MsgPassThroughQueueBiObserver.addBiListener(biListener);
+	}
+	
+	@Override
+	public boolean removeSendedSecs1MessagePassThroughBiListener(Secs1MessagePassThroughBiListener biListener) {
+		return this.sendedSecs1MsgPassThroughQueueBiObserver.removeBiListener(biListener);
+	}
+	
 	public void notifySendedSecs1MessagePassThrough(Secs1Message message) throws InterruptedException {
 		super.notifySendedSecsMessagePassThrough(message);
 		this.sendedSecs1MsgPassThroughQueueBiObserver.put(message);
@@ -188,6 +209,16 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	@Override
 	public boolean removeReceiveSecs1MessagePassThroughListener(Secs1MessagePassThroughListener lstnr) {
 		return this.recvSecs1MsgPassThroughQueueBiObserver.removeListener(lstnr);
+	}
+	
+	@Override
+	public boolean addReceiveSecs1MessagePassThroughBiListener(Secs1MessagePassThroughBiListener biListener) {
+		return this.recvSecs1MsgPassThroughQueueBiObserver.addBiListener(biListener);
+	}
+	
+	@Override
+	public boolean removeReceiveSecs1MessagePassThroughBiListener(Secs1MessagePassThroughBiListener biListener) {
+		return this.recvSecs1MsgPassThroughQueueBiObserver.removeBiListener(biListener);
 	}
 	
 	public void notifyReceiveSecs1MessagePassThrough(Secs1Message message) throws InterruptedException {

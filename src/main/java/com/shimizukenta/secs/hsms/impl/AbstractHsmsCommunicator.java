@@ -6,7 +6,6 @@ import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsCommunicator;
 import com.shimizukenta.secs.hsms.HsmsMessage;
-import com.shimizukenta.secs.hsms.HsmsMessagePassThroughListener;
 import com.shimizukenta.secs.impl.AbstractSecsCommunicator;
 import com.shimizukenta.secs.local.property.ObjectProperty;
 import com.shimizukenta.secs.local.property.Observable;
@@ -15,18 +14,10 @@ public abstract class AbstractHsmsCommunicator extends AbstractSecsCommunicator 
 
 	private final ObjectProperty<HsmsCommunicateState> hsmsCommState = ObjectProperty.newInstance(HsmsCommunicateState.NOT_CONNECTED);
 	
-	private final HsmsMessagePassThroughQueueObserver trySendHsmsMsgPassThroughQueueObserver;
-	private final HsmsMessagePassThroughQueueObserver sendedHsmsMsgPassThroughQueueObserver;
-	private final HsmsMessagePassThroughQueueObserver recvHsmsMsgPassThroughQueueObserver;
-	
 	public AbstractHsmsCommunicator(AbstractSecsCommunicatorConfig config) {
 		super(config);
 		
 		this.hsmsCommState.computeIsEqualTo(HsmsCommunicateState.SELECTED).addChangeListener(this::notifyCommunicatableStateChange);
-		
-		this.trySendHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this);
-		this.sendedHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this);
-		this.recvHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this);
 	}
 	
 	@Override
@@ -57,51 +48,27 @@ public abstract class AbstractHsmsCommunicator extends AbstractSecsCommunicator 
 	abstract protected void prototypeNotifyReceiveHsmsMessage(HsmsMessage message) throws InterruptedException;
 	
 	
-	@Override
-	public boolean addTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.trySendHsmsMsgPassThroughQueueObserver.addListener(lstnr);
-	}
-	
-	@Override
-	public boolean removeTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.trySendHsmsMsgPassThroughQueueObserver.removeListener(lstnr);
-	}
-	
 	public void notifyTrySendHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
 		super.notifyTrySendSecsMessagePassThrough(message);
-		this.trySendHsmsMsgPassThroughQueueObserver.put(message);
+		this.prototypeNotifyTrySendHsmsMessagePassThrough(message);
 	}
 	
+	abstract protected void prototypeNotifyTrySendHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException;
 	
-	@Override
-	public boolean addSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.sendedHsmsMsgPassThroughQueueObserver.addListener(lstnr);
-	}
-	
-	@Override
-	public boolean removeSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.sendedHsmsMsgPassThroughQueueObserver.removeListener(lstnr);
-	}
 	
 	public void notifySendedHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
 		super.notifySendedSecsMessagePassThrough(message);
-		this.sendedHsmsMsgPassThroughQueueObserver.put(message);
+		this.prototypeNotifySendedHsmsMessagePassThrough(message);
 	}
 	
+	abstract protected void prototypeNotifySendedHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException;
 	
-	@Override
-	public boolean addReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.recvHsmsMsgPassThroughQueueObserver.addListener(lstnr);
-	}
-	
-	@Override
-	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr) {
-		return this.recvHsmsMsgPassThroughQueueObserver.removeListener(lstnr);
-	}
 	
 	public void notifyReceiveHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
 		super.notifyReceiveSecsMessagePassThrough(message);
-		this.recvHsmsMsgPassThroughQueueObserver.put(message);
+		this.prototypeNotifyReceiveHsmsMessagePassThrough(message);
 	}
 	
+	abstract protected void prototypeNotifyReceiveHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException;
+
 }

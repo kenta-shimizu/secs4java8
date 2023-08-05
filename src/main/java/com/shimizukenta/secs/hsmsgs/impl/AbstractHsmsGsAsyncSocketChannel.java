@@ -18,19 +18,18 @@ import com.shimizukenta.secs.secs2.Secs2BytesParseException;
 
 public abstract class AbstractHsmsGsAsyncSocketChannel extends AbstractHsmsAsyncSocketChannel {
 
-	private final AbstractHsmsGsCommunicator comm;
+	private final AbstractHsmsGsCommunicator communicator;
 	
 	private final AbstractHsmsLinktest linktest;
 	
 	public AbstractHsmsGsAsyncSocketChannel(
 			AsynchronousSocketChannel channel,
-			AbstractHsmsGsCommunicator communicator
-			) {
+			AbstractHsmsGsCommunicator communicator) {
 		
 		super(channel);
-		this.comm = communicator;
 		
-		this.linktest = new AbstractHsmsGsLinktest(this, communicator) {};
+		this.communicator = communicator;
+		this.linktest = new AbstractHsmsGsLinktest(this, this.communicator) {};
 	}
 	
 	@Override
@@ -45,7 +44,7 @@ public abstract class AbstractHsmsGsAsyncSocketChannel extends AbstractHsmsAsync
 	
 	@Override
 	protected HsmsMessageBuilder messageBuilder() {
-		return this.comm.msgBuilder();
+		return this.communicator.msgBuilder();
 	}
 	
 	@Override
@@ -67,37 +66,37 @@ public abstract class AbstractHsmsGsAsyncSocketChannel extends AbstractHsmsAsync
 	
 	@Override
 	protected void notifyLog(AbstractSecsLog log) throws InterruptedException {
-		this.comm.notifyLog(log);
+		this.communicator.notifyLog(log);
 	}
 	
 	@Override
 	protected void notifyTrySendHsmsMsgPassThrough(HsmsMessage msg) throws InterruptedException {
-		this.comm.notifyTrySendHsmsMessagePassThrough(msg);
+		this.communicator.notifyTrySendHsmsMessagePassThrough(msg);
 	}
 	
 	@Override
 	protected void notifySendedHsmsMsgPassThrough(HsmsMessage msg) throws InterruptedException {
-		this.comm.notifySendedHsmsMessagePassThrough(msg);
+		this.communicator.notifySendedHsmsMessagePassThrough(msg);
 	}
 	
 	@Override
 	protected void notifyReceiveHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
-		this.comm.notifyReceiveHsmsMessagePassThrough(msg);
+		this.communicator.notifyReceiveHsmsMessagePassThrough(msg);
 	}
 	
 	@Override
 	protected TimeoutProperty timeoutT3() {
-		return this.comm.config().timeout().t3();
+		return this.communicator.config().timeout().t3();
 	}
 	
 	@Override
 	protected TimeoutProperty timeoutT6() {
-		return this.comm.config().timeout().t6();
+		return this.communicator.config().timeout().t6();
 	}
 	
 	@Override
 	protected TimeoutProperty timeoutT8() {
-		return this.comm.config().timeout().t8();
+		return this.communicator.config().timeout().t8();
 	}
 	
 	@Override

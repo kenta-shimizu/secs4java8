@@ -77,4 +77,53 @@ public interface HsmsSession extends HsmsCommunicator {
 	 */
 	public boolean removeHsmsCommunicateStateChangeBiListener(HsmsSessionCommunicateStateChangeBiListener biListener);
 	
+	
+	/**
+	 * Add Listener to get HsmsMesssage before sending.
+	 * 
+	 * @param biListener the pass through message bi-listener
+	 * @return true if add success
+	 */
+	public boolean addTrySendHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param biListener the pass through message bi-listener
+	 * @return true if remove success
+	 */
+	public boolean removeTrySendHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);	
+	
+	/**
+	 * Add Listener to get HsmsMesssage sended.
+	 * 
+	 * @param biListener the pass through message bi-listener
+	 * @return true if add success
+	 */
+	public boolean addSendedHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param biListener the pass through message bi-listener
+	 * @return true if remove success
+	 */
+	public boolean removeSendedHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);	
+	
+	/**
+	 * Add Listener to receive both Primary and Reply Message.
+	 * 
+	 * @param biListener the pass through message bi-listener
+	 * @return true if add success
+	 */
+	public boolean addReceiveHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param biListener the pass through message bi-listener
+	 * @return true if remove success
+	 */
+	public boolean removeReceiveHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);	
+	
 }
