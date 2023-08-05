@@ -10,7 +10,7 @@ import com.shimizukenta.secs.hsms.HsmsMessageReceiveListener;
 import com.shimizukenta.secs.hsms.HsmsSession;
 import com.shimizukenta.secs.hsms.HsmsSessionMessageReceiveBiListener;
 
-public class HsmsGsMessageReceiveBiObserver {
+public class HsmsGsMessageReceiveBiObserver implements HsmsSessionMessageReceiveBiListener {
 
 	public HsmsGsMessageReceiveBiObserver() {
 		/* Nothing */
@@ -53,7 +53,8 @@ public class HsmsGsMessageReceiveBiObserver {
 		return this.hsmsBiListeners.remove(biListener);
 	}
 	
-	public void notifyReceiveHsmsMessageAndSession(HsmsMessage message, HsmsSession hsmsSession) {
+	@Override
+	public void received(HsmsMessage message, HsmsSession hsmsSession) {
 		
 		for ( SecsMessageReceiveListener l : this.secsListeners ) {
 			l.received(message);

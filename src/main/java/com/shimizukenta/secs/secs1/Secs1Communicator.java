@@ -35,8 +35,6 @@ public interface Secs1Communicator extends SecsCommunicator {
 			InterruptedException;
 	
 	
-	//TODO
-	
 	/* Secs-Message Receive Listener */
 	
 	/**
@@ -80,6 +78,8 @@ public interface Secs1Communicator extends SecsCommunicator {
 	public boolean removeSecs1MessageReceiveBiListener(Secs1MessageReceiveBiListener biListener);
 	
 	
+	/* try send SECS-I Message Pass through */
+	
 	/**
 	 * Add listener.
 	 * 
@@ -95,6 +95,25 @@ public interface Secs1Communicator extends SecsCommunicator {
 	 * @return true if remove success
 	 */
 	public boolean removeTrySendSecs1MessagePassThroughListener(Secs1MessagePassThroughListener listener);
+	
+	/**
+	 * Add Listener to get Secs1Messsage before sending.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success.
+	 */
+	public boolean addTrySendSecs1MessagePassThroughBiListener(Secs1MessagePassThroughBiListener biListener);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeTrySendSecs1MessagePassThroughBiListener(Secs1MessagePassThroughBiListener biListener);	
+	
+	
+	/* Sended SECS-I Message Pass Throught */
 	
 	/**
 	 * Add listener.
@@ -113,6 +132,25 @@ public interface Secs1Communicator extends SecsCommunicator {
 	public boolean removeSendedSecs1MessagePassThroughListener(Secs1MessagePassThroughListener listener);
 	
 	/**
+	 * Add Listener to get sended Secs1Messsage.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addSendedSecs1MessagePassThroughBiListener(Secs1MessagePassThroughBiListener biListener);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeSendedSecs1MessagePassThroughBiListener(Secs1MessagePassThroughBiListener biListener);	
+	
+	
+	/* Receive SECS-I Message Pass Through */
+	
+	/**
 	 * Add listener.
 	 * 
 	 * @param listener the SECS-I Message pass through listener
@@ -127,5 +165,21 @@ public interface Secs1Communicator extends SecsCommunicator {
 	 * @return true if remove success
 	 */
 	public boolean removeReceiveSecs1MessagePassThroughListener(Secs1MessagePassThroughListener listener);
+	
+	/**
+	 * Add BiListener to receive both Primary and Reply Message.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addReceiveSecs1MessagePassThroughBiListener(Secs1MessagePassThroughBiListener biListener);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeReceiveSecs1MessagePassThroughBiListener(Secs1MessagePassThroughBiListener biListener);
 	
 }

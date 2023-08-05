@@ -114,6 +114,7 @@ public interface HsmsCommunicator extends SecsCommunicator {
 	 */
 	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
 	
+	
 	/**
 	 * Send HSMS-Message and receive Reply-Message if exist.
 	 * 

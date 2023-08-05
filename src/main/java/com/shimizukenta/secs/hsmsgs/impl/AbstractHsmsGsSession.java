@@ -10,6 +10,7 @@ public abstract class AbstractHsmsGsSession extends AbstractHsmsSession {
 	private final int sessionId;
 	
 	public AbstractHsmsGsSession(HsmsGsCommunicatorConfig config, int sessionId) {
+		
 		super(config);
 		this.sessionId = sessionId;
 	}

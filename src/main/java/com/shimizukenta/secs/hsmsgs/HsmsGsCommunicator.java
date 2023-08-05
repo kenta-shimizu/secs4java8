@@ -18,6 +18,8 @@ import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
 import com.shimizukenta.secs.hsms.HsmsMessagePassThroughListener;
 import com.shimizukenta.secs.hsms.HsmsMessageReceiveListener;
 import com.shimizukenta.secs.hsms.HsmsSession;
+import com.shimizukenta.secs.hsms.HsmsSessionCommunicateStateChangeBiListener;
+import com.shimizukenta.secs.hsms.HsmsSessionMessagePassThroughBiListener;
 import com.shimizukenta.secs.hsms.HsmsSessionMessageReceiveBiListener;
 import com.shimizukenta.secs.hsmsgs.impl.AbstractHsmsGsActiveCommunicator;
 import com.shimizukenta.secs.hsmsgs.impl.AbstractHsmsGsPassiveCommunicator;
@@ -350,6 +352,7 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	 */
 	public boolean removeHsmsMessageReceiveBiListener(HsmsSessionMessageReceiveBiListener biListener);
 	
+	
 	/**
 	 * Add Listener to get communicate-state-changed.
 	 * 
@@ -358,18 +361,40 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	 * Pass through quickly.<br />
 	 * </p>
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param biListener Not accept {@code null}
 	 * @return {@code true} if add success in all sessions
 	 */
-	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener lstnr);
+	public boolean addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener);
 	
 	/**
 	 * Remove Listener.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param biListener Not accept {@code null}
 	 * @return {@code true} if remove success in all sessions
 	 */
-	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener lstnr);
+	public boolean removeSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener);
+	
+	/**
+	 * Add Listener to get HSMS communicate-state-changed.
+	 * 
+	 * <p>
+	 * Blocking-Listener.<br />
+	 * Pass through quickly.<br />
+	 * </p>
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success in all sessions
+	 */
+	public boolean addHsmsCommunicateStateChangeBiListener(HsmsSessionCommunicateStateChangeBiListener biListener);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success in all sessions
+	 */
+	public boolean removeHsmsCommunicateStateChangeBiListener(HsmsSessionCommunicateStateChangeBiListener biListener);
+	
 	
 	/**
 	 * Add Listener to log Communicating.
@@ -387,52 +412,132 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	 */
 	public boolean removeSecsLogListener(SecsLogListener lstnr);
 	
+	
 	/**
 	 * Add Listener to get SecsMesssage before sending.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if add success.
 	 */
-	public boolean addTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	public boolean addTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);
 	
 	/**
 	 * Remove Listener.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);	
+	public boolean removeTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);	
+	
+	/**
+	 * Add Bi-Listener to get SecsMesssage before sending.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success.
+	 */
+	public boolean addTrySendHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);
+	
+	/**
+	 * Remove Bi-Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeTrySendHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);	
+	
 	
 	/**
 	 * Add Listener to get sended SecsMesssage.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if add success
 	 */
-	public boolean addSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	public boolean addSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);
 	
 	/**
 	 * Remove Listener.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);	
+	public boolean removeSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);	
+	
+	
+	/**
+	 * Add Listener to get sended SecsMesssage.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addSendedHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeSendedHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);	
+	
 	
 	/**
 	 * Add Listener to receive both Primary and Reply Message.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if add success
 	 */
-	public boolean addReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	public boolean addReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);
 	
 	/**
 	 * Remove Listener.
 	 * 
-	 * @param lstnr Not accept {@code null}
+	 * @param listener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener lstnr);
+	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);
+	
+	/**
+	 * Add Bi-Listener to receive both Primary and Reply Message.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addReceiveHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);
+	
+	/**
+	 * Remove Bi-Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsSessionMessagePassThroughBiListener biListener);
+	
+	
+	/**
+	 * Add Listener to get communicate-state-changed.
+	 * 
+	 * <p>
+	 * Blocking-Listener.<br />
+	 * Pass through quickly.<br />
+	 * </p>
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success in all sessions
+	 */
+	@Deprecated
+	default public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener biListener) {
+		return this.addSecsCommunicatableStateChangeBiListener(biListener);
+	}
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success in all sessions
+	 */
+	@Deprecated
+	default public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener biListener) {
+		return this.removeSecsCommunicatableStateChangeBiListener(biListener);
+	}
 	
 }
