@@ -31,24 +31,24 @@ public interface Secs1Message extends SecsMessage {
 	/**
 	 * Returns SECS-I Message, HEAD-ONLY Message builder.
 	 * 
-	 * @param header10bytes the HEAD-10-bytes.
+	 * @param header10Bytes the HEAD-10-bytes.
 	 * @return SECS-I Message
 	 */
-	public static Secs1Message of(byte[] header10bytes) {
-		return Secs1Message.of(header10bytes, Secs2.empty());
+	public static Secs1Message of(byte[] header10Bytes) {
+		return Secs1Message.of(header10Bytes, Secs2.empty());
 	}
 	
 	/**
 	 * Returns SECS-I Message.
 	 * 
-	 * @param header10bytes the HEAD-10-bytes.
+	 * @param header10Bytes the HEAD-10-bytes.
 	 * @param body the body SECS-II
 	 * @return SECS-I Message
 	 * @throws Secs1TooBigMessageBodyException if SECS-II body is too big
 	 */
-	public static Secs1Message of(byte[] header10bytes, Secs2 body) {
+	public static Secs1Message of(byte[] header10Bytes, Secs2 body) {
 		try {
-			return Secs1MessageBuilder.build(header10bytes, body);
+			return Secs1MessageBuilder.build(header10Bytes, body);
 		}
 		catch ( Secs1TooBigSendMessageException e ) {
 			throw new Secs1TooBigMessageBodyException();

@@ -23,10 +23,8 @@ import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicator;
 import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
-import com.shimizukenta.secs.hsmsss.impl.HsmsSsMessageBuilder;
 import com.shimizukenta.secs.secs1.Secs1Message;
 import com.shimizukenta.secs.secs1.Secs1TooBigSendMessageException;
-import com.shimizukenta.secs.secs1.impl.Secs1MessageBuilder;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicator;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicatorConfig;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpReceiverCommunicator;
@@ -221,7 +219,7 @@ public class ProtocolConverter implements Closeable {
 				bs[9]
 		};
 		
-		return HsmsSsMessageBuilder.build(header, msg.secs2());
+		return HsmsMessage.of(header, msg.secs2());
 	}
 	
 	private Secs1Message toSecs1MessageFromHsmsMessage(SecsMessage msg)
@@ -248,7 +246,7 @@ public class ProtocolConverter implements Closeable {
 			header[0] &= (byte)0x7F;
 		}
 		
-		return Secs1MessageBuilder.build(header, msg.secs2());
+		return Secs1Message.of(header, msg.secs2());
 	}
 	
 	private HsmsMessage toHsmsRejectMessage(SecsMessage ref, byte reason) {
@@ -268,7 +266,7 @@ public class ProtocolConverter implements Closeable {
 				bs[9]
 		};
 		
-		return HsmsSsMessageBuilder.build(header);
+		return HsmsMessage.of(header);
 	}
 	
 	public boolean addSecsLogListener(SecsLogListener l) {
