@@ -16,16 +16,48 @@ public abstract class AbstractHsmsMessage extends AbstractSecsMessage implements
 	private final byte[] header;
 	private final Secs2 body;
 	
+	private final HsmsMessageType msgType;
+	private final boolean isDataMsg;
+	private final byte pType;
+	private final byte sType;
+	
+	private final int sessionId;
+	private final int strm;
+	private final int func;
+	private final boolean wbit;
+	
 	public AbstractHsmsMessage(byte[] header, Secs2 body) {
 		super();
 		this.header = Arrays.copyOf(header, HEADER_SIZE);
 		this.body = body;
+		
+		this.msgType = HsmsMessageType.get(this);
+		this.isDataMsg = this.msgType == HsmsMessageType.DATA;
+		this.pType = this.msgType.pType();
+		this.sType = this.msgType.sType();
+		
+		{
+			int i = ((((int)(header[0])) << 8) & 0x0000FF00) | (((int)(header[1])) & 0x000000FF);
+			if ( isDataMsg ) {
+				this.sessionId = i;
+			} else {
+				this.sessionId = (i == 0x0000FFFF ? -1 : i);
+			}
+		}
+		
+		if ( this.isDataMsg ) {
+			this.strm = (int)(header[2]) & 0x0000007F;
+			this.func = (int)(header[3]) & 0x000000FF;
+			this.wbit = ((int)(header[2]) & 0x80) == 0x80;
+		} else {
+			this.strm = -1;
+			this.func = -1;
+			this.wbit = false;
+		}
 	}
 	
 	public AbstractHsmsMessage(byte[] header) {
-		super();
-		this.header = Arrays.copyOf(header, HEADER_SIZE);
-		this.body = Secs2.empty();
+		this(header, Secs2.empty());
 	}
 	
 	@Override
@@ -39,23 +71,53 @@ public abstract class AbstractHsmsMessage extends AbstractSecsMessage implements
 	}
 	
 	@Override
+	public int deviceId() {
+		return this.sessionId;
+	}
+
+	@Override
+	public int sessionId() {
+		return this.sessionId;
+	}
+	
+	@Override
+	public int getStream() {
+		return this.strm;
+	}
+	
+	@Override
+	public int getFunction() {
+		return this.func;
+	}
+
+	@Override
+	public boolean wbit() {
+		return this.wbit;
+	}
+	
+	@Override
+	public boolean isDataMessage() {
+		return this.isDataMsg;
+	}
+	
+	@Override
 	public HsmsMessageType messageType() {
-		return HsmsMessageType.get(this);
+		return this.msgType;
 	}
 	
 	@Override
 	public byte pType() {
-		return this.messageType().pType();
+		return this.pType;
 	}
 	
 	@Override
 	public byte sType() {
-		return this.messageType().sType();
+		return this.sType;
 	}
 	
-	protected int getSessionIdFromHeader() {
-		return (((int)(this.header[0]) << 8) & 0x0000FF00)
-		| ((int)(header[1]) & 0x000000FF);
+	@Override
+	protected String toJsonProxy() {
+		return this.isDataMsg ? this.toDataMessageJsonProxy() : this.toControlMessageJsonProxy();
 	}
 	
 	protected String toDataMessageJsonProxy() {
@@ -70,7 +132,7 @@ public abstract class AbstractHsmsMessage extends AbstractSecsMessage implements
 				+ "}";
 	}
 	
-	protected String toControllMessageJsonProxy() {
+	protected String toControlMessageJsonProxy() {
 		
 		return "{\"messageType\":\"" + messageType().toString()
 				+ "\",\"p\":" + pType()
@@ -80,6 +142,11 @@ public abstract class AbstractHsmsMessage extends AbstractSecsMessage implements
 				+ "}";
 	}
 	
+	@Override
+	protected String toStringProxy() {
+		return this.isDataMsg ? this.toDataMessageStringProxy() : this.toControlMessageStringProxy();
+	}
+
 	private static final String BR = System.lineSeparator();
 	
 	protected String toDataMessageStringProxy() {
@@ -105,7 +172,7 @@ public abstract class AbstractHsmsMessage extends AbstractSecsMessage implements
 		return sb.toString();
 	}
 	
-	protected String toControllMessageStringProxy() {
+	protected String toControlMessageStringProxy() {
 		return toHeaderBytesString();
 	}
 	
