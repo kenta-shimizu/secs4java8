@@ -1,5 +1,9 @@
 package com.shimizukenta.secs.secs1;
 
+import java.util.Objects;
+
+import com.shimizukenta.secs.secs1.impl.Secs1s;
+
 /**
  * SECS-I Message Block.
  * 
@@ -72,5 +76,34 @@ public interface Secs1MessageBlock {
 	 * @return true if nextBlock is next block.
 	 */
 	public boolean isNextBlock(Secs1MessageBlock nextBlock);
+	
+	/**
+	 * Returns Secs1MessageBlock.
+	 * 
+	 * @param bs block bytes.
+	 * @return Secs1MessageBlock
+	 * @throws NullPointerException if input null
+	 * @throws IllegalArgumentException if byte length Illegal
+	 */
+	public static Secs1MessageBlock of(byte[] bs) {
+		
+		Objects.requireNonNull(bs);
+		
+		int len = bs.length;
+		if (len < 13 || len > 257) {
+			throw new IllegalArgumentException("byte length is >=13 && <= 257");
+		}
+		
+		int lengthByte = (int)(bs[0]) & 0x000000FF;
+		if ( lengthByte < 10 || lengthByte > 254 ) {
+			throw new IllegalArgumentException("length-byte is >=10 && <= 254");
+		}
+		
+		if ((lengthByte + 3) > len ) {
+			throw new IllegalArgumentException("(length-byte + 3) > bytes.length");
+		}
+		
+		return Secs1s.newMessageBlock(bs);
+	}
 	
 }

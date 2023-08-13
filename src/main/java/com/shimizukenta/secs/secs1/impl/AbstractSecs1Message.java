@@ -1,8 +1,8 @@
 package com.shimizukenta.secs.secs1.impl;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.impl.AbstractSecsMessage;
 import com.shimizukenta.secs.secs1.Secs1Message;
@@ -106,9 +106,7 @@ public abstract class AbstractSecs1Message extends AbstractSecsMessage implement
 	
 	@Override
 	public List<Secs1MessageBlock> toBlocks() {
-		return this.toAbstractBlocks().stream()
-				.map(b -> (Secs1MessageBlock)b)
-				.collect(Collectors.toList());
+		return Collections.unmodifiableList(this.toAbstractBlocks());
 	}
 	
 	abstract public List<AbstractSecs1MessageBlock> toAbstractBlocks();

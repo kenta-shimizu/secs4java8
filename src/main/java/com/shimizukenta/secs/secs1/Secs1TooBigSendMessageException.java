@@ -3,7 +3,7 @@ package com.shimizukenta.secs.secs1;
 /**
  * SECS-I Message Too Big Send Message Exception.
  * 
- * @author shimizukenta
+ * @author kenta-shimizu
  *
  */
 public class Secs1TooBigSendMessageException extends Secs1SendMessageException {

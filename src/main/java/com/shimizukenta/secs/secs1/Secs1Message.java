@@ -1,6 +1,7 @@
 package com.shimizukenta.secs.secs1;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs1.impl.Secs1MessageBuilder;
@@ -33,8 +34,18 @@ public interface Secs1Message extends SecsMessage {
 	 * 
 	 * @param header10Bytes the HEAD-10-bytes.
 	 * @return SECS-I Message
+	 * @throws NullPointerException if input null
+	 * @throws IllegalArgumentException if byte length is not 10
 	 */
 	public static Secs1Message of(byte[] header10Bytes) {
+		
+		Objects.requireNonNull(header10Bytes);
+		
+		int len = header10Bytes.length;
+		if ( len != 10 ) {
+			throw new IllegalArgumentException("header10Bytes.length != 10");
+		}
+		
 		return Secs1Message.of(header10Bytes, Secs2.empty());
 	}
 	
@@ -45,8 +56,19 @@ public interface Secs1Message extends SecsMessage {
 	 * @param body the body SECS-II
 	 * @return SECS-I Message
 	 * @throws Secs1TooBigMessageBodyException if SECS-II body is too big
+	 * @throws NullPointerException if input null
+	 * @throws IllegalArgumentException if byte length is not 10
 	 */
 	public static Secs1Message of(byte[] header10Bytes, Secs2 body) {
+		
+		Objects.requireNonNull(header10Bytes);
+		Objects.requireNonNull(body);
+		
+		int len = header10Bytes.length;
+		if ( len != 10 ) {
+			throw new IllegalArgumentException("header10Bytes.length != 10");
+		}
+		
 		try {
 			return Secs1MessageBuilder.build(header10Bytes, body);
 		}
