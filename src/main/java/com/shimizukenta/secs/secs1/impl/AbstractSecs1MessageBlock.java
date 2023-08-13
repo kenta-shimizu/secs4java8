@@ -21,7 +21,7 @@ public abstract class AbstractSecs1MessageBlock implements Secs1MessageBlock, Se
 	
 	public AbstractSecs1MessageBlock(byte[] bs) {
 		this.length = ((int)(bs[0])) & 0x000000FF;
-		this.bs = Arrays.copyOf(bs, this.length + 3);
+		this.bs = Arrays.copyOf(bs, length + 3);
 		this.cacheToString = null;
 		this.cacheSystemBytesKey = null;
 	}
