@@ -7,10 +7,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 import com.shimizukenta.secs.secs2.Secs2IndexOutOfBoundsException;
 import com.shimizukenta.secs.secs2.Secs2Item;
+import com.shimizukenta.secs.secs2.Secs2LengthByteOutOfRangeException;
 
 public class Secs2Boolean extends AbstractSecs2 {
 	
@@ -36,6 +36,10 @@ public class Secs2Boolean extends AbstractSecs2 {
 		
 		Objects.requireNonNull(bools);
 		
+		if (bools.length > 0x00FFFFFF) {
+			throw new Secs2LengthByteOutOfRangeException();
+		}
+		
 		this.bools = new ArrayList<>();
 		for ( boolean b : bools ) {
 			this.bools.add(b);
@@ -49,7 +53,12 @@ public class Secs2Boolean extends AbstractSecs2 {
 		
 		Objects.requireNonNull(bools);
 		
+		if (bools.size() > 0x00FFFFFF) {
+			throw new Secs2LengthByteOutOfRangeException();
+		}
+		
 		this.bools = new ArrayList<>(bools);
+		
 		this.bytes = null;
 	}
 	
@@ -69,37 +78,45 @@ public class Secs2Boolean extends AbstractSecs2 {
 	
 	
 	@Override
-	protected void putBytesPack(Secs2BytesPackBuilder builder) throws Secs2BuildException {
+	protected void putBytesPack(Secs2BytesListBuilder builder) {
 		this.putHeadAndBodyBytesToBytesPack(builder, bytes());
 	}
-
-	private synchronized List<Boolean> bools() {
+	
+	private final Object sync = new Object();
+	
+	private List<Boolean> bools() {
 		
-		if ( this.bools == null ) {
+		synchronized ( this.sync ) {
 			
-			this.bools = new ArrayList<>();
-			for ( byte b : bytes() ) {
-				this.bools.add(b != BYTE_FALSE);
+			if ( this.bools == null ) {
+				
+				this.bools = new ArrayList<>();
+				for ( byte b : bytes() ) {
+					this.bools.add(b != BYTE_FALSE);
+				}
 			}
+			
+			return this.bools;
 		}
-		
-		return this.bools;
 	}
 	
-	private synchronized byte[] bytes() {
+	private byte[] bytes() {
 		
-		if (this.bytes == null) {
+		synchronized ( this.sync ) {
 			
-			List<Boolean> bs = bools();
-			this.bytes = new byte[bs.size()];
-			int i = 0;
-			for ( Boolean b : bs ) {
-				this.bytes[i] = b ? BYTE_TRUE : BYTE_FALSE;
-				++i;
+			if (this.bytes == null) {
+				
+				List<Boolean> bs = bools();
+				this.bytes = new byte[bs.size()];
+				int i = 0;
+				for ( Boolean b : bs ) {
+					this.bytes[i] = b ? BYTE_TRUE : BYTE_FALSE;
+					++i;
+				}
 			}
+			
+			return this.bytes;
 		}
-		
-		return this.bytes;
 	}
 	
 	@Override

@@ -9,11 +9,10 @@ import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs1.Secs1Message;
+import com.shimizukenta.secs.secs1.Secs1MessageBlock;
 import com.shimizukenta.secs.secs1.Secs1TooBigSendMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
-import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
-import com.shimizukenta.secs.secs2.impl.Secs2BytesPackBuilder;
 import com.shimizukenta.secs.secs2.impl.Secs2BytesParsers;
 
 public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder {
@@ -169,41 +168,29 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 	public static AbstractSecs1Message build(byte[] header, Secs2 body)
 			throws Secs1TooBigSendMessageException {
 		
-		final List<AbstractSecs1MessageBlock> blocks = new ArrayList<>();
+		final List<Secs1MessageBlock> blocks = new ArrayList<>();
 		
-		final AbstractSecs1Message o = new AbstractSecs1Message(header, body) {
-			
-			private static final long serialVersionUID = 4267142316046169877L;
-			
-			@Override
-			public List<AbstractSecs1MessageBlock> toAbstractBlocks() {
-				return Collections.unmodifiableList(blocks);
-			}
-		};
+		final List<byte[]> ll = body.getBytesList(244);
 		
-		try {
-			final List<byte[]> ll = Secs2BytesPackBuilder.build(244, body).getBytes();
-			
-			if ( ll.size() > 0x7FFE) {
-				throw new Secs1TooBigSendMessageException(o);
-			}
-			
-			int blockNum = AbstractSecs1MessageBlock.ONE;
-			int m = ll.size() - 1;
-			
-			for ( int i = 0; i < m; ++i ) {
-				blocks.add(buildBlock(header, ll.get(i), false, blockNum));
-				++ blockNum;
-			}
-			
-			blocks.add(buildBlock(header, ll.get(m), true, blockNum));
-			
-			
-			return o;
+		if ( ll.size() > 0x7FFE) {
+			throw new Secs1TooBigSendMessageException(exceptRefMessage(header, body));
 		}
-		catch (Secs2BuildException e) {
-			throw new Secs1TooBigSendMessageException(o, e);
+		
+		int blockNum = AbstractSecs1MessageBlock.ONE;
+		int m = ll.size() - 1;
+		
+		for ( int i = 0; i < m; ++i ) {
+			blocks.add(buildBlock(header, ll.get(i), false, blockNum));
+			++ blockNum;
 		}
+		
+		blocks.add(buildBlock(header, ll.get(m), true, blockNum));
+		
+		return Secs1s.newMessage(header, body, blocks);
+	}
+	
+	private static AbstractSecs1Message exceptRefMessage(byte[] header10Bytes, Secs2 body) {
+		return Secs1s.newMessage(header10Bytes, body, Collections.emptyList());
 	}
 	
 	private static AbstractSecs1MessageBlock buildBlock(byte[] header, byte[] body, boolean ebit, int blockNumber) {
@@ -246,44 +233,27 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 		bs[pos] = (byte)(sum >> 8);
 		bs[pos + 1] = (byte)sum;
 		
-		return new AbstractSecs1MessageBlock(bs) {
-			
-			private static final long serialVersionUID = -3592481525438106452L;
-		};
+		return Secs1s.newMessageBlock(bs);
 	}
 	
 	public static AbstractSecs1Message fromBlocks(
-			List<? extends AbstractSecs1MessageBlock> blocks)
+			List<? extends Secs1MessageBlock> blocks)
 					throws Secs2BytesParseException {
 		
-		final List<AbstractSecs1MessageBlock> refs = new ArrayList<>(blocks);
-		
-		byte[] header = Arrays.copyOfRange(blocks.get(blocks.size() - 1).getBytes(), 1, 11);
+		byte[] header10Bytes = Arrays.copyOfRange(blocks.get(blocks.size() - 1).getBytes(), 1, 11);
 		
 		List<byte[]> bss = blocks.stream()
-				.map(AbstractSecs1MessageBlock::getBytes)
+				.map(Secs1MessageBlock::getBytes)
 				.map(bs -> Arrays.copyOfRange(bs, 11, bs.length - 2))
 				.collect(Collectors.toList());
 		
 		Secs2 body = Secs2BytesParsers.parse(bss);
 		
-		return new AbstractSecs1Message(header, body) {
-			
-			private static final long serialVersionUID = -338757353807161473L;
-			
-			@Override
-			public List<AbstractSecs1MessageBlock> toAbstractBlocks() {
-				return Collections.unmodifiableList(refs);
-			}
-		};
+		return Secs1s.newMessage(header10Bytes, body, blocks);
 	}
 	
-	public static AbstractSecs1Message fromMessage(Secs1Message msg) throws Secs1TooBigSendMessageException {
-		if ( msg instanceof AbstractSecs1Message ) {
-			return (AbstractSecs1Message)msg;
-		} else {
-			return build(msg.header10Bytes(), msg.secs2());
-		}
+	public static AbstractSecs1Message fromMessage(Secs1Message message) throws Secs1TooBigSendMessageException {
+		return Secs1s.castOrNewMessage(message);
 	}
 	
 }

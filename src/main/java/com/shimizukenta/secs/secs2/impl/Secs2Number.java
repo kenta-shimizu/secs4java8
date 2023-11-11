@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 import com.shimizukenta.secs.secs2.Secs2IndexOutOfBoundsException;
 
@@ -81,7 +80,7 @@ abstract public class Secs2Number<T extends Number> extends AbstractSecs2 {
 	}
 	
 	@Override
-	protected void putBytesPack(Secs2BytesPackBuilder builder) throws Secs2BuildException {
+	protected void putBytesPack(Secs2BytesListBuilder builder) {
 		this.putHeadAndBodyBytesToBytesPack(builder, bytes());
 	}
 

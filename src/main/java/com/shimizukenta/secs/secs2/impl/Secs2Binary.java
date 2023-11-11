@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.secs2.Secs2Exception;
 import com.shimizukenta.secs.secs2.Secs2Item;
+import com.shimizukenta.secs.secs2.Secs2LengthByteOutOfRangeException;
 
 public class Secs2Binary extends Secs2Number<Byte> {
 	
@@ -26,6 +27,10 @@ public class Secs2Binary extends Secs2Number<Byte> {
 		
 		Objects.requireNonNull(bs);
 		
+		if (bs.length > 0x00FFFFFF) {
+			throw new Secs2LengthByteOutOfRangeException();
+		}
+		
 		this.bytes = Arrays.copyOf(bs, bs.length);
 	}
 	
@@ -33,6 +38,10 @@ public class Secs2Binary extends Secs2Number<Byte> {
 		super();
 		
 		Objects.requireNonNull(values);
+		
+		if (values.size() > 0x00FFFFFF) {
+			throw new Secs2LengthByteOutOfRangeException();
+		}
 		
 		this.values = Collections.unmodifiableList(values);
 	}

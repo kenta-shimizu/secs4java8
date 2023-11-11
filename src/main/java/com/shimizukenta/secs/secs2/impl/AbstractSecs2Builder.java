@@ -12,12 +12,12 @@ public class AbstractSecs2Builder implements Secs2Builder {
 		/* Nothing */
 	}
 	
-	private static Secs2RawBytes rawEmpty = new Secs2RawBytes();
-	private static Secs2List listEmpty = new Secs2List();
-	private static Secs2Int4 i4empty = new Secs2Int4();
-	private static Secs2Int8 i8empty = new Secs2Int8();
-	private static Secs2Uint4 u4empty = new Secs2Uint4();
-	private static Secs2Uint8 u8empty = new Secs2Uint8();
+	private static final Secs2RawBytes rawEmpty = new Secs2RawBytes();
+	private static final Secs2List listEmpty = new Secs2List();
+	private static final Secs2Int4 i4empty = new Secs2Int4();
+	private static final Secs2Int8 i8empty = new Secs2Int8();
+	private static final Secs2Uint4 u4empty = new Secs2Uint4();
+	private static final Secs2Uint8 u8empty = new Secs2Uint8();
 	
 	@Override
 	public Secs2 empty() {

@@ -6,7 +6,7 @@ package com.shimizukenta.secs.secs2;
  * @author kenta-shimizu
  *
  */
-public class Secs2LengthByteOutOfRangeException extends Secs2BuildException {
+public class Secs2LengthByteOutOfRangeException extends IllegalArgumentException {
 	
 	private static final long serialVersionUID = -4790954656700659624L;
 	
