@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -13,10 +14,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.shimizukenta.secs.secs2.Secs2;
-import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 import com.shimizukenta.secs.secs2.Secs2IllegalDataFormatException;
-import com.shimizukenta.secs.secs2.Secs2LengthByteOutOfRangeException;
 
 public abstract class AbstractSecs2 implements Secs2, Serializable {
 	
@@ -26,18 +25,14 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 		/* Nothing */
 	}
 	
-	abstract protected void putBytesPack(Secs2BytesPackBuilder builder) throws Secs2BuildException;
+	abstract protected void putBytesPack(Secs2BytesListBuilder builder);
 	
-	protected void putHeadAndBodyBytesToBytesPack(Secs2BytesPackBuilder builder, byte[] body) throws Secs2BuildException {
+	protected void putHeadAndBodyBytesToBytesPack(Secs2BytesListBuilder builder, byte[] body) {
 		putHeaderBytesToBytesPack(builder, body.length);
 		builder.put(body);
 	}
 	
-	protected void putHeaderBytesToBytesPack(Secs2BytesPackBuilder builder, int length) throws Secs2BuildException {
-		
-		if ( length > 0xFFFFFF || length < 0 ) {
-			throw new Secs2LengthByteOutOfRangeException("length: " + length);
-		}
+	protected void putHeaderBytesToBytesPack(Secs2BytesListBuilder builder, int length) {
 		
 		byte b = secs2Item().code();
 		
@@ -288,6 +283,13 @@ public abstract class AbstractSecs2 implements Secs2, Serializable {
 	
 	protected Optional<Number> optionalNumber(int index) {
 		return Optional.empty();
+	}
+	
+	@Override
+	public List<byte[]> getBytesList(int maxBytesSize) {
+		Secs2BytesListBuilder b = new Secs2BytesListBuilder(maxBytesSize);
+		this.putBytesPack(b);
+		return b.getBytesList();
 	}
 	
 	@Override

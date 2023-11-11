@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs1.Secs1Message;
+import com.shimizukenta.secs.secs1.Secs1MessageBlock;
 import com.shimizukenta.secs.secs1.Secs1TooBigSendMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
@@ -23,7 +24,7 @@ public interface Secs1MessageBuilder {
 	
 	public AbstractSecs1Message build(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 body) throws Secs1TooBigSendMessageException;
 	
-	public static AbstractSecs1Message fromBlocks(List<? extends AbstractSecs1MessageBlock> blocks) throws Secs2BytesParseException {
+	public static AbstractSecs1Message fromBlocks(List<? extends Secs1MessageBlock> blocks) throws Secs2BytesParseException {
 		return AbstractSecs1MessageBuilder.fromBlocks(blocks);
 	}
 	

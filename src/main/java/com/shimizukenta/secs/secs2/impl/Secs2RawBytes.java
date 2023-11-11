@@ -1,8 +1,9 @@
 package com.shimizukenta.secs.secs2.impl;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2Item;
 
 public class Secs2RawBytes extends AbstractSecs2 {
@@ -28,14 +29,25 @@ public class Secs2RawBytes extends AbstractSecs2 {
 	public int size() {
 		return -1;
 	}
-
+	
 	@Override
 	public Secs2Item secs2Item() {
 		return Secs2Item.UNDEFINED;
 	}
 	
+	private static final List<byte[]> emptyBytesList = Collections.singletonList(new byte[0]);
+	
 	@Override
-	protected void putBytesPack(Secs2BytesPackBuilder builder) throws Secs2BuildException {
+	public List<byte[]> getBytesList(int maxBytesSize) {
+		if ( this.isEmpty() ) {
+			return emptyBytesList;
+		} else {
+			return super.getBytesList(maxBytesSize);
+		}
+	}
+	
+	@Override
+	protected void putBytesPack(Secs2BytesListBuilder builder) {
 		builder.put(bs);
 	}
 	

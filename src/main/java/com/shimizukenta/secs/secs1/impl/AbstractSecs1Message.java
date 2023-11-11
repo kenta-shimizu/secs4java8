@@ -1,5 +1,6 @@
 package com.shimizukenta.secs.secs1.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -15,32 +16,43 @@ public abstract class AbstractSecs1Message extends AbstractSecsMessage implement
 	
 	private final byte[] header;
 	private final Secs2 body;
+	private final List<Secs1MessageBlock> blocks;
 	
-	public AbstractSecs1Message(byte[] header, Secs2 body) {
+	private final int strm;
+	private final int func;
+	private final boolean wbit;
+	private final int deviceId;
+	private final boolean rbit;
+	
+	public AbstractSecs1Message(
+			byte[] header, Secs2 body,
+			List<? extends Secs1MessageBlock> blocks) {
+		
 		super();
 		this.header = Arrays.copyOf(header, header.length);
 		this.body = body;
-	}
-	
-	public AbstractSecs1Message(byte[] header) {
-		super();
-		this.header = Arrays.copyOf(header, header.length);
-		this.body = Secs2.empty();
+		this.blocks = new ArrayList<>(blocks);
+		
+		this.strm = (int)(this.header[2]) & 0x7F;
+		this.func = (int)(this.header[3]) & 0xFF;
+		this.wbit = ((int)(this.header[2]) & 0x80) == 0x80;
+		this.deviceId = (((int)(this.header[0]) << 8) & 0x00007F00) | (this.header[1] & 0x000000FF);
+		this.rbit = ((int)(this.header[0]) & 0x80) == 0x80;
 	}
 	
 	@Override
 	public int getStream() {
-		return (int)(this.header[2]) & 0x7F;
+		return this.strm;
 	}
 	
 	@Override
 	public int getFunction() {
-		return (int)(this.header[3]) & 0xFF;
+		return this.func;
 	}
 
 	@Override
 	public boolean wbit() {
-		return ((int)(this.header[2]) & 0x80) == 0x80;
+		return this.wbit;
 	}
 	
 	@Override
@@ -50,7 +62,7 @@ public abstract class AbstractSecs1Message extends AbstractSecsMessage implement
 	
 	@Override
 	public int deviceId() {
-		return (((int)(this.header[0]) << 8) & 0x00007F00) | (this.header[1] & 0x000000FF);
+		return this.deviceId;
 	}
 	
 	@Override
@@ -65,7 +77,7 @@ public abstract class AbstractSecs1Message extends AbstractSecsMessage implement
 	
 	@Override
 	public boolean rbit() {
-		return ((int)(this.header[0]) & 0x80) == 0x80;
+		return this.rbit;
 	}
 	
 	@Override
@@ -106,9 +118,7 @@ public abstract class AbstractSecs1Message extends AbstractSecsMessage implement
 	
 	@Override
 	public List<Secs1MessageBlock> toBlocks() {
-		return Collections.unmodifiableList(this.toAbstractBlocks());
+		return Collections.unmodifiableList(this.blocks);
 	}
-	
-	abstract public List<AbstractSecs1MessageBlock> toAbstractBlocks();
 	
 }

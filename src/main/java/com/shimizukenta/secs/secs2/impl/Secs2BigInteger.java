@@ -9,10 +9,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
-import java.util.stream.Stream;
 
 import com.shimizukenta.secs.secs2.Secs2Exception;
 import com.shimizukenta.secs.secs2.Secs2IndexOutOfBoundsException;
+import com.shimizukenta.secs.secs2.Secs2LengthByteOutOfRangeException;
 
 abstract public class Secs2BigInteger extends Secs2Number<BigInteger> {
 	
@@ -23,15 +23,24 @@ abstract public class Secs2BigInteger extends Secs2Number<BigInteger> {
 		
 		Objects.requireNonNull(values);
 		
+		if (values.length >= (0x01000000 / this.secs2Item().size())) {
+			throw new Secs2LengthByteOutOfRangeException();
+		}
+		
 		this.values = IntStream.of(values)
 				.mapToObj(BigInteger::valueOf)
 				.collect(Collectors.toList());
+		
 	}
 	
 	public Secs2BigInteger(long... values) {
 		super();
 		
 		Objects.requireNonNull(values);
+		
+		if (values.length >= (0x01000000 / this.secs2Item().size())) {
+			throw new Secs2LengthByteOutOfRangeException();
+		}
 		
 		this.values = LongStream.of(values)
 				.mapToObj(BigInteger::valueOf)
@@ -43,13 +52,21 @@ abstract public class Secs2BigInteger extends Secs2Number<BigInteger> {
 		
 		Objects.requireNonNull(values);
 		
-		this.values = Stream.of(values).collect(Collectors.toList());
+		if (values.length >= (0x01000000 / this.secs2Item().size())) {
+			throw new Secs2LengthByteOutOfRangeException();
+		}
+		
+		this.values = Arrays.asList(values);
 	}
 	
 	public Secs2BigInteger(List<? extends Number> values) {
 		super();
 		
 		Objects.requireNonNull(values);
+		
+		if (values.size() >= (0x01000000 / this.secs2Item().size())) {
+			throw new Secs2LengthByteOutOfRangeException();
+		}
 		
 		this.values = values.stream()
 				.map(v -> {

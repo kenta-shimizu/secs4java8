@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.secs1.Secs1Exception;
 import com.shimizukenta.secs.secs1.Secs1Message;
+import com.shimizukenta.secs.secs1.Secs1MessageBlock;
 import com.shimizukenta.secs.secs1.Secs1RetryOverException;
 import com.shimizukenta.secs.secs1.Secs1SendByteException;
 import com.shimizukenta.secs.secs1.Secs1SendMessageException;
@@ -206,7 +207,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 		}
 	}
 	
-	private boolean sending(AbstractSecs1MessageBlock block)
+	private boolean sending(Secs1MessageBlock block)
 			throws Secs1Exception, InterruptedException {
 		
 		this.comm.notifyLog(new Secs1TrySendMessageBlockLog(block));

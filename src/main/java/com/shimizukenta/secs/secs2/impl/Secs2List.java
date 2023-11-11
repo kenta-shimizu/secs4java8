@@ -1,6 +1,7 @@
 package com.shimizukenta.secs.secs2.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -10,10 +11,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.shimizukenta.secs.secs2.Secs2;
-import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 import com.shimizukenta.secs.secs2.Secs2IndexOutOfBoundsException;
 import com.shimizukenta.secs.secs2.Secs2Item;
+import com.shimizukenta.secs.secs2.Secs2LengthByteOutOfRangeException;
 
 public class Secs2List extends AbstractSecs2 {
 	
@@ -40,13 +41,21 @@ public class Secs2List extends AbstractSecs2 {
 	public Secs2List(Secs2... values){
 		super();
 		
-		this.values = Stream.of(values).collect(Collectors.toList());
+		if (values.length > 0x00FFFFFF) {
+			throw new Secs2LengthByteOutOfRangeException();
+		}
+		
+		this.values = Arrays.asList(values);
 		this.proxyToString = null;
 		this.proxyToJson = null;
 	}
 
 	public Secs2List(List<? extends Secs2> values) {
 		super();
+		
+		if (values.size() > 0x00FFFFFF) {
+			throw new Secs2LengthByteOutOfRangeException();
+		}
 		
 		this.values = new ArrayList<>(values);
 		this.proxyToString = null;
@@ -69,19 +78,16 @@ public class Secs2List extends AbstractSecs2 {
 	}
 	
 	@Override
-	protected void putBytesPack(Secs2BytesPackBuilder builder) throws Secs2BuildException {
+	protected void putBytesPack(Secs2BytesListBuilder builder) {
 		
 		this.putHeaderBytesToBytesPack(builder, size());
 		
 		for ( Secs2 ss : values ) {
 			
-			if ( ss instanceof AbstractSecs2 ) {
-				
-				((AbstractSecs2)ss).putBytesPack(builder);
-				
-			} else {
-				
-				throw new Secs2BuildException("cast failed");
+			List<byte[]> bss = ss.getBytesList(1024);
+			
+			for (byte[] bs : bss ) {
+				builder.put(bs);
 			}
 		}
 	}

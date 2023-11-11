@@ -8,9 +8,9 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 import com.shimizukenta.secs.secs2.Secs2Item;
+import com.shimizukenta.secs.secs2.Secs2LengthByteOutOfRangeException;
 
 public class Secs2Ascii extends AbstractSecs2 {
 	
@@ -26,7 +26,11 @@ public class Secs2Ascii extends AbstractSecs2 {
 		super();
 		
 		this.ascii = Objects.requireNonNull(cs).toString();
-		this.bytes = null;
+		this.bytes = this.ascii.getBytes(charset);
+		
+		if ( this.bytes.length > 0x00FFFFFF ) {
+			throw new Secs2LengthByteOutOfRangeException();
+		}
 	}
 	
 	public Secs2Ascii(byte[] bs) {
@@ -44,24 +48,22 @@ public class Secs2Ascii extends AbstractSecs2 {
 	}
 	
 	@Override
-	protected void putBytesPack(Secs2BytesPackBuilder builder) throws Secs2BuildException {
-		putHeadAndBodyBytesToBytesPack(builder, bytes());
+	protected void putBytesPack(Secs2BytesListBuilder builder) {
+		putHeadAndBodyBytesToBytesPack(builder, this.bytes);
 	}
 	
-	private synchronized String ascii() {
-		if ( this.ascii == null ) {
-			this.ascii = new String(bytes, charset);
-		}
-		
-		return this.ascii;
-	}
+	private final Object sync = new Object();
 	
-	private synchronized byte[] bytes() {
-		if ( this.bytes == null ) {
-			this.bytes = ascii.getBytes(charset);
-		}
+	private String ascii() {
 		
-		return this.bytes;
+		synchronized ( this.sync ) {
+			
+			if ( this.ascii == null ) {
+				this.ascii = new String(bytes, charset);
+			}
+			
+			return this.ascii;
+		}
 	}
 	
 	@Override
@@ -137,10 +139,9 @@ public class Secs2Ascii extends AbstractSecs2 {
 				}
 			}
 			
-			return new String(strm.toByteArray(), StandardCharsets.US_ASCII);
+			return new String(strm.toByteArray(), charset);
 		}
 		catch (IOException notHappen) {
-			notHappen.printStackTrace();
 		}
 		
 		return "";

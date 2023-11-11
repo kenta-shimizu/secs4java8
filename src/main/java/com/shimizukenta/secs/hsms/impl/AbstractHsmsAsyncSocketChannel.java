@@ -36,10 +36,7 @@ import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 import com.shimizukenta.secs.impl.AbstractSecsLog;
 import com.shimizukenta.secs.local.property.TimeoutProperty;
 import com.shimizukenta.secs.secs2.Secs2;
-import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
-import com.shimizukenta.secs.secs2.impl.Secs2BytesPack;
-import com.shimizukenta.secs.secs2.impl.Secs2BytesPackBuilder;
 
 public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketChannel {
 	
@@ -545,46 +542,26 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 		
 		synchronized ( this.syncSendMsg ) {
 			
-			try {
+			final List<byte[]> bss = msg.secs2().getBytesList(1024);
+			
+			long len = 0L;
+			
+			for ( byte[] bs : bss ) {
+				len += (long)(bs.length);
+			}
+			
+			len += 10L;
+			
+			if ( len > 0x00000000FFFFFFFFL || len < 10L ) {
+				throw new HsmsTooBigSendMessageException(msg);
+			}
+			
+			long msglen = len + 4;
+			
+			if ( msglen > (long)(this.prototypeDefaultSendBufferSize()) ) {
 				
-				final Secs2BytesPack pack = Secs2BytesPackBuilder.build(1024, msg.secs2());
-				
-				long len = pack.size() + 10L;
-				
-				if ( len > 0x00000000FFFFFFFFL || len < 10L ) {
-					throw new HsmsTooBigSendMessageException(msg);
-				}
-				
-				long msglen = len + 4;
-				
-				if ( msglen > (long)(this.prototypeDefaultSendBufferSize()) ) {
-					
-					{
-						final ByteBuffer buffer = ByteBuffer.allocate(14);
-						
-						buffer.put((byte)(len >> 24));
-						buffer.put((byte)(len >> 16));
-						buffer.put((byte)(len >>  8));
-						buffer.put((byte)(len      ));
-						buffer.put(msg.header10Bytes());
-						
-						((Buffer)buffer).flip();
-						
-						this.sendByteBuffer(buffer, msg);
-					}
-					
-					for ( byte[] bs : pack.getBytes() ) {
-						
-						final ByteBuffer buffer = ByteBuffer.allocate(bs.length);
-						buffer.put(bs);
-						((Buffer)buffer).flip();
-						
-						this.sendByteBuffer(buffer, msg);
-					}
-					
-				} else {
-					
-					final ByteBuffer buffer = ByteBuffer.allocate((int)msglen);
+				{
+					final ByteBuffer buffer = ByteBuffer.allocate(14);
 					
 					buffer.put((byte)(len >> 24));
 					buffer.put((byte)(len >> 16));
@@ -592,17 +569,37 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 					buffer.put((byte)(len      ));
 					buffer.put(msg.header10Bytes());
 					
-					for ( byte[] bs : pack.getBytes() ) {
-						buffer.put(bs);
-					}
-					
 					((Buffer)buffer).flip();
 					
 					this.sendByteBuffer(buffer, msg);
 				}
-			}
-			catch ( Secs2BuildException e ) {
-				throw new HsmsSendMessageException(msg);
+				
+				for ( byte[] bs : bss ) {
+					
+					final ByteBuffer buffer = ByteBuffer.allocate(bs.length);
+					buffer.put(bs);
+					((Buffer)buffer).flip();
+					
+					this.sendByteBuffer(buffer, msg);
+				}
+				
+			} else {
+				
+				final ByteBuffer buffer = ByteBuffer.allocate((int)msglen);
+				
+				buffer.put((byte)(len >> 24));
+				buffer.put((byte)(len >> 16));
+				buffer.put((byte)(len >>  8));
+				buffer.put((byte)(len      ));
+				buffer.put(msg.header10Bytes());
+				
+				for ( byte[] bs : bss ) {
+					buffer.put(bs);
+				}
+				
+				((Buffer)buffer).flip();
+				
+				this.sendByteBuffer(buffer, msg);
 			}
 		}
 		

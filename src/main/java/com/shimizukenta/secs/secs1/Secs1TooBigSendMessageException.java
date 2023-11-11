@@ -13,6 +13,15 @@ public class Secs1TooBigSendMessageException extends Secs1SendMessageException {
 	/**
 	 * Constructor.
 	 * 
+	 * @param cause the cause
+	 */
+	public Secs1TooBigSendMessageException(Throwable cause) {
+		super(cause);
+	}
+	
+	/**
+	 * Constructor.
+	 * 
 	 * @param secs1Message the SECS-I Message
 	 */
 	public Secs1TooBigSendMessageException(Secs1Message secs1Message) {

@@ -6,6 +6,7 @@ import java.util.Objects;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs1.impl.Secs1MessageBuilder;
 import com.shimizukenta.secs.secs2.Secs2;
+import com.shimizukenta.secs.secs2.Secs2BytesParseException;
 
 /**
  * SECS-I Message.
@@ -38,14 +39,6 @@ public interface Secs1Message extends SecsMessage {
 	 * @throws IllegalArgumentException if byte length is not 10
 	 */
 	public static Secs1Message of(byte[] header10Bytes) {
-		
-		Objects.requireNonNull(header10Bytes);
-		
-		int len = header10Bytes.length;
-		if ( len != 10 ) {
-			throw new IllegalArgumentException("header10Bytes.length != 10");
-		}
-		
 		return Secs1Message.of(header10Bytes, Secs2.empty());
 	}
 	
@@ -57,7 +50,7 @@ public interface Secs1Message extends SecsMessage {
 	 * @return SECS-I Message
 	 * @throws Secs1TooBigMessageBodyException if SECS-II body is too big
 	 * @throws NullPointerException if input null
-	 * @throws IllegalArgumentException if byte length is not 10
+	 * @throws IllegalArgumentException if byte length is NOT　10
 	 */
 	public static Secs1Message of(byte[] header10Bytes, Secs2 body) {
 		
@@ -75,6 +68,24 @@ public interface Secs1Message extends SecsMessage {
 		catch ( Secs1TooBigSendMessageException e ) {
 			throw new Secs1TooBigMessageBodyException();
 		}
+	}
+	
+	/**
+	 * Returns Secs-I Message.
+	 * 
+	 * @param blocks the Secs-I Message blocks
+	 * @return Secs-I Message
+	 * @throws Secs2BytesParseException if blocks.size() {@code <1}
+	 */
+	public static Secs1Message of(List<? extends Secs1MessageBlock> blocks) throws Secs2BytesParseException {
+		
+		Objects.requireNonNull(blocks);
+		
+		if ( blocks.size() < 1 ) {
+			throw new IllegalArgumentException("Block size requires >0");
+		}
+		
+		return Secs1MessageBuilder.fromBlocks(blocks);
 	}
 	
 }

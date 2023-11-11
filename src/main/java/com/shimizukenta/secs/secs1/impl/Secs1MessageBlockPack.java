@@ -3,15 +3,17 @@ package com.shimizukenta.secs.secs1.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.shimizukenta.secs.secs1.Secs1MessageBlock;
+
 public final class Secs1MessageBlockPack {
 	
 	private final AbstractSecs1Message msg;
-	private final List<AbstractSecs1MessageBlock> absBlocks;
+	private final List<Secs1MessageBlock> blocks;
 	private int present;
 	
 	public Secs1MessageBlockPack(AbstractSecs1Message msg) {
 		this.msg = msg;
-		this.absBlocks = new ArrayList<>(msg.toAbstractBlocks());
+		this.blocks = new ArrayList<>(msg.toBlocks());
 		this.present = 0;
 	}
 	
@@ -19,8 +21,8 @@ public final class Secs1MessageBlockPack {
 		return msg;
 	}
 	
-	public AbstractSecs1MessageBlock present() {
-		return this.absBlocks.get(present);
+	public Secs1MessageBlock present() {
+		return this.blocks.get(present);
 	}
 	
 	public void reset() {
@@ -32,7 +34,7 @@ public final class Secs1MessageBlockPack {
 	}
 	
 	public boolean ebit() {
-		return this.absBlocks.get(this.present).ebit();
+		return this.blocks.get(this.present).ebit();
 	}
 	
 }

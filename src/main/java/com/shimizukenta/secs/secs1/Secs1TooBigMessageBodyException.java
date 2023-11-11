@@ -1,7 +1,5 @@
 package com.shimizukenta.secs.secs1;
 
-import java.util.Optional;
-
 /**
  * Secs1 Message is Too Big body Exception.
  * 
@@ -15,7 +13,6 @@ public class Secs1TooBigMessageBodyException extends RuntimeException {
 	/**
 	 * Reference SECS-I Message.
 	 */
-	private final Secs1Message referenceSecs1Message;
 	
 	/**
 	 * Constructor.
@@ -23,27 +20,6 @@ public class Secs1TooBigMessageBodyException extends RuntimeException {
 	 */
 	public Secs1TooBigMessageBodyException() {
 		super();
-		this.referenceSecs1Message = null;
-	}
-	
-	/**
-	 * Constructor.
-	 * 
-	 * @param secs1Message the SECS-I Message
-	 * 
-	 */
-	public Secs1TooBigMessageBodyException(Secs1Message secs1Message) {
-		super();
-		this.referenceSecs1Message = secs1Message;
-	}
-	
-	/**
-	 * Returns Optional of reference Secs1Message.
-	 * 
-	 * @return Optional of reference Secs1Message
-	 */
-	public Optional<Secs1Message> referenceSecs1Message() {
-		return this.referenceSecs1Message == null ? Optional.empty() : Optional.of(this.referenceSecs1Message);
 	}
 	
 }

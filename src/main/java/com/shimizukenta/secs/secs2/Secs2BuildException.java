@@ -5,7 +5,8 @@ package com.shimizukenta.secs.secs2;
  * 
  * @author kenta-shimizu
  */
-public class Secs2BuildException extends Secs2Exception {
+@Deprecated
+public class Secs2BuildException extends RuntimeException {
 	
 	private static final long serialVersionUID = -7679941208943175508L;
 	

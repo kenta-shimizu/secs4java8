@@ -15,6 +15,15 @@ public class Secs1SendMessageException extends SecsSendMessageException {
 	/**
 	 * Constructor.
 	 * 
+	 * @param cause the cause
+	 */
+	public Secs1SendMessageException(Throwable cause) {
+		super(cause);
+	}
+	
+	/**
+	 * Constructor.
+	 * 
 	 * @param secs1Message the SECS-I Message
 	 */
 	public Secs1SendMessageException(Secs1Message secs1Message) {

@@ -64,6 +64,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the Secs2 values
 	 * @return Secs2 of List
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 list(Secs2... values);
 
@@ -72,6 +74,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values list of Secs2
 	 * @return Secs2 of List
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 list(List<? extends Secs2> values);
 
@@ -84,6 +88,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param cs the CharSequence
 	 * @return Secs2 of Ascii
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 ascii(CharSequence cs);
 
@@ -99,6 +105,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param bs the bytes
 	 * @return Secs of Binary
+	 * @throws NullPointerException if bs is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 binary(byte... bs);
 
@@ -107,6 +115,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param bs List of Byte
 	 * @return Secs2 of binary
+	 * @throws NullPointerException if bs is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 binary(List<Byte> bs);
 
@@ -122,6 +132,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param bools booleans
 	 * @return Secs2 of BOOLEAN
+	 * @throws NullPointerException if bools is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 bool(boolean... bools);
 	
@@ -130,6 +142,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param bools list of boolean
 	 * @return Secs2 of boolean
+	 * @throws NullPointerException if bools is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 bool(List<Boolean> bools);
 
@@ -145,6 +159,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the int values
 	 * @return Secs2 of {@code <I1[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int1(int... values);
 
@@ -153,6 +169,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the long values
 	 * @return Secs2 of {@code <I1[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int1(long... values);
 
@@ -161,6 +179,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the BigInteger values
 	 * @return Secs2 of {@code <I1[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int1(BigInteger... values);
 
@@ -169,6 +189,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values list of Number
 	 * @return Secs2 of {@code <I1[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int1(List<? extends Number> values);
 
@@ -184,6 +206,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the int values
 	 * @return Secs2 of {@code <I2[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int2(int... values);
 
@@ -192,6 +216,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the long values
 	 * @return Secs2 of {@code <I2[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int2(long... values);
 
@@ -200,6 +226,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the BigInteger values
 	 * @return Secs2 of {@code <I2[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int2(BigInteger... values);
 
@@ -208,6 +236,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values list of Numbers
 	 * @return Secs2 of {@code <I2[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int2(List<? extends Number> values);
 
@@ -223,6 +253,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the int values
 	 * @return Secs2 of {@code <I4[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int4(int... values);
 
@@ -231,6 +263,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the long values
 	 * @return Secs2 of {@code <I4[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int4(long... values);
 
@@ -239,6 +273,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the BigInteger values
 	 * @return Secs2 of {@code <I4[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int4(BigInteger... values);
 
@@ -247,6 +283,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values list of Numbers
 	 * @return Secs2 of {@code <I4[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int4(List<? extends Number> values);
 
@@ -262,6 +300,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the int values
 	 * @return Secs2 of {@code <I8[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int8(int... values);
 
@@ -270,6 +310,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the long values
 	 * @return Secs2 of {@code <I8[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int8(long... values);
 
@@ -278,6 +320,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the BigInteger values
 	 * @return Secs2 of {@code <I8[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int8(BigInteger... values);
 
@@ -286,6 +330,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values list of Numbers
 	 * @return Secs2 of {@code <I8[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 int8(List<? extends Number> values);
 
@@ -301,6 +347,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the int values
 	 * @return Secs2 of {@code <U1[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint1(int... values);
 
@@ -309,6 +357,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the long values
 	 * @return Secs2 of {@code <U1[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint1(long... values);
 
@@ -317,6 +367,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the BigInteger values
 	 * @return Secs2 of {@code <U1[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint1(BigInteger... values);
 
@@ -325,6 +377,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values list of Numbers
 	 * @return Secs2 of {@code <U1[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint1(List<? extends Number> values);
 
@@ -340,6 +394,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the int values
 	 * @return Secs2 of {@code <U2[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint2(int... values);
 
@@ -348,6 +404,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the long values
 	 * @return Secs2 of {@code <U2[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint2(long... values);
 
@@ -356,6 +414,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the BigInteger values
 	 * @return Secs2 of {@code <U2[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint2(BigInteger... values);
 
@@ -364,6 +424,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values list of Numbers
 	 * @return Secs2 of {@code <U2[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint2(List<? extends Number> values);
 
@@ -379,6 +441,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the int values
 	 * @return Secs2 of {@code <U4[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint4(int... values);
 
@@ -387,6 +451,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the long values
 	 * @return Secs2 of {@code <U4[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint4(long... values);
 
@@ -395,6 +461,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the BigInteger values
 	 * @return Secs2 of {@code <U4[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint4(BigInteger... values);
 
@@ -403,6 +471,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values list of Numbers
 	 * @return Secs2 of {@code <U4[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint4(List<? extends Number> values);
 
@@ -418,6 +488,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the int values
 	 * @return Secs2 of {@code <U8[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint8(int... values);
 
@@ -426,6 +498,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the long values
 	 * @return Secs2 of {@code <U8[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint8(long... values);
 
@@ -434,6 +508,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the BigInteger values
 	 * @return Secs2 of {@code <U8[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint8(BigInteger... values);
 
@@ -442,6 +518,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values list of Numbers
 	 * @return Secs2 of {@code <U8[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 uint8(List<? extends Number> values);
 
@@ -457,6 +535,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the float values
 	 * @return Secs2 of {@code <F4[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 float4(float... values);
 
@@ -465,6 +545,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values list of Numbers
 	 * @return Secs2 of {@code <F4[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 float4(List<? extends Number> values);
 
@@ -480,6 +562,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values the double values
 	 * @return Secs2 of {@code <F8[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 float8(double... values);
 
@@ -488,6 +572,8 @@ public interface Secs2Builder {
 	 * 
 	 * @param values list of Numbers
 	 * @return Secs2 of {@code <F8[n] n...>}
+	 * @throws NullPointerException if values is null.
+	 * @throws Secs2LengthByteOutOfRangeException if length-byte-size {@code >0x00FFFFFF}.
 	 */
 	public Secs2 float8(List<? extends Number> values);
 	

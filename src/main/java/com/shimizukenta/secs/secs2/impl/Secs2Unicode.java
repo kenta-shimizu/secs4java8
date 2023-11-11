@@ -3,7 +3,6 @@ package com.shimizukenta.secs.secs2.impl;
 import java.util.Arrays;
 import java.util.Objects;
 
-import com.shimizukenta.secs.secs2.Secs2BuildException;
 import com.shimizukenta.secs.secs2.Secs2Item;
 
 public class Secs2Unicode extends AbstractSecs2 {
@@ -22,24 +21,14 @@ public class Secs2Unicode extends AbstractSecs2 {
 		this.bytes = Arrays.copyOf(bs, bs.length);
 	}
 	
-	private synchronized byte[] bytes() {
-		
-		if ( bytes == null ) {
-			
-			bytes = new byte[0];
-		}
-		
-		return bytes;
-	}
-
 	@Override
 	public int size() {
-		return bytes().length;
+		return this.bytes.length;
 	}
 	
 	@Override
-	protected void putBytesPack(Secs2BytesPackBuilder builder) throws Secs2BuildException {
-		this.putHeadAndBodyBytesToBytesPack(builder, bytes());
+	protected void putBytesPack(Secs2BytesListBuilder builder) {
+		this.putHeadAndBodyBytesToBytesPack(builder, this.bytes);
 	}
 	
 	@Override

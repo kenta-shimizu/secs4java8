@@ -1,6 +1,5 @@
 package com.shimizukenta.secs.secs2.impl;
 
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,8 +7,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.shimizukenta.secs.secs2.Secs2Exception;
 import com.shimizukenta.secs.secs2.Secs2Item;
+import com.shimizukenta.secs.secs2.Secs2LengthByteOutOfRangeException;
 
 public class Secs2Float4 extends Secs2Number<Float> {
 	
@@ -26,6 +25,10 @@ public class Secs2Float4 extends Secs2Number<Float> {
 		
 		Objects.requireNonNull(values);
 		
+		if (values.length >= (0x01000000 / this.secs2Item().size())) {
+			throw new Secs2LengthByteOutOfRangeException();
+		}
+		
 		this.values = new ArrayList<>();
 		for ( float v : values ) {
 			this.values.add(v);
@@ -36,6 +39,10 @@ public class Secs2Float4 extends Secs2Number<Float> {
 		super();
 		
 		Objects.requireNonNull(values);
+		
+		if (values.size() >= (0x01000000 / this.secs2Item().size())) {
+			throw new Secs2LengthByteOutOfRangeException();
+		}
 		
 		this.values = values.stream()
 				.map(Number::floatValue)
@@ -63,11 +70,6 @@ public class Secs2Float4 extends Secs2Number<Float> {
 	@Override
 	public Secs2Item secs2Item() {
 		return secs2Item;
-	}
-	
-	@Override
-	protected BigInteger getBigInteger(int index) throws Secs2Exception {
-		return BigInteger.valueOf(this.getNumber(index).longValue());
 	}
 	
 }
