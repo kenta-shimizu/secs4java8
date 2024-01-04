@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsReceiveMessageLog;
 
 public abstract class AbstractSecsReceiveMessageLog extends AbstractSecsLog implements SecsReceiveMessageLog {
@@ -30,7 +31,7 @@ public abstract class AbstractSecsReceiveMessageLog extends AbstractSecsLog impl
 	}
 	
 	@Override
-	public Optional<AbstractSecsMessage> optionalAbstractSecsMessage() {
+	public Optional<SecsMessage> optionalSecsMessage() {
 		return Optional.of(this.msg);
 	}
 

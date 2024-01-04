@@ -127,7 +127,7 @@ public abstract class AbstractHsmsMessage extends AbstractSecsMessage implements
 				+ ",\"func\":" + getFunction()
 				+ ",\"wbit\":" + (wbit() ? "true" : "false")
 				+ ",\"sessionId\":" + sessionId()
-				+ ",\"systemBytes\":"+ systemBytesKey().toString()
+				+ ",\"systemBytes\":"+ this.systemBytesKey().toString()
 				+ ",\"secs2\":"+ secs2().toJson()
 				+ "}";
 	}
@@ -138,7 +138,7 @@ public abstract class AbstractHsmsMessage extends AbstractSecsMessage implements
 				+ "\",\"p\":" + pType()
 				+ ",\"s\":" + sType()
 				+ ",\"sessionId\":" + sessionId()
-				+ ",\"systemBytes\":"+ systemBytesKey().toString()
+				+ ",\"systemBytes\":" + this.systemBytesKey().toString()
 				+ "}";
 	}
 	

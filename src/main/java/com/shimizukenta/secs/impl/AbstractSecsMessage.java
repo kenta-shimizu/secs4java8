@@ -10,47 +10,23 @@ public abstract class AbstractSecsMessage implements SecsMessage, Serializable {
 	
 	private final Object sync = new Object();
 	
-	private Integer cacheSystemBytesKey;
 	private String cacheToJson;
 	private String cacheToHeaderBytesString;
 	private String cacheToString;
+	private Integer cacheSystemBytesKey;
 	
 	protected AbstractSecsMessage() {
-		this.cacheSystemBytesKey = null;
 		this.cacheToJson = null;
 		this.cacheToHeaderBytesString = null;
 		this.cacheToString = null;
-	}
-	
-	/**
-	 * System-Bytes-getter, using Map's key.
-	 * 
-	 * @return {@code Integer} of Message System-Bytes
-	 */
-	public Integer systemBytesKey() {
-		
-		synchronized ( sync ) {
-			
-			if ( this.cacheSystemBytesKey == null ) {
-				
-				byte[] bs = this.header10Bytes();
-				int i = ((int)(bs[6]) << 24) & 0xFF000000;
-				i |= ((int)(bs[7]) << 16) & 0x00FF0000;
-				i |= ((int)(bs[8]) <<  8) & 0x0000FF00;
-				i |= (int)(bs[9]) & 0x000000FF;
-				
-				this.cacheSystemBytesKey = Integer.valueOf(i);
-			}
-			
-			return this.cacheSystemBytesKey;
-		}
+		this.cacheSystemBytesKey = null;
 	}
 	
 	abstract protected String toJsonProxy();
 	
 	@Override
 	public String toJson() {
-		synchronized ( sync ) {
+		synchronized ( this.sync ) {
 			if ( this.cacheToJson == null ) {
 				this.cacheToJson = this.toJsonProxy();
 			}
@@ -65,7 +41,7 @@ public abstract class AbstractSecsMessage implements SecsMessage, Serializable {
 	 */
 	protected String toHeaderBytesString() {
 		
-		synchronized ( sync ) {
+		synchronized ( this.sync ) {
 			
 			if ( this.cacheToHeaderBytesString == null ) {
 				
@@ -92,11 +68,30 @@ public abstract class AbstractSecsMessage implements SecsMessage, Serializable {
 	
 	@Override
 	public String toString() {
-		synchronized ( sync ) {
+		synchronized ( this.sync ) {
 			if ( this.cacheToString == null ) {
 				this.cacheToString = this.toStringProxy();
 			}
 			return this.cacheToString;
+		}
+	}
+	
+	protected Integer systemBytesKey() {
+		
+		synchronized ( this.sync ) {
+			
+			if (this.cacheSystemBytesKey == null) {
+				
+				byte[] bs = this.header10Bytes();
+				int i = (((int)(bs[6]) << 24) & 0xFF000000)
+						| (((int)(bs[7]) << 16) & 0x00FF0000)
+						| (((int)(bs[8]) << 8) & 0x0000FF00)
+						| ((int)(bs[9]) & 0x000000FF);
+				
+				this.cacheSystemBytesKey = Integer.valueOf(i);
+			}
+			
+			return this.cacheSystemBytesKey;
 		}
 	}
 	

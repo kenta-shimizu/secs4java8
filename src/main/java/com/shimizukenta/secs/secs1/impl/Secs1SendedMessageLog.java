@@ -3,6 +3,7 @@ package com.shimizukenta.secs.secs1.impl;
 import java.time.LocalDateTime;
 
 import com.shimizukenta.secs.impl.AbstractSecsSendedMessageLog;
+import com.shimizukenta.secs.secs1.Secs1Message;
 
 public class Secs1SendedMessageLog extends AbstractSecsSendedMessageLog {
 	
@@ -10,11 +11,11 @@ public class Secs1SendedMessageLog extends AbstractSecsSendedMessageLog {
 	
 	private static final String commonSubject = "Sended SECS1-Message";
 	
-	public Secs1SendedMessageLog(AbstractSecs1Message message, LocalDateTime timestamp) {
+	public Secs1SendedMessageLog(Secs1Message message, LocalDateTime timestamp) {
 		super(message, timestamp);
 	}
 
-	public Secs1SendedMessageLog(AbstractSecs1Message message) {
+	public Secs1SendedMessageLog(Secs1Message message) {
 		super(message);
 	}
 	

@@ -1,8 +1,6 @@
 package com.shimizukenta.secs.secs1;
 
-import java.util.Objects;
-
-import com.shimizukenta.secs.secs1.impl.Secs1s;
+import com.shimizukenta.secs.secs1.impl.AbstractSecs1MessageBlock;
 
 /**
  * SECS-I Message Block.
@@ -13,7 +11,28 @@ import com.shimizukenta.secs.secs1.impl.Secs1s;
 public interface Secs1MessageBlock {
 	
 	/**
+	 * Returns true if block is valid data.
+	 * 
+	 * <p>
+	 * Valid block condition is
+	 * </p>
+	 * <ul>
+	 * <li>bytes.ength is  {@code >=13 && <=257}</li>
+	 * <li>length-byte is {@code >=10 && <=254}</li>
+	 * <li>length-byte + 3 == bytes.length</li>
+	 * <li>checksum is true</li>
+	 * </ul>
+	 * 
+	 * @return true if valid block
+	 */
+	public boolean isValid();
+	
+	/**
 	 * Returns Block Device-ID number.
+	 * 
+	 * <p>
+	 * Returns -1 if block is <strong>NOT</strong> valid data.<br />
+	 * </p>
 	 * 
 	 * @return Device-ID
 	 */
@@ -22,12 +41,20 @@ public interface Secs1MessageBlock {
 	/**
 	 * Returns Block E-Bit.
 	 * 
+	 * <p>
+	 * Returns false if block is <strong>NOT</strong> valid data.<br />
+	 * </p>
+	 * 
 	 * @return true if has e-bit
 	 */
 	public boolean ebit();
 	
 	/**
 	 * Returns Block number.
+	 * 
+	 * <p>
+	 * Returns -1 if block is <strong>NOT</strong> valid data.<br />
+	 * </p>
 	 * 
 	 * @return block number
 	 */
@@ -36,12 +63,20 @@ public interface Secs1MessageBlock {
 	/**
 	 * Return Block is First.
 	 * 
+	 * <p>
+	 * Returns false if block is <strong>NOT</strong> valid data.<br />
+	 * </p>
+	 * 
 	 * @return true if block-number is ZERO or ONE
 	 */
 	public boolean isFirstBlock();
 	
 	/**
 	 * Returns Length-byte number.
+	 * 
+	 * <p>
+	 * Returns -1 if block is <strong>NOT</strong> valid data.<br />
+	 * </p>
 	 * 
 	 * @return Length-byte number
 	 */
@@ -57,12 +92,20 @@ public interface Secs1MessageBlock {
 	/**
 	 * Returns Check SUM result.
 	 * 
+	 * <p>
+	 * Returns false if block is <strong>NOT</strong> valid data.<br />
+	 * </p>
+	 * 
 	 * @return true if check-sum is valid
 	 */
 	public boolean checkSum();
 	
 	/**
 	 * Returns Block system bytes is equals.
+	 * 
+	 * <p>
+	 * Returns false if block is <strong>NOT</strong> valid data.<br />
+	 * </p>
 	 * 
 	 * @param otherBlock the Other SECS-I Message Block
 	 * @return true if system bytes is equals
@@ -72,6 +115,10 @@ public interface Secs1MessageBlock {
 	/**
 	 * Returns nextBlock is next block.
 	 * 
+	 * <p>
+	 * Returns false if block is <strong>NOT</strong> valid data.<br />
+	 * </p>
+	 * 
 	 * @param nextBlock the next SECS-I Message Block
 	 * @return true if nextBlock is next block.
 	 */
@@ -80,30 +127,20 @@ public interface Secs1MessageBlock {
 	/**
 	 * Returns Secs1MessageBlock.
 	 * 
+	 * <p>
+	 * This method can build also invalid block.
+	 * </p>
+	 * 
 	 * @param bs block bytes.
 	 * @return Secs1MessageBlock
 	 * @throws NullPointerException if input null
-	 * @throws IllegalArgumentException if byte length Illegal
 	 */
 	public static Secs1MessageBlock of(byte[] bs) {
 		
-		Objects.requireNonNull(bs);
-		
-		int len = bs.length;
-		if (len < 13 || len > 257) {
-			throw new IllegalArgumentException("byte length is >=13 && <= 257");
-		}
-		
-		int lengthByte = (int)(bs[0]) & 0x000000FF;
-		if ( lengthByte < 10 || lengthByte > 254 ) {
-			throw new IllegalArgumentException("length-byte is >=10 && <= 254");
-		}
-		
-		if ((lengthByte + 3) > len ) {
-			throw new IllegalArgumentException("(length-byte + 3) > bytes.length");
-		}
-		
-		return Secs1s.newMessageBlock(bs);
+		return new AbstractSecs1MessageBlock(bs) {
+
+			private static final long serialVersionUID = -8242596923530274834L;
+		};
 	}
 	
 }

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsTrySendMessageLog;
 
 public abstract class AbstractSecsTrySendMessageLog extends AbstractSecsLog implements SecsTrySendMessageLog {
@@ -12,14 +13,14 @@ public abstract class AbstractSecsTrySendMessageLog extends AbstractSecsLog impl
 	
 	private static final String commonSubject = "Try-Send SECS-Message";
 	
-	private final AbstractSecsMessage msg;
+	private final SecsMessage msg;
 	
-	public AbstractSecsTrySendMessageLog(AbstractSecsMessage message, LocalDateTime timestamp) {
+	public AbstractSecsTrySendMessageLog(SecsMessage message, LocalDateTime timestamp) {
 		super(commonSubject, timestamp, Objects.requireNonNull(message));
 		this.msg = message;
 	}
 	
-	public AbstractSecsTrySendMessageLog(AbstractSecsMessage message) {
+	public AbstractSecsTrySendMessageLog(SecsMessage message) {
 		super(commonSubject, Objects.requireNonNull(message));
 		this.msg = message;
 	}
@@ -30,7 +31,7 @@ public abstract class AbstractSecsTrySendMessageLog extends AbstractSecsLog impl
 	}
 	
 	@Override
-	public Optional<AbstractSecsMessage> optionalAbstractSecsMessage() {
+	public Optional<SecsMessage> optionalSecsMessage() {
 		return Optional.of(this.msg);
 	}
 	

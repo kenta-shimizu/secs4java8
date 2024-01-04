@@ -3,6 +3,7 @@ package com.shimizukenta.secs.secs1.impl;
 import java.time.LocalDateTime;
 
 import com.shimizukenta.secs.impl.AbstractSecsTrySendMessageLog;
+import com.shimizukenta.secs.secs1.Secs1Message;
 
 public class Secs1TrySendMessageLog extends AbstractSecsTrySendMessageLog {
 	
@@ -10,11 +11,11 @@ public class Secs1TrySendMessageLog extends AbstractSecsTrySendMessageLog {
 	
 	private static final String commonSubject = "Try-Send SECS1-Message";
 	
-	public Secs1TrySendMessageLog(AbstractSecs1Message message, LocalDateTime timestamp) {
+	public Secs1TrySendMessageLog(Secs1Message message, LocalDateTime timestamp) {
 		super(message, timestamp);
 	}
 
-	public Secs1TrySendMessageLog(AbstractSecs1Message message) {
+	public Secs1TrySendMessageLog(Secs1Message message) {
 		super(message);
 	}
 	

@@ -6,7 +6,6 @@ import java.util.Objects;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs1.impl.Secs1MessageBuilder;
 import com.shimizukenta.secs.secs2.Secs2;
-import com.shimizukenta.secs.secs2.Secs2BytesParseException;
 
 /**
  * SECS-I Message.
@@ -31,6 +30,13 @@ public interface Secs1Message extends SecsMessage {
 	public List<Secs1MessageBlock> toBlocks();
 	
 	/**
+	 * Returns true if All Secs1Blocks is valid.
+	 * 
+	 * @return true if All Secs1Blocks is valid.
+	 */
+	public boolean isValidBlocks();
+	
+	/**
 	 * Returns SECS-I Message, HEAD-ONLY Message builder.
 	 * 
 	 * @param header10Bytes the HEAD-10-bytes.
@@ -51,6 +57,7 @@ public interface Secs1Message extends SecsMessage {
 	 * @throws Secs1TooBigMessageBodyException if SECS-II body is too big
 	 * @throws NullPointerException if input null
 	 * @throws IllegalArgumentException if byte length is NOT　10
+	 * @throws Secs1TooBigMessageBodyException if body is too big
 	 */
 	public static Secs1Message of(byte[] header10Bytes, Secs2 body) {
 		
@@ -62,12 +69,7 @@ public interface Secs1Message extends SecsMessage {
 			throw new IllegalArgumentException("header10Bytes.length != 10");
 		}
 		
-		try {
-			return Secs1MessageBuilder.build(header10Bytes, body);
-		}
-		catch ( Secs1TooBigSendMessageException e ) {
-			throw new Secs1TooBigMessageBodyException();
-		}
+		return Secs1MessageBuilder.build(header10Bytes, body);
 	}
 	
 	/**
@@ -75,16 +77,10 @@ public interface Secs1Message extends SecsMessage {
 	 * 
 	 * @param blocks the Secs-I Message blocks
 	 * @return Secs-I Message
-	 * @throws Secs2BytesParseException if blocks.size() {@code <1}
+	 * @throws NullPointerException if blocks is null.
+	 * @throws IllegalArgumentException if blocks size is {@code <1}
 	 */
-	public static Secs1Message of(List<? extends Secs1MessageBlock> blocks) throws Secs2BytesParseException {
-		
-		Objects.requireNonNull(blocks);
-		
-		if ( blocks.size() < 1 ) {
-			throw new IllegalArgumentException("Block size requires >0");
-		}
-		
+	public static Secs1Message of(List<? extends Secs1MessageBlock> blocks) {
 		return Secs1MessageBuilder.fromBlocks(blocks);
 	}
 	

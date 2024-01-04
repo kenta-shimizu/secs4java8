@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.shimizukenta.secs.local.property.TimeoutAndUnit;
 import com.shimizukenta.secs.local.property.TimeoutGettable;
+import com.shimizukenta.secs.secs1.Secs1Message;
 import com.shimizukenta.secs.secs1.Secs1SendMessageException;
 
 public final class ByteAndSecs1MessageQueue {
@@ -43,7 +44,7 @@ public final class ByteAndSecs1MessageQueue {
 		}
 	}
 	
-	public void putSecs1Message(AbstractSecs1Message msg) throws Secs1SendMessageException, InterruptedException {
+	public void putSecs1Message(Secs1Message msg) throws Secs1SendMessageException, InterruptedException {
 		synchronized ( sync ) {
 			mm.add(new Secs1MessageBlockPack(msg));
 			sync.notifyAll();
