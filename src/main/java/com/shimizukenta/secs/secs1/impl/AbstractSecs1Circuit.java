@@ -1,5 +1,6 @@
 package com.shimizukenta.secs.secs1.impl;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -12,7 +13,6 @@ import com.shimizukenta.secs.secs1.Secs1SendByteException;
 import com.shimizukenta.secs.secs1.Secs1SendMessageException;
 import com.shimizukenta.secs.secs1.Secs1TimeoutT3Exception;
 import com.shimizukenta.secs.secs1.Secs1WaitReplyMessageException;
-import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public abstract class AbstractSecs1Circuit implements Runnable {
 	
@@ -23,7 +23,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 	
 	private final ByteAndSecs1MessageQueue queue = new ByteAndSecs1MessageQueue();
 	private final Secs1SendMessageManager sendMgr = new Secs1SendMessageManager();
-	private final Secs1TransactionManager<AbstractSecs1Message, AbstractSecs1MessageBlock> transMgr = new Secs1TransactionManager<>();
+	private final Secs1TransactionManager<Secs1Message, Secs1MessageBlock> transMgr = new Secs1TransactionManager<>();
 	
 	private final AbstractSecs1Communicator comm;
 	
@@ -58,9 +58,9 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 		this.sendBytes(new byte[] {b});
 	}
 	
-	public Optional<Secs1Message> send(AbstractSecs1Message msg)
-			throws Secs1SendMessageException, Secs1WaitReplyMessageException, Secs1Exception
-			, InterruptedException {
+	public Optional<Secs1Message> send(Secs1Message msg)
+			throws Secs1SendMessageException, Secs1WaitReplyMessageException, Secs1Exception,
+			InterruptedException {
 		
 		try {
 			
@@ -69,7 +69,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			this.comm.notifyTrySendSecs1MessagePassThrough(msg);
 			this.comm.notifyLog(new Secs1TrySendMessageLog(msg));
 			
-			if ( msg.wbit() ) {
+			if (msg.wbit() && msg.isValidBlocks()) {
 				
 				try {
 					this.transMgr.enter(msg);
@@ -251,9 +251,9 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			}
 		}
 		
+		int len = (int)(bs[0]) & 0x000000FF;
+		
 		{
-			int len = (int)(bs[0]) & 0x000000FF;
-			
 			if ( len < 10 || len > 254 ) {
 				this.queue.garbageBytes(this.comm.config().timeout().t1());
 				this.sendByte(NAK);
@@ -275,7 +275,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			}
 		}
 		
-		AbstractSecs1MessageBlock block = new AbstractSecs1MessageBlock(bs) {
+		AbstractSecs1MessageBlock block = new AbstractSecs1MessageBlock(Arrays.copyOf(bs, (len + 3))) {
 
 			private static final long serialVersionUID = -1187993676063154279L;
 		};
@@ -327,7 +327,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 				
 				AbstractSecs1Message s1msg = Secs1MessageBuilder.fromBlocks(cacheBlocks);
 				
-				AbstractSecs1Message m = this.transMgr.put(s1msg);
+				Secs1Message m = this.transMgr.put(s1msg);
 				
 				if ( m != null ) {
 					this.comm.notifyReceiveSecs1Message(m);
@@ -335,9 +335,6 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 				
 				this.comm.notifyReceiveSecs1MessagePassThrough(s1msg);
 				this.comm.notifyLog(new Secs1ReceiveMessageLog(s1msg));
-			}
-			catch ( Secs2Exception e ) {
-				this.comm.notifyLog(e);
 			}
 			finally {
 				this.cacheBlocks.clear();

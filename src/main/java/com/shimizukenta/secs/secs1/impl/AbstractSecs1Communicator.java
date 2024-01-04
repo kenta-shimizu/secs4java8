@@ -18,6 +18,8 @@ import com.shimizukenta.secs.secs1.Secs1MessageReceiveBiListener;
 import com.shimizukenta.secs.secs1.Secs1MessageReceiveListener;
 import com.shimizukenta.secs.secs1.Secs1SendByteException;
 import com.shimizukenta.secs.secs1.Secs1SendMessageException;
+import com.shimizukenta.secs.secs1.Secs1TooBigMessageBodyException;
+import com.shimizukenta.secs.secs1.Secs1TooBigSendMessageException;
 import com.shimizukenta.secs.secs1.Secs1WaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
 
@@ -87,16 +89,27 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	public Optional<SecsMessage> templateSend(int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
-		return this.circuit.send(this.messageBuilder().build(strm, func, wbit, secs2))
-				.map(m -> (SecsMessage)m);
+		try {
+			
+			return this.circuit.send(this.messageBuilder().build(strm, func, wbit, secs2))
+					.map(m -> (SecsMessage)m);
+		}
+		catch (Secs1TooBigMessageBodyException e) {
+			throw new Secs1TooBigSendMessageException(e);
+		}
 	}
 	
 	@Override
 	public Optional<SecsMessage> templateSend(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
-		return this.circuit.send(this.messageBuilder().build(primaryMsg, strm, func, wbit, secs2))
-				.map(m -> (SecsMessage)m);
+		try {
+			return this.circuit.send(this.messageBuilder().build(primaryMsg, strm, func, wbit, secs2))
+					.map(m -> (SecsMessage)m);
+		}
+		catch (Secs1TooBigMessageBodyException e) {
+			throw new Secs1TooBigSendMessageException(e);
+		}
 	}
 	
 	@Override
@@ -104,7 +117,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			throws Secs1SendMessageException, Secs1WaitReplyMessageException, Secs1Exception,
 			InterruptedException {
 		
-		return this.circuit.send(Secs1MessageBuilder.fromMessage(msg));
+		return this.circuit.send(msg);
 	}
 	
 	protected void putByte(byte b) throws InterruptedException {

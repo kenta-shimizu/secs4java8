@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.shimizukenta.secs.SecsLog;
+import com.shimizukenta.secs.SecsMessage;
 
 /**
  * 
@@ -113,7 +114,7 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 		return value().map(Object::toString);
 	}
 	
-	public Optional<AbstractSecsMessage> optionalAbstractSecsMessage() {
+	public Optional<SecsMessage> optionalSecsMessage() {
 		return Optional.empty();
 	}
 	

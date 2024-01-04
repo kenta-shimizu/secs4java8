@@ -44,7 +44,6 @@ import com.shimizukenta.secs.hsmsgs.HsmsGsCommunicatorConfig;
 import com.shimizukenta.secs.hsmsgs.HsmsGsUnknownSessionIdException;
 import com.shimizukenta.secs.impl.AbstractBaseCommunicator;
 import com.shimizukenta.secs.impl.AbstractSecsLog;
-import com.shimizukenta.secs.impl.AbstractSecsMessage;
 import com.shimizukenta.secs.impl.AbstractSecsThrowableLog;
 import com.shimizukenta.secs.impl.SecsLogQueueObserver;
 import com.shimizukenta.secs.secs2.Secs2;
@@ -563,7 +562,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		
 		this.logQueueObserver.put(log);
 		
-		final AbstractSecsMessage msg = log.optionalAbstractSecsMessage().orElse(null);
+		final SecsMessage msg = log.optionalSecsMessage().orElse(null);
 		if ( msg != null ) {
 			for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 				if ( s.sessionId() == msg.sessionId() ) {

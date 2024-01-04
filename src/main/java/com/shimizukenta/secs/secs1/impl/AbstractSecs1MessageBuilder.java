@@ -2,15 +2,13 @@ package com.shimizukenta.secs.secs1.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.SecsMessage;
-import com.shimizukenta.secs.secs1.Secs1Message;
 import com.shimizukenta.secs.secs1.Secs1MessageBlock;
-import com.shimizukenta.secs.secs1.Secs1TooBigSendMessageException;
+import com.shimizukenta.secs.secs1.Secs1TooBigMessageBodyException;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
 import com.shimizukenta.secs.secs2.impl.Secs2BytesParsers;
@@ -71,8 +69,7 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 	public AbstractSecs1Message build(
 			int strm,
 			int func,
-			boolean wbit)
-					throws Secs1TooBigSendMessageException {
+			boolean wbit) {
 		
 		return this.build(strm, func, wbit, Secs2.empty());
 	}
@@ -82,8 +79,7 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 			int strm,
 			int func,
 			boolean wbit,
-			Secs2 body)
-					throws Secs1TooBigSendMessageException {
+			Secs2 body) {
 		
 		byte[] dd = this.getDeviceId2Bytes();
 		byte[] ssss = this.getSystem4Bytes();
@@ -117,8 +113,7 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 			SecsMessage primaryMsg,
 			int strm,
 			int func,
-			boolean wbit)
-					throws Secs1TooBigSendMessageException {
+			boolean wbit) {
 		
 		return this.build(primaryMsg, strm, func, wbit, Secs2.empty());
 	}
@@ -129,8 +124,7 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 			int strm,
 			int func,
 			boolean wbit,
-			Secs2 body)
-					throws Secs1TooBigSendMessageException {
+			Secs2 body) {
 		
 		byte[] dd = this.getDeviceId2Bytes();
 		byte[] ppbb = primaryMsg.header10Bytes();
@@ -159,21 +153,18 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 		return build(header, body);
 	}
 	
-	public static AbstractSecs1Message build(byte[] header)
-			throws Secs1TooBigSendMessageException {
-		
+	public static AbstractSecs1Message build(byte[] header) {
 		return AbstractSecs1MessageBuilder.build(header, Secs2.empty());
 	}
 	
-	public static AbstractSecs1Message build(byte[] header, Secs2 body)
-			throws Secs1TooBigSendMessageException {
+	public static AbstractSecs1Message build(byte[] header, Secs2 body) {
 		
 		final List<Secs1MessageBlock> blocks = new ArrayList<>();
 		
 		final List<byte[]> ll = body.getBytesList(244);
 		
 		if ( ll.size() > 0x7FFE) {
-			throw new Secs1TooBigSendMessageException(exceptRefMessage(header, body));
+			throw new Secs1TooBigMessageBodyException();
 		}
 		
 		int blockNum = AbstractSecs1MessageBlock.ONE;
@@ -186,14 +177,10 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 		
 		blocks.add(buildBlock(header, ll.get(m), true, blockNum));
 		
-		return Secs1s.newMessage(header, body, blocks);
+		return new Secs1ValidMessage(header, body, blocks);
 	}
 	
-	private static AbstractSecs1Message exceptRefMessage(byte[] header10Bytes, Secs2 body) {
-		return Secs1s.newMessage(header10Bytes, body, Collections.emptyList());
-	}
-	
-	private static AbstractSecs1MessageBlock buildBlock(byte[] header, byte[] body, boolean ebit, int blockNumber) {
+	private static Secs1MessageBlock buildBlock(byte[] header, byte[] body, boolean ebit, int blockNumber) {
 		
 		int len = header.length + body.length;
 		
@@ -233,27 +220,118 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 		bs[pos] = (byte)(sum >> 8);
 		bs[pos + 1] = (byte)sum;
 		
-		return Secs1s.newMessageBlock(bs);
+		return Secs1MessageBlock.of(bs);
 	}
 	
-	public static AbstractSecs1Message fromBlocks(
-			List<? extends Secs1MessageBlock> blocks)
-					throws Secs2BytesParseException {
+	public static AbstractSecs1Message fromBlocks(List<? extends Secs1MessageBlock> blocks) {
 		
-		byte[] header10Bytes = Arrays.copyOfRange(blocks.get(blocks.size() - 1).getBytes(), 1, 11);
+		Objects.requireNonNull(blocks);
 		
-		List<byte[]> bss = blocks.stream()
-				.map(Secs1MessageBlock::getBytes)
-				.map(bs -> Arrays.copyOfRange(bs, 11, bs.length - 2))
-				.collect(Collectors.toList());
+		final int m = blocks.size();
 		
-		Secs2 body = Secs2BytesParsers.parse(bss);
+		if ( m < 1 ) {
+			throw new IllegalArgumentException("Block size requires >0");
+		}
 		
-		return Secs1s.newMessage(header10Bytes, body, blocks);
+		if (isValidBlocks(blocks)) {
+			
+			final List<byte[]> bss = new ArrayList<>();
+			
+			Secs1MessageBlock bufBlock = blocks.get(0);
+			
+			{
+				byte[] bs = bufBlock.getBytes();
+				bss.add(Arrays.copyOfRange(bs, 11, (bs.length - 2)));
+			}
+			
+			for (int i = 1; i < m; ++i) {
+				
+				final Secs1MessageBlock block = blocks.get(i);
+				
+				if (bufBlock.isNextBlock(block)) {
+					
+					byte[] bs = block.getBytes();
+					bss.add(Arrays.copyOfRange(bs, 11, (bs.length - 2)));
+					
+					bufBlock = block;
+				}
+			}
+			
+			try {
+				final Secs2 body = Secs2BytesParsers.parse(bss);
+				
+				return new Secs1ValidMessage(
+						Arrays.copyOfRange(blocks.get(m - 1).getBytes(), 1, 11),
+						body,
+						blocks);
+			}
+			catch (Secs2BytesParseException parseFailed) {
+				/* failed */
+			}
+		}
+		
+		return new Secs1InvalidMessage(blocks);
 	}
 	
-	public static AbstractSecs1Message fromMessage(Secs1Message message) throws Secs1TooBigSendMessageException {
-		return Secs1s.castOrNewMessage(message);
+	private static boolean isValidBlocks(List<? extends Secs1MessageBlock> blocks) {
+		
+		for (Secs1MessageBlock block : blocks) {
+			if (! block.isValid()) {
+				return false;
+			}
+		}
+		
+		final Secs1MessageBlock firstBlock = blocks.get(0);
+		if (! firstBlock.isFirstBlock()) {
+			return false;
+		}
+		
+		final int m = blocks.size();
+		
+		if (! blocks.get(m - 1).ebit()) {
+			return false;
+		}
+		
+		Secs1MessageBlock bufBlock = firstBlock;
+		byte[] refBytes = firstBlock.getBytes();
+		int eBitCount = firstBlock.ebit() ? 1 : 0;
+		
+		for (int i = 1; i < m; ++i) {
+			
+			Secs1MessageBlock block = blocks.get(i);
+			
+			if (! bufBlock.equalsSystemBytes(block)) {
+				return false;
+			}
+			
+			byte[] bs = block.getBytes();
+			
+			if (! bufBlock.isNextBlock(block)) {
+				if (bufBlock.blockNumber() != block.blockNumber()) {
+					return false;
+				}
+			}
+			
+			if (refBytes[1] != bs[1]
+				|| refBytes[2] != bs[2]
+				|| refBytes[3] != bs[3]
+				|| refBytes[4] != bs[4]) {
+				
+				return false;
+			}
+			
+			if (block.ebit()) {
+				++ eBitCount;
+				if (eBitCount > 1) {
+					return false;
+				}
+			}
+			
+			bufBlock = block;
+			refBytes = bs;
+		}
+		
+		return true;
 	}
 	
 }

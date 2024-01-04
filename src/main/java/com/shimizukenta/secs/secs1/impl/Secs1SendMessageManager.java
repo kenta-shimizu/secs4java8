@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.shimizukenta.secs.secs1.Secs1Exception;
+import com.shimizukenta.secs.secs1.Secs1Message;
 import com.shimizukenta.secs.secs1.Secs1SendMessageException;
 
 public final class Secs1SendMessageManager {
@@ -14,21 +15,30 @@ public final class Secs1SendMessageManager {
 		/* Nothing */
 	}
 	
+	private static Integer systemBytesKey(Secs1Message msg) {
+		byte[] bs = msg.header10Bytes();
+		int i = (((int)(bs[6]) << 24) & 0xFF000000)
+				| (((int)(bs[7]) << 16) & 0x00FF0000)
+				| (((int)(bs[8]) <<  8) & 0x0000FF00)
+				| (((int)(bs[9])      ) & 0x000000FF);
+		return Integer.valueOf(i);
+	}
+	
 	public void clear() {
 		synchronized ( this.map ) {
 			this.map.clear();
 		}
 	}
 	
-	public void enter(AbstractSecs1Message msg) {
+	public void enter(Secs1Message msg) {
 		synchronized ( this.map ) {
-			this.map.put(msg.systemBytesKey(), new Result());
+			this.map.put(systemBytesKey(msg), new Result());
 		}
 	}
 	
-	public void exit(AbstractSecs1Message msg) {
+	public void exit(Secs1Message msg) {
 		synchronized ( this.map ) {
-			this.map.remove(msg.systemBytesKey());
+			this.map.remove(systemBytesKey(msg));
 		}
 	}
 	
@@ -38,11 +48,11 @@ public final class Secs1SendMessageManager {
 		}
 	}
 	
-	private Result getResult(AbstractSecs1Message msg) {
-		return this.getResult(msg.systemBytesKey());
+	private Result getResult(Secs1Message msg) {
+		return this.getResult(systemBytesKey(msg));
 	}
 	
-	public void waitUntilSended(AbstractSecs1Message msg)
+	public void waitUntilSended(Secs1Message msg)
 			throws Secs1SendMessageException, InterruptedException {
 		
 		final Result r = getResult(msg);
@@ -70,7 +80,7 @@ public final class Secs1SendMessageManager {
 		}
 	}
 	
-	public void putSended(AbstractSecs1Message msg) {
+	public void putSended(Secs1Message msg) {
 		
 		final Result r = this.getResult(msg);
 		
@@ -79,7 +89,7 @@ public final class Secs1SendMessageManager {
 		}
 	}
 	
-	public void putException(AbstractSecs1Message msg, Secs1Exception e) {
+	public void putException(Secs1Message msg, Secs1Exception e) {
 		
 		final Result r = this.getResult(msg);
 		
