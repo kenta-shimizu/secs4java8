@@ -22,7 +22,7 @@ public class HsmsSsMessageReceiveQueueBiObserver extends AbstractQueueBiObserver
 			HsmsMessage value,
 			AbstractHsmsSsCommunicator communicator) {
 		
-		biListener.received(value, null);
+		biListener.received(value, communicator);
 	}
 	
 }

@@ -270,7 +270,7 @@ public class ProtocolConvert {
 			}
 			catch ( InterruptedException ignore ) {
 			}
-			catch ( SecsException | Secs2Exception e ) {
+			catch ( SecsException e ) {
 				echo(e);
 			}
 		};
@@ -408,7 +408,7 @@ public class ProtocolConvert {
 			}
 			catch ( InterruptedException ignore ) {
 			}
-			catch ( SecsException | Secs2Exception e ) {
+			catch ( SecsException e ) {
 				echo(e);
 			}
 		};

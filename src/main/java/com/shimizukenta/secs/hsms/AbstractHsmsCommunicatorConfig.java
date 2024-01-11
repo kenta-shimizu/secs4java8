@@ -127,7 +127,7 @@ public abstract class AbstractHsmsCommunicatorConfig extends AbstractSecsCommuni
 	 * 
 	 * @return do-linktest-property
 	 */
-	public BooleanProperty doLinkTest() {
+	public BooleanProperty doLinktest() {
 		return this.doLinktest;
 	}
 	
