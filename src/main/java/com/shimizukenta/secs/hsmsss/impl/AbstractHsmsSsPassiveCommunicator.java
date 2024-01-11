@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.shimizukenta.secs.UnsetSocketAddressException;
+import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
 import com.shimizukenta.secs.hsms.HsmsException;
@@ -61,6 +62,8 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				final TimeoutProperty tp = this.config().rebindIfPassiveTime();
 				
 				while ( ! this.isClosed() ) {
+					this.notifyHsmsCommunicateState(HsmsCommunicateState.NOT_CONNECTED);
+
 					this.openPassive();
 					if ( this.isClosed() ) {
 						return;
@@ -375,6 +378,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				);
 		
 		try {
+			this.notifyHsmsCommunicateState(HsmsCommunicateState.SELECTED);
 			this.executeInvokeAny(tasks);
 		}
 		catch ( ExecutionException e ) {
@@ -386,7 +390,9 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			
 			this.notifyLog(t);
 		}
-		
+		finally {
+			this.notifyHsmsCommunicateState(HsmsCommunicateState.NOT_CONNECTED);
+		}
 	}
 	
 }

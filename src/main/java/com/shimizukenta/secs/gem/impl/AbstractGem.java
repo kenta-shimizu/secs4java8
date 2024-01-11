@@ -320,7 +320,6 @@ public abstract class AbstractGem implements Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
 		return s2f18(primaryMsg, getClockSecs2(c));
@@ -331,7 +330,6 @@ public abstract class AbstractGem implements Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
 		return s2f18(primaryMsg, Clock.now());
@@ -341,7 +339,6 @@ public abstract class AbstractGem implements Gem {
 			throws SecsSendMessageException
 			, SecsWaitReplyMessageException
 			, SecsException
-			, Secs2Exception
 			, InterruptedException {
 		
 		if ( ! primaryMsg.wbit() ) {

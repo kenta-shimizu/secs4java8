@@ -243,14 +243,12 @@ public interface Gem {
 	 * @throws SecsSendMessageException if send failed
 	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException if SECS communicate failed
-	 * @throws Secs2Exception if SECS-II parse failed
 	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> s2f18(SecsMessage primaryMsg, Clock clock)
 			throws SecsSendMessageException,
 			SecsWaitReplyMessageException,
 			SecsException,
-			Secs2Exception,
 			InterruptedException;
 	
 	/**
@@ -265,14 +263,12 @@ public interface Gem {
 	 * @throws SecsSendMessageException if send failed
 	 * @throws SecsWaitReplyMessageException if receive message failed, e.g. Timeout-T3
 	 * @throws SecsException if SECS communicate failed
-	 * @throws Secs2Exception if SECS-II parse failed
 	 * @throws InterruptedException if interrupted
 	 */
 	public Optional<SecsMessage> s2f18Now(SecsMessage primaryMsg)
 			throws SecsSendMessageException,
 			SecsWaitReplyMessageException,
 			SecsException,
-			Secs2Exception,
 			InterruptedException;
 	
 	/**

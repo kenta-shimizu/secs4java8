@@ -551,7 +551,7 @@ public class ProtocolConverter implements Closeable {
 			}
 			catch ( InterruptedException ignore ) {
 			}
-			catch ( SecsException | Secs2Exception e ) {
+			catch ( SecsException e ) {
 				echo(e);
 			}
 		};
@@ -689,7 +689,7 @@ public class ProtocolConverter implements Closeable {
 			}
 			catch ( InterruptedException ignore ) {
 			}
-			catch ( SecsException | Secs2Exception e ) {
+			catch ( SecsException e ) {
 				echo(e);
 			}
 		};

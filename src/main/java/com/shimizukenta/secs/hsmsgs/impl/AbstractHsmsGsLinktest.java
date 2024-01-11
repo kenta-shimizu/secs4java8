@@ -34,7 +34,7 @@ public abstract class AbstractHsmsGsLinktest extends AbstractHsmsLinktest {
 	
 	@Override
 	protected BooleanProperty doLinktest() {
-		return this.comm.config().doLinkTest();
+		return this.comm.config().doLinktest();
 	}
 	
 	@Override

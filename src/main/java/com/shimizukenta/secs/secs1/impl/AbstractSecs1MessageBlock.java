@@ -25,7 +25,6 @@ public abstract class AbstractSecs1MessageBlock implements Secs1MessageBlock, Se
 	private final boolean isFirstBlock;
 	
 	private String cacheToString;
-	private Integer cacheSystemBytesKey;
 	
 	public AbstractSecs1MessageBlock(byte[] bs) {
 		
@@ -65,17 +64,16 @@ public abstract class AbstractSecs1MessageBlock implements Secs1MessageBlock, Se
 			this.isFirstBlock = this.blockNumber == ZERO || this.blockNumber == ONE;
 			
 			this.cacheToString = null;
-			this.cacheSystemBytesKey = null;
 			
 		} else {
 			
+			this.length = -1;
 			this.deviceId = -1;
 			this.ebit = false;
 			this.blockNumber = -1;
 			this.isFirstBlock = false;
 			
 			this.cacheToString = "INVALID BLOCK DATA. SIZE=[" + bs.length + "]";
-			this.cacheSystemBytesKey = Integer.valueOf(-1);
 		}
 	}
 	
@@ -173,24 +171,6 @@ public abstract class AbstractSecs1MessageBlock implements Secs1MessageBlock, Se
 			}
 			
 			return this.cacheToString;
-		}
-	}
-	
-	public Integer systemBytesKey() {
-		
-		synchronized (this.sync) {
-			
-			if (this.cacheSystemBytesKey == null) {
-				
-				int n = (((int)(this.bs[7]) << 24) & 0xFF000000)
-						| (((int)(this.bs[8]) << 16) & 0x00FF0000)
-						| (((int)(this.bs[9]) <<  8) & 0x0000FF00)
-						| ((int)(this.bs[10]) & 0x000000FF);
-				
-				this.cacheSystemBytesKey = Integer.valueOf(n);
-			}
-			
-			return this.cacheSystemBytesKey;
 		}
 	}
 	
