@@ -7,7 +7,10 @@ import java.util.regex.Pattern;
 import com.shimizukenta.secs.sml.SmlDataItemParser;
 import com.shimizukenta.secs.sml.SmlMessage;
 import com.shimizukenta.secs.sml.SmlMessageParser;
+import com.shimizukenta.secs.sml.SmlNotFoundEndPeriodException;
 import com.shimizukenta.secs.sml.SmlParseException;
+import com.shimizukenta.secs.sml.SmlParseFunctionOutOfRangeException;
+import com.shimizukenta.secs.sml.SmlParseStreamOutOfRangeException;
 
 abstract public class AbstractSmlMessageParser implements SmlMessageParser {
 
@@ -51,7 +54,15 @@ abstract public class AbstractSmlMessageParser implements SmlMessageParser {
 		
 		try {
 			int strm = Integer.parseInt(m.group(GROUP_STREAM));
+			if (strm > 0x0000007F) {
+				throw new SmlParseStreamOutOfRangeException(strm);
+			}
+			
 			int func = Integer.parseInt(m.group(GROUP_FUNCTION));
+			if (func > 0x000000FF) {
+				throw new SmlParseFunctionOutOfRangeException(func);
+			}
+			
 			boolean wbit = ! m.group(GROUP_WBIT).isEmpty();
 			String secs2 = m.group(GROUP_SECS2);
 			
@@ -78,7 +89,7 @@ abstract public class AbstractSmlMessageParser implements SmlMessageParser {
 			
 		} else {
 			
-			throw new SmlParseException("not end \".\"");
+			throw new SmlNotFoundEndPeriodException();
 		}
 	}
 

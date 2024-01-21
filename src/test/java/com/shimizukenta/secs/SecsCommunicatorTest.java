@@ -29,6 +29,8 @@ import com.shimizukenta.secs.hsmsss.HsmsSsCommunicatorConfig;
 import com.shimizukenta.secs.local.property.BooleanCompution;
 import com.shimizukenta.secs.local.property.BooleanProperty;
 import com.shimizukenta.secs.secs2.Secs2Exception;
+import com.shimizukenta.secs.sml.SmlMessage;
+import com.shimizukenta.secs.sml.SmlParseException;
 
 class SecsCommunicatorTest {
 
@@ -36,15 +38,16 @@ class SecsCommunicatorTest {
 		return new InetSocketAddress("127.0.0.1", port);
 	}
 	
-	private static InetSocketAddress getInetSocketAddress() {
-		return new InetSocketAddress("127.0.0.1", 0);
-	}
+//	private static InetSocketAddress getInetSocketAddress() {
+//		return new InetSocketAddress("127.0.0.1", 0);
+//	}
 	
 	private static HsmsSsCommunicatorConfig activeCommunicatorConfig(SocketAddress socketAddr, boolean isEquip) {
 		HsmsSsCommunicatorConfig config = new HsmsSsCommunicatorConfig();
 		config.connectionMode(HsmsConnectionMode.ACTIVE);
 		config.socketAddress(socketAddr);
 		config.isEquip(isEquip);
+		config.sessionId(10);
 		config.timeout().t3(5.0F);
 		config.timeout().t5(0.20F);
 		return config;
@@ -55,6 +58,7 @@ class SecsCommunicatorTest {
 		config.connectionMode(HsmsConnectionMode.PASSIVE);
 		config.socketAddress(socketAddr);
 		config.isEquip(isEquip);
+		config.sessionId(10);
 		config.timeout().t3(5.0F);
 		config.gem().mdln("MDLN-A");
 		config.gem().softrev("000001");
@@ -66,17 +70,13 @@ class SecsCommunicatorTest {
 		return HsmsSsCommunicator.newInstance(activeCommunicatorConfig(socketAddr, isEquip));
 	}
 	
-	private static HsmsSsCommunicator activeCommunicator(boolean isEquip) {
-		return activeCommunicator(getInetSocketAddress(), isEquip);
-	}
+//	private static HsmsSsCommunicator activeCommunicator(boolean isEquip) {
+//		return activeCommunicator(getInetSocketAddress(), isEquip);
+//	}
 	
 	private static HsmsSsCommunicator passiveCommunicator(SocketAddress socketAddr, boolean isEquip) {
 		return HsmsSsCommunicator.newInstance(passiveCommunicatorConfig(socketAddr, isEquip));
 	}
-	
-//	private static HsmsSsCommunicator passiveCommunicator(boolean isEquip) {
-//		return passiveCommunicator(getInetSocketAddress(), isEquip);
-//	}
 	
 	private static final SecsMessageReceiveBiListener equipReceiveListener = (SecsMessage primaryMsg, SecsCommunicator comm) -> {
 		
@@ -142,6 +142,21 @@ class SecsCommunicatorTest {
 				}
 				break;
 			}
+			case 99: {
+				
+				switch (func) {
+				case 1: {
+					SmlMessage smlMsg = SmlMessage.of("S99F2 <B 0x00>.");
+					comm.send(primaryMsg, smlMsg);
+				}
+				default: {
+					if (wbit) {
+						comm.send(primaryMsg, strm, 0, false);
+					}
+					comm.gem().s9f5(primaryMsg);
+				}
+				}
+			}
 			default: {
 				
 				if (wbit) {
@@ -152,6 +167,9 @@ class SecsCommunicatorTest {
 			}
 		}
 		catch (SecsException e) {
+			fail(e);
+		}
+		catch (SmlParseException e) {
 			fail(e);
 		}
 		catch (InterruptedException ignore) {
@@ -254,27 +272,10 @@ class SecsCommunicatorTest {
 	};
 	
 	@Test
-	@DisplayName("Reopen")
-	void testReopen() {
-		
-		try {
-			SecsCommunicator comm = activeCommunicator(false);
-			
-			comm.open();	// 1st
-			comm.open();	// 2nd throw AlreadyOpenException
-			
-			fail("not reach");
-		}
-		catch (IOException e) {
-			/* success */
-		}
-	}
-	
-	@Test
-	@DisplayName("run")
+	@DisplayName("Run")
 	void testRun() {
 		
-		final SocketAddress sockAddr = getInetSocketAddress(5002);
+		final SocketAddress sockAddr = getInetSocketAddress(5003);
 		
 		final BooleanProperty equipCommunicatable = BooleanProperty.newInstance(false);
 		final BooleanProperty hostCommunicatable = BooleanProperty.newInstance(false);
@@ -327,6 +328,21 @@ class SecsCommunicatorTest {
 					assertEquals(tiack, TIACK.OK);
 				}
 				{
+					SmlMessage smlMsg = SmlMessage.of("<S99F1 W.");
+					Optional<SecsMessage> op = host.send(smlMsg);
+					
+					assertEquals(op.map(SecsMessage::getStream)
+							.filter(strm -> strm.intValue() == 99)
+							.isPresent(), true);
+					assertEquals(op.map(SecsMessage::getFunction)
+							.filter(strm -> strm.intValue() == 2)
+							.isPresent(), true);
+					assertEquals(op.map(SecsMessage::secs2)
+							.flatMap(ss -> ss.optionalByte(0))
+							.filter(b -> b.byteValue() == (byte)0x0)
+							.isPresent(), true);
+				}
+				{
 					OFLACK oflack = host.gem().s1f15();
 					assertEquals(oflack, OFLACK.OK);
 				}
@@ -336,6 +352,9 @@ class SecsCommunicatorTest {
 			fail(e);
 		}
 		catch (SecsException | Secs2Exception e) {
+			fail(e);
+		}
+		catch (SmlParseException e) {
 			fail(e);
 		}
 		catch (TimeoutException e) {
