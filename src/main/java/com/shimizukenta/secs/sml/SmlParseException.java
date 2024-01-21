@@ -1,9 +1,9 @@
 package com.shimizukenta.secs.sml;
 
 /**
- * SMML Parse Exception.
+ * Parse SML Exception.
  * 
- * @author shimizukenta
+ * @author kenta-shimizu
  *
  */
 public class SmlParseException extends Exception {

@@ -16,9 +16,9 @@ public interface SmlDataItemParser {
 	 * 
 	 * @param cs SML-Format-Secs2-part-Character ({@code <A "ascii">})
 	 * @return Secs2
-	 * @throws SmlParseException if parse failed
+	 * @throws SmlDataItemParseException if parse failed
 	 */
-	public Secs2 parse(CharSequence cs) throws SmlParseException;
+	public Secs2 parse(CharSequence cs) throws SmlDataItemParseException;
 	
 	/**
 	 * Returns SmlDataItemParser instance.

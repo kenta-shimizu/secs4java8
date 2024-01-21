@@ -15,6 +15,7 @@ import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.shimizukenta.secs.AlreadyClosedException;
 import com.shimizukenta.secs.AlreadyOpenedException;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
@@ -30,6 +31,7 @@ import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.local.property.BooleanCompution;
+import com.shimizukenta.secs.local.property.BooleanProperty;
 import com.shimizukenta.secs.local.property.ObjectProperty;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
@@ -48,6 +50,7 @@ class HsmsSsCommunicatorTest {
 		config.connectionMode(HsmsConnectionMode.ACTIVE);
 		config.socketAddress(socketAddr);
 		config.isEquip(isEquip);
+		config.sessionId(10);
 		config.timeout().t3(5.0F);
 		config.timeout().t5(0.20F);
 		return config;
@@ -58,6 +61,7 @@ class HsmsSsCommunicatorTest {
 		config.connectionMode(HsmsConnectionMode.PASSIVE);
 		config.socketAddress(socketAddr);
 		config.isEquip(isEquip);
+		config.sessionId(10);
 		config.timeout().t3(5.0F);
 		config.gem().mdln("MDLN-A");
 		config.gem().softrev("000001");
@@ -257,8 +261,8 @@ class HsmsSsCommunicatorTest {
 	};
 	
 	@Test
-	@DisplayName("ReOpen Active")
-	void testReopenActive() {
+	@DisplayName("Open twice Active")
+	void testOpenTwiceActive() {
 		
 		try (
 				HsmsSsCommunicator active = activeCommunicator(false);
@@ -276,8 +280,8 @@ class HsmsSsCommunicatorTest {
 	}
 	
 	@Test
-	@DisplayName("ReOpen Passive")
-	void testReopenPassive() {
+	@DisplayName("Open twice Passive")
+	void testOpenTwicePassive() {
 		
 		try (
 				HsmsSsCommunicator passive = passiveCommunicator(true);
@@ -295,9 +299,119 @@ class HsmsSsCommunicatorTest {
 	}
 	
 	@Test
+	@DisplayName("Open after close Active")
+	void testOpenAfterCloseActive() {
+		
+		try (
+				HsmsSsCommunicator active = activeCommunicator(false);
+				) {
+			
+			active.open();	// 1st
+			active.close();
+			active.open();	// 2nd reopen, throw AlreadyClosedException
+		}
+		catch (AlreadyClosedException e) {
+			/* success */
+		}
+		catch (IOException e) {
+			fail(e);
+		}
+	}
+	
+	@Test
+	@DisplayName("Open after close Passive")
+	void testOpenAfterClosePassive() {
+		
+		try (
+				HsmsSsCommunicator passive = passiveCommunicator(true);
+				) {
+			
+			passive.open();	// 1st
+			passive.close();
+			passive.open();	// 2nd reopen, throw AlreadyClosedException
+		}
+		catch (AlreadyClosedException e) {
+			/* success */
+		}
+		catch (IOException e) {
+			fail(e);
+		}
+	}
+	
+	@Test
+	@DisplayName("Reconnect after close")
+	void testReconnectAfterClose() {
+		
+		BooleanProperty equipComm = BooleanProperty.newInstance(false);
+		
+		final SocketAddress sockAddr = getInetSocketAddress(5001);
+		
+		try (
+				HsmsSsCommunicator equip = passiveCommunicator(sockAddr, true);
+				) {
+			
+			equip.addSecsCommunicatableStateChangeListener(equipComm::set);
+			
+			assertEquals(equip.isClosed(), false);
+			assertEquals(equip.isOpen(), false);
+			assertEquals(equip.isCommunicatable(), false);
+			
+			equip.open();
+			
+			assertEquals(equip.isClosed(), false);
+			assertEquals(equip.isOpen(), true);
+			
+			Thread.sleep(100L);
+			
+			try (
+					HsmsSsCommunicator host = activeCommunicator(sockAddr, false);
+					) {
+				
+				assertEquals(host.isClosed(), false);
+				assertEquals(host.isOpen(), false);
+				assertEquals(host.isCommunicatable(), false);
+				
+				host.openAndWaitUntilCommunicatable();
+				equipComm.waitUntilTrue(3L, TimeUnit.SECONDS);
+				
+				assertEquals(host.isClosed(), false);
+				assertEquals(host.isOpen(), true);
+				assertEquals(host.isCommunicatable(), true);
+			}
+			
+			equipComm.waitUntilFalse(3L, TimeUnit.SECONDS);
+			
+			/* reccoect other communicator */
+			try (
+					HsmsSsCommunicator host = activeCommunicator(sockAddr, false);
+					) {
+				
+				assertEquals(host.isClosed(), false);
+				assertEquals(host.isOpen(), false);
+				assertEquals(host.isCommunicatable(), false);
+				
+				host.openAndWaitUntilCommunicatable();
+				
+				assertEquals(host.isClosed(), false);
+				assertEquals(host.isOpen(), true);
+				assertEquals(host.isCommunicatable(), true);
+			}
+		}
+		catch (IOException e) {
+			fail(e);
+		}
+		catch (TimeoutException e) {
+			fail(e);
+		}
+		catch (InterruptedException ignore) {
+		}
+	}
+	
+	@Test
 	@DisplayName("Selected fail because already selected")
 	void testNotSelected() {
-		final SocketAddress sockAddr = getInetSocketAddress(5001);
+		
+		final SocketAddress sockAddr = getInetSocketAddress(5002);
 		
 		try (
 				HsmsSsCommunicator equip = passiveCommunicator(sockAddr, true);
@@ -352,14 +466,14 @@ class HsmsSsCommunicatorTest {
 	}
 	
 	@Test
-	@DisplayName("run")
+	@DisplayName("Run")
 	void testRun() {
 		
 		final ObjectProperty<HsmsCommunicateState> hostCommState = ObjectProperty.newInstance(HsmsCommunicateState.NOT_CONNECTED);
 		final ObjectProperty<HsmsCommunicateState> equipCommState = ObjectProperty.newInstance(HsmsCommunicateState.NOT_CONNECTED);
 		final BooleanCompution bothCommSelected = hostCommState.computeIsEqualTo(HsmsCommunicateState.SELECTED).and(equipCommState.computeIsEqualTo(HsmsCommunicateState.SELECTED));
 		
-		final SocketAddress sockAddr = getInetSocketAddress(5002);
+		final SocketAddress sockAddr = getInetSocketAddress(5003);
 		
 		try (
 				HsmsSsCommunicator equip = passiveCommunicator(sockAddr, true);
@@ -367,6 +481,7 @@ class HsmsSsCommunicatorTest {
 			
 			equip.addHsmsCommunicateStateChangeListener(equipCommState::set);
 			equip.addHsmsMessageReceiveBiListener(equipReceiveListener);
+			
 			equip.open();
 			
 			Thread.sleep(100L);
@@ -377,6 +492,8 @@ class HsmsSsCommunicatorTest {
 				
 				host.addHsmsCommunicateStateChangeListener(hostCommState::set);
 				host.addHsmsMessageReceiveBiListener(hostReceiveListener);
+				
+				host.open();
 				
 				bothCommSelected.waitUntilTrue(3L, TimeUnit.SECONDS);
 				

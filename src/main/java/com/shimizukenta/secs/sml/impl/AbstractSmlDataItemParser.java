@@ -1,7 +1,6 @@
 package com.shimizukenta.secs.sml.impl;
 
 import java.math.BigInteger;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +10,12 @@ import java.util.regex.Pattern;
 
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Item;
+import com.shimizukenta.secs.sml.SmlDataItemAsciiParseException;
+import com.shimizukenta.secs.sml.SmlDataItemBooleanParseException;
+import com.shimizukenta.secs.sml.SmlDataItemNumberParseException;
+import com.shimizukenta.secs.sml.SmlDataItemParseException;
 import com.shimizukenta.secs.sml.SmlDataItemParser;
-import com.shimizukenta.secs.sml.SmlParseException;
+import com.shimizukenta.secs.sml.SmlDataItemUnsupportItemTypeParseException;
 
 abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 
@@ -21,7 +24,7 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 	}
 	
 	@Override
-	public Secs2 parse(CharSequence cs) throws SmlParseException {
+	public Secs2 parse(CharSequence cs) throws SmlDataItemParseException {
 		
 		String s = Objects.requireNonNull(cs).toString().trim();
 		
@@ -32,13 +35,13 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 		SeekValueResult r = parsing(s, 0);
 		
 		if ( r.endIndex < s.length() ) {
-			throw new SmlParseException("SML not end. index: " + r.endIndex);
+			throw new SmlDataItemParseException("SML not end. index: " + r.endIndex);
 		}
 		
 		return r.value;
 	}
 	
-	protected SeekValueResult parsing(String s, int fromIndex) throws SmlParseException {
+	protected SeekValueResult parsing(String s, int fromIndex) throws SmlDataItemParseException {
 		
 		try {
 			SeekCharResult r = seekAngleBranketBegin(s, fromIndex);
@@ -72,7 +75,7 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 						size = Integer.valueOf(ss);
 					}
 					catch ( NumberFormatException e ) {
-						throw new SmlParseException("size parse failed. index: " + s2ir.endIndex, e);
+						throw new SmlDataItemNumberParseException("size parse failed. index: " + s2ir.endIndex, e);
 					}
 				}
 				
@@ -86,11 +89,11 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 			}
 		}
 		catch ( IndexOutOfBoundsException e ) {
-			throw new SmlParseException(("parse failed. index: " + fromIndex), e);
+			throw new SmlDataItemParseException(("parse failed. index: " + fromIndex), e);
 		}
 	}
 	
-	private SeekValueResult parseList(String str, int fromIndex) throws SmlParseException {
+	private SeekValueResult parseList(String str, int fromIndex) throws SmlDataItemParseException {
 		
 		List<Secs2> ll = new ArrayList<>();
 		
@@ -110,12 +113,12 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 				
 			} else {
 				
-				throw new SmlParseException("List not found '<' or '>'. index: " + fromIndex);
+				throw new SmlDataItemParseException("List not found '<' or '>'. index: " + fromIndex);
 			}
 		}
 	}
 	
-	private SeekValueResult parseAscii(String str, int fromIndex) throws SmlParseException {
+	private SeekValueResult parseAscii(String str, int fromIndex) throws SmlDataItemParseException {
 		
 		StringBuilder sb = new StringBuilder();
 		
@@ -148,13 +151,13 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 				
 			} else {
 				
-				throw new SmlParseException("Ascii not found '\"' or '0' or '>'. index: " + fromIndex);
+				throw new SmlDataItemAsciiParseException("Ascii not found '\"' or '0' or '>'. index: " + fromIndex);
 			}
 		}
 	}
 	
 	private SeekValueResult parseDefaults(String str, int fromIndex, Secs2Item secs2Item)
-			throws SmlParseException {
+			throws SmlDataItemParseException {
 		
 		SeekCharResult r = this.seekAngleBranketEnd(str, fromIndex);
 		
@@ -189,9 +192,9 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 							ll.add(Boolean.TRUE);
 						}
 					}
-					catch ( SmlParseException e ) {
+					catch ( SmlDataItemParseException e ) {
 						
-						throw new SmlParseException("BOOLEAN parse failed", e);
+						throw new SmlDataItemBooleanParseException(e);
 					}
 				}
 			}
@@ -209,7 +212,7 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 		case INT1: {
 			List<Number> ll = new ArrayList<>();
 			for ( String v : values ) {
-				ll.add(new BigInteger(v));
+				ll.add(toBigInteger(v));
 			}
 			return seekValueResult(Secs2.int1(ll), endIndex);
 			/* break; */
@@ -217,7 +220,7 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 		case INT2: {
 			List<Number> ll = new ArrayList<>();
 			for ( String v : values ) {
-				ll.add(new BigInteger(v));
+				ll.add(toBigInteger(v));
 			}
 			return seekValueResult(Secs2.int2(ll), endIndex);
 			/* break; */
@@ -225,7 +228,7 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 		case INT4: {
 			List<Number> ll = new ArrayList<>();
 			for ( String v : values ) {
-				ll.add(new BigInteger(v));
+				ll.add(toBigInteger(v));
 			}
 			return seekValueResult(Secs2.int4(ll), endIndex);
 			/* break; */
@@ -233,7 +236,7 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 		case INT8: {
 			List<Number> ll = new ArrayList<>();
 			for ( String v : values ) {
-				ll.add(new BigInteger(v));
+				ll.add(toBigInteger(v));
 			}
 			return seekValueResult(Secs2.int8(ll), endIndex);
 			/* break; */
@@ -241,7 +244,7 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 		case UINT1: {
 			List<Number> ll = new ArrayList<>();
 			for ( String v : values ) {
-				ll.add(new BigInteger(v).abs());
+				ll.add(toBigInteger(v).abs());
 			}
 			return seekValueResult(Secs2.uint1(ll), endIndex);
 			/* break; */
@@ -249,7 +252,7 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 		case UINT2: {
 			List<Number> ll = new ArrayList<>();
 			for ( String v : values ) {
-				ll.add(new BigInteger(v).abs());
+				ll.add(toBigInteger(v).abs());
 			}
 			return seekValueResult(Secs2.uint2(ll), endIndex);
 			/* break; */
@@ -257,7 +260,7 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 		case UINT4: {
 			List<Number> ll = new ArrayList<>();
 			for ( String v : values ) {
-				ll.add(new BigInteger(v).abs());
+				ll.add(toBigInteger(v).abs());
 			}
 			return seekValueResult(Secs2.uint4(ll), endIndex);
 			/* break; */
@@ -265,7 +268,7 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 		case UINT8: {
 			List<Number> ll = new ArrayList<>();
 			for ( String v : values ) {
-				ll.add(new BigInteger(v).abs());
+				ll.add(toBigInteger(v).abs());
 			}
 			return seekValueResult(Secs2.uint8(ll), endIndex);
 			/* break; */
@@ -273,7 +276,7 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 		case FLOAT4: {
 			List<Number> ll = new ArrayList<>();
 			for ( String v : values ) {
-				ll.add(Float.valueOf(v));
+				ll.add(toFloat(v));
 			}
 			return seekValueResult(Secs2.float4(ll), endIndex);
 			/* break; */
@@ -281,13 +284,13 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 		case FLOAT8: {
 			List<Number> ll = new ArrayList<>();
 			for ( String v : values ) {
-				ll.add(Double.valueOf(v));
+				ll.add(toDouble(v));
 			}
 			return seekValueResult(Secs2.float8(ll), endIndex);
 			/* break; */
 		}
 		default: {
-			throw new SmlParseException("Unsupport Format " + secs2Item);
+			throw new SmlDataItemUnsupportItemTypeParseException(secs2Item);
 		}
 		}
 	}
@@ -297,7 +300,7 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 	private static final String pregByte = "0[Xx](?<" + GROUP_BYTE + ">[0-9A-Fa-f]{1,2})";
 	private static final Pattern ptnByte = Pattern.compile("^" + pregByte + "$");
 	
-	private Byte toByte(String value) throws SmlParseException {
+	private static Byte toByte(String value) throws SmlDataItemNumberParseException {
 		
 		Matcher m = ptnByte.matcher(value);
 		
@@ -314,26 +317,54 @@ abstract public class AbstractSmlDataItemParser implements SmlDataItemParser {
 			}
 		}
 		catch ( NumberFormatException e ) {
-			throw new SmlParseException("Binary parse failed \"" + value + "\"", e);
+			throw new SmlDataItemNumberParseException("Binary parse failed \"" + value + "\"", e);
 		}
 	}
-
+	
+	private static BigInteger toBigInteger(String value) throws SmlDataItemNumberParseException {
+		
+		try {
+			return new BigInteger(value);
+		}
+		catch (NumberFormatException e) {
+			throw new SmlDataItemNumberParseException("BigInteger parse failed \"" + value + "\"", e);
+		}
+	}
+	
+	private static Float toFloat(String value) throws SmlDataItemNumberParseException {
+		
+		try {
+			return Float.valueOf(value);
+		}
+		catch (NumberFormatException e) {
+			throw new SmlDataItemNumberParseException("Float parse failed \"" + value + "\"", e);
+		}
+	}
+	
+	private static Double toDouble(String value) throws SmlDataItemNumberParseException {
+		
+		try {
+			return Double.valueOf(value);
+		}
+		catch (NumberFormatException e) {
+			throw new SmlDataItemNumberParseException("Double parse failed \"" + value + "\"", e);
+		}
+	}
 	
 	/**
-	 * 
-	 * prototype-pattern
+	 * Prototype pattern.
 	 * 
 	 * @param str
 	 * @param fromIndex
 	 * @param secs2ItemString
 	 * @param size
 	 * @return
-	 * @throws SmlParseException
+	 * @throws SmlDataItemParseException
 	 */
 	protected SeekValueResult parseExtend(String str, int fromIndex, String secs2ItemString, int size)
-			throws SmlParseException {
+			throws SmlDataItemParseException {
 		
-		throw new SmlParseException("UNKNOWN SECS2ITEM type: " + secs2ItemString);
+		throw new SmlDataItemUnsupportItemTypeParseException(secs2ItemString);
 	}
 	
 	
