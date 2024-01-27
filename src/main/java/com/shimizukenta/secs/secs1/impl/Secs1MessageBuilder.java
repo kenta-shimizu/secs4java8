@@ -2,24 +2,18 @@ package com.shimizukenta.secs.secs1.impl;
 
 import java.util.List;
 
-import com.shimizukenta.secs.SecsMessage;
+import com.shimizukenta.secs.impl.SecsMessageBuilder;
+import com.shimizukenta.secs.secs1.Secs1Communicator;
 import com.shimizukenta.secs.secs1.Secs1MessageBlock;
 import com.shimizukenta.secs.secs2.Secs2;
 
 /**
+ * SECS-I-Message builder.
  * 
  * @author kenta-shimizu
  *
  */
-public interface Secs1MessageBuilder {
-	
-	public AbstractSecs1Message build(int strm, int func, boolean wbit);
-	
-	public AbstractSecs1Message build(int strm, int func, boolean wbit, Secs2 body);
-	
-	public AbstractSecs1Message build(SecsMessage primaryMsg, int strm, int func, boolean wbit);
-	
-	public AbstractSecs1Message build(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 body);
+public interface Secs1MessageBuilder extends SecsMessageBuilder<AbstractSecs1Message, Secs1Communicator> {
 	
 	public static AbstractSecs1Message build(byte[] header) {
 		return AbstractSecs1MessageBuilder.build(header);
