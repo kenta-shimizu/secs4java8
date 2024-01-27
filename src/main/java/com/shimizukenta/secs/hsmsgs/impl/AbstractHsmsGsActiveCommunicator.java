@@ -9,21 +9,26 @@ import java.nio.channels.CompletionHandler;
 import com.shimizukenta.secs.UnsetSocketAddressException;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
-import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
 import com.shimizukenta.secs.hsmsgs.HsmsGsCommunicatorConfig;
 
 public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCommunicator {
 	
 	public AbstractHsmsGsActiveCommunicator(HsmsGsCommunicatorConfig config) {
 		super(config);
+		
+		config.connectionMode().addChangeListener(mode -> {
+			if (mode != HsmsConnectionMode.ACTIVE) {
+				try {
+					this.close();
+				}
+				catch (IOException giveup) {
+				}
+			}
+		});
 	}
 	
 	@Override
 	public void open() throws IOException {
-		
-		if ( this.config().connectionMode().get() != HsmsConnectionMode.ACTIVE ) {
-			throw new HsmsConnectionModeIllegalStateException("NOT ACTIVE");
-		}
 		
 		super.open();
 		

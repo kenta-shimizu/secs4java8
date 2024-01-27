@@ -328,7 +328,7 @@ class SecsCommunicatorTest {
 					assertEquals(tiack, TIACK.OK);
 				}
 				{
-					SmlMessage smlMsg = SmlMessage.of("<S99F1 W.");
+					SmlMessage smlMsg = SmlMessage.of("S99F1 W.");
 					Optional<SecsMessage> op = host.send(smlMsg);
 					
 					assertEquals(op.map(SecsMessage::getStream)

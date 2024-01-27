@@ -45,7 +45,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	public AbstractSecs1Communicator(AbstractSecs1CommunicatorConfig config) {
 		super(config);
 		this.config = config;
-		this.msgBuilder = new AbstractSecs1MessageBuilder(this) {};
+		this.msgBuilder = new AbstractSecs1MessageBuilder() {};
 		this.circuit = new AbstractSecs1Circuit(this) {};
 		
 		this.secs1MsgRecvQueueBiObserver = new Secs1MessageReceiveQueueBiObserver(this);
@@ -91,7 +91,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		
 		try {
 			
-			return this.circuit.send(this.messageBuilder().build(strm, func, wbit, secs2))
+			return this.circuit.send(this.messageBuilder().build(this, strm, func, wbit, secs2))
 					.map(m -> (SecsMessage)m);
 		}
 		catch (Secs1TooBigMessageBodyException e) {
@@ -104,7 +104,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
 		try {
-			return this.circuit.send(this.messageBuilder().build(primaryMsg, strm, func, wbit, secs2))
+			return this.circuit.send(this.messageBuilder().build(this, primaryMsg, strm, func, wbit, secs2))
 					.map(m -> (SecsMessage)m);
 		}
 		catch (Secs1TooBigMessageBodyException e) {

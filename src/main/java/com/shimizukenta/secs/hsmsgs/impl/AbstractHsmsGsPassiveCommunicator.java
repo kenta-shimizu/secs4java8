@@ -10,7 +10,6 @@ import java.nio.channels.CompletionHandler;
 import com.shimizukenta.secs.UnsetSocketAddressException;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
-import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
 import com.shimizukenta.secs.hsmsgs.HsmsGsCommunicatorConfig;
 import com.shimizukenta.secs.local.property.TimeoutProperty;
 
@@ -18,14 +17,20 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 	
 	public AbstractHsmsGsPassiveCommunicator(HsmsGsCommunicatorConfig config) {
 		super(config);
+		
+		config.connectionMode().addChangeListener(mode -> {
+			if (mode != HsmsConnectionMode.PASSIVE) {
+				try {
+					this.close();
+				}
+				catch (IOException giveup) {
+				}
+			}
+		});
 	}
 	
 	@Override
 	public void open() throws IOException {
-		
-		if ( this.config().connectionMode().get() != HsmsConnectionMode.PASSIVE ) {
-			throw new HsmsConnectionModeIllegalStateException("NOT PASSIVE");
-		}
 		
 		super.open();
 		

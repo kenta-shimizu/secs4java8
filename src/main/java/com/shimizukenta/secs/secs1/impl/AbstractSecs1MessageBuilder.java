@@ -4,85 +4,46 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.shimizukenta.secs.SecsMessage;
+import com.shimizukenta.secs.impl.AbstractSecsMessageBuilder;
+import com.shimizukenta.secs.secs1.Secs1Communicator;
 import com.shimizukenta.secs.secs1.Secs1MessageBlock;
 import com.shimizukenta.secs.secs1.Secs1TooBigMessageBodyException;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
 import com.shimizukenta.secs.secs2.impl.Secs2BytesParsers;
 
-public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder {
+public abstract class AbstractSecs1MessageBuilder extends AbstractSecsMessageBuilder<AbstractSecs1Message, Secs1Communicator> implements Secs1MessageBuilder {
 	
-	private final AbstractSecs1Communicator comm;
-	
-	public AbstractSecs1MessageBuilder(AbstractSecs1Communicator communicator) {
-		this.comm = communicator;
+	public AbstractSecs1MessageBuilder() {
+		/* Nothing */
 	}
 	
-	private final AtomicInteger autoNumber = new AtomicInteger(0);
-	
-	protected byte[] getAutoNumber2Bytes() {
-		int n = autoNumber.incrementAndGet();
-		return new byte[] {
-				(byte)(n >> 8),
-				(byte)n
-		};
+	@Override
+	protected boolean isEquip(Secs1Communicator communicator) {
+		return communicator.isEquip();
 	}
 	
-	protected byte[] getDeviceId2Bytes() {
-		int n = this.comm.deviceId();
+	@Override
+	protected byte[] device2Bytes(Secs1Communicator communicator) {
+		int n = communicator.deviceId();
 		return new byte[] {
 				(byte)((n >> 8) & 0x7F),
 				(byte)n
 		};
 	}
 	
-	protected byte[] getSystem4Bytes() {
-		
-		byte[] aa = this.getAutoNumber2Bytes();
-		
-		if ( this.comm.isEquip() ) {
-			
-			byte[] ss = this.getDeviceId2Bytes();
-			
-			return new byte[] {
-					ss[0],
-					ss[1],
-					aa[0],
-					aa[1]
-			};
-			
-		} else {
-			
-			return new byte[] {
-					(byte)0x0,
-					(byte)0x0,
-					aa[0],
-					aa[1]
-			};
-		}
-	}
-	
 	@Override
 	public AbstractSecs1Message build(
-			int strm,
-			int func,
-			boolean wbit) {
-		
-		return this.build(strm, func, wbit, Secs2.empty());
-	}
-
-	@Override
-	public AbstractSecs1Message build(
+			Secs1Communicator communicator,
 			int strm,
 			int func,
 			boolean wbit,
 			Secs2 body) {
 		
-		byte[] dd = this.getDeviceId2Bytes();
-		byte[] ssss = this.getSystem4Bytes();
+		byte[] dd = this.device2Bytes(communicator);
+		byte[] ssss = this.system4Bytes(communicator);
 		
 		byte[] header = new byte[] {
 				dd[0],
@@ -97,7 +58,7 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 				ssss[3]
 		};
 		
-		if ( this.comm.isEquip() ) {
+		if ( this.isEquip(communicator) ) {
 			header[0] |= (byte)0x80;
 		}
 		
@@ -107,26 +68,17 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 		
 		return build(header, body);
 	}
-
+	
 	@Override
 	public AbstractSecs1Message build(
-			SecsMessage primaryMsg,
-			int strm,
-			int func,
-			boolean wbit) {
-		
-		return this.build(primaryMsg, strm, func, wbit, Secs2.empty());
-	}
-
-	@Override
-	public AbstractSecs1Message build(
+			Secs1Communicator communicator,
 			SecsMessage primaryMsg,
 			int strm,
 			int func,
 			boolean wbit,
 			Secs2 body) {
 		
-		byte[] dd = this.getDeviceId2Bytes();
+		byte[] dd = this.device2Bytes(communicator);
 		byte[] ppbb = primaryMsg.header10Bytes();
 		
 		byte[] header = new byte[] {
@@ -142,7 +94,7 @@ public abstract class AbstractSecs1MessageBuilder implements Secs1MessageBuilder
 				ppbb[9]
 		};
 		
-		if ( this.comm.isEquip() ) {
+		if ( this.isEquip(communicator) ) {
 			header[0] |= (byte)0x80;
 		}
 		

@@ -17,7 +17,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import com.shimizukenta.secs.UnsetSocketAddressException;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
-import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
 import com.shimizukenta.secs.hsms.HsmsException;
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
@@ -45,14 +44,20 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 	
 	public AbstractHsmsSsPassiveCommunicator(HsmsSsCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
+		
+		config.connectionMode().addChangeListener(mode -> {
+			if (mode != HsmsConnectionMode.PASSIVE) {
+				try {
+					this.close();
+				}
+				catch (IOException giveup) {
+				}
+			}
+		});
 	}
 	
 	@Override
 	public void open() throws IOException {
-		
-		if ( this.config().connectionMode().get() != HsmsConnectionMode.PASSIVE ) {
-			throw new HsmsConnectionModeIllegalStateException("NOT PASSIVE");
-		}
 		
 		super.open();
 		
