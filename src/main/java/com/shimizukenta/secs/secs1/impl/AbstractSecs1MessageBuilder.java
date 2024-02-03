@@ -3,7 +3,6 @@ package com.shimizukenta.secs.secs1.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.impl.AbstractSecsMessageBuilder;
@@ -17,7 +16,7 @@ import com.shimizukenta.secs.secs2.impl.Secs2BytesParsers;
 public abstract class AbstractSecs1MessageBuilder extends AbstractSecsMessageBuilder<AbstractSecs1Message, Secs1Communicator> implements Secs1MessageBuilder {
 	
 	public AbstractSecs1MessageBuilder() {
-		/* Nothing */
+		super();
 	}
 	
 	@Override
@@ -35,7 +34,7 @@ public abstract class AbstractSecs1MessageBuilder extends AbstractSecsMessageBui
 	}
 	
 	@Override
-	public AbstractSecs1Message build(
+	public AbstractSecs1Message buildDataMessage(
 			Secs1Communicator communicator,
 			int strm,
 			int func,
@@ -66,11 +65,11 @@ public abstract class AbstractSecs1MessageBuilder extends AbstractSecsMessageBui
 			header[2] |= (byte)0x80;
 		}
 		
-		return build(header, body);
+		return buildDataMessage(header, body);
 	}
 	
 	@Override
-	public AbstractSecs1Message build(
+	public AbstractSecs1Message buildDataMessage(
 			Secs1Communicator communicator,
 			SecsMessage primaryMsg,
 			int strm,
@@ -102,14 +101,14 @@ public abstract class AbstractSecs1MessageBuilder extends AbstractSecsMessageBui
 			header[2] |= (byte)0x80;
 		}
 		
-		return build(header, body);
+		return buildDataMessage(header, body);
 	}
 	
-	public static AbstractSecs1Message build(byte[] header) {
-		return AbstractSecs1MessageBuilder.build(header, Secs2.empty());
+	public static AbstractSecs1Message buildDataMessage(byte[] header) {
+		return AbstractSecs1MessageBuilder.buildDataMessage(header, Secs2.empty());
 	}
 	
-	public static AbstractSecs1Message build(byte[] header, Secs2 body) {
+	public static AbstractSecs1Message buildDataMessage(byte[] header, Secs2 body) {
 		
 		final List<Secs1MessageBlock> blocks = new ArrayList<>();
 		
@@ -175,15 +174,7 @@ public abstract class AbstractSecs1MessageBuilder extends AbstractSecsMessageBui
 		return Secs1MessageBlock.of(bs);
 	}
 	
-	public static AbstractSecs1Message fromBlocks(List<? extends Secs1MessageBlock> blocks) {
-		
-		Objects.requireNonNull(blocks);
-		
-		final int m = blocks.size();
-		
-		if ( m < 1 ) {
-			throw new IllegalArgumentException("Block size requires >0");
-		}
+	public static AbstractSecs1Message buildFromBlocks(List<? extends Secs1MessageBlock> blocks) {
 		
 		if (isValidBlocks(blocks)) {
 			
@@ -195,6 +186,8 @@ public abstract class AbstractSecs1MessageBuilder extends AbstractSecsMessageBui
 				byte[] bs = bufBlock.getBytes();
 				bss.add(Arrays.copyOfRange(bs, 11, (bs.length - 2)));
 			}
+			
+			final int m = blocks.size();
 			
 			for (int i = 1; i < m; ++i) {
 				

@@ -23,40 +23,63 @@ public enum HsmsMessageSelectStatus {
 	/**
 	 * SUCCESS.
 	 * 
+	 * <p>
+	 * STATUS: 0x00<br />
+	 * </p>
 	 */
 	SUCCESS((byte)0),
 	
 	/**
 	 * ACTIVED.
 	 * 
+	 * <p>
+	 * STATUS: 0x01<br />
+	 * </p>
 	 */
 	ACTIVED((byte)1),
 	
 	/**
 	 * NOT_READY.
+	 * 
+	 * <p>
+	 * STATUS: 0x02<br />
+	 * </p>
 	 */
 	NOT_READY((byte)2),
 	
 	/**
 	 * ALREADY_USED.
+	 * 
+	 * <p>
+	 * STATUS: 0x03<br />
+	 * </p>
 	 */
 	ALREADY_USED((byte)3),
 	
 	/**
 	 * ENTITY_UNKNOWN.
 	 * 
+	 * <p>
+	 * STATUS: 0x04<br />
+	 * </p>
 	 */
 	ENTITY_UNKNOWN((byte)4),
 	
 	/**
 	 * ENTITY_ALREADY_USED.
 	 * 
+	 * <p>
+	 * STATUS: 0x05<br />
+	 * </p>
 	 */
 	ENTITY_ALREADY_USED((byte)5),
 	
 	/**
 	 * ENTITY_ACTIVED.
 	 * 
+	 * <p>
+	 * STATUS: 0x06<br />
+	 * </p>
 	 */
 	ENTITY_ACTIVED((byte)6),
 	

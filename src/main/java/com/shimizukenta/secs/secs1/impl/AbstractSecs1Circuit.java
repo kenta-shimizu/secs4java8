@@ -325,7 +325,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			
 			try {
 				
-				AbstractSecs1Message s1msg = Secs1MessageBuilder.fromBlocks(cacheBlocks);
+				AbstractSecs1Message s1msg = Secs1MessageBuilder.buildFromBlocks(cacheBlocks);
 				
 				Secs1Message m = this.transMgr.put(s1msg);
 				

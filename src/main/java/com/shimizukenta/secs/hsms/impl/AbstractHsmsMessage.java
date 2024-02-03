@@ -3,6 +3,7 @@ package com.shimizukenta.secs.hsms.impl;
 import java.util.Arrays;
 
 import com.shimizukenta.secs.hsms.HsmsMessage;
+import com.shimizukenta.secs.hsms.HsmsMessageHeaderByteLengthIllegalArgumentException;
 import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.impl.AbstractSecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
@@ -26,8 +27,17 @@ public abstract class AbstractHsmsMessage extends AbstractSecsMessage implements
 	private final int func;
 	private final boolean wbit;
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param header the haeder 10 bytes
+	 * @param body the SECS-II body
+	 * @throws NullPointerException if value is null
+	 * @throws HsmsMessageHeaderByteLengthIllegalArgumentException if header.length is NOT equals 10
+	 */
 	public AbstractHsmsMessage(byte[] header, Secs2 body) {
 		super();
+		
 		this.header = Arrays.copyOf(header, HEADER_SIZE);
 		this.body = body;
 		

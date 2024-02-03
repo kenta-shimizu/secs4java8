@@ -2,51 +2,68 @@ package com.shimizukenta.secs.hsms.impl;
 
 import java.util.List;
 
-import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageDeselectStatus;
+import com.shimizukenta.secs.hsms.HsmsMessageHeaderByteLengthIllegalArgumentException;
 import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
 import com.shimizukenta.secs.hsms.HsmsMessageSelectStatus;
+import com.shimizukenta.secs.hsms.HsmsSession;
+import com.shimizukenta.secs.impl.SecsMessageBuilder;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2BytesParseException;
 
-public interface HsmsMessageBuilder {
+public interface HsmsMessageBuilder extends SecsMessageBuilder<AbstractHsmsMessage, HsmsSession> {
 	
-	public AbstractHsmsMessage buildSelectRequest(AbstractHsmsSession session);
+	public AbstractHsmsMessage buildSelectRequest(HsmsSession session);
 	
 	public AbstractHsmsMessage buildSelectResponse(HsmsMessage primaryMsg, HsmsMessageSelectStatus status);
 	
-	public AbstractHsmsMessage buildDeselectRequest(AbstractHsmsSession session);
+	public AbstractHsmsMessage buildDeselectRequest(HsmsSession session);
 	
 	public AbstractHsmsMessage buildDeselectResponse(HsmsMessage primaryMsg, HsmsMessageDeselectStatus status);
 	
-	public AbstractHsmsMessage buildLinktestRequest(AbstractHsmsSession session);
+	public AbstractHsmsMessage buildLinktestRequest(HsmsSession session);
 	
 	public AbstractHsmsMessage buildLinktestResponse(HsmsMessage primaryMsg);
 	
 	public AbstractHsmsMessage buildRejectRequest(HsmsMessage referenceMsg, HsmsMessageRejectReason reason);
 	
-	public AbstractHsmsMessage buildSeparateRequest(AbstractHsmsSession session);
-	
-	public AbstractHsmsMessage buildDataMessage(AbstractHsmsSession session, int strm, int func, boolean wbit);
-	
-	public AbstractHsmsMessage buildDataMessage(AbstractHsmsSession session, int strm, int func, boolean wbit, Secs2 body);
-	
-	public AbstractHsmsMessage buildDataMessage(SecsMessage primaryMsg, int strm, int func, boolean wbit);
-	
-	public AbstractHsmsMessage buildDataMessage(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 body);
+	public AbstractHsmsMessage buildSeparateRequest(HsmsSession session);
 	
 	
-	public static AbstractHsmsMessage build(byte[] header10Bytes) {
-		return AbstractHsmsMessageBuilder.build(header10Bytes, Secs2.empty());
+	/**
+	 * Builder.
+	 * 
+	 * @param header10Bytes the header-10-bytes
+	 * @return instance
+	 */
+	public static AbstractHsmsMessage buildMessage(byte[] header10Bytes) {
+		return AbstractHsmsMessageBuilder.buildMessage(header10Bytes);
 	}
 	
-	public static AbstractHsmsMessage build(byte[] header10Bytes, Secs2 body) {
-		return AbstractHsmsMessageBuilder.build(header10Bytes, body);
+	/**
+	 * Builder.
+	 * 
+	 * @param header10Bytes the header-10-bytes
+	 * @param body the SECS-II body
+	 * @return instance
+	 */
+	public static AbstractHsmsMessage buildMessage(byte[] header10Bytes, Secs2 body) {
+		return AbstractHsmsMessageBuilder.buildMessage(header10Bytes, body);
 	}
 	
-	public static AbstractHsmsMessage fromBytes(byte[] header, List<byte[]> bodies) throws Secs2BytesParseException {
-		return AbstractHsmsMessageBuilder.fromBytes(header, bodies);
+	/**
+	 * Build from List of bytes.
+	 * 
+	 * @param header the header-10-bytes
+	 * @param bodies the List of bytes
+	 * @return instance
+	 * @throws Secs2BytesParseException the SECS-II parse failed
+	 * @throws NullPointerException if value is null
+	 * @throws HsmsMessageHeaderByteLengthIllegalArgumentException if header.length is NOT equals 10
+	 */
+	public static AbstractHsmsMessage buildFromBytes(byte[] header10Bytes, List<byte[]> bodies) throws Secs2BytesParseException {
+		return AbstractHsmsMessageBuilder.buildFromBytes(header10Bytes, bodies);
 	}
 	
 }

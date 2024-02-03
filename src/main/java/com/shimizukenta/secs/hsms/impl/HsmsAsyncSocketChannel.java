@@ -10,6 +10,7 @@ import com.shimizukenta.secs.hsms.HsmsMessageReceiveListener;
 import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
 import com.shimizukenta.secs.hsms.HsmsMessageSelectStatus;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
+import com.shimizukenta.secs.hsms.HsmsSession;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 import com.shimizukenta.secs.secs2.Secs2;
 
@@ -31,7 +32,7 @@ public interface HsmsAsyncSocketChannel {
 	public boolean removeHsmsMessageReceiveListener(HsmsMessageReceiveListener l);
 	
 	public Optional<HsmsMessage> sendSelectRequest(
-			AbstractHsmsSession session)
+			HsmsSession session)
 					throws HsmsSendMessageException,
 					HsmsWaitReplyMessageException,
 					HsmsException,
@@ -46,7 +47,7 @@ public interface HsmsAsyncSocketChannel {
 					InterruptedException;
 	
 	public Optional<HsmsMessage> sendDeselectRequest(
-			AbstractHsmsSession session)
+			HsmsSession session)
 					throws HsmsSendMessageException,
 					HsmsWaitReplyMessageException,
 					HsmsException,
@@ -61,7 +62,7 @@ public interface HsmsAsyncSocketChannel {
 					InterruptedException;
 	
 	public Optional<HsmsMessage> sendLinktestRequest(
-			AbstractHsmsSession session)
+			HsmsSession session)
 					throws HsmsSendMessageException,
 					HsmsWaitReplyMessageException,
 					HsmsException,
@@ -83,14 +84,14 @@ public interface HsmsAsyncSocketChannel {
 					InterruptedException;
 	
 	public Optional<HsmsMessage> sendSeparateRequest(
-			AbstractHsmsSession session)
+			HsmsSession session)
 					throws HsmsSendMessageException,
 					HsmsWaitReplyMessageException,
 					HsmsException,
 					InterruptedException;
 	
 	public Optional<HsmsMessage> send(
-			AbstractHsmsSession session,
+			HsmsSession session,
 			int strm,
 			int func,
 			boolean wbit,
@@ -101,6 +102,7 @@ public interface HsmsAsyncSocketChannel {
 					InterruptedException;
 	
 	public Optional<HsmsMessage> send(
+			HsmsSession session,
 			SecsMessage primaryMsg,
 			int strm,
 			int func,

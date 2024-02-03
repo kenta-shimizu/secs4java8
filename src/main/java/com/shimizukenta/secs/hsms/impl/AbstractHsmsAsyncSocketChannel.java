@@ -28,6 +28,7 @@ import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.hsms.HsmsNotExpectControlTypeReplyMessageException;
 import com.shimizukenta.secs.hsms.HsmsRejectException;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
+import com.shimizukenta.secs.hsms.HsmsSession;
 import com.shimizukenta.secs.hsms.HsmsTimeoutT3Exception;
 import com.shimizukenta.secs.hsms.HsmsTimeoutT6Exception;
 import com.shimizukenta.secs.hsms.HsmsTimeoutT8Exception;
@@ -270,7 +271,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 	
 	@Override
 	public Optional<HsmsMessage> sendSelectRequest(
-			AbstractHsmsSession session)
+			HsmsSession session)
 					throws HsmsSendMessageException,
 					HsmsWaitReplyMessageException,
 					HsmsException,
@@ -307,7 +308,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 	
 	@Override
 	public Optional<HsmsMessage> sendDeselectRequest(
-			AbstractHsmsSession session)
+			HsmsSession session)
 					throws HsmsSendMessageException,
 					HsmsWaitReplyMessageException,
 					HsmsException,
@@ -344,7 +345,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 	
 	@Override
 	public Optional<HsmsMessage> sendLinktestRequest(
-			AbstractHsmsSession session)
+			HsmsSession session)
 					throws HsmsSendMessageException,
 					HsmsWaitReplyMessageException,
 					HsmsException,
@@ -392,7 +393,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 	
 	@Override
 	public Optional<HsmsMessage> sendSeparateRequest(
-			AbstractHsmsSession session)
+			HsmsSession session)
 					throws HsmsSendMessageException,
 					HsmsWaitReplyMessageException,
 					HsmsException,
@@ -403,7 +404,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 	
 	@Override
 	public Optional<HsmsMessage> send(
-			AbstractHsmsSession session,
+			HsmsSession session,
 			int strm, int func, boolean wbit, Secs2 secs2)
 					throws HsmsSendMessageException,
 					HsmsWaitReplyMessageException,
@@ -415,6 +416,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 	
 	@Override
 	public Optional<HsmsMessage> send(
+			HsmsSession session,
 			SecsMessage primaryMsg,
 			int strm, int func, boolean wbit, Secs2 secs2)
 					throws HsmsSendMessageException,
@@ -422,7 +424,7 @@ public abstract class AbstractHsmsAsyncSocketChannel implements HsmsAsyncSocketC
 					HsmsException,
 					InterruptedException {
 		
-		return this.sendDataMsg(this.messageBuilder().buildDataMessage(primaryMsg, strm, func, wbit, secs2));
+		return this.sendDataMsg(this.messageBuilder().buildDataMessage(session, primaryMsg, strm, func, wbit, secs2));
 	}
 	
 	private Optional<HsmsMessage> sendDataMsg(AbstractHsmsMessage msg)
