@@ -17,54 +17,90 @@ public enum HsmsMessageType {
 	/**
 	 * DATA.
 	 * 
+	 * <p>
+	 * P: 0x00<br />
+	 * S: 0x00<br />
+	 * </p>
 	 */
 	DATA( (byte)0, (byte)0 ),
 	
 	/**
 	 * SELECT_REQ.
 	 * 
+	 * <p>
+	 * P: 0x00<br />
+	 * S: 0x01<br />
+	 * </p>
 	 */
 	SELECT_REQ( (byte)0, (byte)1 ),
 	
 	/**
 	 * SELECT_RSP.
 	 * 
+	 * <p>
+	 * P: 0x00<br />
+	 * S: 0x02<br />
+	 * </p>
 	 */
 	SELECT_RSP( (byte)0, (byte)2 ),
 	
 	/**
 	 * DESELECT_REQ.
 	 * 
+	 * <p>
+	 * P: 0x00<br />
+	 * S: 0x03<br />
+	 * </p>
 	 */
 	DESELECT_REQ( (byte)0, (byte)3 ),
 	
 	/**
 	 * DESELECT_RSP.
 	 * 
+	 * <p>
+	 * P: 0x00<br />
+	 * S: 0x04<br />
+	 * </p>
 	 */
 	DESELECT_RSP( (byte)0, (byte)4 ),
 	
 	/**
 	 * LINKTEST_REQ.
 	 * 
+	 * <p>
+	 * P: 0x00<br />
+	 * S: 0x05<br />
+	 * </p>
 	 */
 	LINKTEST_REQ( (byte)0, (byte)5 ),
 	
 	/**
 	 * LINKTEST_RSP.
 	 * 
+	 * <p>
+	 * P: 0x00<br />
+	 * S: 0x06<br />
+	 * </p>
 	 */
 	LINKTEST_RSP( (byte)0, (byte)6 ),
 	
 	/**
 	 * REJECT_REQ.
 	 * 
+	 * <p>
+	 * P: 0x00<br />
+	 * S: 0x07<br />
+	 * </p>
 	 */
 	REJECT_REQ( (byte)0, (byte)7 ),
 	
 	/**
 	 * SEPARATE_REQ.
 	 * 
+	 * <p>
+	 * P: 0x00<br />
+	 * S: 0x09<br />
+	 * </p>
 	 */
 	SEPARATE_REQ( (byte)0, (byte)9 ),
 	

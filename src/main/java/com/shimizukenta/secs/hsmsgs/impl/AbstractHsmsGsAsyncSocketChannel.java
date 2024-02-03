@@ -49,7 +49,7 @@ public abstract class AbstractHsmsGsAsyncSocketChannel extends AbstractHsmsAsync
 	
 	@Override
 	protected AbstractHsmsMessage buildMessageFromBytes(byte[] header, List<byte[]> bodies) throws Secs2BytesParseException {
-		return HsmsMessageBuilder.fromBytes(header, bodies);
+		return HsmsMessageBuilder.buildFromBytes(header, bodies);
 	}
 	
 	@Override
@@ -57,7 +57,7 @@ public abstract class AbstractHsmsGsAsyncSocketChannel extends AbstractHsmsAsync
 		if ( message instanceof AbstractHsmsMessage ) {
 			return (AbstractHsmsMessage)message;
 		} else {
-			return HsmsMessageBuilder.build(message.header10Bytes(), message.secs2());
+			return HsmsMessageBuilder.buildMessage(message.header10Bytes(), message.secs2());
 		}
 	}
 	

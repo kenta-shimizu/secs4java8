@@ -118,7 +118,7 @@ public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator imple
 	public Optional<SecsMessage> templateSend(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
-		return this.asyncSocketChannel().send(primaryMsg, strm, func, wbit, secs2).map(m -> (SecsMessage)m);
+		return this.asyncSocketChannel().send(this, primaryMsg, strm, func, wbit, secs2).map(m -> (SecsMessage)m);
 	}
 	
 	@Override

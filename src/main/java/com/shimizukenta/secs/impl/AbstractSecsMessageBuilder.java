@@ -49,13 +49,13 @@ public abstract class AbstractSecsMessageBuilder<M extends SecsMessage, C extend
 	}
 	
 	@Override
-	public M build(C communicator, int strm, int func, boolean wbit) {
-		return this.build(communicator, strm, func, wbit, Secs2.empty());
+	public M buildDataMessage(C communicator, int strm, int func, boolean wbit) {
+		return this.buildDataMessage(communicator, strm, func, wbit, Secs2.empty());
 	}
 	
 	@Override
-	public M build(C communicator, SecsMessage primaryMsg, int strm, int func, boolean wbit) {
-		return this.build(communicator, primaryMsg, strm, func, wbit, Secs2.empty());
+	public M buildDataMessage(C communicator, SecsMessage primaryMsg, int strm, int func, boolean wbit) {
+		return this.buildDataMessage(communicator, primaryMsg, strm, func, wbit, Secs2.empty());
 	}
 	
 }

@@ -91,7 +91,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		
 		try {
 			
-			return this.circuit.send(this.messageBuilder().build(this, strm, func, wbit, secs2))
+			return this.circuit.send(this.messageBuilder().buildDataMessage(this, strm, func, wbit, secs2))
 					.map(m -> (SecsMessage)m);
 		}
 		catch (Secs1TooBigMessageBodyException e) {
@@ -104,7 +104,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
 		try {
-			return this.circuit.send(this.messageBuilder().build(this, primaryMsg, strm, func, wbit, secs2))
+			return this.circuit.send(this.messageBuilder().buildDataMessage(this, primaryMsg, strm, func, wbit, secs2))
 					.map(m -> (SecsMessage)m);
 		}
 		catch (Secs1TooBigMessageBodyException e) {

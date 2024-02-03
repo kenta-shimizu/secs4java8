@@ -40,9 +40,9 @@ public interface Secs1Message extends SecsMessage {
 	 * Returns SECS-I Message, HEAD-ONLY Message builder.
 	 * 
 	 * @param header10Bytes the HEAD-10-bytes.
-	 * @return SECS-I Message
+	 * @return SECS-I Message instance
 	 * @throws NullPointerException if input null
-	 * @throws IllegalArgumentException if byte length is not 10
+	 * @throws Secs1MessageHeaderByteLengthIllegalArgumentException if byte length is NOT equals 10
 	 */
 	public static Secs1Message of(byte[] header10Bytes) {
 		return Secs1Message.of(header10Bytes, Secs2.empty());
@@ -53,10 +53,10 @@ public interface Secs1Message extends SecsMessage {
 	 * 
 	 * @param header10Bytes the HEAD-10-bytes.
 	 * @param body the body SECS-II
-	 * @return SECS-I Message
+	 * @return SECS-I Message instance
 	 * @throws Secs1TooBigMessageBodyException if SECS-II body is too big
 	 * @throws NullPointerException if input null
-	 * @throws IllegalArgumentException if byte length is NOT　10
+	 * @throws Secs1MessageHeaderByteLengthIllegalArgumentException if byte length is NOT　equals 10
 	 * @throws Secs1TooBigMessageBodyException if body is too big
 	 */
 	public static Secs1Message of(byte[] header10Bytes, Secs2 body) {
@@ -64,24 +64,30 @@ public interface Secs1Message extends SecsMessage {
 		Objects.requireNonNull(header10Bytes);
 		Objects.requireNonNull(body);
 		
-		int len = header10Bytes.length;
-		if ( len != 10 ) {
-			throw new IllegalArgumentException("header10Bytes.length != 10");
+		if (header10Bytes.length != 10) {
+			throw new Secs1MessageHeaderByteLengthIllegalArgumentException();
 		}
 		
-		return Secs1MessageBuilder.build(header10Bytes, body);
+		return Secs1MessageBuilder.buildDataMessage(header10Bytes, body);
 	}
 	
 	/**
 	 * Returns Secs-I Message.
 	 * 
 	 * @param blocks the Secs-I Message blocks
-	 * @return Secs-I Message
+	 * @return Secs-I Message instance
 	 * @throws NullPointerException if blocks is null.
-	 * @throws IllegalArgumentException if blocks size is {@code <1}
+	 * @throws Secs1MessageEmptyBlockListIllegalArgumentException if blocks is empty
 	 */
 	public static Secs1Message of(List<? extends Secs1MessageBlock> blocks) {
-		return Secs1MessageBuilder.fromBlocks(blocks);
+		
+		Objects.requireNonNull(blocks);
+		
+		if (blocks.isEmpty()) {
+			throw new Secs1MessageEmptyBlockListIllegalArgumentException();
+		}
+		
+		return Secs1MessageBuilder.buildFromBlocks(blocks);
 	}
 	
 }

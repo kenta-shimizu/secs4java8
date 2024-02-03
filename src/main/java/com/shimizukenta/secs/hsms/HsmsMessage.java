@@ -49,18 +49,10 @@ public interface HsmsMessage extends SecsMessage {
 	 * @param header10Bytes HEADER-10-bytes
 	 * @return HSMS Message
 	 * @throws NullPointerException if input null
-	 * @throws IllegalArgumentException if byte length is not 10
+	 * @throws HsmsMessageHeaderByteLengthIllegalArgumentException if header.length is NOT equals 10
 	 */
 	public static HsmsMessage of(byte[] header10Bytes) {
-		
-		Objects.requireNonNull(header10Bytes);
-		
-		int len = header10Bytes.length;
-		if ( len != 10 ) {
-			throw new IllegalArgumentException("header10Bytes.length != 10");
-		}
-		
-		return HsmsMessageBuilder.build(header10Bytes);
+		return HsmsMessage.of(header10Bytes, Secs2.empty());
 	}
 	
 	/**
@@ -70,19 +62,18 @@ public interface HsmsMessage extends SecsMessage {
 	 * @param body SECS-II body
 	 * @return HSMS Message
 	 * @throws NullPointerException if input null
-	 * @throws IllegalArgumentException if byte length is not 10
+	 * @throws HsmsMessageHeaderByteLengthIllegalArgumentException if header.length is NOT equals 10
 	 */
 	public static HsmsMessage of(byte[] header10Bytes, Secs2 body) {
 		
 		Objects.requireNonNull(header10Bytes);
 		Objects.requireNonNull(body);
 		
-		int len = header10Bytes.length;
-		if ( len != 10 ) {
-			throw new IllegalArgumentException("header10Bytes.length != 10");
+		if (header10Bytes.length != 10) {
+			throw new HsmsMessageHeaderByteLengthIllegalArgumentException();
 		}
 		
-		return HsmsMessageBuilder.build(header10Bytes, body);
+		return HsmsMessageBuilder.buildMessage(header10Bytes, body);
 	}
 	
 }

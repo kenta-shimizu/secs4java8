@@ -15,16 +15,16 @@ import com.shimizukenta.secs.secs2.Secs2;
  */
 public interface Secs1MessageBuilder extends SecsMessageBuilder<AbstractSecs1Message, Secs1Communicator> {
 	
-	public static AbstractSecs1Message build(byte[] header) {
-		return AbstractSecs1MessageBuilder.build(header);
+	public static AbstractSecs1Message buildDataMessage(byte[] header) {
+		return AbstractSecs1MessageBuilder.buildDataMessage(header);
 	}
 	
-	public static AbstractSecs1Message build(byte[] header, Secs2 body) {
-		return AbstractSecs1MessageBuilder.build(header, body);
+	public static AbstractSecs1Message buildDataMessage(byte[] header, Secs2 body) {
+		return AbstractSecs1MessageBuilder.buildDataMessage(header, body);
 	}
 	
-	public static AbstractSecs1Message fromBlocks(List<? extends Secs1MessageBlock> blocks) {
-		return AbstractSecs1MessageBuilder.fromBlocks(blocks);
+	public static AbstractSecs1Message buildFromBlocks(List<? extends Secs1MessageBlock> blocks) {
+		return AbstractSecs1MessageBuilder.buildFromBlocks(blocks);
 	}
 	
 }

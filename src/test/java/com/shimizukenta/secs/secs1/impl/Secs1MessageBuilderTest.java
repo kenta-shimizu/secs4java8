@@ -47,7 +47,7 @@ class Secs1MessageBuilderTest {
 		final Secs1Communicator equipComm = buildCommunicator(buildConfig(deviceId, isEquip));
 		final Secs1MessageBuilder builder = getBuilder();
 		
-		Secs1Message msg = builder.build(equipComm, strm, func, wbit);
+		Secs1Message msg = builder.buildDataMessage(equipComm, strm, func, wbit);
 		
 		assertEquals(msg.getStream(), strm);
 		assertEquals(msg.getFunction(), func);
@@ -76,7 +76,7 @@ class Secs1MessageBuilderTest {
 		final Secs1Communicator hostComm = buildCommunicator(buildConfig(deviceId, isEquip));
 		final Secs1MessageBuilder builder = getBuilder();
 		
-		Secs1Message msg = builder.build(hostComm, strm, func, wbit, body);
+		Secs1Message msg = builder.buildDataMessage(hostComm, strm, func, wbit, body);
 		
 		assertEquals(msg.getStream(), strm);
 		assertEquals(msg.getFunction(), func);
@@ -105,11 +105,11 @@ class Secs1MessageBuilderTest {
 		final Secs1Communicator equipComm = buildCommunicator(buildConfig(deviceId, true));
 		final Secs1MessageBuilder equipBuilder = getBuilder();
 		
-		final Secs1Message primaryMsg = hostBuilder.build(hostComm, strm, func, true);
+		final Secs1Message primaryMsg = hostBuilder.buildDataMessage(hostComm, strm, func, true);
 		
 		final int replyFunc = func + 1;
 		
-		final Secs1Message replyMsg = equipBuilder.build(equipComm, primaryMsg, strm, replyFunc, false);
+		final Secs1Message replyMsg = equipBuilder.buildDataMessage(equipComm, primaryMsg, strm, replyFunc, false);
 		
 		assertEquals(replyMsg.getStream(), strm);
 		assertEquals(replyMsg.getFunction(), replyFunc);
@@ -141,12 +141,12 @@ class Secs1MessageBuilderTest {
 		final Secs1Communicator hostComm = buildCommunicator(buildConfig(deviceId, false));
 		final Secs1MessageBuilder hostBuilder = getBuilder();
 		
-		final Secs1Message primaryMsg = equipBuilder.build(equipComm, strm, func, true);
+		final Secs1Message primaryMsg = equipBuilder.buildDataMessage(equipComm, strm, func, true);
 		
 		final int replyFunc = func + 1;
 		final Secs2 body = Secs2.list();
 		
-		final Secs1Message replyMsg = hostBuilder.build(hostComm, primaryMsg, strm, replyFunc, false, body);
+		final Secs1Message replyMsg = hostBuilder.buildDataMessage(hostComm, primaryMsg, strm, replyFunc, false, body);
 		
 		assertEquals(replyMsg.getStream(), strm);
 		assertEquals(replyMsg.getFunction(), replyFunc);
@@ -178,7 +178,7 @@ class Secs1MessageBuilderTest {
 				(byte)0x00, (byte)0x00, (byte)0x00, (byte)0x01
 		};
 		
-		Secs1Message msg = Secs1MessageBuilder.build(header10Bytes);
+		Secs1Message msg = Secs1MessageBuilder.buildDataMessage(header10Bytes);
 		
 		int strm = msg.getStream();
 		int func = msg.getFunction();
@@ -239,7 +239,7 @@ class Secs1MessageBuilderTest {
 				(byte)0x00, (byte)0x00, (byte)0x00, (byte)0x01
 		};
 		
-		Secs1Message msg = Secs1MessageBuilder.build(header10Bytes, Secs2.list());
+		Secs1Message msg = Secs1MessageBuilder.buildDataMessage(header10Bytes, Secs2.list());
 		
 		int strm = msg.getStream();
 		int func = msg.getFunction();
@@ -308,7 +308,7 @@ class Secs1MessageBuilderTest {
 		
 		assertEquals(block.isValid(), true);
 		
-		Secs1Message msg = Secs1MessageBuilder.fromBlocks(Arrays.asList(block));
+		Secs1Message msg = Secs1MessageBuilder.buildFromBlocks(Arrays.asList(block));
 		
 		int strm = msg.getStream();
 		int func = msg.getFunction();
@@ -363,7 +363,7 @@ class Secs1MessageBuilderTest {
 		assertEquals(block2.ebit(), true);
 		assertEquals(block2.isFirstBlock(), false);
 		
-		Secs1Message msg = Secs1MessageBuilder.fromBlocks(Arrays.asList(block1, block2));
+		Secs1Message msg = Secs1MessageBuilder.buildFromBlocks(Arrays.asList(block1, block2));
 		
 		int strm = msg.getStream();
 		int func = msg.getFunction();

@@ -1,9 +1,9 @@
 package com.shimizukenta.secs.hsmsss.impl;
 
 import com.shimizukenta.secs.hsms.HsmsMessageType;
+import com.shimizukenta.secs.hsms.HsmsSession;
 import com.shimizukenta.secs.hsms.impl.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.impl.AbstractHsmsMessageBuilder;
-import com.shimizukenta.secs.hsms.impl.AbstractHsmsSession;
 
 public abstract class AbstractHsmsSsMessageBuilder extends AbstractHsmsMessageBuilder {
 	
@@ -12,11 +12,11 @@ public abstract class AbstractHsmsSsMessageBuilder extends AbstractHsmsMessageBu
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildSelectRequest(AbstractHsmsSession session) {
+	public AbstractHsmsMessage buildSelectRequest(HsmsSession session) {
 		
-		byte[] sysbytes = this.getSystem4Bytes(session);
+		byte[] sysbytes = this.system4Bytes(session);
 		
-		byte[] header = new byte[] {
+		byte[] header10Bytes = new byte[] {
 				(byte)0xFF,
 				(byte)0xFF,
 				(byte)0x0,
@@ -29,15 +29,15 @@ public abstract class AbstractHsmsSsMessageBuilder extends AbstractHsmsMessageBu
 				sysbytes[3]
 		};
 		
-		return build(header);
+		return buildMessage(header10Bytes);
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildDeselectRequest(AbstractHsmsSession session) {
+	public AbstractHsmsMessage buildDeselectRequest(HsmsSession session) {
 		
-		byte[] sysbytes = this.getSystem4Bytes(session);
+		byte[] sysbytes = this.system4Bytes(session);
 		
-		byte[] header = new byte[] {
+		byte[] header10Bytes = new byte[] {
 				(byte)0xFF,
 				(byte)0xFF,
 				(byte)0x0,
@@ -50,15 +50,15 @@ public abstract class AbstractHsmsSsMessageBuilder extends AbstractHsmsMessageBu
 				sysbytes[3]
 		};
 		
-		return build(header);
+		return buildMessage(header10Bytes);
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildSeparateRequest(AbstractHsmsSession session) {
+	public AbstractHsmsMessage buildSeparateRequest(HsmsSession session) {
 		
-		byte[] sysbytes = this.getSystem4Bytes(session);
+		byte[] sysbytes = this.system4Bytes(session);
 		
-		byte[] header = new byte[] {
+		byte[] header10Bytes = new byte[] {
 				(byte)0xFF,
 				(byte)0xFF,
 				(byte)0x0,
@@ -71,7 +71,7 @@ public abstract class AbstractHsmsSsMessageBuilder extends AbstractHsmsMessageBu
 				sysbytes[3]
 		};
 		
-		return build(header);
+		return buildMessage(header10Bytes);
 	}
 	
 }
