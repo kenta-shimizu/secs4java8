@@ -22,7 +22,6 @@ import com.shimizukenta.secs.gem.Gem;
 import com.shimizukenta.secs.gem.impl.AbstractGem;
 import com.shimizukenta.secs.local.property.BooleanProperty;
 import com.shimizukenta.secs.secs2.Secs2;
-import com.shimizukenta.secs.sml.SmlMessage;
 
 /**
  * This abstract class is implementation of SECS-communicate.
@@ -143,13 +142,14 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	abstract public Optional<SecsMessage> templateSend(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException;
 	
-	@Override
-	public Optional<SecsMessage> send(int strm, int func, boolean wbit)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
-			, InterruptedException {
-		
-		return templateSend(strm, func, wbit, Secs2.empty());
-	}
+	//TODO
+//	@Override
+//	public Optional<SecsMessage> send(int strm, int func, boolean wbit)
+//			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
+//			, InterruptedException {
+//		
+//		return templateSend(strm, func, wbit, Secs2.empty());
+//	}
 	
 	@Override
 	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)
@@ -160,14 +160,6 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
-			, InterruptedException {
-		
-		return templateSend(primaryMsg, strm, func, wbit, Secs2.empty());
-	}
-	
-	@Override
 	public Optional<SecsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
 			, InterruptedException {
@@ -175,34 +167,16 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		return templateSend(primaryMsg, strm, func, wbit, secs2);
 	}
 	
-	@Override
-	public Optional<SecsMessage> send(SmlMessage sml)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
-			, InterruptedException {
-		
-		return templateSend(sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
-	}
-	
-	@Override
-	public Optional<SecsMessage> send(SecsMessage primaryMsg, SmlMessage sml)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
-			, InterruptedException {
-		
-		return templateSend(primaryMsg, sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
-	}
-	
 	
 	/* Secs-Message Receive Listener */
 	
 	@Override
 	public boolean addSecsMessageReceiveListener(SecsMessageReceiveListener l) {
-//		return msgRecvListeners.add(Objects.requireNonNull(l));
 		return this.secsMsgRecvQueueObserver.addListener(l);
 	}
 	
 	@Override
 	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveListener l) {
-//		return msgRecvListeners.remove(Objects.requireNonNull(l));
 		return this.secsMsgRecvQueueObserver.removeListener(l);
 	}
 	

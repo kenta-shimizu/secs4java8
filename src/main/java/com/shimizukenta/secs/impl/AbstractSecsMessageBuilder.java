@@ -2,11 +2,11 @@ package com.shimizukenta.secs.impl;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.shimizukenta.secs.SecsCommunicator;
+import com.shimizukenta.secs.SecsCommunicatorConfigValueGettable;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 
-public abstract class AbstractSecsMessageBuilder<M extends SecsMessage, C extends SecsCommunicator> implements SecsMessageBuilder<M, C> {
+public abstract class AbstractSecsMessageBuilder<M extends SecsMessage, C extends SecsCommunicatorConfigValueGettable> implements SecsMessageBuilder<M, C> {
 	
 	private final AtomicInteger autoNum;
 	
@@ -14,11 +14,9 @@ public abstract class AbstractSecsMessageBuilder<M extends SecsMessage, C extend
 		this.autoNum = new AtomicInteger(0);
 	}
 	
-//	abstract protected boolean isEquip();
-//	
-//	abstract protected byte[] device2Bytes();
-	
-	abstract protected boolean isEquip(C communicator);
+	protected boolean isEquip(C communicator) {
+		return communicator.isEquip();
+	}
 	
 	abstract protected byte[] device2Bytes(C communicator);
 	

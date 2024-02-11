@@ -45,11 +45,14 @@ public interface SecsMessageSendable {
 	 * @throws SecsException if SECS failed
 	 * @throws InterruptedException if interrupted
 	 */
-	public Optional<SecsMessage> send(int strm, int func, boolean wbit)
+	default public Optional<SecsMessage> send(int strm, int func, boolean wbit)
 			throws SecsSendMessageException,
 			SecsWaitReplyMessageException,
 			SecsException,
-			InterruptedException;
+			InterruptedException {
+		
+		return this.send(strm, func, wbit, Secs2.empty());
+	}
 	
 	/**
 	 * Send Primary-Message and receive Reply-Message.
@@ -93,11 +96,14 @@ public interface SecsMessageSendable {
 	 * @throws SecsException if SECS failed
 	 * @throws InterruptedException if interrupted
 	 */
-	public Optional<SecsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit)
+	default public Optional<SecsMessage> send(SecsMessage primaryMsg, int strm, int func, boolean wbit)
 			throws SecsSendMessageException,
 			SecsWaitReplyMessageException,
 			SecsException,
-			InterruptedException;
+			InterruptedException {
+		
+		return this.send(primaryMsg, strm, func, wbit, Secs2.empty());
+	}
 	
 	/**
 	 * Send Reply-Message.
@@ -139,11 +145,14 @@ public interface SecsMessageSendable {
 	 * @throws SecsException if SECS failed
 	 * @throws InterruptedException if interrupted
 	 */
-	public Optional<SecsMessage> send(SmlMessage sml)
+	default public Optional<SecsMessage> send(SmlMessage sml)
 			throws SecsSendMessageException,
 			SecsWaitReplyMessageException,
 			SecsException,
-			InterruptedException;
+			InterruptedException {
+		
+		return this.send(sml.getStream(), sml.getFunction(), sml.wbit(), Secs2.empty());
+	}
 	
 	/**
 	 * Send Reply-Message by SML.
@@ -161,10 +170,13 @@ public interface SecsMessageSendable {
 	 * @throws SecsException if SECS failed
 	 * @throws InterruptedException if interrupted
 	 */
-	public Optional<SecsMessage> send(SecsMessage primaryMsg, SmlMessage sml)
+	default public Optional<SecsMessage> send(SecsMessage primaryMsg, SmlMessage sml)
 			throws SecsSendMessageException,
 			SecsWaitReplyMessageException,
 			SecsException,
-			InterruptedException;
+			InterruptedException {
+		
+		return this.send(primaryMsg, sml.getStream(), sml.getFunction(), sml.wbit(), Secs2.empty());
+	}
 	
 }
