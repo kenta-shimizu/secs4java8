@@ -21,11 +21,6 @@ public abstract class AbstractHsmsMessageBuilder extends AbstractSecsMessageBuil
 	}
 	
 	@Override
-	protected boolean isEquip(HsmsSession communicator) {
-		return communicator.isEquip();
-	}
-	
-	@Override
 	protected byte[] device2Bytes(HsmsSession communicator) {
 		int n = communicator.sessionId();
 		return new byte[] {

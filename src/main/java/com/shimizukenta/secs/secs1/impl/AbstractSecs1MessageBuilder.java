@@ -20,11 +20,6 @@ public abstract class AbstractSecs1MessageBuilder extends AbstractSecsMessageBui
 	}
 	
 	@Override
-	protected boolean isEquip(Secs1Communicator communicator) {
-		return communicator.isEquip();
-	}
-	
-	@Override
 	protected byte[] device2Bytes(Secs1Communicator communicator) {
 		int n = communicator.deviceId();
 		return new byte[] {

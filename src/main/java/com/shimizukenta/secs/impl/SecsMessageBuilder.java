@@ -1,6 +1,6 @@
 package com.shimizukenta.secs.impl;
 
-import com.shimizukenta.secs.SecsCommunicator;
+import com.shimizukenta.secs.SecsCommunicatorConfigValueGettable;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs2.Secs2;
 
@@ -12,7 +12,7 @@ import com.shimizukenta.secs.secs2.Secs2;
  * @param <M> the Secs-Message extends
  * @param <C> the SecsCommunicator extends
  */
-public interface SecsMessageBuilder<M extends SecsMessage, C extends SecsCommunicator> {
+public interface SecsMessageBuilder<M extends SecsMessage, C extends SecsCommunicatorConfigValueGettable> {
 	
 	public M buildDataMessage(C communicator, int strm, int func, boolean wbit);
 	

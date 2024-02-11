@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.shimizukenta.secs.GemAccessor;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
@@ -30,18 +31,17 @@ import com.shimizukenta.secs.gem.LRACK;
 import com.shimizukenta.secs.gem.OFLACK;
 import com.shimizukenta.secs.gem.ONLACK;
 import com.shimizukenta.secs.gem.TIACK;
-import com.shimizukenta.secs.impl.AbstractSecsCommunicator;
 import com.shimizukenta.secs.secs2.Secs2;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 import com.shimizukenta.secs.secs2.Secs2Item;
 
 public abstract class AbstractGem implements Gem {
 
-	private final AbstractSecsCommunicator comm;
+	private final GemAccessor comm;
 	private final GemConfig config;
 	
-	public AbstractGem(AbstractSecsCommunicator communicator, GemConfig config) {
-		this.comm = communicator;
+	public AbstractGem(GemAccessor accessor, GemConfig config) {
+		this.comm = accessor;
 		this.config = config;
 	}
 	
