@@ -1,12 +1,32 @@
 package com.shimizukenta.secs;
 
 /**
- * SecsMessage Listenable.
+ * SecsMessage Observer methods.
  * 
  * @author kenta-shimizu
  *
  */
-public interface SecsMessageListenable {
+public interface SecsMessageObservable {
+	
+	/**
+	 * Add Listener to receive Primary-Message.
+	 * 
+	 * <p>
+	 * This Listener not receive Reply-Message.<br />
+	 * </p>
+	 * 
+	 * @param listener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addSecsMessageReceiveListener(SecsMessageReceiveListener listener);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param listener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveListener listener);
 	
 	/**
 	 * Add Listener to receive Primary-Message.
@@ -28,9 +48,6 @@ public interface SecsMessageListenable {
 	 */
 	public boolean removeSecsMessageReceiveBiListener(SecsMessageReceiveBiListener biListener);
 	
-	
-	
-	/* Try-Send Secs-Message Pass-through Listener */
 	
 	/**
 	 * Add Listener to get SecsMesssage before sending.
@@ -63,9 +80,7 @@ public interface SecsMessageListenable {
 	 * @return {@code true} if remove success
 	 */
 	public boolean removeTrySendSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener);	
-
 	
-	/* Sended Secs-Message Pass-through Listener */
 	
 	/**
 	 * Add Listener to get sended SecsMesssage.
@@ -98,9 +113,7 @@ public interface SecsMessageListenable {
 	 * @return {@code true} if remove success
 	 */
 	public boolean removeSendedSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener);	
-
 	
-	/* Receive Secs-Message Pass-through Listener */
 	
 	/**
 	 * Add Listener to receive both Primary and Reply Message.

@@ -5,10 +5,13 @@ import java.util.Collection;
 import java.util.EventListener;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public abstract class AbstractQueueBiObserver<C extends AbstractSecsCommunicator, M extends EventListener, B extends EventListener, V> {
+import com.shimizukenta.secs.GemAccessor;
+
+public abstract class AbstractQueueBiObserver<C extends GemAccessor, M extends EventListener, B extends EventListener, V> {
 	
 	private final BlockingQueue<V> queue = new LinkedBlockingQueue<>();
 	private final Collection<M> lstnrs = new ArrayList<>();
@@ -16,12 +19,13 @@ public abstract class AbstractQueueBiObserver<C extends AbstractSecsCommunicator
 	
 	private final Object sync = new Object();
 	
-	private final C comm;
+	private final C communicator;
 	
-	public AbstractQueueBiObserver(C comm) {
-		this.comm = comm;
+	public AbstractQueueBiObserver(Executor executor, C communicator) {
 		
-		comm.executorService().execute(() -> {
+		this.communicator = communicator;
+		
+		executor.execute(() -> {
 			
 			try {
 				for ( ;; ) {
@@ -55,7 +59,7 @@ public abstract class AbstractQueueBiObserver<C extends AbstractSecsCommunicator
 			}
 			
 			for (B biListener : this.biLstnrs) {
-				this.notifyValueToBiListener(biListener, value, this.comm);
+				this.notifyValueToBiListener(biListener, value, this.communicator);
 			}
 		}
 	}

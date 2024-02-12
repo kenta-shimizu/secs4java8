@@ -55,15 +55,15 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		this.gem = new AbstractGem(this, config.gem()) {};
 		
 		
-		this.secsMsgRecvQueueObserver = new SecsMessageReceiveQueueBiObserver(this);
+		this.secsMsgRecvQueueObserver = new SecsMessageReceiveQueueBiObserver(this.executorService(), this);
 		
-		this.logQueuObserver = new SecsLogQueueObserver(this);
+		this.logQueuObserver = new SecsLogQueueObserver(this.executorService());
 		
 		this.communicatableStatePropOberser = new SecsCommunicatableStatePropertyBiObserver(this, this.communicatable);
 		
-		this.trySendSecsMsgPassThroughQueueBiObserver = new SecsMessagePassThroughQueueBiObserver(this);
-		this.sendedSecsMsgPassThroughQueueBiObserver = new SecsMessagePassThroughQueueBiObserver(this);
-		this.recvSecsMsgPassThroughQueueBiObserver = new SecsMessagePassThroughQueueBiObserver(this);
+		this.trySendSecsMsgPassThroughQueueBiObserver = new SecsMessagePassThroughQueueBiObserver(this.executorService(), this);
+		this.sendedSecsMsgPassThroughQueueBiObserver = new SecsMessagePassThroughQueueBiObserver(this.executorService(), this);
+		this.recvSecsMsgPassThroughQueueBiObserver = new SecsMessagePassThroughQueueBiObserver(this.executorService(), this);
 	}
 	
 	@Override
@@ -141,15 +141,6 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	
 	abstract public Optional<SecsMessage> templateSend(SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException;
-	
-	//TODO
-//	@Override
-//	public Optional<SecsMessage> send(int strm, int func, boolean wbit)
-//			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException
-//			, InterruptedException {
-//		
-//		return templateSend(strm, func, wbit, Secs2.empty());
-//	}
 	
 	@Override
 	public Optional<SecsMessage> send(int strm, int func, boolean wbit, Secs2 secs2)

@@ -1,13 +1,16 @@
 package com.shimizukenta.secs.impl;
 
+import java.util.concurrent.Executor;
+
+import com.shimizukenta.secs.GemAccessor;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessagePassThroughBiListener;
 import com.shimizukenta.secs.SecsMessagePassThroughListener;
 
-public class SecsMessagePassThroughQueueBiObserver extends AbstractQueueBiObserver<AbstractSecsCommunicator, SecsMessagePassThroughListener, SecsMessagePassThroughBiListener, SecsMessage> {
+public class SecsMessagePassThroughQueueBiObserver extends AbstractQueueBiObserver<GemAccessor, SecsMessagePassThroughListener, SecsMessagePassThroughBiListener, SecsMessage> {
 
-	public SecsMessagePassThroughQueueBiObserver(AbstractSecsCommunicator comm) {
-		super(comm);
+	public SecsMessagePassThroughQueueBiObserver(Executor executor, GemAccessor communicator) {
+		super(executor, communicator);
 	}
 
 	@Override
@@ -19,7 +22,7 @@ public class SecsMessagePassThroughQueueBiObserver extends AbstractQueueBiObserv
 	protected void notifyValueToBiListener(
 			SecsMessagePassThroughBiListener biListener,
 			SecsMessage value,
-			AbstractSecsCommunicator communicator) {
+			GemAccessor communicator) {
 		
 		biListener.passThrough(value, communicator);
 	}

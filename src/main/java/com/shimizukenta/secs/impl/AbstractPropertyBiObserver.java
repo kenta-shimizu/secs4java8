@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
+import com.shimizukenta.secs.GemAccessor;
 import com.shimizukenta.secs.local.property.Observable;
 
-public abstract class AbstractPropertyBiObserver<C extends AbstractSecsCommunicator,V, M, B> {
+public abstract class AbstractPropertyBiObserver<C extends GemAccessor,V, M, B> {
 	
 	private final Collection<M> listeners = new ArrayList<>();
 	private final Collection<B> biListeners = new ArrayList<>();

@@ -3,8 +3,8 @@ package com.shimizukenta.secs.hsmsgs.impl;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.shimizukenta.secs.GemAccessor;
 import com.shimizukenta.secs.SecsCommunicatableStateChangeBiListener;
-import com.shimizukenta.secs.SecsCommunicator;
 
 public class HsmsGsSecsCommunicatableBiObserver implements SecsCommunicatableStateChangeBiListener {
 	
@@ -39,7 +39,7 @@ public class HsmsGsSecsCommunicatableBiObserver implements SecsCommunicatableSta
 	}
 
 	@Override
-	public void changed(boolean communicatable, SecsCommunicator communicator) {
+	public void changed(boolean communicatable, GemAccessor communicator) {
 		
 		for ( SecsCommunicatableStateChangeBiListener l : this.biListener ) {
 			l.changed(communicatable, communicator);

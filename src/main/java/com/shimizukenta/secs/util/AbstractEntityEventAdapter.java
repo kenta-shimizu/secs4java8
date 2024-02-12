@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import com.shimizukenta.secs.GemAccessor;
 import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
@@ -26,14 +27,14 @@ public abstract class AbstractEntityEventAdapter implements EntityEventAdapter {
 	}
 	
 	@Override
-	public void changed(boolean communicatable, SecsCommunicator communicator) {
+	public void changed(boolean communicatable, GemAccessor communicator) {
 		for ( EntityCommunicatableStateChangeListener l : this.communicatableLstners ) {
 			l.changed(communicatable, communicator);
 		}
 	}
 	
 	@Override
-	public void received(SecsMessage message, SecsCommunicator communicator) {
+	public void received(SecsMessage message, GemAccessor communicator) {
 		
 		try {
 			
@@ -97,7 +98,7 @@ public abstract class AbstractEntityEventAdapter implements EntityEventAdapter {
 		}
 	}
 	
-	private static boolean equalsDeviceIdOrSessionId(SecsMessage message, SecsCommunicator communicator) {
+	private static boolean equalsDeviceIdOrSessionId(SecsMessage message, GemAccessor communicator) {
 		
 		int msgId = message.deviceId();
 		int commId = communicator.deviceId();

@@ -1,5 +1,7 @@
 package com.shimizukenta.secs.hsmsss.impl;
 
+import java.util.concurrent.Executor;
+
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessagePassThroughListener;
 import com.shimizukenta.secs.hsmsss.HsmsSsMessagePassThroughBiListener;
@@ -7,8 +9,8 @@ import com.shimizukenta.secs.impl.AbstractQueueBiObserver;
 
 public class HsmsSsMessagePassThroughQueueBiObserver extends AbstractQueueBiObserver<AbstractHsmsSsCommunicator, HsmsMessagePassThroughListener, HsmsSsMessagePassThroughBiListener, HsmsMessage> {
 
-	public HsmsSsMessagePassThroughQueueBiObserver(AbstractHsmsSsCommunicator communicator) {
-		super(communicator);
+	public HsmsSsMessagePassThroughQueueBiObserver(Executor executor, AbstractHsmsSsCommunicator communicator) {
+		super(executor, communicator);
 	}
 	
 	@Override

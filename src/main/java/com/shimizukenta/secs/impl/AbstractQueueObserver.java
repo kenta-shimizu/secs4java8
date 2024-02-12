@@ -5,6 +5,7 @@ import java.util.EventListener;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -13,9 +14,9 @@ public abstract class AbstractQueueObserver<L extends EventListener, V> {
 	private final Collection<L> lstnrs = new CopyOnWriteArrayList<>();
 	private final BlockingQueue<V> queue = new LinkedBlockingQueue<>();
 	
-	public AbstractQueueObserver(AbstractBaseCommunicator comm) {
+	public AbstractQueueObserver(Executor executor) {
 		
-		comm.executorService().execute(() -> {
+		executor.execute(() -> {
 			
 			try {
 				for ( ;; ) {

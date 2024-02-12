@@ -53,12 +53,12 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractHsmsCommunicato
 		
 		this.session = new AbstractHsmsSsSession(config) {};
 		
-		this.hsmsSsMsgRecvQueueBiObserver = new HsmsSsMessageReceiveQueueBiObserver(this);
+		this.hsmsSsMsgRecvQueueBiObserver = new HsmsSsMessageReceiveQueueBiObserver(this.executorService(), this);
 		this.hsmsStatePropBiObserver = new HsmsSsCommunicateStatePropertyBiObserver(this, this.getHsmsCommunicateState());
 		
-		this.trySendHsmsSsMsgPassThroughQueueBiObserver = new HsmsSsMessagePassThroughQueueBiObserver(this);
-		this.sendedHsmsSsMsgPassThroughQueueBiObserver = new HsmsSsMessagePassThroughQueueBiObserver(this);
-		this.recvHsmsSsMsgPassThroughQueueBiObserver = new HsmsSsMessagePassThroughQueueBiObserver(this);
+		this.trySendHsmsSsMsgPassThroughQueueBiObserver = new HsmsSsMessagePassThroughQueueBiObserver(this.executorService(), this);
+		this.sendedHsmsSsMsgPassThroughQueueBiObserver = new HsmsSsMessagePassThroughQueueBiObserver(this.executorService(), this);
+		this.recvHsmsSsMsgPassThroughQueueBiObserver = new HsmsSsMessagePassThroughQueueBiObserver(this.executorService(), this);
 	}
 	
 	@Override
