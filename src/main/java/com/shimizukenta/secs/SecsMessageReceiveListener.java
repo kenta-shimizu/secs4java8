@@ -6,7 +6,6 @@ import java.util.EventListener;
  * SecsMessage receive Listener.
  * 
  * <p>
- * This interface is used in {@link SecsCommunicator#addSecsMessageReceiveListener(SecsMessageReceiveListener)}<br />
  * Receive-Message is only Primary-SecsMessage.<br />
  * </p>
  * 

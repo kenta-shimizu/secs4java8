@@ -1,12 +1,13 @@
 package com.shimizukenta.secs.impl;
 
+import com.shimizukenta.secs.GemAccessor;
 import com.shimizukenta.secs.SecsCommunicatableStateChangeBiListener;
 import com.shimizukenta.secs.SecsCommunicatableStateChangeListener;
 import com.shimizukenta.secs.local.property.Observable;
 
-public class SecsCommunicatableStatePropertyBiObserver extends AbstractPropertyBiObserver<AbstractSecsCommunicator, Boolean, SecsCommunicatableStateChangeListener, SecsCommunicatableStateChangeBiListener> {
+public class SecsCommunicatableStatePropertyBiObserver extends AbstractPropertyBiObserver<GemAccessor, Boolean, SecsCommunicatableStateChangeListener, SecsCommunicatableStateChangeBiListener> {
 
-	public SecsCommunicatableStatePropertyBiObserver(AbstractSecsCommunicator communicator, Observable<Boolean> observer) {
+	public SecsCommunicatableStatePropertyBiObserver(GemAccessor communicator, Observable<Boolean> observer) {
 		super(communicator, observer);
 	}
 
@@ -19,7 +20,7 @@ public class SecsCommunicatableStatePropertyBiObserver extends AbstractPropertyB
 	protected void notifyValueToBiListener(
 			SecsCommunicatableStateChangeBiListener biListener,
 			Boolean value,
-			AbstractSecsCommunicator communicator) {
+			GemAccessor communicator) {
 		
 		biListener.changed(value.booleanValue(), communicator);
 	}

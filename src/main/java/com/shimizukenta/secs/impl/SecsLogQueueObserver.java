@@ -1,12 +1,14 @@
 package com.shimizukenta.secs.impl;
 
+import java.util.concurrent.Executor;
+
 import com.shimizukenta.secs.SecsLog;
 import com.shimizukenta.secs.SecsLogListener;
 
 public class SecsLogQueueObserver extends AbstractQueueObserver<SecsLogListener, SecsLog> {
 	
-	public SecsLogQueueObserver(AbstractBaseCommunicator comm) {
-		super(comm);
+	public SecsLogQueueObserver(Executor executor) {
+		super(executor);
 	}
 	
 	@Override

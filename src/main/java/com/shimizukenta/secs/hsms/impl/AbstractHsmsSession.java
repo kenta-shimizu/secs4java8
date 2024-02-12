@@ -37,12 +37,12 @@ public abstract class AbstractHsmsSession extends AbstractHsmsCommunicator imple
 	public AbstractHsmsSession(AbstractHsmsCommunicatorConfig config) {
 		super(config);
 		
-		this.hsmsSessionMsgRecvQueueBiObserver = new HsmsSessionMessageReceiveQueueBiObserver(this);
+		this.hsmsSessionMsgRecvQueueBiObserver = new HsmsSessionMessageReceiveQueueBiObserver(this.executorService(), this);
 		this.hsmsStatePropBiObserver = new HsmsSessionCommunicateStatePropertyBiObserver(this, this.getHsmsCommunicateState());
 		
-		this.trySendHsmsMsgPassThroughQueueBiObserver = new HsmsSessionMessagePassThroughQueueBiObserver(this);
-		this.sendedHsmsMsgPassThroughQueueBiObserver = new HsmsSessionMessagePassThroughQueueBiObserver(this);
-		this.recvHsmsMsgPassThroughQueueBiObserver = new HsmsSessionMessagePassThroughQueueBiObserver(this);
+		this.trySendHsmsMsgPassThroughQueueBiObserver = new HsmsSessionMessagePassThroughQueueBiObserver(this.executorService(), this);
+		this.sendedHsmsMsgPassThroughQueueBiObserver = new HsmsSessionMessagePassThroughQueueBiObserver(this.executorService(), this);
+		this.recvHsmsMsgPassThroughQueueBiObserver = new HsmsSessionMessagePassThroughQueueBiObserver(this.executorService(), this);
 	}
 	
 	private final ObjectProperty<AbstractHsmsAsyncSocketChannel> channel = ObjectProperty.newInstance(null);

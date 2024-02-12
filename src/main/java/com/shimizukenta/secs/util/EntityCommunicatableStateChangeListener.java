@@ -2,7 +2,7 @@ package com.shimizukenta.secs.util;
 
 import java.util.EventListener;
 
-import com.shimizukenta.secs.SecsCommunicator;
+import com.shimizukenta.secs.GemAccessor;
 
 /**
  * 
@@ -11,5 +11,5 @@ import com.shimizukenta.secs.SecsCommunicator;
  */
 public interface EntityCommunicatableStateChangeListener extends EventListener {
 	
-	public void changed(boolean communicatable, SecsCommunicator comm);
+	public void changed(boolean communicatable, GemAccessor comm);
 }

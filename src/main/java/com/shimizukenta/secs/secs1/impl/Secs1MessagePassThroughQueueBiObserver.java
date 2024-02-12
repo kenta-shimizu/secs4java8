@@ -1,5 +1,7 @@
 package com.shimizukenta.secs.secs1.impl;
 
+import java.util.concurrent.Executor;
+
 import com.shimizukenta.secs.impl.AbstractQueueBiObserver;
 import com.shimizukenta.secs.secs1.Secs1Message;
 import com.shimizukenta.secs.secs1.Secs1MessagePassThroughBiListener;
@@ -7,8 +9,8 @@ import com.shimizukenta.secs.secs1.Secs1MessagePassThroughListener;
 
 public class Secs1MessagePassThroughQueueBiObserver extends AbstractQueueBiObserver<AbstractSecs1Communicator, Secs1MessagePassThroughListener, Secs1MessagePassThroughBiListener, Secs1Message> {
 
-	public Secs1MessagePassThroughQueueBiObserver(AbstractSecs1Communicator comm) {
-		super(comm);
+	public Secs1MessagePassThroughQueueBiObserver(Executor executor, AbstractSecs1Communicator comm) {
+		super(executor, comm);
 	}
 	
 	@Override

@@ -6,7 +6,6 @@ import java.util.EventListener;
  * SecsMessage receive Listener.
  * 
  * <p>
- * This interface is used in {@link SecsCommunicator#addSecsMessageReceiveBiListener(SecsMessageReceiveBiListener)}<br />
  * Receive-Message is only Primary-SecsMessage.<br />
  * </p>
  * 
@@ -15,11 +14,11 @@ import java.util.EventListener;
 public interface SecsMessageReceiveBiListener extends EventListener {
 	
 	/**
-	 * Putter Received Primary-SecsMessage and SecsCommunicator.
+	 * Putter Received Primary-SecsMessage and GemAccessor.
 	 * 
 	 * @param message only Primary-SecsMessage
-	 * @param communicator the SecsCommunicator
+	 * @param communicator the GemAccessor
 	 */
-	public void received(SecsMessage message, SecsCommunicator communicator);
+	public void received(SecsMessage message, GemAccessor communicator);
 
 }

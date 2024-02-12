@@ -80,15 +80,15 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		this.secsCommStatableObserver = new HsmsGsSecsCommunicatableBiObserver();
 		this.hsmsCommStateObserver = new HsmsGsHsmsCommunicateStateBiObserver();
 		
-		this.trySendHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this);
-		this.sendedHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this);
-		this.recvHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this);
+		this.trySendHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this.executorService());
+		this.sendedHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this.executorService());
+		this.recvHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this.executorService());
 		
 		this.trySendHsmsMsgPassThroughBiObserver = new HsmsGsMessagePassThroughBiObserver();
 		this.sendedHsmsMsgPassThroughBiObserver = new HsmsGsMessagePassThroughBiObserver();
 		this.recvHsmsMsgPassThroughBiObserver = new HsmsGsMessagePassThroughBiObserver();
 		
-		this.logQueueObserver = new SecsLogQueueObserver(this);
+		this.logQueueObserver = new SecsLogQueueObserver(this.executorService());
 		
 		for (HsmsSession s : this.sessions) {
 			

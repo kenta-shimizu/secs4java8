@@ -1,5 +1,7 @@
 package com.shimizukenta.secs.hsms.impl;
 
+import java.util.concurrent.Executor;
+
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageReceiveListener;
 import com.shimizukenta.secs.hsms.HsmsSessionMessageReceiveBiListener;
@@ -7,8 +9,8 @@ import com.shimizukenta.secs.impl.AbstractQueueBiObserver;
 
 public class HsmsSessionMessageReceiveQueueBiObserver extends AbstractQueueBiObserver<AbstractHsmsSession, HsmsMessageReceiveListener, HsmsSessionMessageReceiveBiListener, HsmsMessage> {
 
-	public HsmsSessionMessageReceiveQueueBiObserver(AbstractHsmsSession comm) {
-		super(comm);
+	public HsmsSessionMessageReceiveQueueBiObserver(Executor executor, AbstractHsmsSession comm) {
+		super(executor, comm);
 	}
 
 	@Override
