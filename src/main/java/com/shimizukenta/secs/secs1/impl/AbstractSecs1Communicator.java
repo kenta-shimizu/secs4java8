@@ -48,11 +48,11 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		this.msgBuilder = new AbstractSecs1MessageBuilder() {};
 		this.circuit = new AbstractSecs1Circuit(this) {};
 		
-		this.secs1MsgRecvQueueBiObserver = new Secs1MessageReceiveQueueBiObserver(this);
+		this.secs1MsgRecvQueueBiObserver = new Secs1MessageReceiveQueueBiObserver(this.executorService(), this);
 		
-		this.trySendSecs1MsgPassThroughQueueBiObserver = new Secs1MessagePassThroughQueueBiObserver(this);
-		this.sendedSecs1MsgPassThroughQueueBiObserver = new Secs1MessagePassThroughQueueBiObserver(this);
-		this.recvSecs1MsgPassThroughQueueBiObserver = new Secs1MessagePassThroughQueueBiObserver(this);
+		this.trySendSecs1MsgPassThroughQueueBiObserver = new Secs1MessagePassThroughQueueBiObserver(this.executorService(), this);
+		this.sendedSecs1MsgPassThroughQueueBiObserver = new Secs1MessagePassThroughQueueBiObserver(this.executorService(), this);
+		this.recvSecs1MsgPassThroughQueueBiObserver = new Secs1MessagePassThroughQueueBiObserver(this.executorService(), this);
 	}
 	
 	public AbstractSecs1CommunicatorConfig config() {

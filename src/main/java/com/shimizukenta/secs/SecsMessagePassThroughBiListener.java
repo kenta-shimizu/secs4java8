@@ -14,8 +14,8 @@ public interface SecsMessagePassThroughBiListener extends EventListener {
 	 * Pass-through SECS-Message and SecsCommunicator Listener.
 	 * 
 	 * @param message the SecsMessage
-	 * @param communicator the SecsCommunicator
+	 * @param communicator the GemAccessor
 	 */
-	public void passThrough(SecsMessage message, SecsCommunicator communicator);
+	public void passThrough(SecsMessage message, GemAccessor communicator);
 	
 }

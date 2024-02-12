@@ -5,10 +5,6 @@ import java.util.EventListener;
 /**
  * SECS-Communicate-State Change Listener.
  * 
- * <p>
- * This interface is called in {@link SecsCommunicator#addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener)}<br />
- * </p>
- * 
  * @author kenta-shimizu
  *
  */
@@ -23,8 +19,8 @@ public interface SecsCommunicatableStateChangeBiListener extends EventListener {
 	 * </p>
 	 * 
 	 * @param communicatable true if state is communicatable
-	 * @param communicator the SecsCommunicator
+	 * @param communicator the GemAccessor
 	 */
-	public void changed(boolean communicatable, SecsCommunicator communicator);
+	public void changed(boolean communicatable, GemAccessor communicator);
 	
 }

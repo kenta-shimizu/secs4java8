@@ -47,7 +47,7 @@ import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicatorConfig;
  * @author kenta-shimizu
  *
  */
-public interface SecsCommunicator extends OpenAndCloseable, GemAccessor, SecsMessageListenable, SecsCommunicateStateDetectable {
+public interface SecsCommunicator extends OpenAndCloseable, GemAccessor, SecsMessageObservable, SecsCommunicateStateDetectable {
 	
 	/**
 	 * Open and wait until communicatable.
@@ -79,30 +79,6 @@ public interface SecsCommunicator extends OpenAndCloseable, GemAccessor, SecsMes
 	 * @throws TimeoutException if timeout
 	 */
 	public void openAndWaitUntilCommunicatable(long timeout, TimeUnit unit) throws IOException, InterruptedException, TimeoutException;
-	
-	
-	/* Secs-Message Receive Listener */
-	
-	/**
-	 * Add Listener to receive Primary-Message.
-	 * 
-	 * <p>
-	 * This Listener not receive Reply-Message.<br />
-	 * </p>
-	 * 
-	 * @param listener Not accept {@code null}
-	 * @return {@code true} if add success
-	 */
-	public boolean addSecsMessageReceiveListener(SecsMessageReceiveListener listener);
-	
-	/**
-	 * Remove Listener.
-	 * 
-	 * @param listener Not accept {@code null}
-	 * @return {@code true} if remove success
-	 */
-	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveListener listener);
-	
 	
 	
 	/* Secs-Log Receive Listener */

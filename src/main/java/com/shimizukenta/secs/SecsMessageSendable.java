@@ -151,7 +151,7 @@ public interface SecsMessageSendable {
 			SecsException,
 			InterruptedException {
 		
-		return this.send(sml.getStream(), sml.getFunction(), sml.wbit(), Secs2.empty());
+		return this.send(sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
 	}
 	
 	/**
@@ -176,7 +176,7 @@ public interface SecsMessageSendable {
 			SecsException,
 			InterruptedException {
 		
-		return this.send(primaryMsg, sml.getStream(), sml.getFunction(), sml.wbit(), Secs2.empty());
+		return this.send(primaryMsg, sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
 	}
 	
 }
