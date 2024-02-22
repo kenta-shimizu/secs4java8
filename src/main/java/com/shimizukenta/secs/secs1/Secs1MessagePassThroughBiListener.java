@@ -8,6 +8,7 @@ import java.util.EventListener;
  * @author kenta-shimizu
  *
  */
+@Deprecated
 public interface Secs1MessagePassThroughBiListener extends EventListener {
 	
 	/**

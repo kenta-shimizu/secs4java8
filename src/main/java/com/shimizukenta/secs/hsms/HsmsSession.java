@@ -84,7 +84,10 @@ public interface HsmsSession extends HsmsCommunicator {
 	 * @param biListener the pass through message bi-listener
 	 * @return true if add success
 	 */
-	public boolean addTrySendHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);
+	@Deprecated
+	default public boolean addTrySendHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener) {
+		throw new UnsupportedOperationException();
+	}
 	
 	/**
 	 * Remove listener.
@@ -92,7 +95,10 @@ public interface HsmsSession extends HsmsCommunicator {
 	 * @param biListener the pass through message bi-listener
 	 * @return true if remove success
 	 */
-	public boolean removeTrySendHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);	
+	@Deprecated
+	default public boolean removeTrySendHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener) {
+		throw new UnsupportedOperationException();
+	}
 	
 	/**
 	 * Add Listener to get HsmsMesssage sended.
@@ -100,7 +106,10 @@ public interface HsmsSession extends HsmsCommunicator {
 	 * @param biListener the pass through message bi-listener
 	 * @return true if add success
 	 */
-	public boolean addSendedHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);
+	@Deprecated
+	default public boolean addSendedHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener) {
+		throw new UnsupportedOperationException();
+	}
 	
 	/**
 	 * Remove listener.
@@ -108,7 +117,10 @@ public interface HsmsSession extends HsmsCommunicator {
 	 * @param biListener the pass through message bi-listener
 	 * @return true if remove success
 	 */
-	public boolean removeSendedHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);	
+	@Deprecated
+	default public boolean removeSendedHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener) {
+		throw new UnsupportedOperationException();
+	}
 	
 	/**
 	 * Add Listener to receive both Primary and Reply Message.
@@ -116,7 +128,10 @@ public interface HsmsSession extends HsmsCommunicator {
 	 * @param biListener the pass through message bi-listener
 	 * @return true if add success
 	 */
-	public boolean addReceiveHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);
+	@Deprecated
+	default public boolean addReceiveHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener) {
+		throw new UnsupportedOperationException();
+	}
 	
 	/**
 	 * Remove listener.
@@ -124,6 +139,9 @@ public interface HsmsSession extends HsmsCommunicator {
 	 * @param biListener the pass through message bi-listener
 	 * @return true if remove success
 	 */
-	public boolean removeReceiveHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener);	
+	@Deprecated
+	default public boolean removeReceiveHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener) {
+		throw new UnsupportedOperationException();
+	}
 	
 }

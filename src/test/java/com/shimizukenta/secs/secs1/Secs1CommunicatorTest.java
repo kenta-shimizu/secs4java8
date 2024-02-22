@@ -87,7 +87,7 @@ class Secs1CommunicatorTest {
 		return receiverCommunicator(getInetSocketAddress(), isEquip, isMaster);
 	}
 	
-	private static final Secs1MessageReceiveBiListener equipReceiveListener = (Secs1Message primaryMsg, Secs1Communicator comm) -> {
+	private static final Secs1MessageReceiveBiListener equipReceiveListener = (Secs1Message primaryMsg, Secs1GemAccessor comm) -> {
 		
 		int strm = primaryMsg.getStream();
 		int func = primaryMsg.getFunction();
@@ -167,7 +167,7 @@ class Secs1CommunicatorTest {
 		}
 	};
 	
-	private static final Secs1MessageReceiveBiListener hostReceiveListener = (Secs1Message primaryMsg, Secs1Communicator comm) -> {
+	private static final Secs1MessageReceiveBiListener hostReceiveListener = (Secs1Message primaryMsg, Secs1GemAccessor comm) -> {
 		
 		int strm = primaryMsg.getStream();
 		int func = primaryMsg.getFunction();

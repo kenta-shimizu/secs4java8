@@ -7,6 +7,7 @@ import com.shimizukenta.secs.hsms.HsmsMessagePassThroughListener;
 import com.shimizukenta.secs.hsms.HsmsSessionMessagePassThroughBiListener;
 import com.shimizukenta.secs.impl.AbstractQueueBiObserver;
 
+@Deprecated
 public class HsmsSessionMessagePassThroughQueueBiObserver extends AbstractQueueBiObserver<AbstractHsmsSession, HsmsMessagePassThroughListener, HsmsSessionMessagePassThroughBiListener, HsmsMessage> {
 
 	public HsmsSessionMessagePassThroughQueueBiObserver(Executor executor, AbstractHsmsSession comm) {

@@ -2,14 +2,14 @@ package com.shimizukenta.secs.impl;
 
 import java.util.concurrent.Executor;
 
-import com.shimizukenta.secs.GemAccessor;
+import com.shimizukenta.secs.SecsGemAccessor;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessageReceiveBiListener;
 import com.shimizukenta.secs.SecsMessageReceiveListener;
 
-public class SecsMessageReceiveQueueBiObserver extends AbstractQueueBiObserver<GemAccessor, SecsMessageReceiveListener, SecsMessageReceiveBiListener, SecsMessage> {
+public class SecsMessageReceiveQueueBiObserver extends AbstractQueueBiObserver<SecsGemAccessor, SecsMessageReceiveListener, SecsMessageReceiveBiListener, SecsMessage> {
 
-	public SecsMessageReceiveQueueBiObserver(Executor executor, GemAccessor comm) {
+	public SecsMessageReceiveQueueBiObserver(Executor executor, SecsGemAccessor comm) {
 		super(executor, comm);
 	}
 
@@ -22,7 +22,7 @@ public class SecsMessageReceiveQueueBiObserver extends AbstractQueueBiObserver<G
 	protected void notifyValueToBiListener(
 			SecsMessageReceiveBiListener biListener,
 			SecsMessage value,
-			GemAccessor communicator) {
+			SecsGemAccessor communicator) {
 		
 		biListener.received(value, communicator);
 	}

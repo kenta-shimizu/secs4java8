@@ -3,12 +3,12 @@ package com.shimizukenta.secs;
 import com.shimizukenta.secs.gem.Gem;
 
 /**
- * GEM Accessor.
+ * SECS GEM Accessor.
  * 
  * @author kenta-shimizu
  *
  */
-public interface GemAccessor extends SecsCommunicatorConfigValueGettable, SecsMessageSendable {
+public interface SecsGemAccessor extends SecsCommunicatorConfigValueGettable, SecsMessageSendable {
 	
 	/**
 	 * Returns GEM-interface.
