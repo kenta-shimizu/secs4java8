@@ -32,7 +32,6 @@ import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsSession;
 import com.shimizukenta.secs.hsms.HsmsSessionCommunicateStateChangeBiListener;
-import com.shimizukenta.secs.hsms.HsmsSessionMessagePassThroughBiListener;
 import com.shimizukenta.secs.hsms.HsmsSessionMessageReceiveBiListener;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.impl.AbstractHsmsAsyncSocketChannel;
@@ -65,10 +64,6 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	private final HsmsMessagePassThroughQueueObserver sendedHsmsMsgPassThroughQueueObserver;
 	private final HsmsMessagePassThroughQueueObserver recvHsmsMsgPassThroughQueueObserver;
 	
-	private final HsmsGsMessagePassThroughBiObserver trySendHsmsMsgPassThroughBiObserver;
-	private final HsmsGsMessagePassThroughBiObserver sendedHsmsMsgPassThroughBiObserver;
-	private final HsmsGsMessagePassThroughBiObserver recvHsmsMsgPassThroughBiObserver;
-	
 	public AbstractHsmsGsCommunicator(HsmsGsCommunicatorConfig config) {
 		this.config = config;
 		this.sessions = config.sessionIds().stream()
@@ -84,10 +79,6 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		this.sendedHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this.executorService());
 		this.recvHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this.executorService());
 		
-		this.trySendHsmsMsgPassThroughBiObserver = new HsmsGsMessagePassThroughBiObserver();
-		this.sendedHsmsMsgPassThroughBiObserver = new HsmsGsMessagePassThroughBiObserver();
-		this.recvHsmsMsgPassThroughBiObserver = new HsmsGsMessagePassThroughBiObserver();
-		
 		this.logQueueObserver = new SecsLogQueueObserver(this.executorService());
 		
 		for (HsmsSession s : this.sessions) {
@@ -96,10 +87,6 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 			
 			s.addSecsCommunicatableStateChangeBiListener(this.secsCommStatableObserver);
 			s.addHsmsCommunicateStateChangeBiListener(this.hsmsCommStateObserver);
-			
-			s.addTrySendHsmsMessagePassThroughBiListener(this.trySendHsmsMsgPassThroughBiObserver);
-			s.addSendedHsmsMessagePassThroughBiListener(this.sendedHsmsMsgPassThroughBiObserver);
-			s.addReceiveHsmsMessagePassThroughBiListener(this.recvHsmsMsgPassThroughBiObserver);
 		}
 	}
 	
@@ -593,16 +580,6 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		return this.trySendHsmsMsgPassThroughQueueObserver.removeListener(listener);
 	}
 	
-	@Override
-	public boolean addTrySendHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener) {
-		return this.trySendHsmsMsgPassThroughBiObserver.addBiListener(biListener);
-	}
-	
-	@Override
-	public boolean removeTrySendHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener) {
-		return this.trySendHsmsMsgPassThroughBiObserver.removeBiListener(biListener);
-	}
-	
 	public void notifyTrySendHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
 		this.trySendHsmsMsgPassThroughQueueObserver.put(msg);
 		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
@@ -625,16 +602,6 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		return this.sendedHsmsMsgPassThroughQueueObserver.removeListener(listener);
 	}
 	
-	@Override
-	public boolean addSendedHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener) {
-		return this.sendedHsmsMsgPassThroughBiObserver.addBiListener(biListener);
-	}
-	
-	@Override
-	public boolean removeSendedHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener) {
-		return this.sendedHsmsMsgPassThroughBiObserver.removeBiListener(biListener);
-	}
-	
 	public void notifySendedHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
 		this.sendedHsmsMsgPassThroughQueueObserver.put(msg);
 		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
@@ -646,26 +613,6 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	
 	
 	/* Receive HSMS Message Pass Through */
-	
-	@Override
-	public boolean addReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener) {
-		return this.recvHsmsMsgPassThroughQueueObserver.addListener(listener);
-	}
-	
-	@Override
-	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener) {
-		return this.recvHsmsMsgPassThroughQueueObserver.removeListener(listener);
-	}
-	
-	@Override
-	public boolean addReceiveHsmsMessagePassThroughBiListener(HsmsSessionMessagePassThroughBiListener biListener) {
-		return this.recvHsmsMsgPassThroughBiObserver.addBiListener(biListener);
-	}
-	
-	@Override
-	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsSessionMessagePassThroughBiListener biListener) {
-		return this.recvHsmsMsgPassThroughBiObserver.removeBiListener(biListener);
-	}
 	
 	public void notifyReceiveHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
 		this.recvHsmsMsgPassThroughQueueObserver.put(msg);

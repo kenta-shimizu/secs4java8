@@ -8,6 +8,7 @@ import java.util.EventListener;
  * @author kenta-shimizu
  *
  */
+@Deprecated
 public interface SecsMessagePassThroughBiListener extends EventListener {
 	
 	/**
@@ -16,6 +17,6 @@ public interface SecsMessagePassThroughBiListener extends EventListener {
 	 * @param message the SecsMessage
 	 * @param communicator the GemAccessor
 	 */
-	public void passThrough(SecsMessage message, GemAccessor communicator);
+	public void passThrough(SecsMessage message, SecsGemAccessor communicator);
 	
 }

@@ -47,7 +47,7 @@ import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicatorConfig;
  * @author kenta-shimizu
  *
  */
-public interface SecsCommunicator extends OpenAndCloseable, GemAccessor, SecsMessageObservable, SecsCommunicateStateDetectable {
+public interface SecsCommunicator extends OpenAndCloseable, SecsGemAccessor, SecsMessageObservable, SecsCommunicateStateDetectable {
 	
 	/**
 	 * Open and wait until communicatable.
