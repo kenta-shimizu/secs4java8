@@ -21,6 +21,6 @@ public interface SecsCommunicatableStateChangeBiListener extends EventListener {
 	 * @param communicatable true if state is communicatable
 	 * @param communicator the GemAccessor
 	 */
-	public void changed(boolean communicatable, GemAccessor communicator);
+	public void changed(boolean communicatable, SecsGemAccessor communicator);
 	
 }

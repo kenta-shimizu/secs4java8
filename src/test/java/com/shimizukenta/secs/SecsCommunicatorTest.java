@@ -78,7 +78,7 @@ class SecsCommunicatorTest {
 		return HsmsSsCommunicator.newInstance(passiveCommunicatorConfig(socketAddr, isEquip));
 	}
 	
-	private static final SecsMessageReceiveBiListener equipReceiveListener = (SecsMessage primaryMsg, GemAccessor comm) -> {
+	private static final SecsMessageReceiveBiListener equipReceiveListener = (SecsMessage primaryMsg, SecsGemAccessor comm) -> {
 		
 		int strm = primaryMsg.getStream();
 		int func = primaryMsg.getFunction();
@@ -176,7 +176,7 @@ class SecsCommunicatorTest {
 		}
 	};
 	
-	private static final SecsMessageReceiveBiListener hostReceiveListener = (SecsMessage primaryMsg, GemAccessor comm) -> {
+	private static final SecsMessageReceiveBiListener hostReceiveListener = (SecsMessage primaryMsg, SecsGemAccessor comm) -> {
 		
 		int strm = primaryMsg.getStream();
 		int func = primaryMsg.getFunction();

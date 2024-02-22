@@ -20,6 +20,6 @@ public interface Secs1MessageReceiveBiListener extends EventListener {
 	 * @param message only Primary-SecsMessage
 	 * @param communicator the Secs1Communicator
 	 */
-	public void received(Secs1Message message, Secs1Communicator communicator);
+	public void received(Secs1Message message, Secs1GemAccessor communicator);
 	
 }

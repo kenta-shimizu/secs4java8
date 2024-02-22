@@ -65,22 +65,6 @@ public interface SecsMessageObservable {
 	 */
 	public boolean removeTrySendSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);	
 	
-	/**
-	 * Add Listener to get SecsMesssage before sending.
-	 * 
-	 * @param biListener Not accept {@code null}
-	 * @return {@code true} if add success.
-	 */
-	public boolean addTrySendSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener);
-	
-	/**
-	 * Remove Listener.
-	 * 
-	 * @param biListener Not accept {@code null}
-	 * @return {@code true} if remove success
-	 */
-	public boolean removeTrySendSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener);	
-	
 	
 	/**
 	 * Add Listener to get sended SecsMesssage.
@@ -97,22 +81,6 @@ public interface SecsMessageObservable {
 	 * @return {@code true} if remove success
 	 */
 	public boolean removeSendedSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);	
-	
-	/**
-	 * Add Listener to get sended SecsMesssage.
-	 * 
-	 * @param biListener Not accept {@code null}
-	 * @return {@code true} if add success
-	 */
-	public boolean addSendedSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener);
-	
-	/**
-	 * Remove Listener.
-	 * 
-	 * @param biListener Not accept {@code null}
-	 * @return {@code true} if remove success
-	 */
-	public boolean removeSendedSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener);	
 	
 	
 	/**
@@ -131,13 +99,20 @@ public interface SecsMessageObservable {
 	 */
 	public boolean removeReceiveSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);
 	
+	
+	
+	/* Deprecateds */
+	
 	/**
-	 * Add BiListener to receive both Primary and Reply Message.
+	 * Add Listener to get SecsMesssage before sending.
 	 * 
 	 * @param biListener Not accept {@code null}
-	 * @return {@code true} if add success
+	 * @return {@code true} if add success.
 	 */
-	public boolean addReceiveSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener);
+	@Deprecated
+	default public boolean addTrySendSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener) {
+		throw new UnsupportedOperationException();
+	}
 	
 	/**
 	 * Remove Listener.
@@ -145,7 +120,53 @@ public interface SecsMessageObservable {
 	 * @param biListener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeReceiveSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener);
-
-
+	@Deprecated
+	default public boolean removeTrySendSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener) {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * Add Listener to get sended SecsMesssage.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	@Deprecated
+	default public boolean addSendedSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener) {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	@Deprecated
+	default public boolean removeSendedSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener) {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * Add BiListener to receive both Primary and Reply Message.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	@Deprecated
+	default public boolean addReceiveSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener) {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	@Deprecated
+	default public boolean removeReceiveSecsMessagePassThroughBiListener(SecsMessagePassThroughBiListener biListener) {
+		throw new UnsupportedOperationException();
+	}
+	
 }

@@ -8,6 +8,7 @@ import com.shimizukenta.secs.hsms.HsmsMessagePassThroughListener;
 import com.shimizukenta.secs.hsms.HsmsSession;
 import com.shimizukenta.secs.hsms.HsmsSessionMessagePassThroughBiListener;
 
+@Deprecated
 public class HsmsGsMessagePassThroughBiObserver implements HsmsSessionMessagePassThroughBiListener {
 	
 	private final Collection<HsmsMessagePassThroughListener> hsmsLstnrs = new CopyOnWriteArrayList<>();

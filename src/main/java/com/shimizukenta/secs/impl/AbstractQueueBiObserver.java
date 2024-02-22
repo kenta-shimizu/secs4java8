@@ -9,9 +9,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import com.shimizukenta.secs.GemAccessor;
+import com.shimizukenta.secs.SecsGemAccessor;
 
-public abstract class AbstractQueueBiObserver<C extends GemAccessor, M extends EventListener, B extends EventListener, V> {
+public abstract class AbstractQueueBiObserver<C extends SecsGemAccessor, M extends EventListener, B extends EventListener, V> {
 	
 	private final BlockingQueue<V> queue = new LinkedBlockingQueue<>();
 	private final Collection<M> lstnrs = new ArrayList<>();

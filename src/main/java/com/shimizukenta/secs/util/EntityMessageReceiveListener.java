@@ -2,7 +2,7 @@ package com.shimizukenta.secs.util;
 
 import java.util.EventListener;
 
-import com.shimizukenta.secs.GemAccessor;
+import com.shimizukenta.secs.SecsGemAccessor;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.secs2.Secs2Exception;
 
@@ -13,5 +13,5 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
  */
 public interface EntityMessageReceiveListener extends EventListener {
 	
-	public void received(SecsMessage msg, GemAccessor comm) throws Secs2Exception, InterruptedException;
+	public void received(SecsMessage msg, SecsGemAccessor comm) throws Secs2Exception, InterruptedException;
 }
