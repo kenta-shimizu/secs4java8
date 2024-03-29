@@ -63,7 +63,7 @@ public class PairHsmsGs {
 					HsmsGsCommunicator equipComm = HsmsGsCommunicator.newInstance(equipConfig);
 					) {
 				
-				equipComm.addSecsLogListener(log -> {echo(log);});
+//				equipComm.addSecsLogListener(log -> {echo(log);});
 				
 				equipComm.addSecsMessageReceiveBiListener((msg, comm) -> {
 					
@@ -115,13 +115,13 @@ public class PairHsmsGs {
 						HsmsGsCommunicator hostComm = HsmsGsCommunicator.newInstance(hostConfig);
 						) {
 					
-					hostComm.addSecsLogListener(log -> {echo(log);});
+//					hostComm.addSecsLogListener(log -> {echo(log);});
 					
 					hostComm.open();
 					
-					equipComm.getSession(session1).waitUntilCommunicatable();
+					equipComm.getHsmsSession(session1).waitUntilCommunicatable();
 					
-					HsmsSession hostSession1 = hostComm.getSession(session1);
+					HsmsSession hostSession1 = hostComm.getHsmsSession(session1);
 					hostSession1.waitUntilCommunicatable();
 					
 					hostSession1.send(1, 1, true, Secs2.list());

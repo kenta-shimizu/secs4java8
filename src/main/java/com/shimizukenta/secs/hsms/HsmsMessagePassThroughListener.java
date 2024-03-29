@@ -16,4 +16,5 @@ public interface HsmsMessagePassThroughListener extends EventListener {
 	 * @param message the HSMS Message
 	 */
 	public void passThrough(HsmsMessage message);
+	
 }

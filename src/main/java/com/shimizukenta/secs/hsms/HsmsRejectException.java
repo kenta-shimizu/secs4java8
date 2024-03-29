@@ -21,14 +21,4 @@ public class HsmsRejectException extends HsmsWaitReplyMessageException {
 		super(primaryMessage);
 	}
 	
-	/**
-	 * Constructor.
-	 * 
-	 * @param primaryMessage the primary message
-	 * @param cause the cause
-	 */
-	public HsmsRejectException(SecsMessage primaryMessage, Throwable cause) {
-		super(primaryMessage, cause);
-	}
-
 }

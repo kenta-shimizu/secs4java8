@@ -1,15 +1,16 @@
 package com.shimizukenta.secs.hsms.impl;
 
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
+import com.shimizukenta.secs.hsms.HsmsCommunicateStateChangeBiListener;
 import com.shimizukenta.secs.hsms.HsmsCommunicateStateChangeListener;
-import com.shimizukenta.secs.hsms.HsmsSessionCommunicateStateChangeBiListener;
+import com.shimizukenta.secs.hsms.HsmsGemAccessor;
 import com.shimizukenta.secs.impl.AbstractPropertyBiObserver;
 import com.shimizukenta.secs.local.property.Observable;
 
-public class HsmsSessionCommunicateStatePropertyBiObserver extends AbstractPropertyBiObserver<AbstractHsmsSession, HsmsCommunicateState, HsmsCommunicateStateChangeListener, HsmsSessionCommunicateStateChangeBiListener> {
+public class HsmsCommunicateStatePropertyBiObserver extends AbstractPropertyBiObserver<HsmsGemAccessor, HsmsCommunicateState, HsmsCommunicateStateChangeListener, HsmsCommunicateStateChangeBiListener> {
 
-	public HsmsSessionCommunicateStatePropertyBiObserver(
-			AbstractHsmsSession communicator,
+	public HsmsCommunicateStatePropertyBiObserver(
+			HsmsGemAccessor communicator,
 			Observable<HsmsCommunicateState> observer) {
 		
 		super(communicator, observer);
@@ -22,9 +23,9 @@ public class HsmsSessionCommunicateStatePropertyBiObserver extends AbstractPrope
 
 	@Override
 	protected void notifyValueToBiListener(
-			HsmsSessionCommunicateStateChangeBiListener biListener,
+			HsmsCommunicateStateChangeBiListener biListener,
 			HsmsCommunicateState value,
-			AbstractHsmsSession communicator) {
+			HsmsGemAccessor communicator) {
 		
 		biListener.changed(value, communicator);
 	}

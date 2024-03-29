@@ -52,7 +52,10 @@ public class PairHsmsSs {
 		equipConfig.sessionId(10);
 		equipConfig.isEquip(true);
 		equipConfig.rebindIfPassive(5.0F);
-		equipConfig.timeout().t3(10.0F);
+		equipConfig.timeout().t3(12.0F);
+		equipConfig.timeout().t6( 5.0F);
+		equipConfig.timeout().t7(10.0F);
+		equipConfig.timeout().t8( 6.0F);
 		equipConfig.linktest(6.0F);
 		equipConfig.gem().mdln("MDLN-A");
 		equipConfig.gem().softrev("000001");
@@ -62,7 +65,10 @@ public class PairHsmsSs {
 		hostConfig.socketAddress(addr);
 		hostConfig.sessionId(10);
 		hostConfig.isEquip(false);
-		hostConfig.timeout().t3(10.0F);
+		hostConfig.timeout().t3(12.0F);
+		hostConfig.timeout().t5(10.0F);
+		hostConfig.timeout().t6( 5.0F);
+		hostConfig.timeout().t8( 6.0F);
 		hostConfig.linktest(6.0F);
 		
 		

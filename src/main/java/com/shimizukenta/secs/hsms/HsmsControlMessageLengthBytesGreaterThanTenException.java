@@ -6,9 +6,9 @@ package com.shimizukenta.secs.hsms;
  * @author kenta-shimizu
  *
  */
-public class HsmsControlMessageLengthBytesUpperThanTenException extends HsmsMessageLengthBytesException {
+public class HsmsControlMessageLengthBytesGreaterThanTenException extends HsmsMessageLengthBytesException {
 	
-	private static final long serialVersionUID = -5662768171171603635L;
+	private static final long serialVersionUID = 2142542736758882422L;
 	
 	/**
 	 * Hsms Message Type.
@@ -22,7 +22,7 @@ public class HsmsControlMessageLengthBytesUpperThanTenException extends HsmsMess
 	 * @param type the message type
 	 * @param length the byte length
 	 */
-	public HsmsControlMessageLengthBytesUpperThanTenException(HsmsMessageType type, long length) {
+	public HsmsControlMessageLengthBytesGreaterThanTenException(HsmsMessageType type, long length) {
 		super(("type: " + type.toString() + ", length: " + length), length);
 		this.type = type;
 	}

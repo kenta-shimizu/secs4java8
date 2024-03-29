@@ -22,8 +22,6 @@ public interface HsmsMessageBuilder extends SecsMessageBuilder<AbstractHsmsMessa
 	
 	public AbstractHsmsMessage buildDeselectResponse(HsmsMessage primaryMsg, HsmsMessageDeselectStatus status);
 	
-	public AbstractHsmsMessage buildLinktestRequest(HsmsSession session);
-	
 	public AbstractHsmsMessage buildLinktestResponse(HsmsMessage primaryMsg);
 	
 	public AbstractHsmsMessage buildRejectRequest(HsmsMessage referenceMsg, HsmsMessageRejectReason reason);
