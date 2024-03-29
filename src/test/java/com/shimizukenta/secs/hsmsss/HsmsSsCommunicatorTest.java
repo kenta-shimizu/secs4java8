@@ -29,7 +29,9 @@ import com.shimizukenta.secs.gem.ONLACK;
 import com.shimizukenta.secs.gem.TIACK;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
+import com.shimizukenta.secs.hsms.HsmsGemAccessor;
 import com.shimizukenta.secs.hsms.HsmsMessage;
+import com.shimizukenta.secs.hsms.HsmsMessageReceiveBiListener;
 import com.shimizukenta.secs.local.property.BooleanCompution;
 import com.shimizukenta.secs.local.property.BooleanProperty;
 import com.shimizukenta.secs.local.property.ObjectProperty;
@@ -52,7 +54,7 @@ class HsmsSsCommunicatorTest {
 		config.isEquip(isEquip);
 		config.sessionId(10);
 		config.timeout().t3(5.0F);
-		config.timeout().t5(0.20F);
+		config.timeout().t5(0.30F);
 		return config;
 	}
 	
@@ -85,7 +87,7 @@ class HsmsSsCommunicatorTest {
 		return passiveCommunicator(getInetSocketAddress(), isEquip);
 	}
 	
-	private static final HsmsSsMessageReceiveBiListener equipReceiveListener = (HsmsMessage primaryMsg, HsmsSsCommunicator comm) -> {
+	private static final HsmsMessageReceiveBiListener equipReceiveListener = (HsmsMessage primaryMsg, HsmsGemAccessor comm) -> {
 		
 		int strm = primaryMsg.getStream();
 		int func = primaryMsg.getFunction();
@@ -165,7 +167,7 @@ class HsmsSsCommunicatorTest {
 		}
 	};
 	
-	private static final HsmsSsMessageReceiveBiListener hostReceiveListener = (HsmsMessage primaryMsg, HsmsSsCommunicator comm) -> {
+	private static final HsmsMessageReceiveBiListener hostReceiveListener = (HsmsMessage primaryMsg, HsmsGemAccessor comm) -> {
 		
 		int strm = primaryMsg.getStream();
 		int func = primaryMsg.getFunction();

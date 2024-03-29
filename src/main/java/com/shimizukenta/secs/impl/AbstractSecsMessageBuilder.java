@@ -20,9 +20,13 @@ public abstract class AbstractSecsMessageBuilder<M extends SecsMessage, C extend
 	
 	abstract protected byte[] device2Bytes(C communicator);
 	
+	protected int getAutoNumber() {
+		return this.autoNum.incrementAndGet();
+	}
+	
 	protected byte[] system4Bytes(C communicator) {
 		
-		final int num = autoNum.incrementAndGet();
+		final int num = this.getAutoNumber();
 		
 		if (isEquip(communicator)) {
 			

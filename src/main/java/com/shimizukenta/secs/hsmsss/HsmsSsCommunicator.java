@@ -2,9 +2,13 @@ package com.shimizukenta.secs.hsmsss;
 
 import java.io.IOException;
 
-import com.shimizukenta.secs.hsms.HsmsCommunicator;
+import com.shimizukenta.secs.SecsCommunicator;
+import com.shimizukenta.secs.hsms.HsmsCommunicateStateDetectable;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
+import com.shimizukenta.secs.hsms.HsmsGemAccessor;
+import com.shimizukenta.secs.hsms.HsmsMessagePassThroughObservable;
+import com.shimizukenta.secs.hsms.HsmsMessageReceiveObservable;
 import com.shimizukenta.secs.hsmsss.impl.AbstractHsmsSsActiveCommunicator;
 import com.shimizukenta.secs.hsmsss.impl.AbstractHsmsSsPassiveCommunicator;
 
@@ -19,7 +23,15 @@ import com.shimizukenta.secs.hsmsss.impl.AbstractHsmsSsPassiveCommunicator;
  * @author kenta-shimizu
  *
  */
-public interface HsmsSsCommunicator extends HsmsCommunicator {
+public interface HsmsSsCommunicator extends SecsCommunicator, HsmsGemAccessor, HsmsMessageReceiveObservable, HsmsCommunicateStateDetectable, HsmsMessagePassThroughObservable {
+	
+	/**
+	 * Linktest.
+	 * 
+	 * @return true if linktest success, otherwise false.
+	 * @throws InterruptedException if interrupted
+	 */
+	public boolean linktest() throws InterruptedException;
 	
 	/**
 	 * create new HSMS-SS-Communicator instance.
@@ -74,99 +86,5 @@ public interface HsmsSsCommunicator extends HsmsCommunicator {
 		
 		return inst;
 	}
-	
-	/**
-	 * Add Listener to receive Primary-Message.
-	 * 
-	 * <p>
-	 * This Listener not receive Reply-Message.<br />
-	 * </p>
-	 * 
-	 * @param biListener the HSMS Message ans HSMS-SS communicator listener
-	 * @return {@code true} if add success
-	 * @throws NullPointerException if biListener is null
-	 */
-	public boolean addHsmsMessageReceiveBiListener(HsmsSsMessageReceiveBiListener biListener);
-	
-	/**
-	 * Remove listener.
-	 * 
-	 * @param biListener the HSMS Message ans HSMS-SS communicator listener
-	 * @return {@code true} if remove success
-	 * @throws NullPointerException if biListener is null
-	 */
-	public boolean removeHsmsMessageReceiveBiListener(HsmsSsMessageReceiveBiListener biListener);
-	
-	/**
-	 * Add Listener to get communicate-state-changed.
-	 * 
-	 * <p>
-	 * Blocking-Listener.<br />
-	 * Pass through quickly.<br />
-	 * </p>
-	 * 
-	 * @param biListener the state change listener
-	 * @return {@code true} if add success
-	 * @throws NullPointerException if biListener is null
-	 */
-	public boolean addHsmsCommunicateStateChangeBiListener(HsmsSsCommunicateStateChangeBiListener biListener);
-	
-	/**
-	 * Remove listener.
-	 * 
-	 * @param biListener the state change listener
-	 * @return {@code true} if remove success
-	 * @throws NullPointerException if biListener is null
-	 */
-	public boolean removeHsmsCommunicateStateChangeBiListener(HsmsSsCommunicateStateChangeBiListener biListener);
-	
-	
-	/**
-	 * Add Listener to get HsmsMesssage before sending.
-	 * 
-	 * @param biListener the pass through message bi-listener
-	 * @return true if add success
-	 */
-	public boolean addTrySendHsmsMessagePassThroughBiListener(HsmsSsMessagePassThroughBiListener biListener);
-	
-	/**
-	 * Remove listener.
-	 * 
-	 * @param biListener the pass through message bi-listener
-	 * @return true if remove success
-	 */
-	public boolean removeTrySendHsmsMessagePassThroughBiListener(HsmsSsMessagePassThroughBiListener biListener);	
-	
-	/**
-	 * Add Listener to get HsmsMesssage sended.
-	 * 
-	 * @param biListener the pass through message bi-listener
-	 * @return true if add success
-	 */
-	public boolean addSendedHsmsMessagePassThroughBiListener(HsmsSsMessagePassThroughBiListener biListener);
-	
-	/**
-	 * Remove listener.
-	 * 
-	 * @param biListener the pass through message bi-listener
-	 * @return true if remove success
-	 */
-	public boolean removeSendedHsmsMessagePassThroughBiListener(HsmsSsMessagePassThroughBiListener biListener);	
-	
-	/**
-	 * Add Listener to receive both Primary and Reply Message.
-	 * 
-	 * @param biListener the pass through message bi-listener
-	 * @return true if add success
-	 */
-	public boolean addReceiveHsmsMessagePassThroughBiListener(HsmsSsMessagePassThroughBiListener biListener);
-	
-	/**
-	 * Remove listener.
-	 * 
-	 * @param biListener the pass through message bi-listener
-	 * @return true if remove success
-	 */
-	public boolean removeReceiveHsmsMessagePassThroughBiListener(HsmsSsMessagePassThroughBiListener biListener);	
 	
 }

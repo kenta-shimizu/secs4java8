@@ -14,8 +14,8 @@ public interface HsmsCommunicateStateChangeBiListener extends EventListener {
 	 * HSMS Communicate State Changed.
 	 * 
 	 * @param state the HSMS Communicate State
-	 * @param session the HsmsSession
+	 * @param accessor the HSMS communicate accessor
 	 */
-	public void changed(HsmsCommunicateState state, HsmsSession session);
+	public void changed(HsmsCommunicateState state, HsmsGemAccessor accessor);
 	
 }

@@ -6,17 +6,20 @@ import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
+import java.util.Objects;
 
 import com.shimizukenta.secs.UnsetSocketAddressException;
-import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsmsgs.HsmsGsCommunicatorConfig;
-import com.shimizukenta.secs.local.property.TimeoutProperty;
 
 public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCommunicator {
 	
+	private final HsmsGsCommunicatorConfig config;
+	
 	public AbstractHsmsGsPassiveCommunicator(HsmsGsCommunicatorConfig config) {
-		super(config);
+		super(Objects.requireNonNull(config));
+		
+		this.config = config;
 		
 		config.connectionMode().addChangeListener(mode -> {
 			if (mode != HsmsConnectionMode.PASSIVE) {
@@ -36,18 +39,10 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 		
 		this.executorService().execute(() -> {
 			try {
-				final TimeoutProperty tp = this.config().rebindIfPassiveTime();
-				
-				while ( ! this.isClosed() ) {
+				this.openPassive();
+				while (! this.isClosed() && this.config.doRebindIfPassive().booleanValue()) {
+					this.config.rebindIfPassiveTime().sleep();
 					this.openPassive();
-					if ( this.isClosed() ) {
-						return;
-					}
-					if ( this.config().doRebindIfPassive().booleanValue() ) {
-						tp.sleep();
-					} else {
-						return;
-					}
 				}
 			}
 			catch ( InterruptedException ignore ) {
@@ -66,10 +61,6 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 				AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
 				) {
 			
-			this.getAbstractHsmsSessions().forEach(s -> {
-				s.notifyHsmsCommunicateState(HsmsCommunicateState.NOT_CONNECTED);
-			});
-			
 			passiveAccepting(server);
 			
 			synchronized ( server ) {
@@ -79,18 +70,12 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 		catch ( IOException e ) {
 			this.notifyLog(e);
 		}
-		finally {
-			
-			this.getAbstractHsmsSessions().forEach(s -> {
-				s.notifyHsmsCommunicateState(HsmsCommunicateState.NOT_CONNECTED);
-			});
-		}
 	}
 	
 	private void passiveAccepting(AsynchronousServerSocketChannel server)
 			throws IOException, InterruptedException {
 		
-		final SocketAddress addr = this.config().socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
+		final SocketAddress addr = this.config.socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
 		
 		this.notifyLog(HsmsGsPassiveBindLog.tryBind(addr));
 		
@@ -109,9 +94,7 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 				SocketAddress pRemote = null;
 				
 				try {
-					
 					try {
-						
 						pLocal = channel.getLocalAddress();
 						pRemote = channel.getRemoteAddress();
 					}
@@ -124,26 +107,26 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 					
 					AbstractHsmsGsPassiveCommunicator.this.completionAction(channel);
 				}
-				catch ( InterruptedException ignore ) {
+				catch (InterruptedException ignore) {
 				}
 				finally {
 					
 					try {
 						channel.shutdownOutput();
 					}
-					catch ( IOException giveup ) {
+					catch (IOException giveup) {
 					}
 					
 					try {
 						channel.close();
 					}
-					catch ( IOException giveup ) {
+					catch (IOException giveup) {
 					}
 					
 					try {
 						AbstractHsmsGsPassiveCommunicator.this.notifyLog(HsmsGsConnectionLog.closed(pLocal, pRemote));
 					}
-					catch ( InterruptedException ignore ) {
+					catch (InterruptedException ignore) {
 					}
 				}
 			}
@@ -151,15 +134,11 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 			@Override
 			public void failed(Throwable t, Void attachment) {
 				
-				if ( t instanceof RuntimeException ) {
-					throw (RuntimeException)t;
-				}
-				
-				if ( ! (t instanceof ClosedChannelException) ) {
+				if (! (t instanceof ClosedChannelException)) {
 					try {
 						AbstractHsmsGsPassiveCommunicator.this.notifyLog(t);
 					}
-					catch ( InterruptedException ignore ) {
+					catch (InterruptedException ignore) {
 					}
 				}
 				

@@ -13,7 +13,7 @@ public interface HsmsMessageReceiveListener extends EventListener {
 	/**
 	 * received.
 	 * 
-	 * @param message the HSMS Message
+	 * @param message the HSMS message
 	 */
 	public void received(HsmsMessage message);
 	

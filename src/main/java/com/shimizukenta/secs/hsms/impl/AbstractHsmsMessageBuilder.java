@@ -72,27 +72,6 @@ public abstract class AbstractHsmsMessageBuilder extends AbstractSecsMessageBuil
 	}
 	
 	@Override
-	public AbstractHsmsMessage buildLinktestRequest(HsmsSession session) {
-		
-		byte[] sysbytes = this.system4Bytes(session);
-		
-		byte[] header10Bytes = new byte[] {
-				(byte)0xFF,
-				(byte)0xFF,
-				(byte)0x0,
-				(byte)0x0,
-				HsmsMessageType.LINKTEST_REQ.pType(),
-				HsmsMessageType.LINKTEST_REQ.sType(),
-				sysbytes[0],
-				sysbytes[1],
-				sysbytes[2],
-				sysbytes[3]
-		};
-		
-		return buildMessage(header10Bytes);
-	}
-	
-	@Override
 	public AbstractHsmsMessage buildLinktestResponse(HsmsMessage primaryMsg) {
 		
 		byte[] bs = primaryMsg.header10Bytes();

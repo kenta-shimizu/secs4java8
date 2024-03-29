@@ -2,14 +2,15 @@ package com.shimizukenta.secs.hsms.impl;
 
 import java.util.concurrent.Executor;
 
+import com.shimizukenta.secs.hsms.HsmsGemAccessor;
 import com.shimizukenta.secs.hsms.HsmsMessage;
+import com.shimizukenta.secs.hsms.HsmsMessageReceiveBiListener;
 import com.shimizukenta.secs.hsms.HsmsMessageReceiveListener;
-import com.shimizukenta.secs.hsms.HsmsSessionMessageReceiveBiListener;
 import com.shimizukenta.secs.impl.AbstractQueueBiObserver;
 
-public class HsmsSessionMessageReceiveQueueBiObserver extends AbstractQueueBiObserver<AbstractHsmsSession, HsmsMessageReceiveListener, HsmsSessionMessageReceiveBiListener, HsmsMessage> {
+public class HsmsMessageReceiveQueueBiObserver extends AbstractQueueBiObserver<HsmsGemAccessor, HsmsMessageReceiveListener, HsmsMessageReceiveBiListener, HsmsMessage> {
 
-	public HsmsSessionMessageReceiveQueueBiObserver(Executor executor, AbstractHsmsSession comm) {
+	public HsmsMessageReceiveQueueBiObserver(Executor executor, HsmsGemAccessor comm) {
 		super(executor, comm);
 	}
 
@@ -20,9 +21,9 @@ public class HsmsSessionMessageReceiveQueueBiObserver extends AbstractQueueBiObs
 
 	@Override
 	protected void notifyValueToBiListener(
-			HsmsSessionMessageReceiveBiListener biListener,
+			HsmsMessageReceiveBiListener biListener,
 			HsmsMessage value,
-			AbstractHsmsSession communicator) {
+			HsmsGemAccessor communicator) {
 		
 		biListener.received(value, communicator);
 	}
