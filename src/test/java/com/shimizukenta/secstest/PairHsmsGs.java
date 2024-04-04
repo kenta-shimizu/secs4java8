@@ -22,7 +22,7 @@ public class PairHsmsGs {
 		
 		final int session1 = 100;
 		final int session2 = 200;
-		final SocketAddress addr = new InetSocketAddress("127.0.0.1", 5000);
+		final SocketAddress addr = new InetSocketAddress("127.0.0.1", 10000);
 		
 		echo ("started");
 		
@@ -63,7 +63,7 @@ public class PairHsmsGs {
 					HsmsGsCommunicator equipComm = HsmsGsCommunicator.newInstance(equipConfig);
 					) {
 				
-//				equipComm.addSecsLogListener(log -> {echo(log);});
+				equipComm.addSecsLogListener(log -> {echo(log);});
 				
 				equipComm.addSecsMessageReceiveBiListener((msg, comm) -> {
 					
@@ -115,7 +115,7 @@ public class PairHsmsGs {
 						HsmsGsCommunicator hostComm = HsmsGsCommunicator.newInstance(hostConfig);
 						) {
 					
-//					hostComm.addSecsLogListener(log -> {echo(log);});
+					hostComm.addSecsLogListener(log -> {echo(log);});
 					
 					hostComm.open();
 					
@@ -123,6 +123,8 @@ public class PairHsmsGs {
 					
 					HsmsSession hostSession1 = hostComm.getHsmsSession(session1);
 					hostSession1.waitUntilCommunicatable();
+					
+					Thread.sleep(509L);
 					
 					hostSession1.send(1, 1, true, Secs2.list());
 					

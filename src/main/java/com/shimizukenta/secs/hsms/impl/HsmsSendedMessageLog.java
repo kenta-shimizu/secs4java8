@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.shimizukenta.secs.impl.AbstractSecsSendedMessageLog;
 
+@Deprecated
 public class HsmsSendedMessageLog extends AbstractSecsSendedMessageLog {
 	
 	private static final long serialVersionUID = 7358456946949913863L;

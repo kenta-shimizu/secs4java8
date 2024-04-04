@@ -67,7 +67,7 @@ public class ExampleHsmsGsActiveTwo {
 				active.open();
 				
 				{
-					HsmsSession session = active.getSession(SESSION_B);
+					HsmsSession session = active.getHsmsSession(SESSION_B);
 					
 					session.waitUntilCommunicatable();
 					Thread.sleep(200L);
@@ -83,7 +83,7 @@ public class ExampleHsmsGsActiveTwo {
 				}
 				
 				{
-					HsmsSession session = active.getSession(SESSION_C);
+					HsmsSession session = active.getHsmsSession(SESSION_C);
 					
 					session.waitUntilCommunicatable();
 					Thread.sleep(200L);

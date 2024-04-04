@@ -12,7 +12,19 @@ import java.util.EventListener;
  * @author kenta-shimizu
  *
  */
-public interface SecsLogListener extends EventListener {
+
+/**
+ * SecsLog receive Listener.
+ * 
+ * <p>
+ * This interface is used in {@link SecsCommunicator#addSecsLogListener(SecsLogListener)}<br />
+ * </p>
+ * 
+ * @author shimizukenta
+ *
+ * @param <T> Type of SecsLog
+ */
+public interface SecsLogListener<T extends SecsLog> extends EventListener {
 	
 	/**
 	 * put received-SecsLog.
@@ -23,6 +35,6 @@ public interface SecsLogListener extends EventListener {
 	 * 
 	 * @param log the SecsLog
 	 */
-	public void received(SecsLog log);
+	public void received(T log);
 	
 }

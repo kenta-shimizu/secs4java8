@@ -7,6 +7,7 @@ import java.util.Optional;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsTrySendMessageLog;
 
+@Deprecated
 public abstract class AbstractSecsTrySendMessageLog extends AbstractSecsLog implements SecsTrySendMessageLog {
 	
 	private static final long serialVersionUID = -5404537548566127711L;
@@ -28,11 +29,6 @@ public abstract class AbstractSecsTrySendMessageLog extends AbstractSecsLog impl
 	@Override
 	public String subject() {
 		return commonSubject;
-	}
-	
-	@Override
-	public Optional<SecsMessage> optionalSecsMessage() {
-		return Optional.of(this.msg);
 	}
 	
 }

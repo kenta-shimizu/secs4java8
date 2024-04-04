@@ -46,7 +46,7 @@ public class HsmsSsAsynchronousSocketChannelFacade extends AbstractHsmsAsynchron
 	}
 	
 	@Override
-	protected boolean notifyHsmsThrowableLog(Throwable t) {
+	protected boolean offerThrowableToLog(Throwable t) {
 		
 		//TODO
 		

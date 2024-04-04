@@ -15,6 +15,7 @@ import com.shimizukenta.secs.SecsWaitReplyMessageException;
 import com.shimizukenta.secs.hsms.HsmsCommunicateStateChangeBiListener;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
+import com.shimizukenta.secs.hsms.HsmsLogObservable;
 import com.shimizukenta.secs.hsms.HsmsMessagePassThroughObservable;
 import com.shimizukenta.secs.hsms.HsmsMessageReceiveBiListener;
 import com.shimizukenta.secs.hsms.HsmsSession;
@@ -41,7 +42,7 @@ import com.shimizukenta.secs.sml.SmlMessage;
  * @author kenta-shimizu
  *
  */
-public interface HsmsGsCommunicator extends OpenAndCloseable, HsmsMessagePassThroughObservable {
+public interface HsmsGsCommunicator extends OpenAndCloseable, HsmsMessagePassThroughObservable, HsmsLogObservable {
 	
 	/**
 	 * create new HSMS-GS-Communicator instance.
@@ -255,9 +256,6 @@ public interface HsmsGsCommunicator extends OpenAndCloseable, HsmsMessagePassThr
 	 * @throws NullPointerException if biListener is null
 	 */
 	public boolean removeHsmsCommunicateStateChangeBiListener(HsmsCommunicateStateChangeBiListener biListener);
-
-	
-	
 	
 	
 	/**
@@ -273,7 +271,7 @@ public interface HsmsGsCommunicator extends OpenAndCloseable, HsmsMessagePassThr
 	 * @throws SecsException if SECS communicate failed
 	 * @throws InterruptedException if interrupted
 	 */
-	public Optional<SecsMessage> send(
+	default public Optional<SecsMessage> send(
 			int sessionId,
 			int strm,
 			int func,
@@ -281,7 +279,10 @@ public interface HsmsGsCommunicator extends OpenAndCloseable, HsmsMessagePassThr
 					throws SecsSendMessageException,
 					SecsWaitReplyMessageException,
 					SecsException,
-					InterruptedException;
+					InterruptedException {
+		
+		return this.send(sessionId, strm, func, wbit, Secs2.empty());
+	}
 	
 	/**
 	 * send shortcut
@@ -321,7 +322,7 @@ public interface HsmsGsCommunicator extends OpenAndCloseable, HsmsMessagePassThr
 	 * @throws SecsException if SECS communicate failed
 	 * @throws InterruptedException if interrupted
 	 */
-	public Optional<SecsMessage> send(
+	default public Optional<SecsMessage> send(
 			int sessionId,
 			SecsMessage primaryMsg,
 			int strm,
@@ -330,7 +331,10 @@ public interface HsmsGsCommunicator extends OpenAndCloseable, HsmsMessagePassThr
 					throws SecsSendMessageException,
 					SecsWaitReplyMessageException,
 					SecsException,
-					InterruptedException;
+					InterruptedException {
+		
+		return this.send(sessionId, primaryMsg, strm, func, wbit, Secs2.empty());
+	}
 	
 	/**
 	 * send shortcut.
@@ -370,13 +374,16 @@ public interface HsmsGsCommunicator extends OpenAndCloseable, HsmsMessagePassThr
 	 * @throws SecsException if SECS communicate failed
 	 * @throws InterruptedException if interrupted
 	 */
-	public Optional<SecsMessage> send(
+	default public Optional<SecsMessage> send(
 			int sessionId,
 			SmlMessage sml)
 					throws SecsSendMessageException,
 					SecsWaitReplyMessageException,
 					SecsException,
-					InterruptedException;
+					InterruptedException {
+		
+		return this.send(sessionId, sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
+	}
 	
 	/**
 	 * send shortcut.
@@ -390,35 +397,16 @@ public interface HsmsGsCommunicator extends OpenAndCloseable, HsmsMessagePassThr
 	 * @throws SecsException if SECS communicate failed
 	 * @throws InterruptedException if interrupted
 	 */
-	public Optional<SecsMessage> send(
+	default public Optional<SecsMessage> send(
 			int sessionId,
 			SecsMessage primaryMsg,
 			SmlMessage sml)
 					throws SecsSendMessageException,
 					SecsWaitReplyMessageException,
 					SecsException,
-					InterruptedException;
-	
-	
-	
-	
-	
-//	/**
-//	 * Add Listener to log Communicating.
-//	 * 
-//	 * @param lstnr Not accept {@code null}
-//	 * @return {@code true} if add success
-//	 */
-//	public boolean addSecsLogListener(SecsLogListener lstnr);
-//	
-//	/**
-//	 * Remove Listener
-//	 * 
-//	 * @param lstnr Not accept {@code null}
-//	 * @return {@code true} if remove success
-//	 */
-//	public boolean removeSecsLogListener(SecsLogListener lstnr);
-	
-	
+					InterruptedException {
+		
+		return this.send(sessionId, primaryMsg, sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
+	}
 	
 }

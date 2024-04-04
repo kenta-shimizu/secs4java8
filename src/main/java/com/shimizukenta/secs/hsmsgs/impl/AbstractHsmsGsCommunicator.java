@@ -33,9 +33,9 @@ import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsSession;
 import com.shimizukenta.secs.hsms.HsmsTimeoutT7Exception;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
+import com.shimizukenta.secs.hsms.impl.AbstractHsmsLogObserverFacade;
 import com.shimizukenta.secs.hsms.impl.AbstractHsmsMessage;
 import com.shimizukenta.secs.hsms.impl.HsmsMessagePassThroughQueueObserver;
-import com.shimizukenta.secs.hsmsgs.HsmsGsCommunicator;
 import com.shimizukenta.secs.hsmsgs.HsmsGsCommunicatorConfig;
 import com.shimizukenta.secs.hsmsgs.HsmsGsUnknownSessionIdException;
 import com.shimizukenta.secs.impl.AbstractBaseCommunicator;
@@ -44,9 +44,8 @@ import com.shimizukenta.secs.local.property.BooleanCompution;
 import com.shimizukenta.secs.local.property.BooleanProperty;
 import com.shimizukenta.secs.local.property.SetProperty;
 import com.shimizukenta.secs.secs2.Secs2;
-import com.shimizukenta.secs.sml.SmlMessage;
 
-public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicator implements HsmsGsCommunicator {
+public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicator implements HsmsGsCommunicatorAndBinder {
 	
 	private final HsmsGsCommunicatorConfig config;
 	
@@ -60,6 +59,8 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	private final HsmsMessagePassThroughQueueObserver trySendHsmsMsgPassThroughQueueObserver;
 	private final HsmsMessagePassThroughQueueObserver sendedHsmsMsgPassThroughQueueObserver;
 	private final HsmsMessagePassThroughQueueObserver recvHsmsMsgPassThroughQueueObserver;
+	
+	private final AbstractHsmsLogObserverFacade logObserver;
 	
 	
 	public AbstractHsmsGsCommunicator(HsmsGsCommunicatorConfig config) {
@@ -87,6 +88,8 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		this.trySendHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this.executorService());
 		this.sendedHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this.executorService());
 		this.recvHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this.executorService());
+		
+		this.logObserver = new AbstractHsmsLogObserverFacade(config, this.executorService()) {};
 	}
 	
 	public HsmsGsMessageBuilder getHsmsGsMessageBuilder() {
@@ -95,7 +98,13 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	
 	@Override
 	public void open() throws IOException {
-		this.getAbstractHsmsGsSessions();
+		
+		this.getAbstractHsmsGsSessions().forEach(session -> {
+			session.addHsmsCommunicateStateChangeBiListener((state, comm) -> {
+				this.logObserver().offerHsmsSessionCommunicateState(comm.sessionId(), state);
+			});
+		});
+		
 		super.open();
 	}
 	
@@ -104,20 +113,21 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	@Override
 	public void close() throws IOException {
 		
-		synchronized ( this.syncClosed ) {
+		synchronized (this.syncClosed) {
 			
-			if ( this.isClosed() ) {
+			if (this.isClosed()) {
 				return;
 			}
-//			
-//			try {
-//				
-//				for ( AbstractHsmsGsSession s : this.getAbstractHsmsGsSessions() ) {
-//					s.separate();
-//				}
-//			}
-//			catch ( InterruptedException ignore ) {
-//			}
+			
+			for (AbstractHsmsGsSession session : getAbstractHsmsGsSessions()) {
+				if (session.isCommunicatable()) {
+					try {
+						session.separate();
+					}
+					catch (InterruptedException ignore) {
+					}
+				}
+			}
 			
 			super.close();
 		}
@@ -199,7 +209,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 							}
 						}
 						catch (TimeoutException e) {
-							this.notifyLog(new HsmsTimeoutT7Exception());
+							this.offerThrowableToLog(new HsmsTimeoutT7Exception());
 						}
 						catch (InterruptedException ignore) {
 						}
@@ -223,7 +233,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 				Throwable t = e.getCause();
 				
 				if (! (t instanceof ClosedChannelException)) {
-					this.notifyLog(t);
+					this.offerThrowableToLog(t);
 				}
 			}
 			finally {
@@ -235,7 +245,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 			}
 		}
 		catch (IOException e) {
-			this.notifyLog(e);
+			this.offerThrowableToLog(e);
 		}
 	}
 	
@@ -279,7 +289,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 						}
 					}
 					catch (HsmsSendMessageException | HsmsWaitReplyMessageException e) {
-						this.notifyLog(e);
+						this.offerThrowableToLog(e);
 					}
 				}
 			}
@@ -396,6 +406,8 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 							selectedSessions.remove(session);
 							session.unsetChannel();
 						}
+						
+						asyncChannel.shutdown();
 					}
 					
 					break;
@@ -424,18 +436,11 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 				}
 			}
 			catch (HsmsSendMessageException | HsmsWaitReplyMessageException e) {
-				this.notifyLog(e);
+				this.offerThrowableToLog(e);
 			}
 		}
 	}
 	
-	
-	@Override
-	public Optional<SecsMessage> send(int sessionId, int strm, int func, boolean wbit)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
-		
-		return getHsmsSession(sessionId).send(strm, func, wbit);
-	}
 	
 	@Override
 	public Optional<SecsMessage> send(int sessionId, int strm, int func, boolean wbit, Secs2 secs2)
@@ -445,31 +450,10 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	}
 	
 	@Override
-	public Optional<SecsMessage> send(int sessionId, SecsMessage primaryMsg, int strm, int func, boolean wbit)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
-		
-		return getHsmsSession(sessionId).send(primaryMsg, strm, func, wbit);
-	}
-	
-	@Override
 	public Optional<SecsMessage> send(int sessionId, SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
 		return getHsmsSession(sessionId).send(primaryMsg, strm, func, wbit, secs2);
-	}
-	
-	@Override
-	public Optional<SecsMessage> send(int sessionId, SmlMessage sml)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
-		
-		return getHsmsSession(sessionId).send(sml);
-	}
-	
-	@Override
-	public Optional<SecsMessage> send(int sessionId, SecsMessage primaryMsg, SmlMessage sml)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
-		
-		return getHsmsSession(sessionId).send(primaryMsg, sml);
 	}
 	
 	
@@ -568,43 +552,6 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	
 	
 	
-//	@Override
-//	public boolean addSecsLogListener(SecsLogListener lstnr) {
-//		return this.logQueueObserver.addListener(lstnr);
-//	}
-//	
-//	@Override
-//	public boolean removeSecsLogListener(SecsLogListener lstnr) {
-//		return this.logQueueObserver.removeListener(lstnr);
-//	}
-//	
-//	public void notifyLog(AbstractSecsLog log) throws InterruptedException {
-//		
-//		log.subjectHeader(this.config.logSubjectHeader().toString());
-//		
-//		this.logQueueObserver.put(log);
-//		
-//		final SecsMessage msg = log.optionalSecsMessage().orElse(null);
-//		if ( msg != null ) {
-//			for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-//				if ( s.sessionId() == msg.sessionId() ) {
-//					s.notifyLog(log);
-//				}
-//			}
-//		}
-//	}
-	
-	public void notifyLog(Throwable t) throws InterruptedException {
-		
-		//TODO
-		//nothing
-	}
-	
-	public void notifyLog(Object o) throws InterruptedException {
-		
-		//TODO
-		//nothing
-	}
 	
 	
 	
@@ -673,19 +620,59 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	}
 	
 	
+	
+	
+	
+	
+	
+	/* LogObservable */
+	
+	@Override
+	public AbstractHsmsLogObserverFacade logObserver() {
+		return this.logObserver;
+	}
+	
 	public void notifyTrySendHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
-		this.trySendSecsMsgPassThroughQueueObserver.put(message);
+		if (message.isDataMessage()) {
+			this.trySendSecsMsgPassThroughQueueObserver.put(message);
+		}
 		this.trySendHsmsMsgPassThroughQueueObserver.put(message);
+		
+		this.logObserver.offerTrySendHsmsMessagePassThrough(message);
 	}
 	
 	public void notifySendedHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
-		this.sendedSecsMsgPassThroughQueueObserver.put(message);
+		if (message.isDataMessage()) {
+			this.sendedSecsMsgPassThroughQueueObserver.put(message);
+		}
 		this.sendedHsmsMsgPassThroughQueueObserver.put(message);
+		
+		this.logObserver.offerSendedHsmsMessagePassThrough(message);
 	}
 	
 	public void notifyReceiveHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
-		this.recvSecsMsgPassThroughQueueObserver.put(message);
+		if (message.isDataMessage()) {
+			this.recvSecsMsgPassThroughQueueObserver.put(message);
+		}
 		this.recvHsmsMsgPassThroughQueueObserver.put(message);
+		
+		this.logObserver.offerReceiveHsmsMessagePassThrough(message);
 	}
+	
+	public boolean offerThrowableToLog(Throwable t) {
+		return this.logObserver.offerThrowable(t);
+	}
+	
+	
+	
+	public void notifyLog(Object o) {
+		
+		//TODO
+		//nothing
+	}
+	
 
+	
+	
+	
 }

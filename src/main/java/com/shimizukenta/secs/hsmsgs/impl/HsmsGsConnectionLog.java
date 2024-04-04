@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import com.shimizukenta.secs.impl.AbstractSecsConnectionLog;
 
+@Deprecated
 public final class HsmsGsConnectionLog extends AbstractSecsConnectionLog {
 	
 	private static final long serialVersionUID = -2682204681452230464L;

@@ -3,7 +3,6 @@ package com.shimizukenta.secs.impl;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -13,23 +12,15 @@ public abstract class AbstractSecsThrowableLog extends AbstractSecsLog implement
 	
 	private static final long serialVersionUID = -7109145044702257924L;
 	
-	private static final String commonSubject = "Throwable";
+	private final Object sync = new Object();
+	
 	private final Throwable cause;
 	
-	private String cacheToSubject;
 	private String cacheToStringValue;
 	
 	public AbstractSecsThrowableLog(Throwable cause) {
-		super(commonSubject, Objects.requireNonNull(cause));
+		super(cause.toString(), Objects.requireNonNull(cause));
 		this.cause = cause;
-		this.cacheToSubject = null;
-		this.cacheToStringValue = null;
-	}
-	
-	public AbstractSecsThrowableLog(Throwable cause, LocalDateTime timestamp) {
-		super(commonSubject, timestamp, Objects.requireNonNull(cause));
-		this.cause = cause;
-		this.cacheToSubject = null;
 		this.cacheToStringValue = null;
 	}
 	
@@ -39,21 +30,11 @@ public abstract class AbstractSecsThrowableLog extends AbstractSecsLog implement
 	}
 	
 	@Override
-	public String subject() {
-		synchronized ( this ) {
-			if ( this.cacheToSubject == null ) {
-				this.cacheToSubject = cause.toString();
-			}
-			return this.cacheToSubject;
-		}
-	}
-	
-	@Override
 	public Optional<String> optionalValueString() {
 		
-		synchronized ( this ) {
+		synchronized (this.sync) {
 			
-			if ( this.cacheToStringValue == null ) {
+			if (this.cacheToStringValue == null) {
 				
 				try (
 						StringWriter sw = new StringWriter();
@@ -69,7 +50,7 @@ public abstract class AbstractSecsThrowableLog extends AbstractSecsLog implement
 						this.cacheToStringValue = sw.toString();
 					}
 				}
-				catch ( IOException e ) {
+				catch (IOException e) {
 					this.cacheToStringValue = "THROWABLE-PARSE-FAILED";
 				}
 			}

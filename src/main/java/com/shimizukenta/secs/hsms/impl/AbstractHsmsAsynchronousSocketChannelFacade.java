@@ -70,7 +70,7 @@ public abstract class AbstractHsmsAsynchronousSocketChannelFacade implements Clo
 			catch (InterruptedException ignore) {
 			}
 			catch (Throwable t) {
-				this.notifyHsmsThrowableLog(t);
+				this.offerThrowableToLog(t);
 			}
 		});
 		
@@ -81,7 +81,7 @@ public abstract class AbstractHsmsAsynchronousSocketChannelFacade implements Clo
 			catch (InterruptedException ignore) {
 			}
 			catch (Throwable t) {
-				this.notifyHsmsThrowableLog(t);
+				this.offerThrowableToLog(t);
 			}
 		});
 		
@@ -92,7 +92,7 @@ public abstract class AbstractHsmsAsynchronousSocketChannelFacade implements Clo
 			catch (InterruptedException ignore) {
 			}
 			catch (Throwable t) {
-				this.notifyHsmsThrowableLog(t);
+				this.offerThrowableToLog(t);
 			}
 		});
 	}
@@ -120,7 +120,7 @@ public abstract class AbstractHsmsAsynchronousSocketChannelFacade implements Clo
 	abstract protected void notifySendedHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException;
 	abstract protected void notifyReceiveHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException;
 	abstract protected AbstractHsmsMessage buildLinktestHsmsMessage();
-	abstract protected boolean notifyHsmsThrowableLog(Throwable t);
+	abstract protected boolean offerThrowableToLog(Throwable t);
 	
 	
 	public void waitUntilShutdown() throws InterruptedException {
@@ -462,7 +462,7 @@ public abstract class AbstractHsmsAsynchronousSocketChannelFacade implements Clo
 		}
 		catch (HsmsException e) {
 			this.shutdown();
-			this.notifyHsmsThrowableLog(e);
+			this.offerThrowableToLog(e);
 		}
 	}
 	
@@ -602,7 +602,7 @@ public abstract class AbstractHsmsAsynchronousSocketChannelFacade implements Clo
 		}
 		catch (HsmsException e) {
 			this.shutdown();
-			this.notifyHsmsThrowableLog(e);
+			this.offerThrowableToLog(e);
 		}
 	}
 	

@@ -6,13 +6,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import com.shimizukenta.secs.SecsGemAccessor;
 import com.shimizukenta.secs.SecsCommunicatableStateChangeBiListener;
 
+@Deprecated
 public class HsmsGsSecsCommunicatableBiObserver implements SecsCommunicatableStateChangeBiListener {
 	
 	/**
 	 * Constructor.
 	 * 
 	 */
-	public HsmsGsSecsCommunicatableBiObserver() {
+	private HsmsGsSecsCommunicatableBiObserver() {
 		/* Nothing */
 	}
 	

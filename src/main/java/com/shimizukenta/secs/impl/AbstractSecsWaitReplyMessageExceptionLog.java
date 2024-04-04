@@ -18,11 +18,6 @@ public abstract class AbstractSecsWaitReplyMessageExceptionLog extends AbstractS
 		this.cause = cause;
 	}
 	
-	public AbstractSecsWaitReplyMessageExceptionLog(SecsWaitReplyMessageException cause, LocalDateTime timestamp) {
-		super(cause, timestamp);
-		this.cause = cause;
-	}
-	
 	public Optional<SecsMessage> referenceSecsMessage() {
 		return cause.secsMessage();
 	}

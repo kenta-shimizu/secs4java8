@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.shimizukenta.secs.impl.AbstractSecsLog;
 
+@Deprecated
 public final class HsmsGsPassiveBindLog extends AbstractSecsLog {
 	
 	private static final long serialVersionUID = -7606695183029225489L;

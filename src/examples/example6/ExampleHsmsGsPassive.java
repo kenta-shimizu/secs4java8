@@ -66,7 +66,7 @@ public class ExampleHsmsGsPassive {
 					echo(log);
 				});
 				
-				passive.getSession(SESSION_A).addSecsMessageReceiveBiListener((msg, session) -> {
+				passive.getHsmsSession(SESSION_A).addSecsMessageReceiveBiListener((msg, session) -> {
 					
 					int strm = msg.getStream();
 					int func = msg.getFunction();
@@ -123,7 +123,7 @@ public class ExampleHsmsGsPassive {
 					}
 				});
 				
-				passive.getSession(SESSION_B).addSecsMessageReceiveBiListener((msg, session) -> {
+				passive.getHsmsSession(SESSION_B).addSecsMessageReceiveBiListener((msg, session) -> {
 					
 					int strm = msg.getStream();
 					int func = msg.getFunction();
@@ -180,7 +180,7 @@ public class ExampleHsmsGsPassive {
 					}
 				});
 				
-				passive.getSession(SESSION_C).addSecsMessageReceiveBiListener((msg, session) -> {
+				passive.getHsmsSession(SESSION_C).addSecsMessageReceiveBiListener((msg, session) -> {
 					
 					int strm = msg.getStream();
 					int func = msg.getFunction();

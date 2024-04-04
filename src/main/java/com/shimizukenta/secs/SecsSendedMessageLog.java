@@ -6,6 +6,7 @@ package com.shimizukenta.secs;
  * @author kenta-shimizu
  *
  */
+@Deprecated
 public interface SecsSendedMessageLog extends SecsLog {
 	/* Nothing */
 }

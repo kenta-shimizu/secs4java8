@@ -64,7 +64,7 @@ public class ExampleHsmsGsActiveOne {
 				
 				active.open();
 				
-				HsmsSession session = active.getSession(SESSION_A);
+				HsmsSession session = active.getHsmsSession(SESSION_A);
 				
 				session.waitUntilCommunicatable();
 				Thread.sleep(200L);
