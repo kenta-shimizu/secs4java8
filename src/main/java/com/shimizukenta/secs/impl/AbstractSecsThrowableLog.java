@@ -19,7 +19,7 @@ public abstract class AbstractSecsThrowableLog extends AbstractSecsLog implement
 	private String cacheToStringValue;
 	
 	public AbstractSecsThrowableLog(Throwable cause) {
-		super(cause.toString(), Objects.requireNonNull(cause));
+		super(cause.getClass().getSimpleName(), Objects.requireNonNull(cause));
 		this.cause = cause;
 		this.cacheToStringValue = null;
 	}

@@ -22,9 +22,9 @@ import java.util.EventListener;
  * 
  * @author shimizukenta
  *
- * @param <T> Type of SecsLog
+ * @param <T> Type
  */
-public interface SecsLogListener<T extends SecsLog> extends EventListener {
+public interface SecsLogListener<T> extends EventListener {
 	
 	/**
 	 * put received-SecsLog.

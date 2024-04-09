@@ -9,7 +9,7 @@ import com.shimizukenta.secs.hsms.HsmsLogObservable;
 import com.shimizukenta.secs.hsms.HsmsMessagePassThroughLog;
 import com.shimizukenta.secs.hsms.HsmsSessionCommunicateStateLog;
 
-public interface HsmsLogObservableAndBinder extends HsmsLogObservable {
+public interface HsmsLogObservableImpl extends HsmsLogObservable {
 	
 	public AbstractHsmsLogObserverFacade logObserver();
 	

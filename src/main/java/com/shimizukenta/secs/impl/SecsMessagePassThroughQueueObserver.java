@@ -5,7 +5,8 @@ import java.util.concurrent.Executor;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessagePassThroughListener;
 
-public class SecsMessagePassThroughQueueObserver extends AbstractQueueObserver<SecsMessagePassThroughListener, SecsMessage> {
+@Deprecated
+public class SecsMessagePassThroughQueueObserver extends AbstractQueueObserver<SecsMessagePassThroughListener＜SecsMessage>, SecsMessage> {
 	
 	public SecsMessagePassThroughQueueObserver(Executor executor) {
 		super(executor);

@@ -17,7 +17,7 @@ public abstract class AbstractHsmsSessionCommunicateStateLog extends AbstractSec
 	private final HsmsCommunicateState state;
 	
 	public AbstractHsmsSessionCommunicateStateLog(int sessionId, HsmsCommunicateState state) {
-		super("HSMS SessionID=" + sessionId + ", state=" + state.toString());
+		super("HSMS-Session-Communicate state changed");
 		this.sessionId = sessionId;
 		this.state = state;
 		
