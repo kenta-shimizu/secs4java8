@@ -8,9 +8,7 @@ import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 import com.shimizukenta.secs.SecsCommunicatableStateChangeBiListener;
 import com.shimizukenta.secs.SecsCommunicatableStateChangeListener;
 import com.shimizukenta.secs.SecsCommunicator;
-import com.shimizukenta.secs.SecsLogListener;
 import com.shimizukenta.secs.SecsMessage;
-import com.shimizukenta.secs.SecsMessagePassThroughListener;
 import com.shimizukenta.secs.SecsMessageReceiveBiListener;
 import com.shimizukenta.secs.SecsMessageReceiveListener;
 import com.shimizukenta.secs.gem.Gem;
@@ -33,13 +31,13 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	
 	private final SecsMessageReceiveQueueBiObserver secsMsgRecvQueueObserver;
 	
-	private final SecsLogQueueObserver logQueuObserver;
+//	private final SecsLogQueueObserver logQueuObserver;
 	
 	private final SecsCommunicatableStatePropertyBiObserver communicatableStatePropOberser;
 	
-	private final SecsMessagePassThroughQueueObserver trySendSecsMsgPassThroughQueueObserver;
-	private final SecsMessagePassThroughQueueObserver sendedSecsMsgPassThroughQueueObserver;
-	private final SecsMessagePassThroughQueueObserver recvSecsMsgPassThroughQueueObserver;
+//	private final SecsMessagePassThroughQueueObserver trySendSecsMsgPassThroughQueueObserver;
+//	private final SecsMessagePassThroughQueueObserver sendedSecsMsgPassThroughQueueObserver;
+//	private final SecsMessagePassThroughQueueObserver recvSecsMsgPassThroughQueueObserver;
 	
 	
 	public AbstractSecsCommunicator(AbstractSecsCommunicatorConfig config) {
@@ -51,13 +49,13 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		
 		this.secsMsgRecvQueueObserver = new SecsMessageReceiveQueueBiObserver(this.executorService(), this);
 		
-		this.logQueuObserver = new SecsLogQueueObserver(this.executorService());
+//		this.logQueuObserver = new SecsLogQueueObserver(this.executorService());
 		
 		this.communicatableStatePropOberser = new SecsCommunicatableStatePropertyBiObserver(this, this.communicatable);
 		
-		this.trySendSecsMsgPassThroughQueueObserver = new SecsMessagePassThroughQueueObserver(this.executorService());
-		this.sendedSecsMsgPassThroughQueueObserver = new SecsMessagePassThroughQueueObserver(this.executorService());
-		this.recvSecsMsgPassThroughQueueObserver = new SecsMessagePassThroughQueueObserver(this.executorService());
+//		this.trySendSecsMsgPassThroughQueueObserver = new SecsMessagePassThroughQueueObserver(this.executorService());
+//		this.sendedSecsMsgPassThroughQueueObserver = new SecsMessagePassThroughQueueObserver(this.executorService());
+//		this.recvSecsMsgPassThroughQueueObserver = new SecsMessagePassThroughQueueObserver(this.executorService());
 	}
 	
 	@Override
@@ -158,30 +156,30 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	}
 	
 	
-	/* Secs-Log Receive Listener */
-	
-	@Override
-	public boolean addSecsLogListener(SecsLogListener l) {
-		return this.logQueuObserver.addListener(l);
-	}
-	
-	@Override
-	public boolean removeSecsLogListener(SecsLogListener l) {
-		return this.logQueuObserver.removeListener(l);
-	}
-	
-	public void notifyLog(AbstractSecsLog log) throws InterruptedException {
-		log.subjectHeader(this.config.logSubjectHeader().toString());
-		this.logQueuObserver.put(log);
-	}
-	
-	public void notifyLog(Throwable t) throws InterruptedException {
-		
-		this.notifyLog(new AbstractSecsThrowableLog(t) {
-			
-			private static final long serialVersionUID = -1271705310309086030L;
-		});
-	}
+//	/* Secs-Log Receive Listener */
+//	
+//	@Override
+//	public boolean addSecsLogListener(SecsLogListener l) {
+//		return this.logQueuObserver.addListener(l);
+//	}
+//	
+//	@Override
+//	public boolean removeSecsLogListener(SecsLogListener l) {
+//		return this.logQueuObserver.removeListener(l);
+//	}
+//	
+//	public void notifyLog(AbstractSecsLog log) throws InterruptedException {
+//		log.subjectHeader(this.config.logSubjectHeader().toString());
+//		this.logQueuObserver.put(log);
+//	}
+//	
+//	public void notifyLog(Throwable t) throws InterruptedException {
+//		
+//		this.notifyLog(new AbstractSecsThrowableLog(t) {
+//			
+//			private static final long serialVersionUID = -1271705310309086030L;
+//		});
+//	}
 	
 	
 	/* Secs-Communicatable-State-Changed-Listener */
@@ -211,54 +209,54 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	}
 	
 	
-	/* Try-Send Secs-Message Pass-through Listener */
-	
-	@Override
-	public boolean addTrySendSecsMessagePassThroughListener(SecsMessagePassThroughListener l) {
-		return this.trySendSecsMsgPassThroughQueueObserver.addListener(l);
-	}
-	
-	@Override
-	public boolean removeTrySendSecsMessagePassThroughListener(SecsMessagePassThroughListener l) {
-		return this.trySendSecsMsgPassThroughQueueObserver.removeListener(l);
-	}
-	
-	public final void notifyTrySendSecsMessagePassThrough(SecsMessage msg) throws InterruptedException {
-		this.trySendSecsMsgPassThroughQueueObserver.put(msg);
-	}
-	
-	
-	/* Sended Secs-Message Pass-through Listener */
-	
-	@Override
-	public boolean addSendedSecsMessagePassThroughListener(SecsMessagePassThroughListener l) {
-		return this.sendedSecsMsgPassThroughQueueObserver.addListener(l);
-	}
-	
-	@Override
-	public boolean removeSendedSecsMessagePassThroughListener(SecsMessagePassThroughListener l) {
-		return this.sendedSecsMsgPassThroughQueueObserver.removeListener(l);
-	}
-	
-	public final void notifySendedSecsMessagePassThrough(SecsMessage msg) throws InterruptedException {
-		this.sendedSecsMsgPassThroughQueueObserver.put(msg);
-	}
+//	/* Try-Send Secs-Message Pass-through Listener */
+//	
+//	@Override
+//	public boolean addTrySendSecsMessagePassThroughListener(SecsMessagePassThroughListener l) {
+//		return this.trySendSecsMsgPassThroughQueueObserver.addListener(l);
+//	}
+//	
+//	@Override
+//	public boolean removeTrySendSecsMessagePassThroughListener(SecsMessagePassThroughListener l) {
+//		return this.trySendSecsMsgPassThroughQueueObserver.removeListener(l);
+//	}
+//	
+//	public final void notifyTrySendSecsMessagePassThrough(SecsMessage msg) throws InterruptedException {
+//		this.trySendSecsMsgPassThroughQueueObserver.put(msg);
+//	}
 	
 	
-	/* Receive Secs-Message Pass-through Listener */
+//	/* Sended Secs-Message Pass-through Listener */
+//	
+//	@Override
+//	public boolean addSendedSecsMessagePassThroughListener(SecsMessagePassThroughListener l) {
+//		return this.sendedSecsMsgPassThroughQueueObserver.addListener(l);
+//	}
+//	
+//	@Override
+//	public boolean removeSendedSecsMessagePassThroughListener(SecsMessagePassThroughListener l) {
+//		return this.sendedSecsMsgPassThroughQueueObserver.removeListener(l);
+//	}
+//	
+//	public final void notifySendedSecsMessagePassThrough(SecsMessage msg) throws InterruptedException {
+//		this.sendedSecsMsgPassThroughQueueObserver.put(msg);
+//	}
 	
-	@Override
-	public boolean addReceiveSecsMessagePassThroughListener(SecsMessagePassThroughListener l) {
-		return this.recvSecsMsgPassThroughQueueObserver.addListener(l);
-	}
 	
-	@Override
-	public boolean removeReceiveSecsMessagePassThroughListener(SecsMessagePassThroughListener l) {
-		return this.recvSecsMsgPassThroughQueueObserver.removeListener(l);
-	}
-	
-	public final void notifyReceiveSecsMessagePassThrough(SecsMessage msg) throws InterruptedException {
-		this.recvSecsMsgPassThroughQueueObserver.put(msg);
-	}
+//	/* Receive Secs-Message Pass-through Listener */
+//	
+//	@Override
+//	public boolean addReceiveSecsMessagePassThroughListener(SecsMessagePassThroughListener l) {
+//		return this.recvSecsMsgPassThroughQueueObserver.addListener(l);
+//	}
+//	
+//	@Override
+//	public boolean removeReceiveSecsMessagePassThroughListener(SecsMessagePassThroughListener l) {
+//		return this.recvSecsMsgPassThroughQueueObserver.removeListener(l);
+//	}
+//	
+//	public final void notifyReceiveSecsMessagePassThrough(SecsMessage msg) throws InterruptedException {
+//		this.recvSecsMsgPassThroughQueueObserver.put(msg);
+//	}
 	
 }

@@ -47,7 +47,7 @@ import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicatorConfig;
  * @author kenta-shimizu
  *
  */
-public interface SecsCommunicator extends OpenAndCloseable, SecsGemAccessor, SecsMessageReceiveObservable, SecsMessagePassThroughObservable, SecsCommunicateStateDetectable {
+public interface SecsCommunicator extends OpenAndCloseable, SecsGemAccessor, SecsMessageReceiveObservable, SecsMessagePassThroughObservable, SecsCommunicateStateDetectable, SecsLogObservable {
 	
 	/**
 	 * Open and wait until communicatable.
@@ -79,28 +79,6 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsGemAccessor, Sec
 	 * @throws TimeoutException if timeout
 	 */
 	public void openAndWaitUntilCommunicatable(long timeout, TimeUnit unit) throws IOException, InterruptedException, TimeoutException;
-	
-	
-	/* Secs-Log Receive Listener */
-	
-	/**
-	 * Add Listener to log Communicating.
-	 * 
-	 * @param listener Not accept {@code null}
-	 * @return {@code true} if add success
-	 */
-	public boolean addSecsLogListener(SecsLogListener listener);
-	
-	/**
-	 * Remove Listener
-	 * 
-	 * @param listener Not accept {@code null}
-	 * @return {@code true} if remove success
-	 */
-	public boolean removeSecsLogListener(SecsLogListener listener);
-	
-	
-	
 	
 	
 }

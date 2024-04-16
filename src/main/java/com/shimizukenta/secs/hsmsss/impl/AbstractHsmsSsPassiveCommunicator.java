@@ -88,8 +88,8 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				server.wait();
 			}
 		}
-		catch ( IOException e ) {
-			this.notifyLog(e);
+		catch (IOException e) {
+			this.offerThrowableToLog(e);
 		}
 	}
 	
@@ -98,11 +98,11 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		
 		final SocketAddress addr = this.config.socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
 		
-		this.notifyLog(HsmsSsPassiveBindLog.tryBind(addr));
+		this.logObserver().offerHsmsChannelConnectionTryBind(addr);
 		
 		server.bind(addr);
 		
-		this.notifyLog(HsmsSsPassiveBindLog.binded(addr));
+		this.logObserver().offerHsmsChannelConnectionBinded(addr);
 		
 		server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
 			
@@ -118,7 +118,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 						
 						try {
 							
-							AbstractHsmsSsPassiveCommunicator.this.notifyLog(HsmsSsConnectionLog.accepted(pLocal, pRemote));
+							AbstractHsmsSsPassiveCommunicator.this.logObserver().offerHsmsChannelConnectionAccepted(pLocal, pRemote);
 							
 							AbstractHsmsSsPassiveCommunicator.this.completionAction(channel);
 						}
@@ -133,18 +133,14 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 							try {
 								channel.close();
 							}
-							catch ( IOException giveup ) {
+							catch (IOException giveup) {
 							}
 							
-							try {
-								AbstractHsmsSsPassiveCommunicator.this.notifyLog(HsmsSsConnectionLog.closed(pLocal, pRemote));
-							}
-							catch ( InterruptedException ignore ) {
-							}
+							AbstractHsmsSsPassiveCommunicator.this.logObserver().offerHsmsChannelConnectionAcceptClosed(pLocal, pRemote);
 						}
 					}
-					catch ( IOException e ) {
-						AbstractHsmsSsPassiveCommunicator.this.notifyLog(e);
+					catch (IOException e) {
+						AbstractHsmsSsPassiveCommunicator.this.offerThrowableToLog(e);
 						return;
 					}
 				}
@@ -156,11 +152,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 			public void failed(Throwable t, Void attachment) {
 				
 				if (! (t instanceof ClosedChannelException)) {
-					try {
-						AbstractHsmsSsPassiveCommunicator.this.notifyLog(t);
-					}
-					catch ( InterruptedException ignore ) {
-					}
+					AbstractHsmsSsPassiveCommunicator.this.offerThrowableToLog(t);
 				}
 				
 				synchronized ( server ) {
@@ -212,12 +204,12 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				}
 				
 				if (! (t instanceof ClosedChannelException)) {
-					notifyLog(t);
+					this.offerThrowableToLog(t);
 				}
 			}
 		}
 		catch (IOException e) {
-			notifyLog(e);
+			this.offerThrowableToLog(e);
 		}
 	}
 	
@@ -226,7 +218,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		final AbstractHsmsMessage initiateMsg = asyncChannel.pollPrimaryHsmsMessage(this.config.timeout().t7());
 		
 		if (initiateMsg == null) {
-			this.notifyLog(new HsmsTimeoutT7Exception());
+			this.offerThrowableToLog(new HsmsTimeoutT7Exception());
 			return ;
 		}
 		
@@ -313,14 +305,14 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 				}
 			}
 			catch (HsmsSendMessageException | HsmsWaitReplyMessageException e) {
-				this.notifyLog(e);
+				this.offerThrowableToLog(e);
 			}
 			
 			break;
 		}
 		default: {
 			
-			this.notifyLog(new HsmsSsPassiveReceiveNotSelectRequestException());
+			this.offerThrowableToLog(new HsmsSsPassiveReceiveNotSelectRequestException());
 			return;
 		}
 		}
