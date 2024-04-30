@@ -25,10 +25,11 @@ import com.shimizukenta.secs.hsms.HsmsSession;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
 import com.shimizukenta.secs.impl.SecsCommunicatableStatePropertyBiObserver;
 import com.shimizukenta.secs.impl.SecsMessageReceiveQueueBiObserver;
+import com.shimizukenta.secs.impl.SecsMessageSendableImpl;
 import com.shimizukenta.secs.local.property.BooleanProperty;
 import com.shimizukenta.secs.local.property.ObjectProperty;
 
-public abstract class AbstractHsmsSession implements HsmsSession {
+public abstract class AbstractHsmsSession implements HsmsSession, SecsMessageSendableImpl {
 	
 	private final Gem gem;
 	

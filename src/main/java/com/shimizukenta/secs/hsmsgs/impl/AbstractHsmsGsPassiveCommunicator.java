@@ -76,7 +76,7 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 		}
 		finally {
 			if (sockAddr != null) {
-				this.logObserver().offerHsmsChannelConnectionBindClosed(sockAddr);
+				this.hsmsLogObserver().offerHsmsChannelConnectionBindClosed(sockAddr);
 			}
 		}
 	}
@@ -84,11 +84,11 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 	private void passiveAccepting(AsynchronousServerSocketChannel server, SocketAddress sockAddr)
 			throws IOException, InterruptedException {
 		
-		this.logObserver().offerHsmsChannelConnectionTryBind(sockAddr);
+		this.hsmsLogObserver().offerHsmsChannelConnectionTryBind(sockAddr);
 		
 		server.bind(sockAddr);
 		
-		this.logObserver().offerHsmsChannelConnectionBinded(sockAddr);
+		this.hsmsLogObserver().offerHsmsChannelConnectionBinded(sockAddr);
 		
 		server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
 			
@@ -110,7 +110,7 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 						return;
 					}
 					
-					AbstractHsmsGsPassiveCommunicator.this.logObserver().offerHsmsChannelConnectionAccepted(pLocal, pRemote);
+					AbstractHsmsGsPassiveCommunicator.this.hsmsLogObserver().offerHsmsChannelConnectionAccepted(pLocal, pRemote);
 					
 					AbstractHsmsGsPassiveCommunicator.this.completionAction(channel);
 				}
@@ -130,7 +130,7 @@ public abstract class AbstractHsmsGsPassiveCommunicator extends AbstractHsmsGsCo
 					catch (IOException giveup) {
 					}
 					
-					AbstractHsmsGsPassiveCommunicator.this.logObserver().offerHsmsChannelConnectionAcceptClosed(pLocal, pRemote);
+					AbstractHsmsGsPassiveCommunicator.this.hsmsLogObserver().offerHsmsChannelConnectionAcceptClosed(pLocal, pRemote);
 				}
 			}
 

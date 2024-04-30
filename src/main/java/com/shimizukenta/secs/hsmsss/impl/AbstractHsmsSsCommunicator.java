@@ -85,7 +85,7 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 	public void open() throws IOException {
 		
 		this.getSession().addHsmsCommunicateStateChangeBiListener((state, comm) -> {
-			this.logObserver().offerHsmsSessionCommunicateState(comm.sessionId(), state);
+			this.hsmsLogObserver().offerHsmsSessionCommunicateState(comm.sessionId(), state);
 		});
 		
 		super.open();
@@ -240,35 +240,31 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 	/* Pass Through */
 	
 	@Override
-	public AbstractHsmsMessagePassThroughObserverFacade passThroughObserver() {
+	public AbstractHsmsMessagePassThroughObserverFacade hsmsPassThroughObserver() {
 		return this.msgPassThroughObserver;
 	}
 	
 	/* LogObservable */
 	
 	@Override
-	public AbstractHsmsLogObserverFacade logObserver() {
+	public AbstractHsmsLogObserverFacade hsmsLogObserver() {
 		return this.logObserver;
 	}
 	
 	
 	public void notifyTrySendHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
-		this.msgPassThroughObserver.putToTrySendHsmsMessage(message);
-		this.logObserver.offerTrySendHsmsMessagePassThrough(message);
+		this.hsmsPassThroughObserver().putToTrySendHsmsMessage(message);
+		this.hsmsLogObserver().offerTrySendHsmsMessagePassThrough(message);
 	}
 	
 	public void notifySendedHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
-		this.msgPassThroughObserver.putToSendedHsmsMessage(message);
-		this.logObserver.offerSendedHsmsMessagePassThrough(message);
+		this.hsmsPassThroughObserver().putToSendedHsmsMessage(message);
+		this.hsmsLogObserver().offerSendedHsmsMessagePassThrough(message);
 	}
 	
 	public void notifyReceiveHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
-		this.msgPassThroughObserver.putToReceiveHsmsMessage(message);
-		this.logObserver.offerReceiveHsmsMessagePassThrough(message);
-	}
-	
-	public boolean offerThrowableToLog(Throwable t) {
-		return this.logObserver.offerThrowable(t);
+		this.hsmsPassThroughObserver().putToReceiveHsmsMessage(message);
+		this.hsmsLogObserver().offerReceiveHsmsMessagePassThrough(message);
 	}
 	
 }

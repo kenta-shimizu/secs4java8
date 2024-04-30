@@ -1,8 +1,6 @@
-/**
- * 
- */
 package com.shimizukenta.secs.secs1;
 
+import com.shimizukenta.secs.SecsMessagePassThroughListener;
 import com.shimizukenta.secs.SecsMessagePassThroughObservable;
 
 /**
@@ -28,7 +26,7 @@ public interface Secs1MessagePassThroughObservable extends SecsMessagePassThroug
 	 * @param listener the SECS-I Message pass through listener
 	 * @return true if add success
 	 */
-	public boolean addTrySendSecs1MessagePassThroughListener(Secs1MessagePassThroughListener listener);
+	public boolean addTrySendSecs1MessagePassThroughListener(SecsMessagePassThroughListener<? super Secs1Message> listener);
 	
 	/**
 	 * Remove listener.
@@ -36,7 +34,7 @@ public interface Secs1MessagePassThroughObservable extends SecsMessagePassThroug
 	 * @param listener the SECS-I Message pass through listener
 	 * @return true if remove success
 	 */
-	public boolean removeTrySendSecs1MessagePassThroughListener(Secs1MessagePassThroughListener listener);
+	public boolean removeTrySendSecs1MessagePassThroughListener(SecsMessagePassThroughListener<? super Secs1Message> listener);
 	
 	
 	/**
@@ -45,7 +43,7 @@ public interface Secs1MessagePassThroughObservable extends SecsMessagePassThroug
 	 * @param listener the SECS-I Message pass through listener
 	 * @return true if add success
 	 */
-	public boolean addSendedSecs1MessagePassThroughListener(Secs1MessagePassThroughListener listener);
+	public boolean addSendedSecs1MessagePassThroughListener(SecsMessagePassThroughListener<? super Secs1Message> listener);
 	
 	/**
 	 * Remove listener.
@@ -53,7 +51,7 @@ public interface Secs1MessagePassThroughObservable extends SecsMessagePassThroug
 	 * @param listener the SECS-I Message pass through listener
 	 * @return true if remove success
 	 */
-	public boolean removeSendedSecs1MessagePassThroughListener(Secs1MessagePassThroughListener listener);
+	public boolean removeSendedSecs1MessagePassThroughListener(SecsMessagePassThroughListener<? super Secs1Message> listener);
 	
 	
 	/**
@@ -62,7 +60,7 @@ public interface Secs1MessagePassThroughObservable extends SecsMessagePassThroug
 	 * @param listener the SECS-I Message pass through listener
 	 * @return true if add success
 	 */
-	public boolean addReceiveSecs1MessagePassThroughListener(Secs1MessagePassThroughListener listener);
+	public boolean addReceiveSecs1MessagePassThroughListener(SecsMessagePassThroughListener<? super Secs1Message> listener);
 	
 	/**
 	 * Remove listener.
@@ -70,6 +68,6 @@ public interface Secs1MessagePassThroughObservable extends SecsMessagePassThroug
 	 * @param listener the SECS-I Message pass through listener
 	 * @return true if remove success
 	 */
-	public boolean removeReceiveSecs1MessagePassThroughListener(Secs1MessagePassThroughListener listener);
+	public boolean removeReceiveSecs1MessagePassThroughListener(SecsMessagePassThroughListener<? super Secs1Message> listener);
 	
 }

@@ -1,6 +1,5 @@
 package com.shimizukenta.secs.impl;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.shimizukenta.secs.SecsMessage;

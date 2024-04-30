@@ -98,11 +98,11 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 		
 		final SocketAddress addr = this.config.socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
 		
-		this.logObserver().offerHsmsChannelConnectionTryBind(addr);
+		this.hsmsLogObserver().offerHsmsChannelConnectionTryBind(addr);
 		
 		server.bind(addr);
 		
-		this.logObserver().offerHsmsChannelConnectionBinded(addr);
+		this.hsmsLogObserver().offerHsmsChannelConnectionBinded(addr);
 		
 		server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
 			
@@ -118,7 +118,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 						
 						try {
 							
-							AbstractHsmsSsPassiveCommunicator.this.logObserver().offerHsmsChannelConnectionAccepted(pLocal, pRemote);
+							AbstractHsmsSsPassiveCommunicator.this.hsmsLogObserver().offerHsmsChannelConnectionAccepted(pLocal, pRemote);
 							
 							AbstractHsmsSsPassiveCommunicator.this.completionAction(channel);
 						}
@@ -136,7 +136,7 @@ public abstract class AbstractHsmsSsPassiveCommunicator extends AbstractHsmsSsCo
 							catch (IOException giveup) {
 							}
 							
-							AbstractHsmsSsPassiveCommunicator.this.logObserver().offerHsmsChannelConnectionAcceptClosed(pLocal, pRemote);
+							AbstractHsmsSsPassiveCommunicator.this.hsmsLogObserver().offerHsmsChannelConnectionAcceptClosed(pLocal, pRemote);
 						}
 					}
 					catch (IOException e) {

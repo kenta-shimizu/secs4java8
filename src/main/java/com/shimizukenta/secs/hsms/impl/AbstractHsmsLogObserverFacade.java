@@ -3,8 +3,8 @@ package com.shimizukenta.secs.hsms.impl;
 import java.net.SocketAddress;
 import java.util.concurrent.Executor;
 
-import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
 import com.shimizukenta.secs.SecsLogListener;
+import com.shimizukenta.secs.hsms.AbstractHsmsCommunicatorConfig;
 import com.shimizukenta.secs.hsms.HsmsChannelConnectionLog;
 import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsLogObservable;
@@ -53,7 +53,7 @@ public abstract class AbstractHsmsLogObserverFacade extends AbstractSecsLogObser
 	}
 
 	
-	private final AbstractSecsCommunicatorConfig config;
+	private final AbstractHsmsCommunicatorConfig config;
 	
 	private final HsmsMessagePassThroghLogObserver trySendHsmsMsgPassThroughLogObserver;
 	private final HsmsMessagePassThroghLogObserver sendedHsmsMsgPassThroughLogObserver;
@@ -63,7 +63,7 @@ public abstract class AbstractHsmsLogObserverFacade extends AbstractSecsLogObser
 	
 	private final HsmsSessionCommunicateStateLogObserver hsmsSessionCommunicateStateLogObserver;
 	
-	public AbstractHsmsLogObserverFacade(AbstractSecsCommunicatorConfig config, Executor executor) {
+	public AbstractHsmsLogObserverFacade(AbstractHsmsCommunicatorConfig config, Executor executor) {
 		super(config, executor);
 		
 		this.config = config;
@@ -176,69 +176,46 @@ public abstract class AbstractHsmsLogObserverFacade extends AbstractSecsLogObser
 		return f;
 	}
 	
-	public boolean offerHsmsChannelConnectionTryBind(SocketAddress local) {
-		final AbstractHsmsChannelConnectionLog log = AbstractHsmsChannelConnectionLog.tryBind(local);
+	
+	private boolean offerHsmsChannelConnection(AbstractHsmsChannelConnectionLog log) {
 		log.subjectHeader(this.config.logSubjectHeader().toString());
 		boolean f = this.channelConnectionLogObserver.offer(log);
 		this.offerToAllLog(log);
 		return f;
+	}
+	
+	public boolean offerHsmsChannelConnectionTryBind(SocketAddress local) {
+		return this.offerHsmsChannelConnection(AbstractHsmsChannelConnectionLog.tryBind(local));
 	}
 	
 	public boolean offerHsmsChannelConnectionBinded(SocketAddress local) {
-		final AbstractHsmsChannelConnectionLog log = AbstractHsmsChannelConnectionLog.binded(local);
-		log.subjectHeader(this.config.logSubjectHeader().toString());
-		boolean f = this.channelConnectionLogObserver.offer(log);
-		this.offerToAllLog(log);
-		return f;
+		return this.offerHsmsChannelConnection(AbstractHsmsChannelConnectionLog.binded(local));
 	}
 	
 	public boolean offerHsmsChannelConnectionBindClosed(SocketAddress local) {
-		final AbstractHsmsChannelConnectionLog log = AbstractHsmsChannelConnectionLog.bindClosed(local);
-		log.subjectHeader(this.config.logSubjectHeader().toString());
-		boolean f = this.channelConnectionLogObserver.offer(log);
-		this.offerToAllLog(log);
-		return f;
+		return this.offerHsmsChannelConnection(AbstractHsmsChannelConnectionLog.bindClosed(local));
 	}
 	
 	public boolean offerHsmsChannelConnectionAccepted(SocketAddress local, SocketAddress remote) {
-		final AbstractHsmsChannelConnectionLog log = AbstractHsmsChannelConnectionLog.accepted(local, remote);
-		log.subjectHeader(this.config.logSubjectHeader().toString());
-		boolean f = this.channelConnectionLogObserver.offer(log);
-		this.offerToAllLog(log);
-		return f;
+		return this.offerHsmsChannelConnection(AbstractHsmsChannelConnectionLog.accepted(local, remote));
 	}
 	
 	public boolean offerHsmsChannelConnectionAcceptClosed(SocketAddress local, SocketAddress remote) {
-		final AbstractHsmsChannelConnectionLog log = AbstractHsmsChannelConnectionLog.acceptClosed(local, remote);
-		log.subjectHeader(this.config.logSubjectHeader().toString());
-		boolean f = this.channelConnectionLogObserver.offer(log);
-		this.offerToAllLog(log);
-		return f;
+		return this.offerHsmsChannelConnection(AbstractHsmsChannelConnectionLog.acceptClosed(local, remote));
 	}
 	
 	public boolean offerHsmsChannelConnectionTryConnect(SocketAddress remote) {
-		final AbstractHsmsChannelConnectionLog log = AbstractHsmsChannelConnectionLog.tryConnect(remote);
-		log.subjectHeader(this.config.logSubjectHeader().toString());
-		boolean f = this.channelConnectionLogObserver.offer(log);
-		this.offerToAllLog(log);
-		return f;
+		return this.offerHsmsChannelConnection(AbstractHsmsChannelConnectionLog.tryConnect(remote));
 	}
 	
 	public boolean offerHsmsChannelConnectionConnected(SocketAddress local, SocketAddress remote) {
-		final AbstractHsmsChannelConnectionLog log = AbstractHsmsChannelConnectionLog.connected(local, remote);
-		log.subjectHeader(this.config.logSubjectHeader().toString());
-		boolean f = this.channelConnectionLogObserver.offer(log);
-		this.offerToAllLog(log);
-		return f;
+		return this.offerHsmsChannelConnection(AbstractHsmsChannelConnectionLog.connected(local, remote));
 	}
 
 	public boolean offerHsmsChannelConnectionConnectClosed(SocketAddress local, SocketAddress remote) {
-		final AbstractHsmsChannelConnectionLog log = AbstractHsmsChannelConnectionLog.connectClosed(local, remote);
-		log.subjectHeader(this.config.logSubjectHeader().toString());
-		boolean f = this.channelConnectionLogObserver.offer(log);
-		this.offerToAllLog(log);
-		return f;
+		return this.offerHsmsChannelConnection(AbstractHsmsChannelConnectionLog.connectClosed(local, remote));
 	}
+	
 	
 	public boolean offerHsmsSessionCommunicateState(int sessionId, HsmsCommunicateState state) {
 		final AbstractHsmsSessionCommunicateStateLog log = AbstractHsmsSessionCommunicateStateLog.build(sessionId, state);

@@ -57,7 +57,7 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 			
 			final SocketAddress remoteAddr = this.config.socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
 			
-			AbstractHsmsGsActiveCommunicator.this.logObserver().offerHsmsChannelConnectionTryConnect(remoteAddr);
+			AbstractHsmsGsActiveCommunicator.this.hsmsLogObserver().offerHsmsChannelConnectionTryConnect(remoteAddr);
 			
 			channel.connect(remoteAddr, null, new CompletionHandler<Void, Void>(){
 				
@@ -73,7 +73,7 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 							pLocal = channel.getLocalAddress();
 							pRemote = channel.getRemoteAddress();
 							
-							AbstractHsmsGsActiveCommunicator.this.logObserver().offerHsmsChannelConnectionConnected(pLocal, pRemote);
+							AbstractHsmsGsActiveCommunicator.this.hsmsLogObserver().offerHsmsChannelConnectionConnected(pLocal, pRemote);
 							
 							AbstractHsmsGsActiveCommunicator.this.completionAction(channel);
 						}
@@ -95,7 +95,7 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 							channel.notifyAll();
 						}
 						
-						AbstractHsmsGsActiveCommunicator.this.logObserver().offerHsmsChannelConnectionConnectClosed(pLocal, pRemote);
+						AbstractHsmsGsActiveCommunicator.this.hsmsLogObserver().offerHsmsChannelConnectionConnectClosed(pLocal, pRemote);
 					}
 				}
 				

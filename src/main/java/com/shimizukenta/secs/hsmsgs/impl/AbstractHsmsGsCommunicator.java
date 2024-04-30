@@ -88,7 +88,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 		
 		this.getAbstractHsmsGsSessions().forEach(session -> {
 			session.addHsmsCommunicateStateChangeBiListener((state, comm) -> {
-				this.logObserver().offerHsmsSessionCommunicateState(comm.sessionId(), state);
+				this.hsmsLogObserver().offerHsmsSessionCommunicateState(comm.sessionId(), state);
 			});
 		});
 		
@@ -542,14 +542,14 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	/* Pass Through */
 	
 	@Override
-	public AbstractHsmsMessagePassThroughObserverFacade passThroughObserver() {
+	public AbstractHsmsMessagePassThroughObserverFacade hsmsPassThroughObserver() {
 		return this.msgPassThroughObserver;
 	}
 	
 	/* LogObservable */
 	
 	@Override
-	public AbstractHsmsLogObserverFacade logObserver() {
+	public AbstractHsmsLogObserverFacade hsmsLogObserver() {
 		return this.logObserver;
 	}
 	

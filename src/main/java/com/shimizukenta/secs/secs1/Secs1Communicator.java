@@ -8,6 +8,6 @@ import com.shimizukenta.secs.SecsCommunicator;
  * @author kenta-shimizu
  *
  */
-public interface Secs1Communicator extends SecsCommunicator, Secs1GemAccessor, Secs1MessageReceiveObservable, Secs1MessagePassThroughObservable {
+public interface Secs1Communicator extends SecsCommunicator, Secs1GemAccessor, Secs1MessageReceiveObservable, Secs1MessagePassThroughObservable, Secs1LogObservable {
 	
 }

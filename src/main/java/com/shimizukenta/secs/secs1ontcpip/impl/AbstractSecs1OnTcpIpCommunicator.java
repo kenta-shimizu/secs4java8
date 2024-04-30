@@ -30,17 +30,25 @@ import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpNotConnectedException;
  *
  */
 public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Communicator
-		implements Secs1OnTcpIpCommunicator {
+		implements Secs1OnTcpIpCommunicator, Secs1OnTcpIpLogObservableImpl {
 	
 	private final ListProperty<AsynchronousSocketChannel> channels = ListProperty.newInstance();
 	
 	private final Secs1OnTcpIpCommunicatorConfig secs1OnTcpIpConfig;
+	private final AbstractSecs1OnTcpIpLogObserverFacade secs1OnTcpIpLogObserver;
 	
 	public AbstractSecs1OnTcpIpCommunicator(Secs1OnTcpIpCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
 		
 		this.secs1OnTcpIpConfig = config;
+		this.secs1OnTcpIpLogObserver = new AbstractSecs1OnTcpIpLogObserverFacade(config, this.executorService()) {};
+		
 		this.channels.computeIsNotEmpty().addChangeListener(this::notifyCommunicatableStateChange);
+	}
+	
+	@Override
+	public AbstractSecs1OnTcpIpLogObserverFacade secs1OnTcpIpLogObserver() {
+		return this.secs1OnTcpIpLogObserver;
 	}
 	
 	@Override
@@ -75,7 +83,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 			
 			SocketAddress socketAddr = secs1OnTcpIpConfig.socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
 			
-			notifyLog(Secs1OnTcpIpConnectionLog.tryConnect(socketAddr));
+			this.secs1OnTcpIpLogObserver().offerSecs1OnTcpIpChannelConnectionTryConnect(socketAddr);
 			
 			channel.connect(socketAddr, null, new CompletionHandler<Void, Void>() {
 
@@ -93,7 +101,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 							
 							addChannel(channel);
 							
-							notifyLog(Secs1OnTcpIpConnectionLog.connected(pLocal, pRemote));
+							AbstractSecs1OnTcpIpCommunicator.this.secs1OnTcpIpLogObserver().offerSecs1OnTcpIpChannelConnectionConnected(pLocal, pRemote);
 							
 							final Collection<Callable<Void>> tasks = Arrays.asList(
 									() -> {
@@ -104,8 +112,8 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 							executeInvokeAny(tasks);
 							
 						}
-						catch ( IOException e ) {
-							notifyLog(e);
+						catch (IOException e) {
+							AbstractSecs1OnTcpIpCommunicator.this.offerThrowableToLog(e);
 						}
 						catch ( ExecutionException e ) {
 							
@@ -115,7 +123,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 								throw (RuntimeException)t;
 							}
 							
-							notifyLog(t);
+							AbstractSecs1OnTcpIpCommunicator.this.offerThrowableToLog(t);
 						}
 						finally {
 							
@@ -127,11 +135,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 							catch ( IOException giveup ) {
 							}
 							
-							try {
-								notifyLog(Secs1OnTcpIpConnectionLog.disconnected(pLocal, pRemote));
-							}
-							catch ( InterruptedException ignore ) {
-							}
+							AbstractSecs1OnTcpIpCommunicator.this.secs1OnTcpIpLogObserver().offerSecs1OnTcpIpChannelConnectionConnectClosed(pLocal, pRemote);
 							
 							synchronized ( channel ) {
 								channel.notifyAll();
@@ -146,11 +150,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 				public void failed(Throwable t, Void attachment) {
 					
 					if ( ! (t instanceof ClosedChannelException) ) {
-						try {
-							notifyLog(t);
-						}
-						catch ( InterruptedException ignore ) {
-						}
+						AbstractSecs1OnTcpIpCommunicator.this.offerThrowableToLog(t);
 					}
 					
 					synchronized ( channel ) {
@@ -164,7 +164,7 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 			}
 		}
 		catch ( IOException e ) {
-			notifyLog(e);
+			AbstractSecs1OnTcpIpCommunicator.this.offerThrowableToLog(e);
 		}
 	}
 	

@@ -6,12 +6,20 @@ import java.util.Optional;
 
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.secs1.Secs1Exception;
+import com.shimizukenta.secs.secs1.Secs1IllegalLengthByteException;
 import com.shimizukenta.secs.secs1.Secs1Message;
 import com.shimizukenta.secs.secs1.Secs1MessageBlock;
+import com.shimizukenta.secs.secs1.Secs1NotReceiveAckException;
+import com.shimizukenta.secs.secs1.Secs1NotReceiveNextBlockEnqException;
+import com.shimizukenta.secs.secs1.Secs1RetryCountUpException;
 import com.shimizukenta.secs.secs1.Secs1RetryOverException;
 import com.shimizukenta.secs.secs1.Secs1SendByteException;
 import com.shimizukenta.secs.secs1.Secs1SendMessageException;
+import com.shimizukenta.secs.secs1.Secs1SumCheckMismatchException;
+import com.shimizukenta.secs.secs1.Secs1TimeoutT1Exception;
+import com.shimizukenta.secs.secs1.Secs1TimeoutT2Exception;
 import com.shimizukenta.secs.secs1.Secs1TimeoutT3Exception;
+import com.shimizukenta.secs.secs1.Secs1TimeoutT4Exception;
 import com.shimizukenta.secs.secs1.Secs1WaitReplyMessageException;
 
 public abstract class AbstractSecs1Circuit implements Runnable {
@@ -67,7 +75,6 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			this.sendMgr.enter(msg);
 			
 			this.comm.notifyTrySendSecs1MessagePassThrough(msg);
-			this.comm.notifyLog(new Secs1TrySendMessageLog(msg));
 			
 			if (msg.wbit() && msg.isValidBlocks()) {
 				
@@ -105,12 +112,12 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 				return Optional.empty();
 			}
 		}
-		catch ( Secs1SendMessageException e ) {
-			this.comm.notifyLog(e);
+		catch (Secs1SendMessageException e) {
+			this.comm.offerThrowableToLog(e);
 			throw e;
 		}
-		catch ( Secs1WaitReplyMessageException e ) {
-			this.comm.notifyLog(e);
+		catch (Secs1WaitReplyMessageException e) {
+			this.comm.offerThrowableToLog(e);
 			throw e;
 		}
 		finally {
@@ -131,8 +138,8 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 				try {
 					this.receiving();
 				}
-				catch ( Secs1Exception e ) {
-					this.comm.notifyLog(e);
+				catch (Secs1Exception e) {
+					this.comm.offerThrowableToLog(e);
 				}
 			}
 			
@@ -150,7 +157,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 						
 						if ( b == null ) {
 							
-							this.comm.notifyLog(Secs1RetryCircuitControlLog.newInstance(retry));
+							this.comm.offerThrowableToLog(new Secs1RetryCountUpException(retry));
 							retry += 1;
 							break;
 							
@@ -159,8 +166,8 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 							try {
 								this.receiving();
 							}
-							catch ( SecsException e ) {
-								this.comm.notifyLog(e);
+							catch (SecsException e) {
+								this.comm.offerThrowableToLog(e);
 							}
 							
 							retry = 0;
@@ -174,8 +181,8 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 								if ( pack.ebit() ) {
 									
 									this.sendMgr.putSended(pack.message());
+									
 									this.comm.notifySendedSecs1MessagePassThrough(pack.message());
-									this.comm.notifyLog(new Secs1SendedMessageLog(pack.message()));
 									
 									return;
 									
@@ -188,7 +195,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 								
 							} else {
 								
-								this.comm.notifyLog(Secs1RetryCircuitControlLog.newInstance(retry));
+								this.comm.offerThrowableToLog(new Secs1RetryCountUpException(retry));
 								retry += 1;
 								break;
 							}
@@ -202,7 +209,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			}
 			catch ( Secs1Exception e ) {
 				this.sendMgr.putException(pack.message(), e);
-				this.comm.notifyLog(e);
+				this.comm.offerThrowableToLog(e);
 			}
 		}
 	}
@@ -210,7 +217,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 	private boolean sending(Secs1MessageBlock block)
 			throws Secs1Exception, InterruptedException {
 		
-		this.comm.notifyLog(new Secs1TrySendMessageBlockLog(block));
+		this.comm.secs1LogObserver().offerTrySendSecs1MessageBlockPassThrough(block);
 		
 		this.sendBytes(block.getBytes());
 		
@@ -218,17 +225,17 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 		
 		if ( b == null ) {
 			
-			this.comm.notifyLog(Secs1TimeoutT2AckCircuitControlLog.newInstance(block));
+			this.comm.offerThrowableToLog(new Secs1TimeoutT2Exception("ACK"));
 			return false;
 			
 		} else if ( b.byteValue() == ACK ) {
 			
-			this.comm.notifyLog(new Secs1SendedMessageBlockLog(block));
+			this.comm.secs1LogObserver().offerSendedSecs1MessageBlockPassThrough(block);
 			return true;
 			
 		} else {
 			
-			this.comm.notifyLog(Secs1NotReceiveAckCircuitControlLog.newInstance(block, b));
+			this.comm.offerThrowableToLog(new Secs1NotReceiveAckException(block,b));
 			return false;
 		}
 	}
@@ -246,7 +253,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			
 			if ( r <= 0 ) {
 				this.sendByte(NAK);
-				this.comm.notifyLog(Secs1TimeoutT2LengthByteCircuitColtrolLog.newInstance());
+				this.comm.offerThrowableToLog(new Secs1TimeoutT2Exception("LengthByte"));
 				return;
 			}
 		}
@@ -257,7 +264,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			if ( len < 10 || len > 254 ) {
 				this.queue.garbageBytes(this.comm.config().timeout().t1());
 				this.sendByte(NAK);
-				this.comm.notifyLog(Secs1IllegalLengthByteCircuitControlLog.newInstance(len));
+				this.comm.offerThrowableToLog(new Secs1IllegalLengthByteException(len));
 				return;
 			}
 			
@@ -267,7 +274,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 				
 				if ( r <= 0 ) {
 					this.sendByte(NAK);
-					this.comm.notifyLog(Secs1TimeoutT1CircuitControlLog.newInstance(pos));
+					this.comm.offerThrowableToLog(new Secs1TimeoutT1Exception(pos));
 					return;
 				}
 				
@@ -288,11 +295,11 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			
 			this.queue.garbageBytes(this.comm.config().timeout().t1());
 			this.sendByte(NAK);
-			this.comm.notifyLog(Secs1SumCheckMismatchCirsuitControlLog.newInstance());
+			this.comm.offerThrowableToLog(new Secs1SumCheckMismatchException());
 			return;
 		}
 		
-		this.comm.notifyLog(new Secs1ReceiveMessageBlockLog(block));
+		this.comm.secs1LogObserver().offerReceiveSecs1MessageBlockPassThrough(block);
 		
 		if (this.comm.config().isCheckMessageBlockDeviceId().booleanValue()) {
 			if (block.deviceId() != this.comm.config().deviceId().intValue()) {
@@ -334,7 +341,6 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 				}
 				
 				this.comm.notifyReceiveSecs1MessagePassThrough(s1msg);
-				this.comm.notifyLog(new Secs1ReceiveMessageLog(s1msg));
 			}
 			finally {
 				this.cacheBlocks.clear();
@@ -348,7 +354,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			
 			if ( b == null ) {
 				
-				this.comm.notifyLog(Secs1TimeoutT4CircuitControlLog.newInstance(block));
+				this.comm.offerThrowableToLog(new Secs1TimeoutT4Exception(block));
 				
 			} else if ( b.byteValue() == ENQ ) {
 				
@@ -356,7 +362,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 				
 			} else {
 				
-				this.comm.notifyLog(Secs1NotReceiveNextBlockEnqCircuitControlLog.newInstance(block, b));
+				this.comm.offerThrowableToLog(new Secs1NotReceiveNextBlockEnqException(block, b));
 			}
 		}
 	}

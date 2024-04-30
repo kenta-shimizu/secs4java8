@@ -8,7 +8,7 @@ import com.shimizukenta.secs.hsms.HsmsMessagePassThroughObservable;
 import com.shimizukenta.secs.impl.AbstractQueueObserver;
 import com.shimizukenta.secs.impl.AbstractSecsMessagePassThroughObserverFacade;
 
-public class AbstractHsmsMessagePassThroughObserverFacade extends AbstractSecsMessagePassThroughObserverFacade implements HsmsMessagePassThroughObservable {
+public abstract class AbstractHsmsMessagePassThroughObserverFacade extends AbstractSecsMessagePassThroughObserverFacade implements HsmsMessagePassThroughObservable {
 	
 	private class HsmsMessagePassThroughObserver extends AbstractQueueObserver<SecsMessagePassThroughListener<? super HsmsMessage>, HsmsMessage> {
 		
@@ -22,9 +22,9 @@ public class AbstractHsmsMessagePassThroughObserverFacade extends AbstractSecsMe
 		}
 	}
 	
-	final HsmsMessagePassThroughObserver trySendHsmsMsg;
-	final HsmsMessagePassThroughObserver sendedHsmsMsg;
-	final HsmsMessagePassThroughObserver recvHsmsMsg;
+	private final HsmsMessagePassThroughObserver trySendHsmsMsg;
+	private final HsmsMessagePassThroughObserver sendedHsmsMsg;
+	private final HsmsMessagePassThroughObserver recvHsmsMsg;
 	
 	public AbstractHsmsMessagePassThroughObserverFacade(Executor executor) {
 		super(executor);
