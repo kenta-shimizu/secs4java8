@@ -7,6 +7,7 @@ import com.shimizukenta.secs.hsms.HsmsGemAccessor;
 import com.shimizukenta.secs.impl.AbstractPropertyBiObserver;
 import com.shimizukenta.secs.local.property.Observable;
 
+@Deprecated
 public class HsmsCommunicateStatePropertyBiObserver extends AbstractPropertyBiObserver<HsmsGemAccessor, HsmsCommunicateState, HsmsCommunicateStateChangeListener, HsmsCommunicateStateChangeBiListener> {
 
 	public HsmsCommunicateStatePropertyBiObserver(

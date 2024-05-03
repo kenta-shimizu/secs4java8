@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.shimizukenta.secs.SecsCommunicatableStateChangeBiListener;
+import com.shimizukenta.secs.SecsCommunicatableStateChangeListener;
 import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessageReceiveBiListener;
@@ -37,7 +39,10 @@ import com.shimizukenta.secs.secs2.Secs2;
  * @author kenta-shimizu
  *
  */
-public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicator implements HsmsSsCommunicator, HsmsLogObservableImpl, HsmsMessagePassThroughObservableImpl {
+public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicator
+		implements HsmsSsCommunicator,
+		HsmsLogObservableImpl,
+		HsmsMessagePassThroughObservableImpl {
 	
 	private final AbstractHsmsSsSession session;
 	
@@ -48,7 +53,6 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 		super(Objects.requireNonNull(config));
 		
 		this.session = new AbstractHsmsSsSession(this, config) {};
-		this.session.addSecsCommunicatableStateChangeListener(this::notifyCommunicatableStateChange);
 		
 		this.logObserver = new AbstractHsmsLogObserverFacade(config, this.executorService()) {};
 		this.msgPassThroughObserver = new AbstractHsmsMessagePassThroughObserverFacade(this.executorService()) {};
@@ -186,6 +190,54 @@ public abstract class AbstractHsmsSsCommunicator extends AbstractSecsCommunicato
 	@Override
 	public boolean removeHsmsMessageReceiveBiListener(HsmsMessageReceiveBiListener biListener) {
 		return this.getSession().removeHsmsMessageReceiveBiListener(biListener);
+	}
+	
+	
+	/* SECS communicate state */
+	
+	@Override
+	public boolean isCommunicatable() {
+		return this.getSession().isCommunicatable();
+	}
+	
+	@Override
+	public void waitUntilCommunicatable() throws InterruptedException {
+		this.getSession().waitUntilCommunicatable();
+	}
+	
+	@Override
+	public void waitUntilCommunicatable(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+		this.getSession().waitUntilCommunicatable(timeout, unit);
+	}
+	
+	@Override
+	public void waitUntilNotCommunicatable() throws InterruptedException {
+		this.getSession().waitUntilNotCommunicatable();
+	}
+	
+	@Override
+	public void waitUntilNotCommunicatable(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+		this.getSession().waitUntilNotCommunicatable(timeout, unit);
+	}
+	
+	@Override
+	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener listener) {
+		return this.getSession().addSecsCommunicatableStateChangeListener(listener);
+	}
+	
+	@Override
+	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener listener) {
+		return this.getSession().removeSecsCommunicatableStateChangeListener(listener);
+	}
+	
+	@Override
+	public boolean addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener) {
+		return this.getSession().addSecsCommunicatableStateChangeBiListener(biListener);
+	}
+	
+	@Override
+	public boolean removeSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener) {
+		return this.getSession().removeSecsCommunicatableStateChangeBiListener(biListener);
 	}
 	
 	

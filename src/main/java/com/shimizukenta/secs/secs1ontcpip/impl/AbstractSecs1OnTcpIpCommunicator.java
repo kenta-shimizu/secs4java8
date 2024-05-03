@@ -36,14 +36,14 @@ public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Comm
 	
 	private final Secs1OnTcpIpCommunicatorConfig secs1OnTcpIpConfig;
 	private final AbstractSecs1OnTcpIpLogObserverFacade secs1OnTcpIpLogObserver;
-	
+
 	public AbstractSecs1OnTcpIpCommunicator(Secs1OnTcpIpCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
 		
 		this.secs1OnTcpIpConfig = config;
 		this.secs1OnTcpIpLogObserver = new AbstractSecs1OnTcpIpLogObserverFacade(config, this.executorService()) {};
 		
-		this.channels.computeIsNotEmpty().addChangeListener(this::notifyCommunicatableStateChange);
+		this.channels.computeIsNotEmpty().addChangeListener(this.secsCommunicateStateObserver()::setSecsCommunicateState);
 	}
 	
 	@Override

@@ -37,7 +37,7 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 		this.config = config;
 		this.secs1OnTcpIpLogObserver = new AbstractSecs1OnTcpIpLogObserverFacade(config, this.executorService()) {};
 		
-		channels.computeIsNotEmpty().addChangeListener(this::notifyCommunicatableStateChange);
+		this.channels.computeIsNotEmpty().addChangeListener(this.secsCommunicateStateObserver()::setSecsCommunicateState);
 	}
 	
 	@Override

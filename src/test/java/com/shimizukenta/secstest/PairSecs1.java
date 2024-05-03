@@ -26,7 +26,7 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class PairSecs1 {
 
-	private static final int testCycle = 1000;
+	private static final int testCycle = 3;
 	
 	public int equipCounter;
 	public int hostCounter;

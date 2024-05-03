@@ -7,7 +7,9 @@ import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
+import com.shimizukenta.secs.impl.AbstractSecsCommunicateStateObserverFacade;
 import com.shimizukenta.secs.impl.AbstractSecsCommunicator;
+import com.shimizukenta.secs.impl.SecsCommunicateStateDetectableImpl;
 import com.shimizukenta.secs.secs1.AbstractSecs1CommunicatorConfig;
 import com.shimizukenta.secs.secs1.Secs1Communicator;
 import com.shimizukenta.secs.secs1.Secs1Exception;
@@ -27,7 +29,11 @@ import com.shimizukenta.secs.secs2.Secs2;
  * @author kenta-shimizu
  *
  */
-public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator implements Secs1Communicator, Secs1MessagePassThroughObservableImpl, Secs1LogObservableImpl {
+public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
+		implements Secs1Communicator,
+		SecsCommunicateStateDetectableImpl,
+		Secs1MessagePassThroughObservableImpl,
+		Secs1LogObservableImpl {
 	
 	private final AbstractSecs1CommunicatorConfig config;
 	private final Secs1MessageBuilder msgBuilder;
@@ -36,6 +42,8 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	private final Secs1MessageReceiveQueueBiObserver secs1MsgRecvQueueBiObserver;
 	
 	private final AbstractSecs1MessagePassThroughObserverFacade msgPassThroughObserver;
+	private final AbstractSecsCommunicateStateObserverFacade secsCommunicateStateObserver;
+	
 	
 	public AbstractSecs1Communicator(AbstractSecs1CommunicatorConfig config) {
 		super(config);
@@ -46,6 +54,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		this.secs1MsgRecvQueueBiObserver = new Secs1MessageReceiveQueueBiObserver(this.executorService(), this);
 		
 		this.msgPassThroughObserver = new AbstractSecs1MessagePassThroughObserverFacade(this.executorService()) {};
+		this.secsCommunicateStateObserver = new AbstractSecsCommunicateStateObserverFacade(this) {};
 	}
 	
 	public AbstractSecs1CommunicatorConfig config() {
@@ -146,6 +155,14 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	public void notifyReceiveSecs1Message(Secs1Message message) throws InterruptedException {
 		super.notifyReceiveSecsMessage(message);
 		this.secs1MsgRecvQueueBiObserver.put(message);
+	}
+	
+	
+	/* Communicate state detect */
+	
+	@Override
+	public AbstractSecsCommunicateStateObserverFacade secsCommunicateStateObserver() {
+		return this.secsCommunicateStateObserver;
 	}
 	
 	

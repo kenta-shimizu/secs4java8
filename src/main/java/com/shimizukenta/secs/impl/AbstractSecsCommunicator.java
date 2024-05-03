@@ -5,15 +5,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.AbstractSecsCommunicatorConfig;
-import com.shimizukenta.secs.SecsCommunicatableStateChangeBiListener;
-import com.shimizukenta.secs.SecsCommunicatableStateChangeListener;
 import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessageReceiveBiListener;
 import com.shimizukenta.secs.SecsMessageReceiveListener;
 import com.shimizukenta.secs.gem.Gem;
 import com.shimizukenta.secs.gem.impl.AbstractGem;
-import com.shimizukenta.secs.local.property.BooleanProperty;
 
 /**
  * This abstract class is implementation of SECS-communicate.
@@ -23,7 +20,7 @@ import com.shimizukenta.secs.local.property.BooleanProperty;
  */
 public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator implements SecsCommunicator, SecsMessageSendableImpl, SecsMessagePassThroughObservableImpl, SecsLogObservableImpl {
 	
-	private final BooleanProperty communicatable = BooleanProperty.newInstance(false);
+//	private final BooleanProperty communicatable = BooleanProperty.newInstance(false);
 	
 	private final AbstractSecsCommunicatorConfig config;
 	private final Gem gem;
@@ -31,7 +28,7 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 	
 	private final SecsMessageReceiveQueueBiObserver secsMsgRecvQueueObserver;
 	
-	private final SecsCommunicatableStatePropertyBiObserver communicatableStatePropOberser;
+//	private final SecsCommunicatableStatePropertyBiObserver communicatableStatePropOberser;
 	
 	public AbstractSecsCommunicator(AbstractSecsCommunicatorConfig config) {
 		super();
@@ -40,7 +37,7 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		this.gem = new AbstractGem(this, config.gem()) {};
 		
 		this.secsMsgRecvQueueObserver = new SecsMessageReceiveQueueBiObserver(this.executorService(), this);
-		this.communicatableStatePropOberser = new SecsCommunicatableStatePropertyBiObserver(this, this.communicatable);
+//		this.communicatableStatePropOberser = new SecsCommunicatableStatePropertyBiObserver(this, this.communicatable);
 	}
 	
 	@Override
@@ -66,30 +63,6 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		return config.isEquip().booleanValue();
 	}
 	
-	@Override
-	public boolean isCommunicatable() {
-		return this.communicatable.booleanValue();
-	}
-	
-	@Override
-	public void waitUntilCommunicatable() throws InterruptedException {
-		this.communicatable.waitUntilTrue();
-	}
-	
-	@Override
-	public void waitUntilCommunicatable(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
-		this.communicatable.waitUntilTrue(timeout, unit);
-	}
-	
-	@Override
-	public void waitUntilNotCommunicatable() throws InterruptedException {
-		this.communicatable.waitUntilFalse();
-	}
-	
-	@Override
-	public void waitUntilNotCommunicatable(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
-		this.communicatable.waitUntilFalse(timeout, unit);
-	}
 	
 	@Override
 	public void openAndWaitUntilCommunicatable() throws IOException, InterruptedException {
@@ -140,32 +113,6 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		this.secsMsgRecvQueueObserver.put(msg);
 	}
 	
-	
-	/* Secs-Communicatable-State-Changed-Listener */
-	
-	@Override
-	public boolean addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener listener) {
-		return this.communicatableStatePropOberser.addListener(listener);
-	}
-	
-	@Override
-	public boolean removeSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener listener) {
-		return this.communicatableStatePropOberser.removeListener(listener);
-	}
-	
-	@Override
-	public boolean addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener) {
-		return this.communicatableStatePropOberser.addBiListener(biListener);
-	}
-	
-	@Override
-	public boolean removeSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener) {
-		return this.communicatableStatePropOberser.removeBiListener(biListener);
-	}
-	
-	public void notifyCommunicatableStateChange(boolean f) {
-		this.communicatable.set(f);
-	}
 	
 	/* Logger */
 	public boolean offerThrowableToLog(Throwable t) {

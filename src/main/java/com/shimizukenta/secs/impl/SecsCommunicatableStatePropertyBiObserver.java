@@ -5,6 +5,7 @@ import com.shimizukenta.secs.SecsCommunicatableStateChangeBiListener;
 import com.shimizukenta.secs.SecsCommunicatableStateChangeListener;
 import com.shimizukenta.secs.local.property.Observable;
 
+@Deprecated
 public class SecsCommunicatableStatePropertyBiObserver extends AbstractPropertyBiObserver<SecsGemAccessor, Boolean, SecsCommunicatableStateChangeListener, SecsCommunicatableStateChangeBiListener> {
 
 	public SecsCommunicatableStatePropertyBiObserver(SecsGemAccessor communicator, Observable<Boolean> observer) {

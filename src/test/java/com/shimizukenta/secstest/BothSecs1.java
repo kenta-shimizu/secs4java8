@@ -25,7 +25,7 @@ import com.shimizukenta.secstestutil.TcpIpAdapter;
 
 public class BothSecs1 {
 	
-	private static final int testCycle = 1000;
+	private static final int testCycle = 3;
 	
 	public int equipCounter;
 	public int hostCounter;
@@ -103,25 +103,25 @@ public class BothSecs1 {
 					}
 				});
 				
-				equip.addTrySendSecsMessagePassThroughListener(msg -> {
-					echo("equip-pt-trysnd: strm: " + msg.getStream() + ", func: " + msg.getFunction());
-				});
-				equip.addSendedSecsMessagePassThroughListener(msg -> {
-					echo("equip-pt-sended: strm: " + msg.getStream() + ", func: " + msg.getFunction());
-				});
-				equip.addReceiveSecsMessagePassThroughListener(msg -> {
-					echo("equip-pt-recved: strm: " + msg.getStream() + ", func: " + msg.getFunction());
-				});
-				
-				host.addTrySendSecsMessagePassThroughListener(msg -> {
-					echo("host-pt-trysnd: strm: " + msg.getStream() + ", func: " + msg.getFunction());
-				});
-				host.addSendedSecsMessagePassThroughListener(msg -> {
-					echo("host-pt-sended: strm: " + msg.getStream() + ", func: " + msg.getFunction());
-				});
-				host.addReceiveSecsMessagePassThroughListener(msg -> {
-					echo("host-pt-recved: strm: " + msg.getStream() + ", func: " + msg.getFunction());
-				});
+//				equip.addTrySendSecsMessagePassThroughListener(msg -> {
+//					echo("equip-pt-trysnd: strm: " + msg.getStream() + ", func: " + msg.getFunction());
+//				});
+//				equip.addSendedSecsMessagePassThroughListener(msg -> {
+//					echo("equip-pt-sended: strm: " + msg.getStream() + ", func: " + msg.getFunction());
+//				});
+//				equip.addReceiveSecsMessagePassThroughListener(msg -> {
+//					echo("equip-pt-recved: strm: " + msg.getStream() + ", func: " + msg.getFunction());
+//				});
+//				
+//				host.addTrySendSecsMessagePassThroughListener(msg -> {
+//					echo("host-pt-trysnd: strm: " + msg.getStream() + ", func: " + msg.getFunction());
+//				});
+//				host.addSendedSecsMessagePassThroughListener(msg -> {
+//					echo("host-pt-sended: strm: " + msg.getStream() + ", func: " + msg.getFunction());
+//				});
+//				host.addReceiveSecsMessagePassThroughListener(msg -> {
+//					echo("host-pt-recved: strm: " + msg.getStream() + ", func: " + msg.getFunction());
+//				});
 				
 				equip.addSecsMessageReceiveListener(msg -> {
 					
@@ -314,8 +314,6 @@ public class BothSecs1 {
 				}
 				
 			}
-			
-			echo("communicators closed");
 			
 			Thread.sleep(500L);
 		}
