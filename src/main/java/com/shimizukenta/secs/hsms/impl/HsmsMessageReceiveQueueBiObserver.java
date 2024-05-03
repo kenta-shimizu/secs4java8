@@ -8,6 +8,7 @@ import com.shimizukenta.secs.hsms.HsmsMessageReceiveBiListener;
 import com.shimizukenta.secs.hsms.HsmsMessageReceiveListener;
 import com.shimizukenta.secs.impl.AbstractQueueBiObserver;
 
+@Deprecated
 public class HsmsMessageReceiveQueueBiObserver extends AbstractQueueBiObserver<HsmsGemAccessor, HsmsMessageReceiveListener, HsmsMessageReceiveBiListener, HsmsMessage> {
 
 	public HsmsMessageReceiveQueueBiObserver(Executor executor, HsmsGemAccessor comm) {

@@ -7,6 +7,7 @@ import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessageReceiveBiListener;
 import com.shimizukenta.secs.SecsMessageReceiveListener;
 
+@Deprecated
 public class SecsMessageReceiveQueueBiObserver extends AbstractQueueBiObserver<SecsGemAccessor, SecsMessageReceiveListener, SecsMessageReceiveBiListener, SecsMessage> {
 
 	public SecsMessageReceiveQueueBiObserver(Executor executor, SecsGemAccessor comm) {

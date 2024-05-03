@@ -17,8 +17,8 @@ public interface HsmsMessageReceiveBiListener extends EventListener {
 	 * HSMS Message received.
 	 * 
 	 * @param message the HSMS message
-	 * @param communicator the HSMS Communicator accessor
+	 * @param accessor the HSMS Communicator accessor
 	 */
-	public void received(HsmsMessage message, HsmsGemAccessor communicator);
+	public void received(HsmsMessage message, HsmsGemAccessor accessor);
 	
 }

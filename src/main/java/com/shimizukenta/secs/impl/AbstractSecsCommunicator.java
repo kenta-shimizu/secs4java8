@@ -37,7 +37,6 @@ public abstract class AbstractSecsCommunicator extends AbstractBaseCommunicator 
 		this.gem = new AbstractGem(this, config.gem()) {};
 		
 		this.secsMsgRecvQueueObserver = new SecsMessageReceiveQueueBiObserver(this.executorService(), this);
-//		this.communicatableStatePropOberser = new SecsCommunicatableStatePropertyBiObserver(this, this.communicatable);
 	}
 	
 	@Override
