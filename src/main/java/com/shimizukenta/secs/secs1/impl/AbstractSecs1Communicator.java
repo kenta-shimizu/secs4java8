@@ -14,8 +14,6 @@ import com.shimizukenta.secs.secs1.AbstractSecs1CommunicatorConfig;
 import com.shimizukenta.secs.secs1.Secs1Communicator;
 import com.shimizukenta.secs.secs1.Secs1Exception;
 import com.shimizukenta.secs.secs1.Secs1Message;
-import com.shimizukenta.secs.secs1.Secs1MessageReceiveBiListener;
-import com.shimizukenta.secs.secs1.Secs1MessageReceiveListener;
 import com.shimizukenta.secs.secs1.Secs1SendByteException;
 import com.shimizukenta.secs.secs1.Secs1SendMessageException;
 import com.shimizukenta.secs.secs1.Secs1TooBigMessageBodyException;
@@ -31,6 +29,7 @@ import com.shimizukenta.secs.secs2.Secs2;
  */
 public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		implements Secs1Communicator,
+		Secs1MessageReceiveObservableImpl,
 		SecsCommunicateStateDetectableImpl,
 		Secs1MessagePassThroughObservableImpl,
 		Secs1LogObservableImpl {
@@ -39,10 +38,9 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	private final Secs1MessageBuilder msgBuilder;
 	private final AbstractSecs1Circuit circuit;
 	
-	private final Secs1MessageReceiveQueueBiObserver secs1MsgRecvQueueBiObserver;
-	
-	private final AbstractSecs1MessagePassThroughObserverFacade msgPassThroughObserver;
+	private final AbstractSecs1MessageReceiveObserverFacade secs1MsgRecvObserver;
 	private final AbstractSecsCommunicateStateObserverFacade secsCommunicateStateObserver;
+	private final AbstractSecs1MessagePassThroughObserverFacade msgPassThroughObserver;
 	
 	
 	public AbstractSecs1Communicator(AbstractSecs1CommunicatorConfig config) {
@@ -51,10 +49,9 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		this.msgBuilder = new AbstractSecs1MessageBuilder() {};
 		this.circuit = new AbstractSecs1Circuit(this) {};
 		
-		this.secs1MsgRecvQueueBiObserver = new Secs1MessageReceiveQueueBiObserver(this.executorService(), this);
-		
-		this.msgPassThroughObserver = new AbstractSecs1MessagePassThroughObserverFacade(this.executorService()) {};
+		this.secs1MsgRecvObserver = new AbstractSecs1MessageReceiveObserverFacade(this.executorService(), this) {};
 		this.secsCommunicateStateObserver = new AbstractSecsCommunicateStateObserverFacade(this) {};
+		this.msgPassThroughObserver = new AbstractSecs1MessagePassThroughObserverFacade(this.executorService()) {};
 	}
 	
 	public AbstractSecs1CommunicatorConfig config() {
@@ -132,29 +129,16 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	
 	abstract public void sendBytes(byte[] bs) throws Secs1SendByteException, InterruptedException;
 	
-	@Override
-	public boolean addSecs1MessageReceiveListener(Secs1MessageReceiveListener listener) {
-		return this.secs1MsgRecvQueueBiObserver.addListener(listener);
-	}
+	
+	/* Secs1 Message Receivable  */
 	
 	@Override
-	public boolean removeSecs1MessageReceiveListener(Secs1MessageReceiveListener listener) {
-		return this.secs1MsgRecvQueueBiObserver.removeListener(listener);
-	}
-	
-	@Override
-	public boolean addSecs1MessageReceiveBiListener(Secs1MessageReceiveBiListener biListener) {
-		return this.secs1MsgRecvQueueBiObserver.addBiListener(biListener);
-	}
-	
-	@Override
-	public boolean removeSecs1MessageReceiveBiListener(Secs1MessageReceiveBiListener biListener) {
-		return this.secs1MsgRecvQueueBiObserver.removeBiListener(biListener);
+	public AbstractSecs1MessageReceiveObserverFacade secs1MessageReceiveObserver() {
+		return this.secs1MsgRecvObserver;
 	}
 	
 	public void notifyReceiveSecs1Message(Secs1Message message) throws InterruptedException {
-		super.notifyReceiveSecsMessage(message);
-		this.secs1MsgRecvQueueBiObserver.put(message);
+		this.secs1MsgRecvObserver.putSecs1Message(message);
 	}
 	
 	

@@ -4,7 +4,7 @@ import com.shimizukenta.secs.impl.AbstractSecsLog;
 import com.shimizukenta.secs.secs1.Secs1MessageBlock;
 import com.shimizukenta.secs.secs1.Secs1MessageBlockPassThroughLog;
 
-public class AbstractSecs1MessageBlockPassThroughLog extends AbstractSecsLog implements Secs1MessageBlockPassThroughLog {
+public abstract class AbstractSecs1MessageBlockPassThroughLog extends AbstractSecsLog implements Secs1MessageBlockPassThroughLog {
 	
 	private static final long serialVersionUID = 5236757589131445699L;
 	
