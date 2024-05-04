@@ -299,7 +299,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 		}
 	}
 	
-	private final class Secs1TransactionManager<T extends Secs1Message, U extends Secs1MessageBlock> {
+	private final class Secs1TransactionManager {
 		
 		private final Map<Integer, Pack> map = new HashMap<>();
 		
@@ -307,13 +307,13 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			/* Nothing */
 		}
 		
-		public void enter(T primaryMsg) {
+		public void enter(Secs1Message primaryMsg) {
 			synchronized (this.map) {
 				this.map.put(systemBytesKey(primaryMsg), new Pack());
 			}
 		}
 		
-		public void exit(T primaryMsg) {
+		public void exit(Secs1Message primaryMsg) {
 			synchronized (this.map) {
 				this.map.remove(systemBytesKey(primaryMsg));
 			}
@@ -325,11 +325,11 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			}
 		}
 		
-		private Pack getPack(T message) {
+		private Pack getPack(Secs1Message message) {
 			return this.getPack(systemBytesKey(message));
 		}
 		
-		public T waitReply(T message, TimeoutProperty timeout) throws InterruptedException {
+		public Secs1Message waitReply(Secs1Message message, TimeoutProperty timeout) throws InterruptedException {
 			
 			final Pack p = getPack(message);
 			
@@ -340,7 +340,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			synchronized (p) {
 				
 				{
-					T r = p.replyMsg();
+					Secs1Message r = p.replyMsg();
 					if (r != null) {
 						return r;
 					}
@@ -350,7 +350,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 					
 					timeout.wait(p);
 					
-					T r = p.replyMsg();
+					Secs1Message r = p.replyMsg();
 					
 					if (r != null) {
 						return r;
@@ -363,7 +363,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 			}
 		}
 		
-		public T put(T message) {
+		public Secs1Message put(Secs1Message message) {
 			
 			final Pack p = this.getPack(message);
 			
@@ -390,7 +390,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 		private final class Pack {
 			
 			private boolean timerResetted;
-			private T replyMsg;
+			private Secs1Message replyMsg;
 			
 			public Pack() {
 				this.timerResetted = false;
@@ -412,14 +412,14 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 				}
 			}
 			
-			public void putReplyMsg(T msg) {
+			public void putReplyMsg(Secs1Message msg) {
 				synchronized (this) {
 					this.replyMsg = msg;
 					this.notifyAll();
 				}
 			}
 			
-			public T replyMsg() {
+			public Secs1Message replyMsg() {
 				synchronized (this) {
 					return this.replyMsg;
 				}
@@ -430,7 +430,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 	
 	private final ByteAndSecs1MessageQueue queue = new ByteAndSecs1MessageQueue();
 	private final Secs1SendMessageManager sendMgr = new Secs1SendMessageManager();
-	private final Secs1TransactionManager<Secs1Message, Secs1MessageBlock> transMgr = new Secs1TransactionManager<>();
+	private final Secs1TransactionManager transMgr = new Secs1TransactionManager();
 	
 	private final AbstractSecs1Communicator comm;
 	
