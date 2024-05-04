@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import com.shimizukenta.secs.UnsetSocketAddressException;
+import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
@@ -193,8 +194,8 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 			return ;
 		}
 		
-		session.notifyHsmsCommunicateStateToSelected();
-		
+		session.hsmsCommunicateStateObserver().setHsmsCommunicateState(HsmsCommunicateState.SELECTED);
+
 		try {
 			
 			for ( ;; ) {
@@ -204,7 +205,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 				switch (primaryMsg.messageType()) {
 				case DATA: {
 					
-					session.notifyHsmsMessageReceive(primaryMsg);
+					session.hsmsMessageReceiveObserver().putHsmsMessage(primaryMsg);
 					break;
 				}
 				case SELECT_REQ:

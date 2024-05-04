@@ -20,6 +20,7 @@ import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessageReceiveBiListener;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
+import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsCommunicateStateChangeBiListener;
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageDeselectStatus;
@@ -264,7 +265,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 							
 							synchronized (selectedSessions) {
 								session.setChannel(asyncChannel);
-								session.notifyHsmsCommunicateStateToSelected();
+								session.hsmsCommunicateStateObserver().setHsmsCommunicateState(HsmsCommunicateState.SELECTED);
 								selectedSessions.add(session);
 							}
 							
@@ -305,7 +306,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 					if (session == null) {
 						asyncChannel.send(this.getHsmsGsMessageBuilder().buildRejectRequest(msg, HsmsMessageRejectReason.NOT_SELECTED));
 					} else {
-						session.notifyHsmsMessageReceive(msg);
+						session.hsmsMessageReceiveObserver().putHsmsMessage(msg);
 					}
 					
 					break;
@@ -334,7 +335,7 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 								
 								synchronized (selectedSessions) {
 									selectedSessions.add(session);
-									session.notifyHsmsCommunicateStateToSelected();
+									session.hsmsCommunicateStateObserver().setHsmsCommunicateState(HsmsCommunicateState.SELECTED);
 								}
 								
 								asyncChannel.send(this.getHsmsGsMessageBuilder().buildSelectResponse(msg, HsmsMessageSelectStatus.SUCCESS));

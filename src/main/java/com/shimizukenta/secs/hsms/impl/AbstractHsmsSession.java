@@ -105,25 +105,12 @@ public abstract class AbstractHsmsSession
 		return this.hsmsMsgRecvObserver;
 	}
 	
-	public void notifyHsmsMessageReceive(HsmsMessage message) throws InterruptedException {
-		this.hsmsMsgRecvObserver.putHsmsMessage(message);
-	}
-	
 	
 	/* Communicatable Detectable */
 	
 	@Override
 	public AbstractHsmsCommunicateStateObserverFacade hsmsCommunicateStateObserver() {
 		return this.hsmsCommStateObserver;
-	}
-	
-	
-	public void notifyHsmsCommunicateStateToSelected() {
-		this.hsmsCommunicateStateObserver().setHsmsCommunicateState(HsmsCommunicateState.SELECTED);
-	}
-	
-	public void notifyHsmsCommunicateStateToNotSelected() {
-		this.hsmsCommunicateStateObserver().setHsmsCommunicateState(HsmsCommunicateState.NOT_SELECTED);
 	}
 	
 	

@@ -119,10 +119,6 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		return this.circuit.send(msg);
 	}
 	
-	protected void putByte(byte b) throws InterruptedException {
-		this.circuit.putByte(b);
-	}
-	
 	protected void putBytes(byte[] bs) throws InterruptedException {
 		this.circuit.putBytes(bs);
 	}
@@ -135,10 +131,6 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	@Override
 	public AbstractSecs1MessageReceiveObserverFacade secs1MessageReceiveObserver() {
 		return this.secs1MsgRecvObserver;
-	}
-	
-	public void notifyReceiveSecs1Message(Secs1Message message) throws InterruptedException {
-		this.secs1MsgRecvObserver.putSecs1Message(message);
 	}
 	
 	
