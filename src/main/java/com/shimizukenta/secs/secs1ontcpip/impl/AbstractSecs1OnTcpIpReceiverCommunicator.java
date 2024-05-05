@@ -25,7 +25,8 @@ import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpReceiverCommunicator;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpReceiverCommunicatorConfig;
 
 public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractSecs1Communicator
-		implements Secs1OnTcpIpReceiverCommunicator, Secs1OnTcpIpLogObservableImpl {
+		implements Secs1OnTcpIpReceiverCommunicator,
+		Secs1OnTcpIpLogObservableImpl {
 	
 	private final ListProperty<AsynchronousSocketChannel> channels = ListProperty.newInstance();
 	

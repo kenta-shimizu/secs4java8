@@ -66,7 +66,7 @@ public interface HsmsCommunicateStateDetectable extends SecsCommunicateStateDete
 	public void waitUntilNotHsmsCommunicateState(HsmsCommunicateState state) throws InterruptedException;
 	
 	/**
-	 * Wait until <string>NOT</strong> equals state.
+	 * Wait until <strong>NOT</strong> equals state.
 	 * 
 	 * <p>
 	 * Blocking-method.<br />

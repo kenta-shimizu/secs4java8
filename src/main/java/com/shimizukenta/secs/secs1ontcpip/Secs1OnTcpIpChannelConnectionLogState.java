@@ -1,5 +1,11 @@
 package com.shimizukenta.secs.secs1ontcpip;
 
+/**
+ * Secs1OnTcpIpChannelConnectionLogState.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public enum Secs1OnTcpIpChannelConnectionLogState {
 	
 	/**

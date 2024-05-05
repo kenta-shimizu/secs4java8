@@ -27,12 +27,12 @@ import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicatorConfig;
  * <ul>
  * <li>To receive Primary-Message,
  * {@link #addSecsMessageReceiveListener(SecsMessageReceiveListener)}
- * or {@link #addSecsMessageReceiveListener(SecsMessageReceiveBiListener)}</li>
+ * or {@link #addSecsMessageReceiveBiListener(SecsMessageReceiveBiListener)}</li>
  * </ul>
  * <ul>
  * <li>To get communicate-state-changed,
  * {@link #addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener)}
- * or {@link #addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener)}</li>
+ * or {@link #addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener)}</li>
  * <li>To wait until communicatable, {@link #waitUntilCommunicatable()}</li>
  * <li>To wait until not communicatable, {@link #waitUntilNotCommunicatable()}</li>
  * </ul>

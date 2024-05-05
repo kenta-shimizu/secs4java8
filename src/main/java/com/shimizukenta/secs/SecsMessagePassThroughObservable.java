@@ -5,12 +5,12 @@ package com.shimizukenta.secs;
  * 
  * <p>
  * Includes
+ * </p>
  * <ul>
  * <li>receive</li>
  * <li>try send</li>
  * <li>sended</li>
  * </ul>
- * </p>
  * 
  * @author kenta-shimizu
  *

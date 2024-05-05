@@ -5,6 +5,12 @@ import java.util.Optional;
 
 import com.shimizukenta.secs.SecsLog;
 
+/**
+ * Secs1OnTcpIpChannelConnectionLog.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public interface Secs1OnTcpIpChannelConnectionLog extends SecsLog {
 	
 	/**

@@ -37,6 +37,16 @@ public abstract class AbstractSecs1OnTcpIpLogObserverFacade extends AbstractSecs
 		this.channelConnectionLogObserver = new Secs1OnTcpIpChannelConnectionLogObserver(executor);
 	}
 	
+	@Override
+	public boolean addSecs1OnTcpIpChannelConnectionLogListener(SecsLogListener<? super Secs1OnTcpIpChannelConnectionLog> listener) {
+		return this.channelConnectionLogObserver.addListener(listener);
+	}
+	
+	@Override
+	public boolean removeSecs1OnTcpIpChannelConnectionLogListener(SecsLogListener<? super Secs1OnTcpIpChannelConnectionLog> listener) {
+		return this.channelConnectionLogObserver.removeListener(listener);
+	}
+	
 	private boolean offerSecs1OnTcpIpChannelConnection(AbstractSecs1OnTcpIpChannelConnectionLog log) {
 		log.subjectHeader(this.config.logSubjectHeader().toString());
 		boolean f = this.channelConnectionLogObserver.offer(log);

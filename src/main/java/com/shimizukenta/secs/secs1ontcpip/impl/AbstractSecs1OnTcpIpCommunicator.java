@@ -30,7 +30,8 @@ import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpNotConnectedException;
  *
  */
 public abstract class AbstractSecs1OnTcpIpCommunicator extends AbstractSecs1Communicator
-		implements Secs1OnTcpIpCommunicator, Secs1OnTcpIpLogObservableImpl {
+		implements Secs1OnTcpIpCommunicator,
+		Secs1OnTcpIpLogObservableImpl {
 	
 	private final ListProperty<AsynchronousSocketChannel> channels = ListProperty.newInstance();
 	

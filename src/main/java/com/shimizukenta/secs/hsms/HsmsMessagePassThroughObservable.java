@@ -8,12 +8,12 @@ import com.shimizukenta.secs.SecsMessagePassThroughObservable;
  * 
  * <p>
  * Includes
+ * </p>
  * <ul>
  * <li>receive</li>
  * <li>try send</li>
  * <li>sended</li>
  * </ul>
- * </p>
  * 
  * @author kenta-shimizu
  *
