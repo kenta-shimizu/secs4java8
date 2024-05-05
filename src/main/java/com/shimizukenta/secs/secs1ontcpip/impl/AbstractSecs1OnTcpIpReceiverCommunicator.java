@@ -25,17 +25,25 @@ import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpReceiverCommunicator;
 import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpReceiverCommunicatorConfig;
 
 public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractSecs1Communicator
-		implements Secs1OnTcpIpReceiverCommunicator {
+		implements Secs1OnTcpIpReceiverCommunicator,
+		Secs1OnTcpIpLogObservableImpl {
 	
 	private final ListProperty<AsynchronousSocketChannel> channels = ListProperty.newInstance();
 	
 	private final Secs1OnTcpIpReceiverCommunicatorConfig config;
+	private final AbstractSecs1OnTcpIpLogObserverFacade secs1OnTcpIpLogObserver;
 	
 	public AbstractSecs1OnTcpIpReceiverCommunicator(Secs1OnTcpIpReceiverCommunicatorConfig config) {
 		super(Objects.requireNonNull(config));
 		this.config = config;
+		this.secs1OnTcpIpLogObserver = new AbstractSecs1OnTcpIpLogObserverFacade(config, this.executorService()) {};
 		
-		channels.computeIsNotEmpty().addChangeListener(this::notifyCommunicatableStateChange);
+		this.channels.computeIsNotEmpty().addChangeListener(this.secsCommunicateStateObserver()::setSecsCommunicateState);
+	}
+	
+	@Override
+	public AbstractSecs1OnTcpIpLogObserverFacade secs1OnTcpIpLogObserver() {
+		return this.secs1OnTcpIpLogObserver;
 	}
 	
 	@Override
@@ -70,13 +78,13 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 			
 			SocketAddress gLocal = config.socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
 			
-			notifyLog(Secs1OnTcpIpReceiverConnectionLog.tryBInd(gLocal));
+			this.secs1OnTcpIpLogObserver().offerHsmsChannelConnectionTryBind(gLocal);
 			
 			server.bind(gLocal);
 			
 			gLocal = server.getLocalAddress();
 			
-			notifyLog(Secs1OnTcpIpReceiverConnectionLog.binded(gLocal));
+			this.secs1OnTcpIpLogObserver().offerSecs1OnTcpIpChannelConnectionBinded(gLocal);
 			
 			server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
 
@@ -96,7 +104,7 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 	
 							addChannel(channel);
 							
-							notifyLog(Secs1OnTcpIpReceiverConnectionLog.accepted(pLocal, pRemote));
+							AbstractSecs1OnTcpIpReceiverCommunicator.this.secs1OnTcpIpLogObserver().offerSecs1OnTcpIpChannelConnectionAccepted(pLocal, pRemote);
 							
 							final Collection<Callable<Void>> tasks = Arrays.asList(
 									() -> {
@@ -107,8 +115,8 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 							executeInvokeAny(tasks);
 							
 						}
-						catch ( IOException e ) {
-							notifyLog(e);
+						catch (IOException e) {
+							AbstractSecs1OnTcpIpReceiverCommunicator.this.offerThrowableToLog(e);
 						}
 						catch ( ExecutionException e ) {
 							
@@ -118,7 +126,7 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 								throw (RuntimeException)t;
 							}
 							
-							notifyLog(t);
+							AbstractSecs1OnTcpIpReceiverCommunicator.this.offerThrowableToLog(t);
 						}
 						finally {
 							
@@ -127,23 +135,19 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 							try {
 								channel.shutdownOutput();
 							}
-							catch ( IOException giveup ) {
+							catch (IOException giveup) {
 							}
 							
 							try {
 								channel.close();
 							}
-							catch ( IOException giveup ) {
+							catch (IOException giveup){
 							}
 							
-							try {
-								notifyLog(Secs1OnTcpIpReceiverConnectionLog.channelClosed(pLocal, pRemote));
-							}
-							catch ( InterruptedException ignore ) {
-							}
+							AbstractSecs1OnTcpIpReceiverCommunicator.this.secs1OnTcpIpLogObserver().offerSecs1OnTcpIpChannelConnectionAcceptClosed(pLocal, pRemote);
 						}
 					}
-					catch ( InterruptedException ignore ) {
+					catch (InterruptedException ignore) {
 					}
 				}
 				
@@ -151,11 +155,7 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 				public void failed(Throwable t, Void attachment) {
 					
 					if ( ! (t instanceof ClosedChannelException) ) {
-						try {
-							notifyLog(t);
-						}
-						catch ( InterruptedException ignore ) {
-						}
+						AbstractSecs1OnTcpIpReceiverCommunicator.this.offerThrowableToLog(t);
 					}
 					
 					synchronized ( server ) {
@@ -170,12 +170,12 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 					server.wait();
 				}
 				finally {
-					notifyLog(Secs1OnTcpIpReceiverConnectionLog.serverClosed(gLocal));
+					AbstractSecs1OnTcpIpReceiverCommunicator.this.secs1OnTcpIpLogObserver().offerSecs1OnTcpIpChannelConnectionBindClosed(gLocal);
 				}
 			}
 		}
-		catch ( IOException e ) {
-			notifyLog(e);
+		catch (IOException e) {
+			AbstractSecs1OnTcpIpReceiverCommunicator.this.offerThrowableToLog(e);
 		}
 	}
 	
@@ -211,7 +211,7 @@ public abstract class AbstractSecs1OnTcpIpReceiverCommunicator extends AbstractS
 				}
 			}
 		}
-		catch ( ExecutionException e ) {
+		catch (ExecutionException e) {
 			
 			Throwable t = e.getCause();
 			

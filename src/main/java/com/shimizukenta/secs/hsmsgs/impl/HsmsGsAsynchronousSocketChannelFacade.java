@@ -23,25 +23,16 @@ public class HsmsGsAsynchronousSocketChannelFacade extends AbstractHsmsAsynchron
 	@Override
 	protected void notifyTrySendHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
 		this.communicator.notifyTrySendHsmsMessagePassThrough(msg);
-		
-		//TODO
-		//notify-log
 	}
 
 	@Override
 	protected void notifySendedHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
 		this.communicator.notifySendedHsmsMessagePassThrough(msg);
-		
-		//TODO
-		//notify-log
 	}
 
 	@Override
 	protected void notifyReceiveHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
 		this.communicator.notifyReceiveHsmsMessagePassThrough(msg);
-		
-		//TODO
-		//notify-log
 	}
 	
 	@Override
@@ -50,16 +41,8 @@ public class HsmsGsAsynchronousSocketChannelFacade extends AbstractHsmsAsynchron
 	}
 
 	@Override
-	protected boolean notifyHsmsThrowableLog(Throwable t) {
-		
-		// TODO Auto-generated method stub
-		try {
-			this.communicator.notifyLog(t);
-		}
-		catch (InterruptedException ignore) {
-		}
-		
-		return true;
+	protected boolean offerThrowableToLog(Throwable t) {
+		return this.communicator.offerThrowableToLog(t);
 	}
 	
 }

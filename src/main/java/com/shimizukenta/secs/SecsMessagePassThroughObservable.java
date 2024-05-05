@@ -5,12 +5,12 @@ package com.shimizukenta.secs;
  * 
  * <p>
  * Includes
+ * </p>
  * <ul>
  * <li>receive</li>
  * <li>try send</li>
  * <li>sended</li>
  * </ul>
- * </p>
  * 
  * @author kenta-shimizu
  *
@@ -23,7 +23,7 @@ public interface SecsMessagePassThroughObservable {
 	 * @param listener Not accept {@code null}
 	 * @return {@code true} if add success.
 	 */
-	public boolean addTrySendSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);
+	public boolean addTrySendSecsMessagePassThroughListener(SecsMessagePassThroughListener<? super SecsMessage> listener);
 	
 	/**
 	 * Remove Listener.
@@ -31,7 +31,7 @@ public interface SecsMessagePassThroughObservable {
 	 * @param listener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeTrySendSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);	
+	public boolean removeTrySendSecsMessagePassThroughListener(SecsMessagePassThroughListener<? super SecsMessage> listener);	
 	
 	
 	/**
@@ -40,7 +40,7 @@ public interface SecsMessagePassThroughObservable {
 	 * @param listener Not accept {@code null}
 	 * @return {@code true} if add success
 	 */
-	public boolean addSendedSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);
+	public boolean addSendedSecsMessagePassThroughListener(SecsMessagePassThroughListener<? super SecsMessage> listener);
 	
 	/**
 	 * Remove Listener.
@@ -48,7 +48,7 @@ public interface SecsMessagePassThroughObservable {
 	 * @param listener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeSendedSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);	
+	public boolean removeSendedSecsMessagePassThroughListener(SecsMessagePassThroughListener<? super SecsMessage> listener);	
 	
 	
 	/**
@@ -57,7 +57,7 @@ public interface SecsMessagePassThroughObservable {
 	 * @param listener Not accept {@code null}
 	 * @return {@code true} if add success
 	 */
-	public boolean addReceiveSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);
+	public boolean addReceiveSecsMessagePassThroughListener(SecsMessagePassThroughListener<? super SecsMessage> listener);
 	
 	/**
 	 * Remove BiListener.
@@ -65,6 +65,6 @@ public interface SecsMessagePassThroughObservable {
 	 * @param listener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeReceiveSecsMessagePassThroughListener(SecsMessagePassThroughListener listener);
+	public boolean removeReceiveSecsMessagePassThroughListener(SecsMessagePassThroughListener<? super SecsMessage> listener);
 	
 }

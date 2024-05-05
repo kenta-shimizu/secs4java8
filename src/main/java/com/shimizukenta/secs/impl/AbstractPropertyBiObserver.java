@@ -12,14 +12,14 @@ public abstract class AbstractPropertyBiObserver<C extends SecsGemAccessor,V, M,
 	private final Collection<M> listeners = new ArrayList<>();
 	private final Collection<B> biListeners = new ArrayList<>();
 	
-	private final C communicator;
+	private final C accessor;
 	
 	private final Object sync = new Object();
 	private V last;
 	
-	public AbstractPropertyBiObserver(C communicator, Observable<V> observer) {
+	public AbstractPropertyBiObserver(C accessor, Observable<V> observer) {
 		
-		this.communicator = communicator;
+		this.accessor = accessor;
 		this.last = null;
 		
 		observer.addChangeListener((V value) -> {
@@ -40,14 +40,14 @@ public abstract class AbstractPropertyBiObserver<C extends SecsGemAccessor,V, M,
 	}
 	
 	abstract protected void notifyValueToListener(M listener, V value);
-	abstract protected void notifyValueToBiListener(B biListener, V value, C communicator);
+	abstract protected void notifyValueToBiListener(B biListener, V value, C accessor);
 	
 	private void notifyToListener(M listener) {
 		this.notifyValueToListener(listener, this.last);
 	}
 	
 	private void notifyToBiListener(B biListener) {
-		this.notifyValueToBiListener(biListener, this.last, this.communicator);
+		this.notifyValueToBiListener(biListener, this.last, this.accessor);
 	}
 	
 	public boolean addListener(M listener) {

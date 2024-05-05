@@ -1,6 +1,5 @@
 package com.shimizukenta.secs.impl;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.shimizukenta.secs.SecsMessage;
@@ -15,11 +14,6 @@ public abstract class AbstractSecsWaitReplyMessageExceptionLog extends AbstractS
 	
 	public AbstractSecsWaitReplyMessageExceptionLog(SecsWaitReplyMessageException cause) {
 		super(cause);
-		this.cause = cause;
-	}
-	
-	public AbstractSecsWaitReplyMessageExceptionLog(SecsWaitReplyMessageException cause, LocalDateTime timestamp) {
-		super(cause, timestamp);
 		this.cause = cause;
 	}
 	

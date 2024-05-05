@@ -1,8 +1,6 @@
-/**
- * 
- */
 package com.shimizukenta.secs.hsms;
 
+import com.shimizukenta.secs.SecsMessagePassThroughListener;
 import com.shimizukenta.secs.SecsMessagePassThroughObservable;
 
 /**
@@ -10,12 +8,12 @@ import com.shimizukenta.secs.SecsMessagePassThroughObservable;
  * 
  * <p>
  * Includes
+ * </p>
  * <ul>
  * <li>receive</li>
  * <li>try send</li>
  * <li>sended</li>
  * </ul>
- * </p>
  * 
  * @author kenta-shimizu
  *
@@ -28,7 +26,7 @@ public interface HsmsMessagePassThroughObservable extends SecsMessagePassThrough
 	 * @param listener the HSMS Message pass through listener
 	 * @return true if add success
 	 */
-	public boolean addTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);
+	public boolean addTrySendHsmsMessagePassThroughListener(SecsMessagePassThroughListener<? super HsmsMessage> listener);
 	
 	/**
 	 * Remove listener.
@@ -36,7 +34,7 @@ public interface HsmsMessagePassThroughObservable extends SecsMessagePassThrough
 	 * @param listener the HSMS Message pass through listener
 	 * @return true if remove success
 	 */
-	public boolean removeTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);
+	public boolean removeTrySendHsmsMessagePassThroughListener(SecsMessagePassThroughListener<? super HsmsMessage> listener);
 	
 	
 	/**
@@ -45,7 +43,7 @@ public interface HsmsMessagePassThroughObservable extends SecsMessagePassThrough
 	 * @param listener the HSMS Message pass through listener
 	 * @return true if add success
 	 */
-	public boolean addSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);
+	public boolean addSendedHsmsMessagePassThroughListener(SecsMessagePassThroughListener<? super HsmsMessage> listener);
 	
 	/**
 	 * Remove listener.
@@ -53,7 +51,7 @@ public interface HsmsMessagePassThroughObservable extends SecsMessagePassThrough
 	 * @param listener the HSMS Message pass through listener
 	 * @return true if remove success
 	 */
-	public boolean removeSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);
+	public boolean removeSendedHsmsMessagePassThroughListener(SecsMessagePassThroughListener<? super HsmsMessage> listener);
 	
 	
 	/**
@@ -62,7 +60,7 @@ public interface HsmsMessagePassThroughObservable extends SecsMessagePassThrough
 	 * @param listener the HSMS Message pass through listener
 	 * @return true if add success
 	 */
-	public boolean addReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);
+	public boolean addReceiveHsmsMessagePassThroughListener(SecsMessagePassThroughListener<? super HsmsMessage> listener);
 	
 	/**
 	 * Remove listener.
@@ -70,6 +68,6 @@ public interface HsmsMessagePassThroughObservable extends SecsMessagePassThrough
 	 * @param listener the HSMS Message pass through listener
 	 * @return true if remove success
 	 */
-	public boolean removeReceiveHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);
+	public boolean removeReceiveHsmsMessagePassThroughListener(SecsMessagePassThroughListener<? super HsmsMessage> listener);
 	
 }

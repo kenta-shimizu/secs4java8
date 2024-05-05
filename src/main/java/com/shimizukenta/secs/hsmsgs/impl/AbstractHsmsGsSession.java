@@ -17,7 +17,7 @@ import com.shimizukenta.secs.hsms.impl.AbstractHsmsSession;
 import com.shimizukenta.secs.hsmsgs.HsmsGsCommunicatorConfig;
 import com.shimizukenta.secs.secs2.Secs2;
 
-public class AbstractHsmsGsSession extends AbstractHsmsSession {
+public abstract class AbstractHsmsGsSession extends AbstractHsmsSession {
 	
 	private final AbstractHsmsGsCommunicator communicator;
 	private final HsmsGsCommunicatorConfig config;

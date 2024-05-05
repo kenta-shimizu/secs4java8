@@ -7,6 +7,7 @@ import com.shimizukenta.secs.hsms.HsmsCommunicateStateDetectable;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
 import com.shimizukenta.secs.hsms.HsmsGemAccessor;
+import com.shimizukenta.secs.hsms.HsmsLogObservable;
 import com.shimizukenta.secs.hsms.HsmsMessagePassThroughObservable;
 import com.shimizukenta.secs.hsms.HsmsMessageReceiveObservable;
 import com.shimizukenta.secs.hsmsss.impl.AbstractHsmsSsActiveCommunicator;
@@ -23,7 +24,7 @@ import com.shimizukenta.secs.hsmsss.impl.AbstractHsmsSsPassiveCommunicator;
  * @author kenta-shimizu
  *
  */
-public interface HsmsSsCommunicator extends SecsCommunicator, HsmsGemAccessor, HsmsMessageReceiveObservable, HsmsCommunicateStateDetectable, HsmsMessagePassThroughObservable {
+public interface HsmsSsCommunicator extends SecsCommunicator, HsmsGemAccessor, HsmsMessageReceiveObservable, HsmsCommunicateStateDetectable, HsmsMessagePassThroughObservable, HsmsLogObservable {
 	
 	/**
 	 * Linktest.

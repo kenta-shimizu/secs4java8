@@ -57,10 +57,10 @@ Notice: `HsmsGsCommunicator` is **NOT** instance of `SecsCommunicator`.
 
 ```java
     /* from Session-ID */
-    HsmsSession session100 = passive.getSession(100);
+    HsmsSession session100 = passive.getHsmsSession(100);
 
     /* Session Set */
-    Set<HsmsSession> sessions = passive.getSessions();
+    Set<HsmsSession> sessions = passive.getHsmsSessions();
 ```
 
 See also ["/src/examples/example6"](/src/examples/example6)

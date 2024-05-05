@@ -19,11 +19,11 @@ public abstract class AbstractQueueBiObserver<C extends SecsGemAccessor, M exten
 	
 	private final Object sync = new Object();
 	
-	private final C communicator;
+	private final C accessor;
 	
-	public AbstractQueueBiObserver(Executor executor, C communicator) {
+	public AbstractQueueBiObserver(Executor executor, C accessor) {
 		
-		this.communicator = communicator;
+		this.accessor = accessor;
 		
 		executor.execute(() -> {
 			
@@ -59,13 +59,13 @@ public abstract class AbstractQueueBiObserver<C extends SecsGemAccessor, M exten
 			}
 			
 			for (B biListener : this.biLstnrs) {
-				this.notifyValueToBiListener(biListener, value, this.communicator);
+				this.notifyValueToBiListener(biListener, value, this.accessor);
 			}
 		}
 	}
 	
 	abstract protected void notifyValueToListener(M listener, V value);
-	abstract protected void notifyValueToBiListener(B biListener, V value, C communicator);
+	abstract protected void notifyValueToBiListener(B biListener, V value, C accessor);
 	
 	public boolean addListener(M listener) {
 		synchronized ( this.sync ) {

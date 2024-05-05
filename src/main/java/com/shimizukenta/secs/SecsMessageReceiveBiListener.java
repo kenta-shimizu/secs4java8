@@ -17,8 +17,8 @@ public interface SecsMessageReceiveBiListener extends EventListener {
 	 * Putter Received Primary-SecsMessage and GemAccessor.
 	 * 
 	 * @param message only Primary-SecsMessage
-	 * @param communicator the GemAccessor
+	 * @param accessor the GemAccessor
 	 */
-	public void received(SecsMessage message, SecsGemAccessor communicator);
+	public void received(SecsMessage message, SecsGemAccessor accessor);
 
 }

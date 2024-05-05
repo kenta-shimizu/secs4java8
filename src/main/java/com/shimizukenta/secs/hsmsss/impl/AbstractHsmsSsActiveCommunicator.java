@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import com.shimizukenta.secs.UnsetSocketAddressException;
+import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
@@ -69,7 +70,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 			
 			final SocketAddress socketAddr = this.config.socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
 			
-			notifyLog(HsmsSsConnectionLog.tryConnect(socketAddr));
+			this.hsmsLogObserver().offerHsmsChannelConnectionTryConnect(socketAddr);
 
 			channel.connect(socketAddr, null, new CompletionHandler<Void, Void>(){
 				
@@ -82,7 +83,8 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 							SocketAddress pRemote = channel.getRemoteAddress();						
 							
 							try {
-								notifyLog(HsmsSsConnectionLog.connected(pLocal, pRemote));
+								
+								AbstractHsmsSsActiveCommunicator.this.hsmsLogObserver().offerHsmsChannelConnectionConnected(pLocal, pRemote);
 								
 								AbstractHsmsSsActiveCommunicator.this.completionAction(channel);
 							}
@@ -98,15 +100,11 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 									channel.notifyAll();
 								}
 								
-								try {
-									notifyLog(HsmsSsConnectionLog.closed(pLocal, pRemote));
-								}
-								catch ( InterruptedException ignore ) {
-								}
+								AbstractHsmsSsActiveCommunicator.this.hsmsLogObserver().offerHsmsChannelConnectionConnectClosed(pLocal, pRemote);
 							}
 						}
 						catch (IOException e) {
-							notifyLog(e);
+							AbstractHsmsSsActiveCommunicator.this.offerThrowableToLog(e);
 						}
 					}
 					catch (InterruptedException ignore) {
@@ -117,12 +115,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 				public void failed(Throwable t, Void attachment) {
 					
 					if (! (t instanceof ClosedChannelException)) {
-						
-						try {
-							notifyLog(t);
-						}
-						catch (InterruptedException ignore) {
-						}
+						AbstractHsmsSsActiveCommunicator.this.offerThrowableToLog(t);
 					}
 					
 					synchronized ( channel ) {
@@ -135,8 +128,8 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 				channel.wait();
 			}
 		}
-		catch ( IOException e ) {
-			notifyLog(e);
+		catch (IOException e) {
+			this.offerThrowableToLog(e);
 		}
 	}
 	
@@ -182,7 +175,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 						}
 						
 						if (! (t instanceof ClosedChannelException)) {
-							notifyLog(t);
+							this.offerThrowableToLog(t);
 						}
 					}
 				}
@@ -201,8 +194,8 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 			return ;
 		}
 		
-		session.notifyHsmsCommunicateStateToSelected();
-		
+		session.hsmsCommunicateStateObserver().setHsmsCommunicateState(HsmsCommunicateState.SELECTED);
+
 		try {
 			
 			for ( ;; ) {
@@ -212,7 +205,7 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 				switch (primaryMsg.messageType()) {
 				case DATA: {
 					
-					session.notifyHsmsMessageReceive(primaryMsg);
+					session.hsmsMessageReceiveObserver().putHsmsMessage(primaryMsg);
 					break;
 				}
 				case SELECT_REQ:
@@ -244,9 +237,8 @@ public abstract class AbstractHsmsSsActiveCommunicator extends AbstractHsmsSsCom
 			}
 		}
 		catch (HsmsSendMessageException | HsmsWaitReplyMessageException e) {
-			this.notifyLog(e);
+			this.offerThrowableToLog(e);
 		}
 	}
-	
 	
 }

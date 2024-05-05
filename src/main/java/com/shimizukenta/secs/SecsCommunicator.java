@@ -27,12 +27,12 @@ import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicatorConfig;
  * <ul>
  * <li>To receive Primary-Message,
  * {@link #addSecsMessageReceiveListener(SecsMessageReceiveListener)}
- * or {@link #addSecsMessageReceiveListener(SecsMessageReceiveBiListener)}</li>
+ * or {@link #addSecsMessageReceiveBiListener(SecsMessageReceiveBiListener)}</li>
  * </ul>
  * <ul>
  * <li>To get communicate-state-changed,
  * {@link #addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeListener)}
- * or {@link #addSecsCommunicatableStateChangeListener(SecsCommunicatableStateChangeBiListener)}</li>
+ * or {@link #addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener)}</li>
  * <li>To wait until communicatable, {@link #waitUntilCommunicatable()}</li>
  * <li>To wait until not communicatable, {@link #waitUntilNotCommunicatable()}</li>
  * </ul>
@@ -47,7 +47,7 @@ import com.shimizukenta.secs.secs1ontcpip.Secs1OnTcpIpCommunicatorConfig;
  * @author kenta-shimizu
  *
  */
-public interface SecsCommunicator extends OpenAndCloseable, SecsGemAccessor, SecsMessageReceiveObservable, SecsMessagePassThroughObservable, SecsCommunicateStateDetectable {
+public interface SecsCommunicator extends OpenAndCloseable, SecsGemAccessor, SecsMessageReceiveObservable, SecsMessagePassThroughObservable, SecsCommunicateStateDetectable, SecsLogObservable {
 	
 	/**
 	 * Open and wait until communicatable.
@@ -79,28 +79,6 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsGemAccessor, Sec
 	 * @throws TimeoutException if timeout
 	 */
 	public void openAndWaitUntilCommunicatable(long timeout, TimeUnit unit) throws IOException, InterruptedException, TimeoutException;
-	
-	
-	/* Secs-Log Receive Listener */
-	
-	/**
-	 * Add Listener to log Communicating.
-	 * 
-	 * @param listener Not accept {@code null}
-	 * @return {@code true} if add success
-	 */
-	public boolean addSecsLogListener(SecsLogListener listener);
-	
-	/**
-	 * Remove Listener
-	 * 
-	 * @param listener Not accept {@code null}
-	 * @return {@code true} if remove success
-	 */
-	public boolean removeSecsLogListener(SecsLogListener listener);
-	
-	
-	
 	
 	
 }

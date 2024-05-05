@@ -21,14 +21,14 @@ public interface Secs1MessageSendable extends SecsMessageSendable {
 	 * Wait until sended Primay-Message and Reply-Secs1Message received if exist.
 	 * </p>
 	 * 
-	 * @param secs1Message SECS-I Message
+	 * @param message SECS-I Message
 	 * @return reply-Secs1Message if exist
 	 * @throws Secs1SendMessageException if SECS-I Message send failed
 	 * @throws Secs1WaitReplyMessageException if SECS-I wait reply Message failed
 	 * @throws Secs1Exception if SECS-I communicate failed
 	 * @throws InterruptedException if interrupted
 	 */
-	public Optional<Secs1Message> send(Secs1Message msg)
+	public Optional<Secs1Message> send(Secs1Message message)
 			throws Secs1SendMessageException,
 			Secs1WaitReplyMessageException,
 			Secs1Exception,

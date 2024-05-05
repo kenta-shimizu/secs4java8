@@ -16,7 +16,7 @@ import com.shimizukenta.secs.secs1ontcpip.impl.AbstractSecs1OnTcpIpCommunicator;
  * @author kenta-shimizu
  *
  */
-public interface Secs1OnTcpIpCommunicator extends Secs1Communicator {
+public interface Secs1OnTcpIpCommunicator extends Secs1Communicator, Secs1OnTcpIpLogObservable {
 	
 	/**
 	 * Create SECS-I-on-TCP/IP instance.

@@ -2,6 +2,12 @@ package com.shimizukenta.secs.secs1;
 
 import com.shimizukenta.secs.SecsMessageReceiveObservable;
 
+/**
+ * Secs1MessageReceiveObservable.
+ * 
+ * @author kenta-shimizu
+ *
+ */
 public interface Secs1MessageReceiveObservable extends SecsMessageReceiveObservable {
 	
 	/**

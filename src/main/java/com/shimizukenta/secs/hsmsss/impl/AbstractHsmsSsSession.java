@@ -83,7 +83,7 @@ public abstract class AbstractHsmsSsSession extends AbstractHsmsSession {
 		
 		return false;
 	}
-
+	
 	@Override
 	public boolean deselect() throws InterruptedException {
 		throw new UnsupportedOperationException();
@@ -125,5 +125,5 @@ public abstract class AbstractHsmsSsSession extends AbstractHsmsSession {
 		HsmsMessage msg = this.msgBuilder().buildDataMessage(this, primaryMsg, strm, func, wbit, secs2);
 		return this.send(msg).map(m -> (SecsMessage)m);
 	}
-	
+
 }
