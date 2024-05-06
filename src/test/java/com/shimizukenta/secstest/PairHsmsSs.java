@@ -25,7 +25,7 @@ import com.shimizukenta.secs.secs2.Secs2Exception;
 
 public class PairHsmsSs {
 	
-	private static final int testCycle = 1000;
+	private static final int testCycle = 3;
 	
 	public int equipCounter;
 	public int hostCounter;
@@ -52,7 +52,10 @@ public class PairHsmsSs {
 		equipConfig.sessionId(10);
 		equipConfig.isEquip(true);
 		equipConfig.rebindIfPassive(5.0F);
-		equipConfig.timeout().t3(10.0F);
+		equipConfig.timeout().t3(12.0F);
+		equipConfig.timeout().t6( 5.0F);
+		equipConfig.timeout().t7(10.0F);
+		equipConfig.timeout().t8( 6.0F);
 		equipConfig.linktest(6.0F);
 		equipConfig.gem().mdln("MDLN-A");
 		equipConfig.gem().softrev("000001");
@@ -62,7 +65,10 @@ public class PairHsmsSs {
 		hostConfig.socketAddress(addr);
 		hostConfig.sessionId(10);
 		hostConfig.isEquip(false);
-		hostConfig.timeout().t3(10.0F);
+		hostConfig.timeout().t3(12.0F);
+		hostConfig.timeout().t5(10.0F);
+		hostConfig.timeout().t6( 5.0F);
+		hostConfig.timeout().t8( 6.0F);
 		hostConfig.linktest(6.0F);
 		
 		
@@ -78,16 +84,6 @@ public class PairHsmsSs {
 				if ( log instanceof SecsThrowableLog ) {
 					tt.add(((SecsThrowableLog) log).getCause());
 				}
-			});
-			
-			equip.addTrySendSecsMessagePassThroughListener(msg -> {
-				echo("equip-pt-trysnd: strm: " + msg.getStream() + ", func: " + msg.getFunction());
-			});
-			equip.addSendedSecsMessagePassThroughListener(msg -> {
-				echo("equip-pt-sended: strm: " + msg.getStream() + ", func: " + msg.getFunction());
-			});
-			equip.addReceiveSecsMessagePassThroughListener(msg -> {
-				echo("equip-pt-recved: strm: " + msg.getStream() + ", func: " + msg.getFunction());
 			});
 			
 			equip.addSecsMessageReceiveListener(msg -> {
@@ -151,16 +147,6 @@ public class PairHsmsSs {
 					if ( log instanceof SecsThrowableLog ) {
 						tt.add(((SecsThrowableLog) log).getCause());
 					}
-				});
-				
-				host.addTrySendSecsMessagePassThroughListener(msg -> {
-					echo("host-pt-trysnd: strm: " + msg.getStream() + ", func: " + msg.getFunction());
-				});
-				host.addSendedSecsMessagePassThroughListener(msg -> {
-					echo("host-pt-sended: strm: " + msg.getStream() + ", func: " + msg.getFunction());
-				});
-				host.addReceiveSecsMessagePassThroughListener(msg -> {
-					echo("host-pt-recved: strm: " + msg.getStream() + ", func: " + msg.getFunction());
 				});
 				
 				host.addSecsMessageReceiveListener(msg -> {

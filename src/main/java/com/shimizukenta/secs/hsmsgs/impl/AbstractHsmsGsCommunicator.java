@@ -2,111 +2,98 @@ package com.shimizukenta.secs.hsmsgs.impl;
 
 import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
-import java.util.ArrayList;
+import java.nio.channels.ClosedChannelException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.stream.Collectors;
+import java.util.concurrent.TimeoutException;
 
 import com.shimizukenta.secs.SecsCommunicatableStateChangeBiListener;
 import com.shimizukenta.secs.SecsException;
-import com.shimizukenta.secs.SecsLogListener;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessageReceiveBiListener;
-import com.shimizukenta.secs.SecsMessageReceiveListener;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
-import com.shimizukenta.secs.hsms.HsmsException;
+import com.shimizukenta.secs.hsms.HsmsCommunicateState;
+import com.shimizukenta.secs.hsms.HsmsCommunicateStateChangeBiListener;
 import com.shimizukenta.secs.hsms.HsmsMessage;
 import com.shimizukenta.secs.hsms.HsmsMessageDeselectStatus;
-import com.shimizukenta.secs.hsms.HsmsMessagePassThroughListener;
-import com.shimizukenta.secs.hsms.HsmsMessageReceiveListener;
+import com.shimizukenta.secs.hsms.HsmsMessageReceiveBiListener;
 import com.shimizukenta.secs.hsms.HsmsMessageRejectReason;
 import com.shimizukenta.secs.hsms.HsmsMessageSelectStatus;
 import com.shimizukenta.secs.hsms.HsmsMessageType;
 import com.shimizukenta.secs.hsms.HsmsSendMessageException;
 import com.shimizukenta.secs.hsms.HsmsSession;
-import com.shimizukenta.secs.hsms.HsmsSessionCommunicateStateChangeBiListener;
-import com.shimizukenta.secs.hsms.HsmsSessionMessageReceiveBiListener;
+import com.shimizukenta.secs.hsms.HsmsTimeoutT7Exception;
 import com.shimizukenta.secs.hsms.HsmsWaitReplyMessageException;
-import com.shimizukenta.secs.hsms.impl.AbstractHsmsAsyncSocketChannel;
-import com.shimizukenta.secs.hsms.impl.AbstractHsmsSession;
-import com.shimizukenta.secs.hsms.impl.HsmsMessageBuilder;
-import com.shimizukenta.secs.hsms.impl.HsmsMessagePassThroughQueueObserver;
+import com.shimizukenta.secs.hsms.impl.AbstractHsmsLogObserverFacade;
+import com.shimizukenta.secs.hsms.impl.AbstractHsmsMessage;
+import com.shimizukenta.secs.hsms.impl.AbstractHsmsMessagePassThroughObserverFacade;
+import com.shimizukenta.secs.hsms.impl.HsmsLogObservableImpl;
+import com.shimizukenta.secs.hsms.impl.HsmsMessagePassThroughObservableImpl;
 import com.shimizukenta.secs.hsmsgs.HsmsGsCommunicator;
 import com.shimizukenta.secs.hsmsgs.HsmsGsCommunicatorConfig;
 import com.shimizukenta.secs.hsmsgs.HsmsGsUnknownSessionIdException;
 import com.shimizukenta.secs.impl.AbstractBaseCommunicator;
-import com.shimizukenta.secs.impl.AbstractSecsLog;
-import com.shimizukenta.secs.impl.AbstractSecsThrowableLog;
-import com.shimizukenta.secs.impl.SecsLogQueueObserver;
+import com.shimizukenta.secs.local.property.BooleanCompution;
+import com.shimizukenta.secs.local.property.BooleanProperty;
+import com.shimizukenta.secs.local.property.SetProperty;
 import com.shimizukenta.secs.secs2.Secs2;
-import com.shimizukenta.secs.sml.SmlMessage;
 
-public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicator implements HsmsGsCommunicator {
+public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicator implements HsmsGsCommunicator, HsmsLogObservableImpl, HsmsMessagePassThroughObservableImpl {
 	
 	private final HsmsGsCommunicatorConfig config;
-	private final Set<AbstractHsmsSession> sessions;
 	
-	private final HsmsGsMessageReceiveBiObserver hsmsMsgRecvBiObserver;
+	private final BooleanProperty sessionFixedProp = BooleanProperty.newInstance(false);
 	
-	private final HsmsGsSecsCommunicatableBiObserver secsCommStatableObserver;
-	private final HsmsGsHsmsCommunicateStateBiObserver hsmsCommStateObserver;
+	private final HsmsGsMessageBuilder msgBuilder;
 	
-	private final SecsLogQueueObserver logQueueObserver;
-	
-	private final HsmsMessagePassThroughQueueObserver trySendHsmsMsgPassThroughQueueObserver;
-	private final HsmsMessagePassThroughQueueObserver sendedHsmsMsgPassThroughQueueObserver;
-	private final HsmsMessagePassThroughQueueObserver recvHsmsMsgPassThroughQueueObserver;
+	private final AbstractHsmsLogObserverFacade logObserver;
+	private final AbstractHsmsMessagePassThroughObserverFacade msgPassThroughObserver;
 	
 	public AbstractHsmsGsCommunicator(HsmsGsCommunicatorConfig config) {
-		this.config = config;
-		this.sessions = config.sessionIds().stream()
-				.map(i -> new AbstractHsmsGsSession(config, i.intValue()) {})
-				.collect(Collectors.toSet());
+		super();
 		
-		this.hsmsMsgRecvBiObserver = new HsmsGsMessageReceiveBiObserver();
+		this.config = Objects.requireNonNull(config);
 		
-		this.secsCommStatableObserver = new HsmsGsSecsCommunicatableBiObserver();
-		this.hsmsCommStateObserver = new HsmsGsHsmsCommunicateStateBiObserver();
+		this.config.sessionIds().addChangeListener(v -> {
+			synchronized (this.sessionFixedProp) {
+				if (this.sessionFixedProp.booleanValue()) {
+					try {
+						this.close();
+					}
+					catch (IOException giveup) {
+					}
+				}
+			}
+		});
 		
-		this.trySendHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this.executorService());
-		this.sendedHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this.executorService());
-		this.recvHsmsMsgPassThroughQueueObserver = new HsmsMessagePassThroughQueueObserver(this.executorService());
+		this.msgBuilder = new AbstractHsmsGsMessageBuilder(this.config) {};
 		
-		this.logQueueObserver = new SecsLogQueueObserver(this.executorService());
-		
-		for (HsmsSession s : this.sessions) {
-			
-			s.addHsmsMessageReceiveBiListener(this.hsmsMsgRecvBiObserver);
-			
-			s.addSecsCommunicatableStateChangeBiListener(this.secsCommStatableObserver);
-			s.addHsmsCommunicateStateChangeBiListener(this.hsmsCommStateObserver);
-		}
+		this.logObserver = new AbstractHsmsLogObserverFacade(config, this.executorService()) {};
+		this.msgPassThroughObserver = new AbstractHsmsMessagePassThroughObserverFacade(this.executorService()) {};
 	}
 	
-	public HsmsGsCommunicatorConfig config() {
-		return this.config;
-	}
-	
-	private final HsmsMessageBuilder msgBuilder = new AbstractHsmsGsMessageBuilder() {};
-	
-	public HsmsMessageBuilder msgBuilder() {
+	public HsmsGsMessageBuilder getHsmsGsMessageBuilder() {
 		return this.msgBuilder;
 	}
 	
 	@Override
 	public void open() throws IOException {
-		super.open();
 		
-		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-			s.open();
-		}
+		this.getAbstractHsmsGsSessions().forEach(session -> {
+			session.addHsmsCommunicateStateChangeBiListener((state, comm) -> {
+				this.hsmsLogObserver().offerHsmsSessionCommunicateState(comm.sessionId(), state);
+			});
+		});
+		
+		super.open();
 	}
 	
 	private final Object syncClosed = new Object();
@@ -114,513 +101,478 @@ public abstract class AbstractHsmsGsCommunicator extends AbstractBaseCommunicato
 	@Override
 	public void close() throws IOException {
 		
-		synchronized ( this.syncClosed ) {
+		synchronized (this.syncClosed) {
 			
-			if ( this.isClosed() ) {
+			if (this.isClosed()) {
 				return;
 			}
 			
-			try {
-				
-				for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-					if ( ! s.deselect() ) {
-						s.separate();
+			for (AbstractHsmsGsSession session : getAbstractHsmsGsSessions()) {
+				if (session.isCommunicatable()) {
+					try {
+						session.separate();
+					}
+					catch (InterruptedException ignore) {
 					}
 				}
 			}
-			catch ( InterruptedException ignore ) {
-			}
 			
-			IOException ioExcept = null;
-			
-			try {
-				super.close();
-			}
-			catch ( IOException e ) {
-				ioExcept = e;
-			}
-			
-			for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-				try {
-					s.close();
-				}
-				catch ( IOException e ) {
-					ioExcept = e;
+			super.close();
+		}
+	}
+	
+	
+	private final Set<AbstractHsmsGsSession> sessions = new HashSet<>();
+	
+	private Set<AbstractHsmsGsSession> getAbstractHsmsGsSessions() {
+		synchronized (this.sessionFixedProp) {
+			if (! this.sessionFixedProp.booleanValue()) {
+				this.sessionFixedProp.setTrue();
+				for (Integer i : this.config.sessionIds()) {
+					this.sessions.add(new AbstractHsmsGsSession(this, this.config, i.intValue()) {});
 				}
 			}
-			
-			if ( ioExcept != null ) {
-				throw ioExcept;
-			}
+			return this.sessions;
 		}
 	}
 	
-	public Set<AbstractHsmsSession> getAbstractHsmsSessions() {
-		return this.sessions;
+	@Override
+	public Set<HsmsSession> getHsmsSessions() {
+		return Collections.unmodifiableSet(this.getAbstractHsmsGsSessions());
 	}
 	
 	@Override
-	public Set<HsmsSession> getSessions() {
-		return Collections.unmodifiableSet(this.getAbstractHsmsSessions());
+	public HsmsSession getHsmsSession(int sessionId) throws HsmsGsUnknownSessionIdException {
+		return this.optionalHsmsSession(sessionId)
+				.orElseThrow(() -> new HsmsGsUnknownSessionIdException(sessionId));
 	}
 	
 	@Override
-	public HsmsSession getSession(int sessionId) throws HsmsGsUnknownSessionIdException {
-		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-			if ( s.sessionId() == sessionId ) {
-				return s;
-			}
-		}
-		throw new HsmsGsUnknownSessionIdException(sessionId);
+	public boolean existHsmsSession(int sessionId) {
+		return this.getAbstractHsmsGsSessions().stream()
+				.anyMatch(s -> s.sessionId() == sessionId);
 	}
 	
 	@Override
-	public boolean existSession(int sessionId) {
-		for ( AbstractHsmsSession s : getAbstractHsmsSessions() ) {
-			if ( s.sessionId() == sessionId ) {
-				return true;
-			}
-		}
-		return false;
+	public Optional<HsmsSession> optionalHsmsSession(int sessionId) {
+		return this.getAbstractHsmsGsSessions().stream()
+				.filter(s -> s.sessionId() == sessionId)
+				.findAny()
+				.map(s -> (HsmsSession)s);
 	}
 	
 	protected void completionAction(AsynchronousSocketChannel channel)
 			throws InterruptedException {
 		
-		final AbstractHsmsAsyncSocketChannel asyncChannel = buildAsyncSocketChannel(channel);
-		final BlockingQueue<HsmsMessage> queue = new LinkedBlockingQueue<>();
-		
-		asyncChannel.addHsmsMessageReceiveListener(msg -> {
+		try (
+			HsmsGsAsynchronousSocketChannelFacade asyncChannel = new HsmsGsAsynchronousSocketChannelFacade(this.config, channel, this);	
+				) {
+			
+			final SetProperty<AbstractHsmsGsSession> selectedSessions = SetProperty.newInstance();
+			
+			final Collection<Callable<Void>> tasks = Arrays.asList(
+					() -> {
+						try {
+							this.trySelectRequesting(asyncChannel, selectedSessions);
+						}
+						catch (InterruptedException ignore) {
+						}
+						
+						return null;
+					},
+					() -> {
+						try {
+							this.mainTask(asyncChannel, selectedSessions);
+						}
+						catch (InterruptedException ignore) {
+						}
+						
+						return null;
+					},
+					() -> {
+						try {
+							for (;;) {
+								selectedSessions.waitUntilIsEmpty();
+								selectedSessions.waitUntilIsNotEmpty(this.config.timeout().t7());
+							}
+						}
+						catch (TimeoutException e) {
+							this.offerThrowableToLog(new HsmsTimeoutT7Exception());
+						}
+						catch (InterruptedException ignore) {
+						}
+						
+						return null;
+					},
+					() -> {
+						try {
+							asyncChannel.waitUntilShutdown();
+						}
+						catch (InterruptedException ignore) {
+						}
+						
+						return null;
+					});
+			
 			try {
-				queue.put(msg);
+				this.executeInvokeAny(tasks);
 			}
-			catch ( InterruptedException ignore ) {
-			}
-		});
-		
-		final Collection<Callable<Void>> tasks = new ArrayList<>();
-		
-		tasks.add(() -> {
-			try {
-				asyncChannel.reading();
-			}
-			catch ( HsmsException e ) {
-				this.notifyLog(e);
-			}
-			catch ( InterruptedException ignore ) {
-			}
-			return null;
-		});
-		
-		tasks.add(() -> {
-			try {
-				asyncChannel.linktesting();
-			}
-			catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException e ) {
-				this.notifyLog(e);
-			}
-			catch ( InterruptedException ignore ) {
-			}
-			return null;
-		});
-		
-		tasks.add(() -> {
-			try {
-				this.recvMsgTask(asyncChannel, queue);
-			}
-			catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException e ) {
-				this.notifyLog(e);
-			}
-			catch ( InterruptedException ignore ) {
-			}
-			return null;
-		});
-		
-		this.getAbstractHsmsSessions().forEach(session -> {
-			tasks.add(() -> {
-				try {
-					this.trySelectRequesting(asyncChannel, session);
+			catch (ExecutionException e) {
+				Throwable t = e.getCause();
+				
+				if (! (t instanceof ClosedChannelException)) {
+					this.offerThrowableToLog(t);
 				}
-				catch ( InterruptedException ignore ) {
+			}
+			finally {
+				synchronized (selectedSessions) {
+					for (AbstractHsmsGsSession session : selectedSessions) {
+						session.unsetChannel();
+					}
 				}
-				return null;
-			});
-		});
-		
-		try {
-			this.executeInvokeAny(tasks);
+			}
 		}
-		catch ( ExecutionException e ) {
-			
-			Throwable t = e.getCause();
-			
-			if ( t instanceof RuntimeException ) {
-				throw (RuntimeException)t;
-			}
-			
-			this.notifyLog(t);
+		catch (IOException e) {
+			this.offerThrowableToLog(e);
 		}
 	}
 	
 	private void trySelectRequesting(
-			AbstractHsmsAsyncSocketChannel asyncChannel,
-			AbstractHsmsSession session)
-					throws InterruptedException {
+			HsmsGsAsynchronousSocketChannelFacade asyncChannel,
+			SetProperty<AbstractHsmsGsSession> selectedSessions
+			) throws InterruptedException {
+		
+		final BooleanCompution existNotSelectedSession = selectedSessions.computeSize().computeIsNotEqualTo(this.getAbstractHsmsGsSessions().size());
 		
 		for ( ;; ) {
-			config.isTrySelectRequest().waitUntilTrue();
-			session.waitUntilUnsetAsyncSocketChannel();
 			
-			try {
-				HsmsMessageSelectStatus status = asyncChannel.sendSelectRequest(session)
-						.map(HsmsMessageSelectStatus::get)
-						.orElse(HsmsMessageSelectStatus.UNKNOWN);
-				
-				switch ( status ) {
-				case SUCCESS:
-				case ENTITY_ACTIVED: {
-					session.setAsyncSocketChannel(asyncChannel);
-					break;
-				}
-				default: {
-					/* Nothing */
-				}
+			existNotSelectedSession.waitUntilTrue();
+			
+			this.config.isTrySelectRequest().waitUntilTrue();
+			
+			for (AbstractHsmsGsSession session : this.getAbstractHsmsGsSessions()) {
+				if (! selectedSessions.contains(session)) {
+					
+					try {
+						HsmsMessageSelectStatus status = asyncChannel.send(this.getHsmsGsMessageBuilder().buildSelectRequest(session))
+								.map(HsmsMessageSelectStatus::get)
+								.orElse(HsmsMessageSelectStatus.UNKNOWN);
+						
+						switch ( status ) {
+						case SUCCESS:
+						case ACTIVED:
+						case ENTITY_ACTIVED: {
+							
+							synchronized (selectedSessions) {
+								session.setChannel(asyncChannel);
+								session.hsmsCommunicateStateObserver().setHsmsCommunicateState(HsmsCommunicateState.SELECTED);
+								selectedSessions.add(session);
+							}
+							
+							break;
+						}
+						default: {
+							/* Nothing */
+						}
+						}
+					}
+					catch (HsmsSendMessageException | HsmsWaitReplyMessageException e) {
+						this.offerThrowableToLog(e);
+					}
 				}
 			}
-			catch ( HsmsSendMessageException | HsmsWaitReplyMessageException | HsmsException e ) {
-				this.notifyLog(e);
-			}
 			
-			config.retrySelectRequestTimeout().sleep();
+			this.config.retrySelectRequestTimeout().sleep();
 		}
 	}
 	
-	private void recvMsgTask(
-			AbstractHsmsAsyncSocketChannel asyncChannel,
-			BlockingQueue<HsmsMessage> queue)
-					throws HsmsSendMessageException,
-					HsmsWaitReplyMessageException,
-					HsmsException,
-					InterruptedException {
+	private void mainTask(
+			HsmsGsAsynchronousSocketChannelFacade asyncChannel,
+			SetProperty<AbstractHsmsGsSession> selectedSessions
+			) throws InterruptedException {
 		
 		for ( ;; ) {
+			final AbstractHsmsMessage msg = asyncChannel.takePrimaryHsmsMessage();
 			
-			final HsmsMessage msg = queue.take();
-			
-			switch ( msg.messageType() ) {
-			case DATA: {
-				
-				final int id = msg.sessionId();
-				
-				boolean recved = false;
-				
-				for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
+			try {
+				switch (msg.messageType()) {
+				case DATA: {
 					
-					if ( s.sessionId() == id ) {
-						if ( s.putReceiveHsmsMessage(msg) ) {
-							recved = true;
-						}
-						break;
+					final AbstractHsmsGsSession session = selectedSessions.stream()
+							.filter(s -> s.sessionId() == msg.sessionId())
+							.findAny()
+							.orElse(null);
+					
+					if (session == null) {
+						asyncChannel.send(this.getHsmsGsMessageBuilder().buildRejectRequest(msg, HsmsMessageRejectReason.NOT_SELECTED));
+					} else {
+						session.hsmsMessageReceiveObserver().putHsmsMessage(msg);
 					}
-				}
-				
-				if ( ! recved ) {
-					asyncChannel.sendRejectRequest(msg, HsmsMessageRejectReason.NOT_SELECTED);
-				}
-				break;
-			}
-			case SELECT_REQ: {
-				
-				final int id = msg.sessionId();
-				
-				boolean responsed = false;
-				
-				for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
 					
-					if ( s.sessionId() == id ) {
+					break;
+				}
+				case SELECT_REQ: {
+					
+					final AbstractHsmsGsSession selectedSession = selectedSessions.stream()
+							.filter(s -> s.sessionId() == msg.sessionId())
+							.findAny()
+							.orElse(null);
+					
+					if (selectedSession == null) {
 						
-						if ( s.setAsyncSocketChannel(asyncChannel) ) {
+						final AbstractHsmsGsSession session = this.getAbstractHsmsGsSessions().stream()
+								.filter(s -> s.sessionId() == msg.sessionId())
+								.findAny()
+								.orElse(null);
+						
+						if (session == null) {
 							
-							asyncChannel.sendSelectResponse(msg, HsmsMessageSelectStatus.SUCCESS);
+							asyncChannel.send(this.getHsmsGsMessageBuilder().buildSelectResponse(msg, HsmsMessageSelectStatus.ENTITY_UNKNOWN));
 							
 						} else {
 							
-							if ( s.equalsAsyncSocketChannel(asyncChannel) ) {
-								asyncChannel.sendSelectResponse(msg, HsmsMessageSelectStatus.ENTITY_ACTIVED);
+							if (session.setChannel(asyncChannel)) {
+								
+								synchronized (selectedSessions) {
+									selectedSessions.add(session);
+									session.hsmsCommunicateStateObserver().setHsmsCommunicateState(HsmsCommunicateState.SELECTED);
+								}
+								
+								asyncChannel.send(this.getHsmsGsMessageBuilder().buildSelectResponse(msg, HsmsMessageSelectStatus.SUCCESS));
+								
 							} else {
-								asyncChannel.sendSelectResponse(msg, HsmsMessageSelectStatus.ENTITY_ALREADY_USED);
+								
+								asyncChannel.send(this.getHsmsGsMessageBuilder().buildSelectResponse(msg, HsmsMessageSelectStatus.ENTITY_ALREADY_USED));
 							}
 						}
 						
-						responsed = true;
-						break;
-					}
-				}
-				
-				if ( ! responsed ) {
-					asyncChannel.sendSelectResponse(msg, HsmsMessageSelectStatus.ENTITY_UNKNOWN);
-				}
-				break;
-			}
-			case DESELECT_REQ: {
-				
-				final int id = msg.sessionId();
-				
-				boolean responsed = false;
-				
-				for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-					
-					if ( s.sessionId() == id ) {
-						boolean f = s.unsetAsyncSocketChannel();
-						HsmsMessageDeselectStatus status = f ? HsmsMessageDeselectStatus.SUCCESS : HsmsMessageDeselectStatus.NO_SELECTED;
-						asyncChannel.sendDeselectResponse(msg, status);
-						responsed = true;
-						break;
-					}
-				}
-				
-				if ( ! responsed ) {
-					asyncChannel.sendDeselectResponse(msg, HsmsMessageDeselectStatus.FAILED);
-				}
-				break;
-			}
-			case LINKTEST_REQ: {
-				
-				asyncChannel.sendLinktestResponse(msg);
-				break;
-			}
-			case SEPARATE_REQ: {
-				
-				final int id = msg.sessionId();
-				
-				for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-					if ( s.sessionId() == id ) {
-						s.unsetAsyncSocketChannel();
-						break;
-					}
-				}
-				break;
-			}
-			case SELECT_RSP:
-			case DESELECT_RSP:
-			case LINKTEST_RSP:
-			case REJECT_REQ: {
-				
-				asyncChannel.sendRejectRequest(msg, HsmsMessageRejectReason.TRANSACTION_NOT_OPEN);
-				break;
-			}
-			default: {
-				if ( HsmsMessageType.supportSType(msg) ) {
-					
-					if ( ! HsmsMessageType.supportPType(msg) ) {
-						asyncChannel.sendRejectRequest(msg, HsmsMessageRejectReason.NOT_SUPPORT_TYPE_P);
+					} else {
+						
+						asyncChannel.send(this.getHsmsGsMessageBuilder().buildSelectResponse(msg, HsmsMessageSelectStatus.ENTITY_ACTIVED));
 					}
 					
-				} else {
+					break;
+				}
+				case DESELECT_REQ: {
 					
-					asyncChannel.sendRejectRequest(msg, HsmsMessageRejectReason.NOT_SUPPORT_TYPE_S);
+					final AbstractHsmsGsSession selectedSession = selectedSessions.stream()
+							.filter(s -> s.sessionId() == msg.sessionId())
+							.findAny()
+							.orElse(null);
+					
+					if (selectedSession == null) {
+						
+						asyncChannel.send(this.getHsmsGsMessageBuilder().buildDeselectResponse(msg, HsmsMessageDeselectStatus.NO_SELECTED));
+						
+					} else {
+						
+						synchronized (selectedSessions) {
+							selectedSession.unsetChannel();
+							selectedSessions.remove(selectedSession);
+						}
+						
+						asyncChannel.send(this.getHsmsGsMessageBuilder().buildDeselectResponse(msg, HsmsMessageDeselectStatus.SUCCESS));
+					}
+					
+					break;
+				}
+				case LINKTEST_REQ: {
+					
+					asyncChannel.send(this.getHsmsGsMessageBuilder().buildLinktestResponse(msg));
+					break;
+				}
+				case SEPARATE_REQ: {
+					
+					final AbstractHsmsGsSession session = selectedSessions.stream()
+							.filter(s -> s.sessionId() == msg.sessionId())
+							.findAny()
+							.orElse(null);
+					
+					if (session != null) {
+						
+						synchronized (selectedSessions) {
+							selectedSessions.remove(session);
+							session.unsetChannel();
+						}
+						
+						asyncChannel.shutdown();
+					}
+					
+					break;
+				}
+				case SELECT_RSP:
+				case DESELECT_RSP:
+				case LINKTEST_RSP:
+				case REJECT_REQ: {
+					
+					asyncChannel.send(this.getHsmsGsMessageBuilder().buildRejectRequest(msg, HsmsMessageRejectReason.TRANSACTION_NOT_OPEN));
+					break;
+				}
+				default: {
+					
+					if (HsmsMessageType.supportSType(msg) ) {
+						
+						if (! HsmsMessageType.supportPType(msg)) {
+							asyncChannel.send(this.getHsmsGsMessageBuilder().buildRejectRequest(msg, HsmsMessageRejectReason.NOT_SUPPORT_TYPE_P));
+						}
+						
+					} else {
+						
+						asyncChannel.send(this.getHsmsGsMessageBuilder().buildRejectRequest(msg, HsmsMessageRejectReason.NOT_SUPPORT_TYPE_S));
+					}
+				}
 				}
 			}
+			catch (HsmsSendMessageException | HsmsWaitReplyMessageException e) {
+				this.offerThrowableToLog(e);
 			}
 		}
 	}
 	
-	@Override
-	public Optional<SecsMessage> send(int sessionId, int strm, int func, boolean wbit)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
-		
-		return getSession(sessionId).send(strm, func, wbit);
-	}
 	
 	@Override
 	public Optional<SecsMessage> send(int sessionId, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
-		return getSession(sessionId).send(strm, func, wbit, secs2);
-	}
-	
-	@Override
-	public Optional<SecsMessage> send(int sessionId, SecsMessage primaryMsg, int strm, int func, boolean wbit)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
-		
-		return getSession(sessionId).send(primaryMsg, strm, func, wbit);
+		return getHsmsSession(sessionId).send(strm, func, wbit, secs2);
 	}
 	
 	@Override
 	public Optional<SecsMessage> send(int sessionId, SecsMessage primaryMsg, int strm, int func, boolean wbit, Secs2 secs2)
 			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
 		
-		return getSession(sessionId).send(primaryMsg, strm, func, wbit, secs2);
+		return getHsmsSession(sessionId).send(primaryMsg, strm, func, wbit, secs2);
 	}
 	
-	@Override
-	public Optional<SecsMessage> send(int sessionId, SmlMessage sml)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
-		
-		return getSession(sessionId).send(sml);
-	}
 	
-	@Override
-	public Optional<SecsMessage> send(int sessionId, SecsMessage primaryMsg, SmlMessage sml)
-			throws SecsSendMessageException, SecsWaitReplyMessageException, SecsException, InterruptedException {
-		
-		return getSession(sessionId).send(primaryMsg, sml);
-	}
-	
-	@Override
-	public boolean addSecsMessageReceiveListener(SecsMessageReceiveListener listener) {
-		return this.hsmsMsgRecvBiObserver.addListener(listener);
-	}
-	
-	@Override
-	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveListener listener) {
-		return this.hsmsMsgRecvBiObserver.removeListener(listener);
-	}
+	/* Receive Primary-Data-Message */
 	
 	@Override
 	public boolean addSecsMessageReceiveBiListener(SecsMessageReceiveBiListener biListener) {
-		return this.hsmsMsgRecvBiObserver.addBiListener(biListener);
+		boolean f = true;
+		for (AbstractHsmsGsSession s : this.getAbstractHsmsGsSessions()) {
+			if(! s.addSecsMessageReceiveBiListener(biListener)) {
+				f = false;
+			}
+		}
+		return f;
 	}
 	
 	@Override
 	public boolean removeSecsMessageReceiveBiListener(SecsMessageReceiveBiListener biListener) {
-		return this.hsmsMsgRecvBiObserver.removeBiListener(biListener);
+		boolean f = true;
+		for (AbstractHsmsGsSession s : this.getAbstractHsmsGsSessions()) {
+			if(! s.removeSecsMessageReceiveBiListener(biListener)) {
+				f = false;
+			}
+		}
+		return f;
 	}
 	
 	@Override
-	public boolean addHsmsMessageReceiveListener(HsmsMessageReceiveListener listener) {
-		return this.hsmsMsgRecvBiObserver.addListener(listener);
+	public boolean addHsmsMessageReceiveBiListener(HsmsMessageReceiveBiListener biListener) {
+		boolean f = true;
+		for (AbstractHsmsGsSession s : this.getAbstractHsmsGsSessions()) {
+			if(! s.addHsmsMessageReceiveBiListener(biListener)) {
+				f = false;
+			}
+		}
+		return f;
 	}
 	
 	@Override
-	public boolean removeHsmsMessageReceiveListener(HsmsMessageReceiveListener listener) {
-		return this.hsmsMsgRecvBiObserver.removeListener(listener);
+	public boolean removeHsmsMessageReceiveBiListener(HsmsMessageReceiveBiListener biListener) {
+		boolean f = true;
+		for (AbstractHsmsGsSession s : this.getAbstractHsmsGsSessions()) {
+			if(! s.removeHsmsMessageReceiveBiListener(biListener)) {
+				f = false;
+			}
+		}
+		return f;
 	}
 	
-	@Override
-	public boolean addHsmsMessageReceiveBiListener(HsmsSessionMessageReceiveBiListener biListener) {
-		return this.hsmsMsgRecvBiObserver.addBiListener(biListener);
-	}
 	
-	@Override
-	public boolean removeHsmsMessageReceiveBiListener(HsmsSessionMessageReceiveBiListener biListener) {
-		return this.hsmsMsgRecvBiObserver.removeBiListener(biListener);
-	}
-	
+	/* Communicate state Detectable */
 	
 	@Override
 	public boolean addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener) {
-		return this.secsCommStatableObserver.addListener(biListener);
+		boolean f = true;
+		for (AbstractHsmsGsSession s : this.getAbstractHsmsGsSessions()) {
+			if (! s.addSecsCommunicatableStateChangeBiListener(biListener)) {
+				f = false;
+			}
+		}
+		return f;
 	}
 	
 	@Override
 	public boolean removeSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener) {
-		return this.secsCommStatableObserver.removeListener(biListener);
-	}
-	
-	@Override
-	public boolean addHsmsCommunicateStateChangeBiListener(HsmsSessionCommunicateStateChangeBiListener biListener) {
-		return this.hsmsCommStateObserver.addListener(biListener);
-	}
-	
-	@Override
-	public boolean removeHsmsCommunicateStateChangeBiListener(HsmsSessionCommunicateStateChangeBiListener biListener) {
-		return this.hsmsCommStateObserver.removeListener(biListener);
-	}
-	
-	protected AbstractHsmsAsyncSocketChannel buildAsyncSocketChannel(AsynchronousSocketChannel channel) {
-		return new AbstractHsmsGsAsyncSocketChannel(channel, this) {};
-	}
-	
-	
-	@Override
-	public boolean addSecsLogListener(SecsLogListener lstnr) {
-		return this.logQueueObserver.addListener(lstnr);
-	}
-	
-	@Override
-	public boolean removeSecsLogListener(SecsLogListener lstnr) {
-		return this.logQueueObserver.removeListener(lstnr);
-	}
-	
-	public void notifyLog(AbstractSecsLog log) throws InterruptedException {
-		
-		log.subjectHeader(this.config.logSubjectHeader().toString());
-		
-		this.logQueueObserver.put(log);
-		
-		final SecsMessage msg = log.optionalSecsMessage().orElse(null);
-		if ( msg != null ) {
-			for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-				if ( s.sessionId() == msg.sessionId() ) {
-					s.notifyLog(log);
-				}
+		boolean f = true;
+		for (AbstractHsmsGsSession s : this.getAbstractHsmsGsSessions()) {
+			if (! s.removeSecsCommunicatableStateChangeBiListener(biListener)) {
+				f = false;
 			}
 		}
-	}
-	
-	public void notifyLog(Throwable t) throws InterruptedException {
-		
-		this.notifyLog(new AbstractSecsThrowableLog(t) {
-
-			private static final long serialVersionUID = -6535535244608063298L;
-		});
-	}
-	
-	
-	/* Try-Send HSMS Message Pass Through */
-	
-	@Override
-	public boolean addTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener) {
-		return this.trySendHsmsMsgPassThroughQueueObserver.addListener(listener);
+		return f;
 	}
 	
 	@Override
-	public boolean removeTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener) {
-		return this.trySendHsmsMsgPassThroughQueueObserver.removeListener(listener);
-	}
-	
-	public void notifyTrySendHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
-		this.trySendHsmsMsgPassThroughQueueObserver.put(msg);
-		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-			if ( msg.sessionId() == s.sessionId() ) {
-				s.notifyTrySendHsmsMessagePassThrough(msg);
+	public boolean addHsmsCommunicateStateChangeBiListener(HsmsCommunicateStateChangeBiListener biListener) {
+		boolean f = true;
+		for (AbstractHsmsGsSession s : this.getAbstractHsmsGsSessions()) {
+			if (! s.addHsmsCommunicateStateChangeBiListener(biListener)) {
+				f = false;
 			}
 		}
-	}
-	
-	
-	/* Sended HSMS Message Pass Through */
-	
-	@Override
-	public boolean addSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener) {
-		return this.sendedHsmsMsgPassThroughQueueObserver.addListener(listener);
+		return f;
 	}
 	
 	@Override
-	public boolean removeSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener) {
-		return this.sendedHsmsMsgPassThroughQueueObserver.removeListener(listener);
-	}
-	
-	public void notifySendedHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
-		this.sendedHsmsMsgPassThroughQueueObserver.put(msg);
-		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-			if ( msg.sessionId() == s.sessionId() ) {
-				s.notifySendedHsmsMessagePassThrough(msg);
+	public boolean removeHsmsCommunicateStateChangeBiListener(HsmsCommunicateStateChangeBiListener biListener) {
+		boolean f = true;
+		for (AbstractHsmsGsSession s : this.getAbstractHsmsGsSessions()) {
+			if (! s.removeHsmsCommunicateStateChangeBiListener(biListener)) {
+				f = false;
 			}
 		}
+		return f;
 	}
 	
 	
-	/* Receive HSMS Message Pass Through */
 	
-	public void notifyReceiveHsmsMessagePassThrough(HsmsMessage msg) throws InterruptedException {
-		this.recvHsmsMsgPassThroughQueueObserver.put(msg);
-		for ( AbstractHsmsSession s : this.getAbstractHsmsSessions() ) {
-			if ( msg.sessionId() == s.sessionId() ) {
-				s.notifyReceiveHsmsMessagePassThrough(msg);
-			}
-		}
+	/* Pass Through */
+	
+	@Override
+	public AbstractHsmsMessagePassThroughObserverFacade hsmsPassThroughObserver() {
+		return this.msgPassThroughObserver;
 	}
+	
+	/* LogObservable */
+	
+	@Override
+	public AbstractHsmsLogObserverFacade hsmsLogObserver() {
+		return this.logObserver;
+	}
+	
+	
+	public void notifyTrySendHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
+		this.msgPassThroughObserver.putToTrySendHsmsMessage(message);
+		this.logObserver.offerTrySendHsmsMessagePassThrough(message);
+	}
+	
+	public void notifySendedHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
+		this.msgPassThroughObserver.putToSendedHsmsMessage(message);
+		this.logObserver.offerSendedHsmsMessagePassThrough(message);
+	}
+	
+	public void notifyReceiveHsmsMessagePassThrough(HsmsMessage message) throws InterruptedException {
+		this.msgPassThroughObserver.putToReceiveHsmsMessage(message);
+		this.logObserver.offerReceiveHsmsMessagePassThrough(message);
+	}
+	
+	public boolean offerThrowableToLog(Throwable t) {
+		return this.logObserver.offerThrowable(t);
+	}
+	
 	
 }

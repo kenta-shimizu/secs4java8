@@ -9,6 +9,7 @@ import java.net.SocketAddress;
 
 import com.shimizukenta.secs.SecsCommunicator;
 import com.shimizukenta.secs.SecsException;
+import com.shimizukenta.secs.SecsLog;
 import com.shimizukenta.secs.SecsLogListener;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessageReceiveBiListener;
@@ -269,13 +270,13 @@ public class ProtocolConverter implements Closeable {
 		return HsmsMessage.of(header);
 	}
 	
-	public boolean addSecsLogListener(SecsLogListener l) {
+	public boolean addSecsLogListener(SecsLogListener<? super SecsLog> l) {
 		boolean a = this.secs1Comm.addSecsLogListener(l);
 		boolean b = this.hsmsSsComm.addSecsLogListener(l);
 		return a && b;
 	}
 	
-	public boolean removeSecsLogListener(SecsLogListener l) {
+	public boolean removeSecsLogListener(SecsLogListener<? super SecsLog> l) {
 		boolean a = this.secs1Comm.removeSecsLogListener(l);
 		boolean b = this.hsmsSsComm.removeSecsLogListener(l);
 		return a || b;

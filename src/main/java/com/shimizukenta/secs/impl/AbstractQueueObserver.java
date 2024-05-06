@@ -58,7 +58,11 @@ public abstract class AbstractQueueObserver<L extends EventListener, V> {
 	}
 	
 	public void put(V value) throws InterruptedException {
-		queue.put(value);
+		this.queue.put(value);
+	}
+	
+	public boolean offer(V value) {
+		return this.queue.offer(value);
 	}
 	
 }

@@ -7,13 +7,14 @@ import java.util.EventListener;
  * 
  * @author kenta-shimizu
  *
+ * @param <T> type.
  */
-public interface SecsMessagePassThroughListener extends EventListener {
+public interface SecsMessagePassThroughListener<T> extends EventListener {
 	
 	/**
 	 * Pass-through SECS-Message Listener.
 	 * 
 	 * @param message the SecsMessage
 	 */
-	public void passThrough(SecsMessage message);
+	public void passThrough(T message);
 }

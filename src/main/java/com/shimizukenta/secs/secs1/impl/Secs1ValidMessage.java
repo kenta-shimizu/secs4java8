@@ -12,6 +12,8 @@ public final class Secs1ValidMessage extends AbstractSecs1Message {
 	
 	private static final long serialVersionUID = 2549586453996223638L;
 	
+	private static final int HEADER_SIZE = 10;
+	
 	private final byte[] header10Bytes;
 	private final Secs2 body;
 	private final List<Secs1MessageBlock> blocks;
@@ -29,9 +31,11 @@ public final class Secs1ValidMessage extends AbstractSecs1Message {
 		
 		super();
 		
-		this.header10Bytes = Objects.requireNonNull(header10Bytes);
-		if (this.header10Bytes.length != 10) {
-			throw new IllegalArgumentException("header10BYtes require 10 bytes.");
+		Objects.requireNonNull(header10Bytes);
+		if (header10Bytes.length == HEADER_SIZE) {
+			this.header10Bytes = Arrays.copyOf(header10Bytes, HEADER_SIZE);
+		} else {
+			throw new IllegalArgumentException("header10Bytes require 10 bytes.");
 		}
 		
 		this.body = Objects.requireNonNull(body);

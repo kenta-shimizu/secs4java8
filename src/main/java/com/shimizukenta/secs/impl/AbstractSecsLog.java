@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.shimizukenta.secs.SecsLog;
-import com.shimizukenta.secs.SecsMessage;
 
 /**
  * 
@@ -18,6 +17,8 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 	
 	private static final long serialVersionUID = -6818838740323979681L;
 	
+	private final Object sync = new Object();
+	
 	private final String subject;
 	private final LocalDateTime timestamp;
 	private final Object value;
@@ -27,8 +28,8 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 	private String cacheToString;
 	
 	public AbstractSecsLog(CharSequence subject, LocalDateTime timestamp, Object value) {
-		this.subject = subject.toString();
-		this.timestamp = timestamp;
+		this.subject = Objects.requireNonNull(subject).toString();
+		this.timestamp = Objects.requireNonNull(timestamp);
 		this.value = value;
 		
 		this.subjectHeader = "";
@@ -36,12 +37,12 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 		this.cacheToString = null;
 	}
 	
-	public AbstractSecsLog(CharSequence subject, Object value) {
-		this(subject, LocalDateTime.now(), value);
-	}
-	
 	public AbstractSecsLog(CharSequence subject, LocalDateTime timestamp) {
 		this(subject, timestamp, null);
+	}
+	
+	public AbstractSecsLog(CharSequence subject, Object value) {
+		this(subject, LocalDateTime.now(), value);
 	}
 	
 	public AbstractSecsLog(CharSequence subject) {
@@ -64,7 +65,7 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 	}
 	
 	public void subjectHeader(CharSequence header) {
-		synchronized ( this ) {
+		synchronized (this.sync) {
 			this.subjectHeader = Objects.requireNonNull(header).toString();
 			this.cacheToString = null;
 		}
@@ -72,7 +73,7 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 	
 	@Override
 	public String subjectHeader() {
-		synchronized ( this ) {
+		synchronized (this.sync) {
 			return this.subjectHeader;
 		}
 	}
@@ -85,9 +86,9 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 	@Override
 	public String toString() {
 		
-		synchronized ( this ) {
+		synchronized (this.sync) {
 			
-			if ( this.cacheToString == null ) {
+			if (this.cacheToString == null) {
 				
 				StringBuilder sb = new StringBuilder(toTimestampString())
 						.append(SPACE)
@@ -112,10 +113,6 @@ public abstract class AbstractSecsLog implements SecsLog, Serializable {
 	@Override
 	public Optional<String> optionalValueString() {
 		return value().map(Object::toString);
-	}
-	
-	public Optional<SecsMessage> optionalSecsMessage() {
-		return Optional.empty();
 	}
 	
 }

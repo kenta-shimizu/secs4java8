@@ -77,10 +77,6 @@ public interface SecsCommunicateStateDetectable {
 	public void waitUntilNotCommunicatable(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException;
 	
 	
-	
-	
-	/* Secs-Communicatable-State-Changed-Listener */
-	
 	/**
 	 * Add Listener to get communicate-state-changed.
 	 * 
@@ -110,17 +106,17 @@ public interface SecsCommunicateStateDetectable {
 	 * Pass through quickly.<br />
 	 * </p>
 	 * 
-	 * @param listener Not accept {@code null}
+	 * @param biListener Not accept {@code null}
 	 * @return {@code true} if add success
 	 */
-	public boolean addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener listener);
+	public boolean addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener);
 	
 	/**
 	 * Remove Listener.
 	 * 
-	 * @param listener Not accept {@code null}
+	 * @param biListener Not accept {@code null}
 	 * @return {@code true} if remove success
 	 */
-	public boolean removeSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener listener);
+	public boolean removeSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener);
 	
 }

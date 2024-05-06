@@ -10,16 +10,15 @@ import com.shimizukenta.secs.SecsException;
 import com.shimizukenta.secs.SecsLogListener;
 import com.shimizukenta.secs.SecsMessage;
 import com.shimizukenta.secs.SecsMessageReceiveBiListener;
-import com.shimizukenta.secs.SecsMessageReceiveListener;
 import com.shimizukenta.secs.SecsSendMessageException;
 import com.shimizukenta.secs.SecsWaitReplyMessageException;
+import com.shimizukenta.secs.hsms.HsmsCommunicateStateChangeBiListener;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsms.HsmsConnectionModeIllegalStateException;
-import com.shimizukenta.secs.hsms.HsmsMessagePassThroughListener;
-import com.shimizukenta.secs.hsms.HsmsMessageReceiveListener;
+import com.shimizukenta.secs.hsms.HsmsLogObservable;
+import com.shimizukenta.secs.hsms.HsmsMessagePassThroughObservable;
+import com.shimizukenta.secs.hsms.HsmsMessageReceiveBiListener;
 import com.shimizukenta.secs.hsms.HsmsSession;
-import com.shimizukenta.secs.hsms.HsmsSessionCommunicateStateChangeBiListener;
-import com.shimizukenta.secs.hsms.HsmsSessionMessageReceiveBiListener;
 import com.shimizukenta.secs.hsmsgs.impl.AbstractHsmsGsActiveCommunicator;
 import com.shimizukenta.secs.hsmsgs.impl.AbstractHsmsGsPassiveCommunicator;
 import com.shimizukenta.secs.secs2.Secs2;
@@ -43,7 +42,7 @@ import com.shimizukenta.secs.sml.SmlMessage;
  * @author kenta-shimizu
  *
  */
-public interface HsmsGsCommunicator extends OpenAndCloseable {
+public interface HsmsGsCommunicator extends OpenAndCloseable, HsmsMessagePassThroughObservable, HsmsLogObservable {
 	
 	/**
 	 * create new HSMS-GS-Communicator instance.
@@ -100,11 +99,21 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	}
 	
 	/**
-	 * Returns Sessions.
+	 * Returns HsmsSessions.
 	 * 
-	 * @return sessions
+	 * @return HsmsSessions
 	 */
-	public Set<HsmsSession> getSessions();
+	@Deprecated
+	default public Set<HsmsSession> getSessions() {
+		return this.getHsmsSessions();
+	}
+	
+	/**
+	 * Returns HsmsSessions.
+	 * 
+	 * @return HsmsSessions
+	 */
+	public Set<HsmsSession> getHsmsSessions();
 	
 	/**
 	 * Return Session by Id.
@@ -113,7 +122,20 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	 * @return Session
 	 * @throws HsmsGsUnknownSessionIdException if Session-ID unknown
 	 */
-	public HsmsSession getSession(int sessionId) throws HsmsGsUnknownSessionIdException;
+	@Deprecated
+	default public HsmsSession getSession(int sessionId) throws HsmsGsUnknownSessionIdException {
+		return this.getHsmsSession(sessionId);
+	}
+	
+	
+	/**
+	 * Return HsmsSession by Id.
+	 * 
+	 * @param sessionId the Session-ID
+	 * @return HsmsSession
+	 * @throws HsmsGsUnknownSessionIdException if Session-ID unknown
+	 */
+	public HsmsSession getHsmsSession(int sessionId) throws HsmsGsUnknownSessionIdException;
 	
 	/**
 	 * Returns true if exist.
@@ -121,7 +143,120 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	 * @param sessionId the Session-ID
 	 * @return true if exist.
 	 */
-	public boolean existSession(int sessionId);
+	default public boolean existSession(int sessionId) {
+		return this.existHsmsSession(sessionId);
+	}
+	
+	/**
+	 * Returns true if exist.
+	 * 
+	 * @param sessionId the Session-ID
+	 * @return true if exist.
+	 */
+	public boolean existHsmsSession(int sessionId);
+	
+	/**
+	 * Returns Optional of HsmsSession.
+	 * 
+	 * <p>
+	 * Optional is present if exist HsmsSession, otherwise empty.<br />
+	 * </p>
+	 * 
+	 * @param sessionId the SESSION-ID
+	 * @return Optional of HsmsSession
+	 */
+	public Optional<HsmsSession> optionalHsmsSession(int sessionId);
+	
+	
+	/* Receive Primary-Data-Message */
+	
+	/**
+	 * Add Listener to receive Primary-Message.
+	 * 
+	 * <p>
+	 * This Listener not receive Reply-Message.<br />
+	 * </p>
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addSecsMessageReceiveBiListener(SecsMessageReceiveBiListener biListener);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeSecsMessageReceiveBiListener(SecsMessageReceiveBiListener biListener);
+	
+	/**
+	 * Add Listener to receive Primary-Message.
+	 * 
+	 * <p>
+	 * This Listener not receive Reply-Message.<br />
+	 * </p>
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addHsmsMessageReceiveBiListener(HsmsMessageReceiveBiListener biListener);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeHsmsMessageReceiveBiListener(HsmsMessageReceiveBiListener biListener);
+	
+	
+	/* communication */
+	
+	/**
+	 * Add Listener to get communicate-state-changed.
+	 * 
+	 * <p>
+	 * Blocking-Listener.<br />
+	 * Pass through quickly.<br />
+	 * </p>
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if add success
+	 */
+	public boolean addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener);
+	
+	/**
+	 * Remove Listener.
+	 * 
+	 * @param biListener Not accept {@code null}
+	 * @return {@code true} if remove success
+	 */
+	public boolean removeSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener);
+
+	/**
+	 * Add Listener to get communicate-state-changed.
+	 * 
+	 * <p>
+	 * Blocking-Listener.<br />
+	 * Pass through quickly.<br />
+	 * </p>
+	 * 
+	 * @param biListener the state change listener
+	 * @return {@code true} if add success
+	 * @throws NullPointerException if biListener is null
+	 */
+	public boolean addHsmsCommunicateStateChangeBiListener(HsmsCommunicateStateChangeBiListener biListener);
+	
+	/**
+	 * Remove listener.
+	 * 
+	 * @param biListener the state change listener
+	 * @return {@code true} if remove success
+	 * @throws NullPointerException if biListener is null
+	 */
+	public boolean removeHsmsCommunicateStateChangeBiListener(HsmsCommunicateStateChangeBiListener biListener);
+	
 	
 	/**
 	 * send shortcut.
@@ -136,7 +271,7 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	 * @throws SecsException if SECS communicate failed
 	 * @throws InterruptedException if interrupted
 	 */
-	public Optional<SecsMessage> send(
+	default public Optional<SecsMessage> send(
 			int sessionId,
 			int strm,
 			int func,
@@ -144,7 +279,10 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 					throws SecsSendMessageException,
 					SecsWaitReplyMessageException,
 					SecsException,
-					InterruptedException;
+					InterruptedException {
+		
+		return this.send(sessionId, strm, func, wbit, Secs2.empty());
+	}
 	
 	/**
 	 * send shortcut
@@ -184,7 +322,7 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	 * @throws SecsException if SECS communicate failed
 	 * @throws InterruptedException if interrupted
 	 */
-	public Optional<SecsMessage> send(
+	default public Optional<SecsMessage> send(
 			int sessionId,
 			SecsMessage primaryMsg,
 			int strm,
@@ -193,7 +331,10 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 					throws SecsSendMessageException,
 					SecsWaitReplyMessageException,
 					SecsException,
-					InterruptedException;
+					InterruptedException {
+		
+		return this.send(sessionId, primaryMsg, strm, func, wbit, Secs2.empty());
+	}
 	
 	/**
 	 * send shortcut.
@@ -233,13 +374,16 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	 * @throws SecsException if SECS communicate failed
 	 * @throws InterruptedException if interrupted
 	 */
-	public Optional<SecsMessage> send(
+	default public Optional<SecsMessage> send(
 			int sessionId,
 			SmlMessage sml)
 					throws SecsSendMessageException,
 					SecsWaitReplyMessageException,
 					SecsException,
-					InterruptedException;
+					InterruptedException {
+		
+		return this.send(sessionId, sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
+	}
 	
 	/**
 	 * send shortcut.
@@ -253,195 +397,16 @@ public interface HsmsGsCommunicator extends OpenAndCloseable {
 	 * @throws SecsException if SECS communicate failed
 	 * @throws InterruptedException if interrupted
 	 */
-	public Optional<? extends SecsMessage> send(
+	default public Optional<SecsMessage> send(
 			int sessionId,
 			SecsMessage primaryMsg,
 			SmlMessage sml)
 					throws SecsSendMessageException,
 					SecsWaitReplyMessageException,
 					SecsException,
-					InterruptedException;
-	
-	
-	/**
-	 * Add Listener to receive Primary-Message.
-	 * 
-	 * <p>
-	 * This Listener not receive Reply-Message.<br />
-	 * </p>
-	 * 
-	 * @param listener the Receive SECS-Message listener
-	 * @return {@code true} if add succesw
-	 * @throws NullPointerException if the listener is null
-	 */
-	public boolean addSecsMessageReceiveListener(SecsMessageReceiveListener listener);
-	
-	/**
-	 * Remove listener.
-	 * 
-	 * @param listener the Receive SECS-Message listener
-	 * @return {@code true} if remove succesw
-	 * @throws NullPointerException if the listener is null
-	 */
-	public boolean removeSecsMessageReceiveListener(SecsMessageReceiveListener listener);
-	
-	/**
-	 * Add Listener to receive Primary-Message.
-	 * 
-	 * <p>
-	 * This Listener not receive Reply-Message.<br />
-	 * </p>
-	 * 
-	 * @param biListener the Receive SECS-Message and SECS-Communicator listener
-	 * @return {@code true} if add success
-	 * @throws NullPointerException if the biListener is null
-	 */
-	public boolean addSecsMessageReceiveBiListener(SecsMessageReceiveBiListener biListener);
-	
-	/**
-	 * Remove Listener.
-	 * 
-	 * @param biListener the Receive SECS-Message and SECS-Communicator listener
-	 * @return {@code true} if remove success in
-	 * @throws NullPointerException if the biListener is null
-	 */
-	public boolean removeSecsMessageReceiveBiListener(SecsMessageReceiveBiListener biListener);
-	
-	/**
-	 * Add Listener to receive Primary-Message.
-	 * 
-	 * <p>
-	 * This Listener not receive Reply-Message.<br />
-	 * </p>
-	 * 
-	 * @param listener the Receive HSMS-Message listener
-	 * @return {@code true} if add succesw
-	 * @throws NullPointerException if the listener is null
-	 */
-	public boolean addHsmsMessageReceiveListener(HsmsMessageReceiveListener listener);
-	
-	/**
-	 * Remove listener.
-	 * 
-	 * @param listener the Receive HSMS-Message listener
-	 * @return {@code true} if remove succesw
-	 * @throws NullPointerException if the listener is null
-	 */
-	public boolean removeHsmsMessageReceiveListener(HsmsMessageReceiveListener listener);
-	
-	/**
-	 * Add Listener to receive Primary-Message.
-	 * 
-	 * <p>
-	 * This Listener not receive Reply-Message.<br />
-	 * </p>
-	 * 
-	 * @param biListener the Receive HSMS-Message and HSMS-SESSION listener
-	 * @return {@code true} if add success
-	 * @throws NullPointerException if the biListener is null
-	 */
-	public boolean addHsmsMessageReceiveBiListener(HsmsSessionMessageReceiveBiListener biListener);
-	
-	/**
-	 * Remove listener.
-	 * 
-	 * @param biListener the Receive HSMS-Message and HSMS-SESSION listener
-	 * @return {@code true} if remove success
-	 * @throws NullPointerException if the biListener is null
-	 */
-	public boolean removeHsmsMessageReceiveBiListener(HsmsSessionMessageReceiveBiListener biListener);
-	
-	
-	/**
-	 * Add Listener to get communicate-state-changed.
-	 * 
-	 * <p>
-	 * Blocking-Listener.<br />
-	 * Pass through quickly.<br />
-	 * </p>
-	 * 
-	 * @param biListener Not accept {@code null}
-	 * @return {@code true} if add success in all sessions
-	 */
-	public boolean addSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener);
-	
-	/**
-	 * Remove Listener.
-	 * 
-	 * @param biListener Not accept {@code null}
-	 * @return {@code true} if remove success in all sessions
-	 */
-	public boolean removeSecsCommunicatableStateChangeBiListener(SecsCommunicatableStateChangeBiListener biListener);
-	
-	/**
-	 * Add Listener to get HSMS communicate-state-changed.
-	 * 
-	 * <p>
-	 * Blocking-Listener.<br />
-	 * Pass through quickly.<br />
-	 * </p>
-	 * 
-	 * @param biListener Not accept {@code null}
-	 * @return {@code true} if add success in all sessions
-	 */
-	public boolean addHsmsCommunicateStateChangeBiListener(HsmsSessionCommunicateStateChangeBiListener biListener);
-	
-	/**
-	 * Remove Listener.
-	 * 
-	 * @param biListener Not accept {@code null}
-	 * @return {@code true} if remove success in all sessions
-	 */
-	public boolean removeHsmsCommunicateStateChangeBiListener(HsmsSessionCommunicateStateChangeBiListener biListener);
-	
-	
-	/**
-	 * Add Listener to log Communicating.
-	 * 
-	 * @param lstnr Not accept {@code null}
-	 * @return {@code true} if add success
-	 */
-	public boolean addSecsLogListener(SecsLogListener lstnr);
-	
-	/**
-	 * Remove Listener
-	 * 
-	 * @param lstnr Not accept {@code null}
-	 * @return {@code true} if remove success
-	 */
-	public boolean removeSecsLogListener(SecsLogListener lstnr);
-	
-	
-	/**
-	 * Add Listener to get SecsMesssage before sending.
-	 * 
-	 * @param listener Not accept {@code null}
-	 * @return {@code true} if add success.
-	 */
-	public boolean addTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);
-	
-	/**
-	 * Remove Listener.
-	 * 
-	 * @param listener Not accept {@code null}
-	 * @return {@code true} if remove success
-	 */
-	public boolean removeTrySendHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);	
-	
-	/**
-	 * Add Listener to get sended SecsMesssage.
-	 * 
-	 * @param listener Not accept {@code null}
-	 * @return {@code true} if add success
-	 */
-	public boolean addSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);
-	
-	/**
-	 * Remove Listener.
-	 * 
-	 * @param listener Not accept {@code null}
-	 * @return {@code true} if remove success
-	 */
-	public boolean removeSendedHsmsMessagePassThroughListener(HsmsMessagePassThroughListener listener);	
+					InterruptedException {
+		
+		return this.send(sessionId, primaryMsg, sml.getStream(), sml.getFunction(), sml.wbit(), sml.secs2());
+	}
 	
 }

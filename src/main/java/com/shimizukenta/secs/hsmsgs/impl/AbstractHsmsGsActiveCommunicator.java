@@ -5,16 +5,20 @@ import java.net.SocketAddress;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
+import java.util.Objects;
 
 import com.shimizukenta.secs.UnsetSocketAddressException;
-import com.shimizukenta.secs.hsms.HsmsCommunicateState;
 import com.shimizukenta.secs.hsms.HsmsConnectionMode;
 import com.shimizukenta.secs.hsmsgs.HsmsGsCommunicatorConfig;
 
 public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCommunicator {
 	
+	private final HsmsGsCommunicatorConfig config;
+	
 	public AbstractHsmsGsActiveCommunicator(HsmsGsCommunicatorConfig config) {
-		super(config);
+		super(Objects.requireNonNull(config));
+		
+		this.config = config;
 		
 		config.connectionMode().addChangeListener(mode -> {
 			if (mode != HsmsConnectionMode.ACTIVE) {
@@ -33,14 +37,11 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 		super.open();
 		
 		this.executorService().execute(() -> {
-			
 			try {
-				while ( ! this.isClosed() ) {
-					this.activeCircuit();
-					if ( this.isClosed() ) {
-						return;
-					}
-					this.config().timeout().t5().sleep();
+				this.openActive();
+				while (! this.isClosed()) {
+					this.config.timeout().t5().sleep();
+					this.openActive();
 				}
 			}
 			catch ( InterruptedException ignore ) {
@@ -48,17 +49,17 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 		});
 	}
 	
-	protected void activeCircuit() throws InterruptedException {
+	protected void openActive() throws InterruptedException {
 		
 		try (
 				AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
 				) {
 			
-			final SocketAddress socketAddr = this.config().socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
+			final SocketAddress remoteAddr = this.config.socketAddress().optional().orElseThrow(UnsetSocketAddressException::new);
 			
-			notifyLog(HsmsGsConnectionLog.tryConnect(socketAddr));
-
-			channel.connect(socketAddr, null, new CompletionHandler<Void, Void>(){
+			AbstractHsmsGsActiveCommunicator.this.hsmsLogObserver().offerHsmsChannelConnectionTryConnect(remoteAddr);
+			
+			channel.connect(remoteAddr, null, new CompletionHandler<Void, Void>(){
 				
 				@Override
 				public void completed(Void none, Void attachment) {
@@ -72,25 +73,12 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 							pLocal = channel.getLocalAddress();
 							pRemote = channel.getRemoteAddress();
 							
-							AbstractHsmsGsActiveCommunicator.this.notifyLog(HsmsGsConnectionLog.connected(pLocal, pRemote));
+							AbstractHsmsGsActiveCommunicator.this.hsmsLogObserver().offerHsmsChannelConnectionConnected(pLocal, pRemote);
 							
-							try {
-								
-								AbstractHsmsGsActiveCommunicator.this.getAbstractHsmsSessions().forEach(s -> {
-									s.notifyHsmsCommunicateState(HsmsCommunicateState.NOT_SELECTED);
-								});
-								
-								completionAction(channel);
-							}
-							finally {
-								
-								AbstractHsmsGsActiveCommunicator.this.getAbstractHsmsSessions().forEach(s -> {
-									s.notifyHsmsCommunicateState(HsmsCommunicateState.NOT_CONNECTED);
-								});
-							}
+							AbstractHsmsGsActiveCommunicator.this.completionAction(channel);
 						}
 						catch ( IOException e ) {
-							notifyLog(e);
+							AbstractHsmsGsActiveCommunicator.this.offerThrowableToLog(e);
 						}
 					}
 					catch ( InterruptedException ignore ) {
@@ -107,24 +95,15 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 							channel.notifyAll();
 						}
 						
-						try {
-							AbstractHsmsGsActiveCommunicator.this.notifyLog(HsmsGsConnectionLog.closed(pLocal, pRemote));
-						}
-						catch ( InterruptedException ignore ) {
-						}
+						AbstractHsmsGsActiveCommunicator.this.hsmsLogObserver().offerHsmsChannelConnectionConnectClosed(pLocal, pRemote);
 					}
 				}
 				
 				@Override
 				public void failed(Throwable t, Void attachment) {
 					
-					if ( ! (t instanceof ClosedChannelException) ) {
-						
-						try {
-							AbstractHsmsGsActiveCommunicator.this.notifyLog(t);
-						}
-						catch ( InterruptedException ignore ) {
-						}
+					if (! (t instanceof ClosedChannelException)) {
+						AbstractHsmsGsActiveCommunicator.this.offerThrowableToLog(t);
 					}
 					
 					synchronized ( channel ) {
@@ -138,7 +117,7 @@ public abstract class AbstractHsmsGsActiveCommunicator extends AbstractHsmsGsCom
 			}
 		}
 		catch ( IOException e ) {
-			this.notifyLog(e);
+			this.offerThrowableToLog(e);
 		}
 	}
 	
