@@ -36,7 +36,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 	
 	private final AbstractSecs1CommunicatorConfig config;
 	private final Secs1MessageBuilder msgBuilder;
-	private final AbstractSecs1Circuit circuit;
+	private final AbstractSecs1CircuitFacade circuit;
 	
 	private final AbstractSecs1MessageReceiveObserverFacade secs1MsgRecvObserver;
 	private final AbstractSecsCommunicateStateObserverFacade secsCommunicateStateObserver;
@@ -47,7 +47,7 @@ public abstract class AbstractSecs1Communicator extends AbstractSecsCommunicator
 		super(config);
 		this.config = config;
 		this.msgBuilder = new AbstractSecs1MessageBuilder() {};
-		this.circuit = new AbstractSecs1Circuit(this) {};
+		this.circuit = new AbstractSecs1CircuitFacade(this) {};
 		
 		this.secs1MsgRecvObserver = new AbstractSecs1MessageReceiveObserverFacade(this.executorService(), this) {};
 		this.secsCommunicateStateObserver = new AbstractSecsCommunicateStateObserverFacade(this) {};

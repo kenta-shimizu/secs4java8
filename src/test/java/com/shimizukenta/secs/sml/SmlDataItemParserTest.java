@@ -87,7 +87,7 @@ class SmlDataItemParserTest {
 	
 	@Test
 	@DisplayName("parse success")
-	void testParseSUccess() {
+	void testParseSuccess() {
 		
 		try {
 			

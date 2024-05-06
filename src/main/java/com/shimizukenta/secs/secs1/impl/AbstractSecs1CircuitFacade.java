@@ -31,7 +31,7 @@ import com.shimizukenta.secs.secs1.Secs1TimeoutT3Exception;
 import com.shimizukenta.secs.secs1.Secs1TimeoutT4Exception;
 import com.shimizukenta.secs.secs1.Secs1WaitReplyMessageException;
 
-public abstract class AbstractSecs1Circuit implements Runnable {
+public abstract class AbstractSecs1CircuitFacade implements Runnable {
 	
 	private static final byte ENQ = (byte)0x05;
 	private static final byte EOT = (byte)0x04;
@@ -434,7 +434,7 @@ public abstract class AbstractSecs1Circuit implements Runnable {
 	
 	private final AbstractSecs1Communicator comm;
 	
-	public AbstractSecs1Circuit(AbstractSecs1Communicator communicator) {
+	public AbstractSecs1CircuitFacade(AbstractSecs1Communicator communicator) {
 		this.comm = communicator;
 	}
 

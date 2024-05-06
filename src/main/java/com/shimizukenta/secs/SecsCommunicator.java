@@ -54,7 +54,7 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsGemAccessor, Sec
 	 * 
 	 * <p>
 	 * Blocking-method.<br />
-	 * If Already opened, do nothing.<br />
+	 * If Already opened, do not open.<br />
 	 * If Already communicatable, do nothing.<br />
 	 * </p>
 	 * 
@@ -68,7 +68,7 @@ public interface SecsCommunicator extends OpenAndCloseable, SecsGemAccessor, Sec
 	 * 
 	 * <p>
 	 * Blocking-method.<br />
-	 * If Already opened, do nothing.<br />
+	 * If Already opened, do not open.<br />
 	 * If Already communicatable, do nothing.<br />
 	 * </p>
 	 * 
