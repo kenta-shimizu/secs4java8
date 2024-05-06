@@ -1,5 +1,10 @@
 package com.shimizukenta.secs.sml.impl;
 
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,6 +82,33 @@ abstract public class AbstractSmlMessageParser implements SmlMessageParser {
 		}
 		catch ( NumberFormatException e) {
 			throw new SmlParseException("SxFy parse failed", e);
+		}
+	}
+	
+	@Override
+	public SmlMessage parse(Reader reader) throws SmlParseException, IOException {
+		try (
+				CharArrayWriter w = new CharArrayWriter();
+				) {
+			
+			for ( ;; ) {
+				int r = reader.read();
+				
+				if ( r < 0 ) {
+					return parse(w.toString());
+				}
+				
+				w.write(r);
+			}
+		}
+	}
+	
+	@Override
+	public SmlMessage parse(Path path) throws SmlParseException, IOException {
+		try (
+				Reader r = Files.newBufferedReader(path);
+				) {
+			return parse(r);
 		}
 	}
 	

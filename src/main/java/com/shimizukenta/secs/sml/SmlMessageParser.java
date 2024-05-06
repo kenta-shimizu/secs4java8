@@ -1,9 +1,7 @@
 package com.shimizukenta.secs.sml;
 
-import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.shimizukenta.secs.sml.impl.SmlMessageParsers;
@@ -38,22 +36,7 @@ public interface SmlMessageParser {
 	 * @throws SmlParseException if parse failed
 	 * @throws IOException if IO failed
 	 */
-	default public SmlMessage parse(Reader reader) throws SmlParseException, IOException {
-		try (
-				CharArrayWriter w = new CharArrayWriter();
-				) {
-			
-			for ( ;; ) {
-				int r = reader.read();
-				
-				if ( r < 0 ) {
-					return parse(w.toString());
-				}
-				
-				w.write(r);
-			}
-		}
-	}
+	public SmlMessage parse(Reader reader) throws SmlParseException, IOException;
 	
 	/**
 	 * Parse to SML-Message from File Path.
@@ -63,13 +46,7 @@ public interface SmlMessageParser {
 	 * @throws SmlParseException if parse failed
 	 * @throws IOException if IO failed
 	 */
-	default public SmlMessage parse(Path path) throws SmlParseException, IOException {
-		try (
-				Reader r = Files.newBufferedReader(path);
-				) {
-			return parse(r);
-		}
-	}
+	public SmlMessage parse(Path path) throws SmlParseException, IOException;
 	
 	/**
 	 * Parser instance getter.
